@@ -1,0 +1,79 @@
+package com.elit.outildedecision.entity;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode(exclude="project")
+public class MultiCriteriaAnalysis implements Serializable {
+    @Id
+    @GeneratedValue(
+            strategy = GenerationType.IDENTITY
+    )
+    private Long multiCriteriaAnalysisId;
+
+    @CreationTimestamp
+    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    private Timestamp createdAt;
+
+    @UpdateTimestamp
+    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    private Timestamp updatedAt;
+
+    private Integer multiCriteriaAnalysisIteration;
+
+    private Boolean isFinished;
+
+    @OneToMany(
+            mappedBy = "multiCriteriaAnalysis",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference("multiCriteria_step")
+    List<FormStep> formSteps;
+
+    @ManyToOne(
+            optional = false,
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "project_id",
+            referencedColumnName = "projectId"
+            )
+    @JsonBackReference("multiCriteria_project")
+    Project project;
+
+    @OneToOne(
+            mappedBy = "multiCriteriaAnalysis",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonBackReference("previsibility_multi")
+    private PredictibilityAnalysis predictibilityAnalysis;
+
+    @Override
+    public String toString() {
+        return "MultiCriteriaAnalysis{" +
+                "multiCriteriaAnalysisId=" + multiCriteriaAnalysisId +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", multiCriteriaAnalysisIteration=" + multiCriteriaAnalysisIteration +
+                ", isFinished=" + isFinished +
+                ", formSteps=" + formSteps +
+                '}';
+    }
+}
+

@@ -1,0 +1,64 @@
+package com.elit.outildedecision.entity;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+
+@Entity
+@Data
+@NoArgsConstructor @AllArgsConstructor
+@Builder
+public class Vote implements Serializable {
+    @Id
+    @GeneratedValue(
+            strategy = GenerationType.IDENTITY
+    )
+    private Long voteId;
+
+    @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Europe/Paris")
+    private Date createdAt;
+
+    private Integer predictibilityValue;
+
+    private String chosenPMM;
+
+    private String justification;
+
+    private Boolean isConfirmed;
+
+    @ManyToOne(
+            optional = false
+    )
+    @JoinColumn(
+            name = "predictibilityAnalysisId",
+            referencedColumnName = "predictibility_analysis_id"
+    )
+    @JsonBackReference("predictibility_analysis_vote")
+    private PredictibilityAnalysis predictibilityAnalysis;
+
+    @OneToOne
+    @JoinColumn(
+            name = "userId",
+            nullable = true
+    )
+//    @JsonManagedReference("user_vote")
+    private User user;
+
+    @Override
+    public String toString() {
+        return "predictibilityValue:" + predictibilityValue;
+    }
+
+}
