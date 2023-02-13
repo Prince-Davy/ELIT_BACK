@@ -1,0 +1,15 @@
+filebeat.inputs:
+- type: filestream
+  paths:
+  - /app/logs/*.json
+  tags: '${APP_CONTEXT}'
+
+  parsers:
+  - multiline:
+      type: pattern
+      pattern: '^{'
+      negate: true
+      match:  after
+
+output.logstash:
+  hosts: '${LOGSTASH_URL}'

@@ -1,0 +1,161 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="brebattu (generated)" id="1627673778667-1">
+        <createTable tableName="bots">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="botsPK"/>
+            </column>
+            <column name="create_on" type="datetime"/>
+            <column name="enabled" type="BIT"/>
+            <column name="update_on" type="datetime"/>
+            <column name="auto_discuss" type="BIT"/>
+            <column name="deployed_id" type="INT"/>
+            <column name="deployed_port" type="INT"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="personality" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="fakeuser_id" type="BIGINT"/>
+            <column name="forum_id" type="BIGINT"/>
+            <column name="topic_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-2">
+        <createTable tableName="fake_users">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="fake_usersPK"/>
+            </column>
+            <column name="create_on" type="datetime"/>
+            <column name="enabled" type="BIT"/>
+            <column name="update_on" type="datetime"/>
+            <column name="password" type="VARCHAR(4096)"/>
+            <column name="personality" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="valid" type="BIT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-3">
+        <createTable tableName="forum_fakeusers">
+            <column name="forum_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fakeuser_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-4">
+        <createTable tableName="forums">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="forumsPK"/>
+            </column>
+            <column name="create_on" type="datetime"/>
+            <column name="enabled" type="BIT"/>
+            <column name="update_on" type="datetime"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-5">
+        <createTable tableName="privileges">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="privilegesPK"/>
+            </column>
+            <column name="create_on" type="datetime"/>
+            <column name="enabled" type="BIT"/>
+            <column name="update_on" type="datetime"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-6">
+        <createTable tableName="roles">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="rolesPK"/>
+            </column>
+            <column name="create_on" type="datetime"/>
+            <column name="enabled" type="BIT"/>
+            <column name="update_on" type="datetime"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-7">
+        <createTable tableName="roles_privileges">
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="privilege_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-8">
+        <createTable tableName="topics">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="topicsPK"/>
+            </column>
+            <column name="create_on" type="datetime"/>
+            <column name="enabled" type="BIT"/>
+            <column name="update_on" type="datetime"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
+            <column name="forum_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-9">
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="usersPK"/>
+            </column>
+            <column name="create_on" type="datetime"/>
+            <column name="enabled" type="BIT"/>
+            <column name="update_on" type="datetime"/>
+            <column name="password" type="VARCHAR(4096)"/>
+            <column name="username" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-10">
+        <createTable tableName="users_roles">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-11">
+        <addUniqueConstraint columnNames="username" constraintName="UC_USERSUSERNAME_COL" tableName="users"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-12">
+        <addUniqueConstraint columnNames="fakeuser_id" constraintName="UK_6wpfgkkwfrks21grfm2cwlja9" tableName="forum_fakeusers"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-13">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="users_roles" constraintName="FK2o0jvgh89lemvvo17cbqvdxaa" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-14">
+        <addForeignKeyConstraint baseColumnNames="privilege_id" baseTableName="roles_privileges" constraintName="FK5duhoc7rwt8h06avv41o41cfy" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="privileges" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-15">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="roles_privileges" constraintName="FK629oqwrudgp5u7tewl07ayugj" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-16">
+        <addForeignKeyConstraint baseColumnNames="forum_id" baseTableName="forum_fakeusers" constraintName="FK7fb9rmvbha9oitoikoaw67v0d" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="forums" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-17">
+        <addForeignKeyConstraint baseColumnNames="forum_id" baseTableName="bots" constraintName="FK8r7h1vokrrd784gb96w34i3jx" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="forums" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-18">
+        <addForeignKeyConstraint baseColumnNames="fakeuser_id" baseTableName="forum_fakeusers" constraintName="FK9w51tm8d3y8ebk09sbi4y9t1k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="fake_users" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-19">
+        <addForeignKeyConstraint baseColumnNames="fakeuser_id" baseTableName="bots" constraintName="FKdeofl7jyfa2lf1uqchm04cvyn" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="fake_users" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-20">
+        <addForeignKeyConstraint baseColumnNames="topic_id" baseTableName="bots" constraintName="FKg81ka6cxo2icns8cmnbo5rcn2" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="topics" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-21">
+        <addForeignKeyConstraint baseColumnNames="forum_id" baseTableName="topics" constraintName="FKh9cpbcvpen6awkeyuxcx9026e" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="forums" validate="true"/>
+    </changeSet>
+    <changeSet author="brebattu (generated)" id="1627673778667-22">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="users_roles" constraintName="FKj6m8fwv7oqv74fcehir1a9ffy" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

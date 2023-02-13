@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "@commitlint/cli": "^16.1.0",
+    "@commitlint/config-conventional": "^16.0.0",
+    "husky": "^7.0.4",
+    "validate-branch-name": "^1.2.1"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  }
+}

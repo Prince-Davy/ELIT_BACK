@@ -1,0 +1,43 @@
+// If you want to run as a non-root user in the container, see .devcontainer/docker-compose.yml.
+{
+	"name": "elit_back",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "elit_back",
+	"workspaceFolder": "/workspaces",
+
+	// If you want to be able to deploy a network with app.dev.yml from the devcontainer,
+	// uncomment the next line and insert the absolute path of your project on your lcal machine
+	// "remoteEnv": { "LOCAL_DIRECTORY": "<absolute path here>/"},
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-azuretools.vscode-docker",
+		"vscjava.vscode-java-pack",
+		"Pivotal.vscode-spring-boot",
+		"shengchen.vscode-checkstyle",
+		"vscjava.vscode-spring-boot-dashboard",
+		"vscjava.vscode-spring-initializr",
+		"waderyan.nodejs-extension-pack",
+		"octref.vetur",
+		"redhat.java",
+		"vscjava.vscode-java-test",
+		"GabrielBB.vscode-lombok",
+	]
+
+	// Uncomment the next line if you want start specific services in your Docker Compose config.
+	// "runServices": [],
+
+	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
+	// "shutdownAction": "none",
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "docker --version",
+
+	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+	//"remoteUser": "vscode"
+}

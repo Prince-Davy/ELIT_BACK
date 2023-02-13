@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <Configuration status="WARN">
+
+    <Appenders>
+      <Console name="Console" target="SYSTEM_OUT">
+        <PatternLayout>
+          <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+        </PatternLayout>
+        <Filters>
+          <ThresholdFilter level="DEBUG"/>
+        </Filters>
+      </Console>
+      <RollingFile name="RollingDebugLogFile" fileName="logs/app-debug.json" filePattern="logs/$${date:yyyy-MM}/app-debug-%d{MM-dd-yyyy}-%i.json.gz">
+        <JsonLayout complete="false" compact="false" stacktraceAsString="true"> </JsonLayout>
+        <Policies>
+          <TimeBasedTriggeringPolicy />
+          <SizeBasedTriggeringPolicy size="20MB"/>
+        </Policies>
+        <Filters>
+          <ThresholdFilter level="DEBUG"/>
+        </Filters>
+      </RollingFile>
+    </Appenders>
+
+    <Loggers>
+      <Logger name="testLogger" level="DEBUG" additivity="false">
+          <AppenderRef ref = "Console" />
+          <AppenderRef ref="RollingDebugLogFile" />
+      </Logger>
+      <Root level="INFO">
+        <AppenderRef ref = "Console" />
+        <AppenderRef ref="RollingDebugLogFile" />
+      </Root>
+    </Loggers>
+</Configuration>

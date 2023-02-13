@@ -1,0 +1,51 @@
+trigger:
+  tags:
+    include:
+      - "*.*.*"
+  branches:
+    include:
+      - "*"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      endpoint: SogetiLabsFranceRepository
+      name: LGE_Templates/LGE_Templates
+
+
+pool: labs-pool
+
+variables:
+  - name: project_group
+    value: 'LGO_PROJET_EMOTICV2'
+  - name: project_name
+    value: 'poc_fusion_back_java'
+  - name: imageRepository
+    value: lgo-emotic/poc-fusion-back-java
+  - name: dockerRegistryServiceConnection
+    value: SogetiLabsFranceRegistry
+  - name: dockerfilePath
+    value: $(Build.SourcesDirectory)/Dockerfile
+  - name: deploymentName
+    value: 'lgo-emotic-poc-fusion-back-java'
+  - name: deploymentIntegName
+    value: 'lgo-emotic-poc-fusion-back-java-integ'
+  - name: kubernetesNamespace
+    value: 'lgo-emotic-chatbot-production'
+  - name: kubernetesIntegNamespace
+    value: 'lgo-emotic-chatbot-integration'
+  - name: kubernetesSecret
+    value: 'lgo-emotic-config'
+  - name: kubernetesIntegSecret
+    value: 'lgo-emotic-config-integ'
+  # Include template variables
+  -  template: templates-general/variables.yml@templates
+
+extends:
+  template: templates-general/azure-general-python-tpl.yml@templates
+  parameters:
+    DEPLOY_INTEG: false
+    DEPLOY_PROD: false
+    SCAN_SQ: true
+

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+     "-//Puppy Crawl//DTD Suppressions 1.0//EN"
+     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+
+<suppressions>
+  <suppress checks="MagicNumber" files="."/>
+  <suppress checks="LineLength" files="."/>
+  <suppress checks="JavadocType" files="."/> <!-- Avoid Documenting Enums, broken checkstyle -->
+  <suppress checks="JavadocVariable" files="."/> <!-- Avoid Documenting Enums, broken checkstyle for enum values -->
+  <suppress checks="MethodName" files="."/> <!-- Let the name of the free to use -->
+  <suppress checks="ParameterNumberCheck" files="."/> <!-- Limit the number of parameter in methods -->
+  <suppress checks="HiddenField" files="."/> <!-- Force to not put the same variable name in the constructor -->
+  <suppress checks="MemberNameCheck" files="."/> <!-- Force to not put _ in variable name -->
+  <suppress checks="NewlineAtEndOfFile" files="."/> <!-- Force a new line at the end of the file -> USELESS -->
+  <suppress checks="HideUtilityClassConstructor" files="."/> <!-- Force constructor to be private and fail the build -->
+</suppressions>

@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+    # Application Container
+  elit-back:
+    build: ./build
+    volumes:
+      - ./:/var/workspace
+    networks:
+      - innovation_default
+    env_file:
+      - ./.env
+
+networks:
+  innovation_default:
+    external:
+      name: innovation_default
