@@ -30,7 +30,7 @@ clean: ## Clean Up temporary files
 qbuild: ## My comment
 	docker-compose -f app.qbuild.yml down
 	docker-compose -f app.qbuild.yml build
-	docker-compose -f app.qbuild.yml up --remove-orphans --exit-code-from poc_fusion_back_java
+	docker-compose -f app.qbuild.yml up --remove-orphans
 	docker-compose -f app.qbuild.yml down
 
 trivy: ## Scan Application Docker Image

@@ -64,10 +64,5 @@ RUN mkdir -p ${MAVEN_HOME} ${MAVEN_HOME}/ref \
 RUN curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - \
     && sudo apt-get install -y nodejs
 
-# Clean up
-RUN apt-get autoremove -y \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
-
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog

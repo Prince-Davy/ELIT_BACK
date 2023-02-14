@@ -18,32 +18,32 @@ pool: labs-pool
 
 variables:
   - name: project_group
-    value: 'LGO_PROJET_EMOTICV2'
+    value: 'ELIT'
   - name: project_name
-    value: 'poc_fusion_back_java'
+    value: 'lge_elit_back'
   - name: imageRepository
-    value: lgo-emotic/poc-fusion-back-java
+    value: lge-elit/lge-elit-back     
   - name: dockerRegistryServiceConnection
     value: SogetiLabsFranceRegistry
   - name: dockerfilePath
     value: $(Build.SourcesDirectory)/Dockerfile
   - name: deploymentName
-    value: 'lgo-emotic-poc-fusion-back-java'
+    value: 'elit-back'
   - name: deploymentIntegName
-    value: 'lgo-emotic-poc-fusion-back-java-integ'
+    value: 'elit-back-integ'          
   - name: kubernetesNamespace
-    value: 'lgo-emotic-chatbot-production'
+    value: 'lge-elit'     
   - name: kubernetesIntegNamespace
-    value: 'lgo-emotic-chatbot-integration'
+    value: 'lge-elit-production'      
   - name: kubernetesSecret
-    value: 'lgo-emotic-config'
+    value: 'lge-elit-config'          
   - name: kubernetesIntegSecret
-    value: 'lgo-emotic-config-integ'
+    value: 'lge-elit-config-integ'   
   # Include template variables
   -  template: templates-general/variables.yml@templates
 
 extends:
-  template: templates-general/azure-general-python-tpl.yml@templates
+  template: templates-general/azure-general-java-tpl.yml@templates
   parameters:
     DEPLOY_INTEG: false
     DEPLOY_PROD: false
