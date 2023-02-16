@@ -2,11 +2,12 @@
 
 # Be aware to put site at the end of the command, exitcode bug.
 
-## Final comand to execute 
-# mvn -ntp checkstyle:check pmd:check clean verify site -Dmaven.test.skip=true  ## Warning : the -Dmaven.test.skip=true must be remove once we have tests
+## Final command to execute 
+# mvn -ntp checkstyle:check pmd:check clean verify site
 
-## Simplified comand for first tests
-mvn site # -Dmaven.test.skip=true
+# simplified temporary command, no checkstyle
+mvn -ntp clean verify site
+
 export exitcode=$?
 
 #check mvn result and exitcode=1 if failed
