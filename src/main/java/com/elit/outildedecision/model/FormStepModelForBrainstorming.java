@@ -16,11 +16,11 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class FormStepModelForBrainstorming {
-    private Long stepId = null;
+    private Long stepId;
     private String stepName;
     private Long stepRef;
     private Float eScore;
-    private Long multiCriteriaAnalysisId = null;
+    private Long multiCriteriaAnalysisId;
     private List<FormQuestionModel> formQuestions;
     /*@Override
     public String toString() {
@@ -33,4 +33,3 @@ public class FormStepModelForBrainstorming {
                 '}';
     }*/
 }
-

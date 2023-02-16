@@ -15,7 +15,8 @@ import javax.persistence.*;
 @Entity
 @Data
 @Builder
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties("id")
 public class ProjectUserPermission {
     @EmbeddedId

@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class PredictibilityAnaliseNotFoundException extends Exception{
+public class PredictibilityAnaliseNotFoundException extends Exception {
     public PredictibilityAnaliseNotFoundException() {
     }
 

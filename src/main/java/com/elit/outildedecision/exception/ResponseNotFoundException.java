@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class ResponseNotFoundException extends Exception{
+public class ResponseNotFoundException extends Exception {
 
 
     public ResponseNotFoundException() {

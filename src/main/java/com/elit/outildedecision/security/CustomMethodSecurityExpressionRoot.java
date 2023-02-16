@@ -20,7 +20,8 @@ public class CustomMethodSecurityExpressionRoot
     public CustomMethodSecurityExpressionRoot(Authentication authentication) {
         super(authentication);
     }
-    public boolean isProjectOwner(Long projectId){
+
+    public boolean isProjectOwner(Long projectId) {
         List<String> permissions = new ArrayList<>();
         try {
             User user = userService.findByEmail((String) this.getPrincipal());
@@ -35,7 +36,8 @@ public class CustomMethodSecurityExpressionRoot
         }
         return permissions.contains(ProjectPermession.CDP.name());
     }
-    public boolean isContributer(Long projectId){
+
+    public boolean isContributer(Long projectId) {
         List<String> permissions = new ArrayList<>();
         try {
             User user = userService.findByEmail((String) this.getPrincipal());
@@ -79,9 +81,11 @@ public class CustomMethodSecurityExpressionRoot
     public Object getThis() {
         return target;
     }
+
     public void setThis(Object target) {
         this.target = target;
     }
+
     public void setUserService(UserService userService) {
         this.userService = userService;
     }

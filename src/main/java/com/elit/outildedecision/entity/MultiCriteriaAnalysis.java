@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude="project")
+@EqualsAndHashCode(exclude = "project")
 public class MultiCriteriaAnalysis implements Serializable {
     @Id
     @GeneratedValue(
@@ -26,11 +26,11 @@ public class MultiCriteriaAnalysis implements Serializable {
     private Long multiCriteriaAnalysisId;
 
     @CreationTimestamp
-    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
     private Timestamp createdAt;
 
     @UpdateTimestamp
-    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
     private Timestamp updatedAt;
 
     private Integer multiCriteriaAnalysisIteration;
@@ -52,7 +52,7 @@ public class MultiCriteriaAnalysis implements Serializable {
     @JoinColumn(
             name = "project_id",
             referencedColumnName = "projectId"
-            )
+    )
     @JsonBackReference("multiCriteria_project")
     Project project;
 
@@ -66,14 +66,13 @@ public class MultiCriteriaAnalysis implements Serializable {
 
     @Override
     public String toString() {
-        return "MultiCriteriaAnalysis{" +
-                "multiCriteriaAnalysisId=" + multiCriteriaAnalysisId +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", multiCriteriaAnalysisIteration=" + multiCriteriaAnalysisIteration +
-                ", isFinished=" + isFinished +
-                ", formSteps=" + formSteps +
-                '}';
+        return "MultiCriteriaAnalysis{"
+                + "multiCriteriaAnalysisId=" + multiCriteriaAnalysisId
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + ", multiCriteriaAnalysisIteration=" + multiCriteriaAnalysisIteration
+                + ", isFinished=" + isFinished
+                + ", formSteps=" + formSteps
+                + '}';
     }
 }
-

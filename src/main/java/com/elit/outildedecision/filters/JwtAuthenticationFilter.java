@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private static final long EXPIRATION_TIME = 5*60*1000;
+    private static final long EXPIRATION_TIME = 5 * 60 * 1000;
     private final AuthenticationManager authenticationManager;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             return authenticationManager.authenticate(authenticationToken);
         } catch (IOException e) {
-            throw new AuthenticationServiceException(e.getMessage(),e);
+            throw new AuthenticationServiceException(e.getMessage(), e);
         }
     }
 
@@ -54,14 +54,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withSubject(user.getUsername()) // the (email) of the authenticated user
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // the token will expire in 5min
                 .withIssuer(request.getRequestURL().toString()) // the issuer of the token is the URL of the server
-                .withClaim("roles",user.getAuthorities().stream().map(ga->ga.getAuthority()).collect(Collectors.toList())) // the roles of the authenticated user
-                .withClaim("firstname",user.getUserFirstName()) // the first name of the authenticated user
-                .withClaim("lastname",user.getUserLastName()) // the last name of the authenticated user
-                .withClaim("id",user.getUser().getUserId()) // the user id of the authenticated user
+                .withClaim("roles", user.getAuthorities().stream().map(ga -> ga.getAuthority()).collect(Collectors.toList())) // the roles of the authenticated user
+                .withClaim("firstname", user.getUserFirstName()) // the first name of the authenticated user
+                .withClaim("lastname", user.getUserLastName()) // the last name of the authenticated user
+                .withClaim("id", user.getUser().getUserId()) // the user id of the authenticated user
                 .sign(algorithm); // sign the token using our secret
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername()) // the username of the authenticated user
-                .withExpiresAt(new Date(System.currentTimeMillis() + 8640*EXPIRATION_TIME)) // the token will expire in 30 days
+                .withExpiresAt(new Date(System.currentTimeMillis() + 8640 * EXPIRATION_TIME)) // the token will expire in 30 days
                 .withIssuer(request.getRequestURL().toString()) // the issuer of the token is the URL of the server
                 .sign(algorithm); // sign the token using our secret
         Map<String, String> tokens = new HashMap<>();
@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         errors.put("access-token", "access_token");
         errors.put("refresh-token", "refresh_token");
 //        response.addHeader("Access-Control-Allow-Origin", "*"); // this one allows to escape the CORS problem
-        response.sendError(1,"error");
+        response.sendError(1, "error");
         new ObjectMapper().writeValue(response.getOutputStream(), errors); // send the tok
     }
 

@@ -10,7 +10,8 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class PredictibilityAnalyseResponseModel implements Serializable {
     private Long predictibilityAnalysisId;
     private Boolean isFinished;

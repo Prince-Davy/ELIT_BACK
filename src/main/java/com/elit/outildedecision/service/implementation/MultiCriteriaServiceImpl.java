@@ -45,7 +45,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
     private String UPLOAD_DIR;
 
     @Value("${max-allowed-evaluation}")
-    private static final int MAX_ALLOWED_EVALUATION_VALUE=5;
+    private static final int MAX_ALLOWED_EVALUATION_VALUE = 5;
     private final ProjectRepository projectRepository;
 
     public MultiCriteriaServiceImpl(MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository, FormStepRepo formStepRepo, FormQuestionRepository formQuestionRepository, CriteriaRepository criteriaRepository, StepWeightRepo stepWeightRepo, ReportRepository reportRepository, UserRepository userRepository, ProjectUserPermissionRepository projectUserPermissionRepository, ProjectRepository projectRepository) {
@@ -71,9 +71,9 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
         }
         MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
         multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(
-                (Objects.nonNull(existingMultiCriteriaAnalysis)) ?
-                        existingMultiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1 :
-                        1);
+                (Objects.nonNull(existingMultiCriteriaAnalysis))
+                        ? existingMultiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1
+                        : 1);
         multiCriteriaAnalysis.setIsFinished(false);
         multiCriteriaAnalysis.setProject(project);
         MultiCriteriaAnalysis persistedAnalysis = multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
@@ -96,7 +96,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
             List<Float> initialWeights = (criterias.size() == 2) ? List.of(0.5f, 0.5f) : List.of(0.5f, 0.25f, 0.25f);
 
             for (int i = 0; i < criterias.size(); i++) {
-                JSONObject criteriaData = ((JSONObject) criterias.get(i));
+                JSONObject criteriaData = (JSONObject) criterias.get(i);
                 stepWeightRepo.save(
                         StepWeight.builder()
                                 .criteriaName(criteriaData.get("name").toString())
@@ -114,7 +114,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
                         .build());
 
                 for (int i = 0; i < criterias.size(); i++) {
-                    JSONObject criteriaData = ((JSONObject) criterias.get(i));
+                    JSONObject criteriaData = (JSONObject) criterias.get(i);
                     criteriaRepository.save(
                             Criteria.builder()
                                     .criteriaName(criteriaData.get("name").toString())
@@ -141,7 +141,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
         } else {
 
             MultiCriteriaAnalysis lastMultiCriteriaAnalysis = multiCriteriaAnalysisList.get(0);
-            MulticriteriaAnalyseResponseModel result = new MulticriteriaAnalyseResponseModel(lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisId(), lastMultiCriteriaAnalysis.getCreatedAt(), lastMultiCriteriaAnalysis.getUpdatedAt(), lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisIteration(), lastMultiCriteriaAnalysis.getIsFinished(), lastMultiCriteriaAnalysis.getFormSteps(),null);
+            MulticriteriaAnalyseResponseModel result = new MulticriteriaAnalyseResponseModel(lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisId(), lastMultiCriteriaAnalysis.getCreatedAt(), lastMultiCriteriaAnalysis.getUpdatedAt(), lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisIteration(), lastMultiCriteriaAnalysis.getIsFinished(), lastMultiCriteriaAnalysis.getFormSteps(), null);
 
             return ResponseEntity.ok()
                     .body(result);
@@ -197,7 +197,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
         FormQuestion formQuestion = formQuestionRepository.findById(formQuestionModel.getQuestionId()).orElseThrow(() -> new MulticriteriaNotFoundException("Ce fichier n'existe pas !"));
         formQuestion.setAnswerText(formQuestionModel.getAnswerText());
         formQuestionRepository.save(formQuestion);
-        for (CriteriaModel criteriaModel: formQuestionModel.getCriterias()){
+        for (CriteriaModel criteriaModel : formQuestionModel.getCriterias()) {
             Criteria criteria = criteriaRepository.getById(criteriaModel.getCriteriaId());
             criteria.setCriteriaValue(criteriaModel.getCriteriaValue());
             criteriaRepository.save(criteria);
@@ -221,12 +221,12 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
                 .body(multiCriteriaAnalysisScore);
     }
 
-    private boolean checkPermissions(Long projectId,String permissionName) {
+    private boolean checkPermissions(Long projectId, String permissionName) {
         String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByUserEmail(userEmail);
 
         ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
-        return (Objects.nonNull(projectUserPermission) && permissionName.equals(projectUserPermission.getPermission()));
+        return Objects.nonNull(projectUserPermission) && permissionName.equals(projectUserPermission.getPermission());
     }
 
     @Override
@@ -237,8 +237,9 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
         if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
             multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
             multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
-        } else
+        } else {
             throw new UserNotAuthorizedException("Vous n'êtes pas autorisé à changer l'itération de cette analyse multicritères.");
+        }
 
         return ResponseEntity
                 .ok()
@@ -257,11 +258,11 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
             formStep.setEScore(eScore);
             formStepRepo.save(formStep);
             List<MultiCriteriaStepScoreModel> stepscores = multiCriteriaAnalysisScore.getMultiCriteriaStepScores();
-            if (Objects.isNull(stepscores)){
+            if (Objects.isNull(stepscores)) {
                 List<MultiCriteriaStepScoreModel> stepscore = new ArrayList<>();
                 stepscore.add(multiCriteriaStepScore);
                 multiCriteriaAnalysisScore.setMultiCriteriaStepScores(stepscore);
-            } else{
+            } else {
                 stepscores.add(multiCriteriaStepScore);
                 multiCriteriaAnalysisScore.setMultiCriteriaStepScores(stepscores);
             }
@@ -272,46 +273,48 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
     private float calculateMultiCriteriaStepEscore(FormStep formStep) throws QuestionsNotFoundException, EscoreException {
         Set<Criteria>  criterias = formStep.getFormQuestions().stream()
                 .findFirst()
-                .orElseThrow(()->new QuestionsNotFoundException("Erreur lors de la récupération des questions"))
+                .orElseThrow(() -> new QuestionsNotFoundException("Erreur lors de la récupération des questions"))
                 .getCriterias();
         float multiCriteriaStepEscoreNumenator = 0;
         float multiCriteriaStepEscoreDenominator = 0;
-        for (Criteria criteria:criterias){
+        for (Criteria criteria :criterias) {
             float criteriaValueSum = this.iterateOverQuestionAndCalculateCriteriaSum(criteria, formStep);
             float criteriaValueAMax = this.iterateOverQuestionAndCalculateAMax(criteria, formStep);
             StepWeight stepWeight = stepWeightRepo.findByStepIdAndCriteriaName(formStep.getStepId(), criteria.getCriteriaName());
             multiCriteriaStepEscoreNumenator += stepWeight.getWeightValue() * criteriaValueSum;
             multiCriteriaStepEscoreDenominator += stepWeight.getWeightValue() * criteriaValueAMax;
         }
-        if (multiCriteriaStepEscoreDenominator == 0) throw new EscoreException("Le dénominateur du e-score ne peux être 0");
-        return multiCriteriaStepEscoreNumenator/multiCriteriaStepEscoreDenominator;
+        if (multiCriteriaStepEscoreDenominator == 0) {
+            throw new EscoreException("Le dénominateur du e-score ne peux être 0");
+        }
+        return multiCriteriaStepEscoreNumenator / multiCriteriaStepEscoreDenominator;
     }
 
     private float iterateOverQuestionAndCalculateCriteriaSum(Criteria criteria, FormStep formStep) {
         List<Criteria> criteriaList = criteriaRepository.getCriteriaByStepIdAndCriteriaName(formStep.getStepId(), criteria.getCriteriaName());
         int criteriaSum = 0;
-        for (Criteria cr : criteriaList){
+        for (Criteria cr : criteriaList) {
             criteriaSum += cr.getCriteriaValue();
         }
         return (float) criteriaSum;
     }
 
-    private float iterateOverQuestionAndCalculateAMax(Criteria criteria, FormStep formStep){
+    private float iterateOverQuestionAndCalculateAMax(Criteria criteria, FormStep formStep) {
         List<Criteria> criteriaList = criteriaRepository.getCriteriaByStepIdAndCriteriaName(formStep.getStepId(), criteria.getCriteriaName());
-        return (float) MAX_ALLOWED_EVALUATION_VALUE*criteriaList.size();
+        return (float) MAX_ALLOWED_EVALUATION_VALUE * criteriaList.size();
     }
 
     private List<CriteriaScoreModel> calculteCriteriaScore(FormStep formStep) throws QuestionsNotFoundException {
         Set<Criteria>  criterias = formStep.getFormQuestions().stream()
                 .findFirst()
-                .orElseThrow(()->new QuestionsNotFoundException("Erreur lors de la récupération des questions"))
+                .orElseThrow(() -> new QuestionsNotFoundException("Erreur lors de la récupération des questions"))
                 .getCriterias();
         int questionSize = formStep.getFormQuestions().size();
         List<CriteriaScoreModel> criteriaScoreModels = new ArrayList<>();
-        for (Criteria criteria:criterias){
+        for (Criteria criteria :criterias) {
             CriteriaScoreModel criteriaScoreModel = new CriteriaScoreModel();
             criteriaScoreModel.setCriteriaName(criteria.getCriteriaName());
-            float criteriaScore = iterateOverQuestionAndCalculateCriteriaSum(criteria, formStep)/questionSize;
+            float criteriaScore = iterateOverQuestionAndCalculateCriteriaSum(criteria, formStep) / questionSize;
             criteriaScoreModel.setCriteriaScore(criteriaScore);
             criteriaScoreModels.add(criteriaScoreModel);
         }
@@ -320,4 +323,3 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
 
 }
-

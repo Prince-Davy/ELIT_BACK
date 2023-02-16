@@ -23,6 +23,7 @@ public interface ProjectService {
     Project getProjectById(Long projectId) throws ProjectNotFoundException;
 
     List<Project> getUserProjects(String keyword);
+
     List<ProjectResponseModel> getUserProjectList(String keyword);
 
     ResponseEntity<String> validateOrRejectProject(Long id, HttpEntity<String> isConfirmed) throws ProjectNotFoundException, IOException;

@@ -17,7 +17,7 @@ public class CriteriaModel implements Serializable {
 
     private int criteriaValue;
 
-   // private float score;
+    // private float score;
 
     private Long questionId;
 }

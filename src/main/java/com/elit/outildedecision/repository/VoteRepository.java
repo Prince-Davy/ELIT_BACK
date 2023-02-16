@@ -15,6 +15,6 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     List<Vote> findAllByPredictibilityAnalysisId(Long predictibilityAnalysisId);
 
     @Query("SELECT v FROM Vote v WHERE v.predictibilityAnalysis.predictibilityAnalysisId=?1 and v.user.userId = ?2")
-    Vote findByPredictibilityAnalysisAndUserId(Long predictibilityAnalysis,Long userId);
+    Vote findByPredictibilityAnalysisAndUserId(Long predictibilityAnalysis, Long userId);
 
 }

@@ -29,7 +29,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findAllByConfirmationStateOrderByCreatedAtAsc(String name, Pageable of);
 
-   @Query("select p from Project p where p.name like CONCAT('%',?1,'%')")
+    @Query("select p from Project p where p.name like CONCAT('%',?1,'%')")
     Page<Project> findByNameOrDescriptionContainingIgnoreCase(String keyword, Pageable pageable);
 
 }

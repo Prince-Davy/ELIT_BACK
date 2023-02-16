@@ -2,7 +2,7 @@ package com.elit.outildedecision.exception;
 
 
 
-public class FormAlreadyExistsException extends Exception{
+public class FormAlreadyExistsException extends Exception {
     public FormAlreadyExistsException() {
         super();
     }

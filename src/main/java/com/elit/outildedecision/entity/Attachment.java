@@ -35,11 +35,11 @@ public class Attachment {
     private Project project;
 
     @JsonBackReference("project_attachment")
-    public Project getProject(){
+    public Project getProject() {
         return this.project;
     }
 
-    public void deleteAttachment(){
+    public void deleteAttachment() {
         this.setProject(null);
     }
 }

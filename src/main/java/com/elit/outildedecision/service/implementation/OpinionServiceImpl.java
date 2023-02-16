@@ -31,7 +31,9 @@ public class OpinionServiceImpl implements OpinionService {
         User user = userRepository.findByUserEmail(userEmail);
 
         Opinion opinionFromDB = opinionRepository.findByUserId(user.getUserId());
-        if (Objects.nonNull(opinionFromDB)) throw new OpinionAlreadyExistException("Cet utilisateur à déjà renseigné un avis.");
+        if (Objects.nonNull(opinionFromDB)) {
+            throw new OpinionAlreadyExistException("Cet utilisateur à déjà renseigné un avis.");
+        }
         Opinion opinion = new Opinion();
         opinion.setDescription(opinionModel.getDescription());
         opinion.setRating(opinionModel.getRating());

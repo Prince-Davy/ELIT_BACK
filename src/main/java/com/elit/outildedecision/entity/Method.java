@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity@Builder
+@Entity
+@Builder
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Method {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +37,7 @@ public class Method {
             fetch = FetchType.LAZY
     )
     @JoinColumn(
-            name ="methodology_id",
+            name = "methodology_id",
             referencedColumnName = "methodologyId"
     )
     @JsonBackReference("methodology_predictibility")
@@ -43,13 +45,13 @@ public class Method {
 
     @Override
     public String toString() {
-        return "Method{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", disadvantages='" + disadvantages + '\'' +
-                ", advantages='" + advantages + '\'' +
-                '}';
+        return "Method{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", disadvantages='" + disadvantages + '\''
+                + ", advantages='" + advantages + '\''
+                + '}';
     }
 
     /* @OneToMany(

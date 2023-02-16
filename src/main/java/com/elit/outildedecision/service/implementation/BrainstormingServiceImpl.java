@@ -53,8 +53,9 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         //TODO  : CHECK ONLY ONE QUESTION BY USER
         Brainstorming savedBrainstorming = brainstormingRepository.findByUserQuestionPredictibilityId(user.getUserId(), brainstormingModel.getQuestionId(), predictibilityAnalysis.getPredictibilityAnalysisId());
 
-        if (!Objects.isNull(savedBrainstorming))
+        if (!Objects.isNull(savedBrainstorming)) {
             throw new ExistingBrainstormingException("Cet utilisateur à déjà soumis un commentaire.");
+        }
 
         Brainstorming brainstorming = new Brainstorming();
         brainstorming.setPredictibilityAnalysis(predictibilityAnalysis);
@@ -165,6 +166,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
                 .body(result);
 
     }
+
     @Override
     public ResponseEntity<Object> getBrainstormingAbstract(Long predictibilityAnalysisId) throws Exception {
 
@@ -172,7 +174,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
                 orElseThrow(() -> new PredictibilityAnaliseNotFoundException("Ce analysis n'existe pas"));
 
         //Get the list of the FormStep with brainstorming
-        List<FormStep> formStepList = predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps().stream().filter(formStep -> formStep.getFormQuestions().stream().filter(formQuestion -> formQuestion.getBrainstormings().size()>0).count()>0).collect(Collectors.toList());
+        List<FormStep> formStepList = predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps().stream().filter(formStep -> formStep.getFormQuestions().stream().filter(formQuestion -> formQuestion.getBrainstormings().size() > 0).count() > 0).collect(Collectors.toList());
         System.out.println("ABSTRACT formStepList" + formStepList.size());
 
         Long projectId = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId();

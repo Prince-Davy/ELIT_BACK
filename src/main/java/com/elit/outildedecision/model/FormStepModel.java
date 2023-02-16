@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class FormStepModel {
-    private Long stepId = null;
+    private Long stepId;
     private String stepName;
     private Long stepRef;
     private Float eScore;
-    private Long multiCriteriaAnalysisId = null;
+    private Long multiCriteriaAnalysisId;
     /*@Override
     public String toString() {
         return "FormStep{" +
@@ -26,4 +26,3 @@ public class FormStepModel {
                 '}';
     }*/
 }
-

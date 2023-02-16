@@ -60,7 +60,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
         MultiCriteriaAnalysis lastMultiCriteriaAnalysis = multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(project.getProjectId());
         PredictibilityAnalysis lastPredictibilityAnalysis = predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisId());
-        
+
         /*if (!lastPredictibilityAnalysis.getIsFinished()) return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(-1L);*/
 
@@ -70,8 +70,9 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
         if (lastExecutionPlan != null) {
             //"Une Analyse de prévisibilité est déjà en cours"
-            if (!lastExecutionPlan.getIsFinished())
+            if (!lastExecutionPlan.getIsFinished()) {
                 return ResponseEntity.ok().body(lastExecutionPlan.getExecutionPlanId());
+            }
             nextIteration = lastExecutionPlan.getExecutionIteration() + 1;
         }
 
@@ -142,12 +143,14 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
         Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
         System.out.println("project = " + project);
         ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(project.getProjectId(), user.getUserId());
-        
+
         Methodology methodology = predictibilityAnalysis.getMethodology();
         List<Method> methodList;
-        if (methodology.getName().equals("Hybride"))
+        if (methodology.getName().equals("Hybride")) {
             methodList = methodRepository.findAllMethods();
-        else methodList = methodology.getMethods();
+        } else {
+            methodList = methodology.getMethods();
+        }
 
         List<ExecutionVoteResponseModel> result = new ArrayList<>();
         for (Method method : methodList) {
@@ -160,16 +163,16 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
             model.setMethodDescription(method.getDescription());
             List<ExecutionPlanVote> votesModelList =
                     projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
-                    ? executionPlanVoteRepo.findAllVotesByMethodIdAndExecutionPlanId(method.getId(), executionPlanId)
-                    : executionPlanVoteRepo.findVoteByMethodIdUserIdAndExecutionPlanId(method.getId(), user.getUserId(), executionPlanId);
+                            ? executionPlanVoteRepo.findAllVotesByMethodIdAndExecutionPlanId(method.getId(), executionPlanId)
+                            : executionPlanVoteRepo.findVoteByMethodIdUserIdAndExecutionPlanId(method.getId(), user.getUserId(), executionPlanId);
             List<ExecutionVoteModel> votesList = new ArrayList<>();
             for (ExecutionPlanVote vote : votesModelList) {
                 ExecutionVoteModel voteModel = new ExecutionVoteModel();
                 voteModel.setId(vote.getId());
                 voteModel.setUserId(
                         projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
-                        ? vote.getUser().getUserId()
-                        : null
+                                ? vote.getUser().getUserId()
+                                : null
                 );
                 votesList.add(voteModel);
             }
@@ -196,14 +199,16 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
         if (projectUserPermission.getPermission().equals(ProjectPermession.CDP.name()) || projectUserPermission.getPermission().equals(ProjectPermession.CONTRIBUTER.toString())) {
             ExecutionPlanVote executionPlanVoteFromDB = executionPlanVoteRepo.findVoteByUserIdAndExecutionPlanId(user.getUserId(), executionVoteRequestModel.getExecutionPlanId());
-            if (Objects.nonNull(executionPlanVoteFromDB)) throw new RuntimeException("Cet utilisateur a déjà soumis un vote sur ce plan d'exécution.");
+            if (Objects.nonNull(executionPlanVoteFromDB)) {
+                throw new RuntimeException("Cet utilisateur a déjà soumis un vote sur ce plan d'exécution.");
+            }
             ExecutionPlanVote executionPlanVote = new ExecutionPlanVote();
             executionPlanVote.setUser(user);
             executionPlanVote.setMethod(methodRepository.getById(executionVoteRequestModel.getMethodId()));
             executionPlanVote.setExecutionPlan(executionPlanRepository.getById(executionVoteRequestModel.getExecutionPlanId()));
             executionPlanVoteRepo.save(executionPlanVote);
 
-            if(executionVoteRequestModel.getMethodId2ForHybrid() != null){
+            if (executionVoteRequestModel.getMethodId2ForHybrid() != null) {
                 ExecutionPlanVote executionPlanVote2 = new ExecutionPlanVote();
                 executionPlanVote2.setUser(user);
                 executionPlanVote2.setMethod(methodRepository.getById(executionVoteRequestModel.getMethodId2ForHybrid()));
@@ -227,14 +232,18 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
         Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
         ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(project.getProjectId(), user.getUserId());
 
-        if(Objects.isNull(projectUserPermission)) throw new RuntimeException("L'utilisateur ne fait pas parti du projet.");
+        if (Objects.isNull(projectUserPermission)) {
+            throw new RuntimeException("L'utilisateur ne fait pas parti du projet.");
+        }
 
         List<ExecutionPlanVote> votesList = executionPlanVoteRepo.findAllVotesByExecutionPlanId(executionPlanId);
 
         List<Method> allMethods;
-        if (predictibilityAnalysis.getMethodology().getName().equals("Classique") || predictibilityAnalysis.getMethodology().getName().equals("Agile"))
+        if (predictibilityAnalysis.getMethodology().getName().equals("Classique") || predictibilityAnalysis.getMethodology().getName().equals("Agile")) {
             allMethods = methodRepository.findAllMethodsByMethodologyId(predictibilityAnalysis.getMethodology().getMethodologyId());
-        else allMethods = methodRepository.findAllMethods();
+        } else {
+            allMethods = methodRepository.findAllMethods();
+        }
         List<MethodModel> allMethodsModel = new ArrayList<>();
 
         Integer countVotes = 0;
@@ -253,12 +262,12 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
         int maxVoteValue = allMethodsModel.stream()
                 .map(MethodModel::getVotes)
-                .mapToInt(v->v)
+                .mapToInt(v -> v)
                 .max()
                 .orElseThrow(() -> new RuntimeException("Pas de valeur max trouvée pour les votes."));
-        
+
         List<String> chooseMethod = allMethodsModel.stream()
-                .filter(m->m.getVotes() == maxVoteValue)
+                .filter(m -> m.getVotes() == maxVoteValue)
                 .map(MethodModel::getName)
                 .collect(Collectors.toList());
 
@@ -270,7 +279,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
             predictibilityResultNew.setValue(predictibilityResult.getValue());
             predictibilityResults.add(predictibilityResultNew);
         }
-        
+
         ExecutionPlanScoreResponseModel result = new ExecutionPlanScoreResponseModel();
         result.setExecutionPlanId(executionPlan.getExecutionPlanId());
         result.setAllMethods(allMethodsModel);
@@ -287,23 +296,26 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
         ExecutionPlan executionPlan = executionPlanRepository.findById(executionPlanId)
                 .orElseThrow(() -> new ExecutionPlanNotFoundException("Ce plan d'exécution n'existe pas."));
         Project project = executionPlan.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject();
-        if(checkPermissions(project.getProjectId(),ProjectPermession.CDP.name())){
-            if (Boolean.FALSE.equals(executionPlan.getIsFinished())){
+        if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
+            if (Boolean.FALSE.equals(executionPlan.getIsFinished())) {
                 executionPlan.setIsFinished(true);
                 executionPlanRepository.save(executionPlan);
-            } else throw new RuntimeException("Le plan d'exécution est déjà terminé.");
-        } else
+            } else {
+                throw new RuntimeException("Le plan d'exécution est déjà terminé.");
+            }
+        } else {
             throw new UserNotAuthorizedException("Vous n'êtes pas autorisé à changer le statut de ce plan d'exécution.");
+        }
         return ResponseEntity
                 .ok()
                 .body(true);
     }
 
-    private boolean checkPermissions(Long projectId,String permissionName  ) {
+    private boolean checkPermissions(Long projectId, String permissionName  ) {
         String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByUserEmail(userEmail);
 
         ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
-        return (Objects.nonNull(projectUserPermission) && permissionName.equals(projectUserPermission.getPermission()));
+        return Objects.nonNull(projectUserPermission) && permissionName.equals(projectUserPermission.getPermission());
     }
 }

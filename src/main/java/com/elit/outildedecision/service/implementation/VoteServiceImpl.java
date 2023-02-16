@@ -39,13 +39,15 @@ public class VoteServiceImpl implements VoteService {
         User user = userRepository.findByUserEmail(userEmail);
 
         Vote voteFromDB = voteRepository.findByPredictibilityAnalysisAndUserId(voteModelRequest.getPredictibilityAnalysisId(), user.getUserId());
-        if (Objects.nonNull(voteFromDB)) throw new VoteAlreadyExistException("Cet utilisateur à déjà soumis un vote.");
+        if (Objects.nonNull(voteFromDB)) {
+            throw new VoteAlreadyExistException("Cet utilisateur à déjà soumis un vote.");
+        }
         Vote vote = new Vote();
         vote.setChosenPMM(voteModelRequest.getChosenPMM());
         vote.setJustification(voteModelRequest.getJustification());
         vote.setPredictibilityValue(voteModelRequest.getPredictibilityValue());
         PredictibilityAnalysis analysis = predictibilityAnalysisRepository.findById(voteModelRequest.getPredictibilityAnalysisId())
-                .orElseThrow(()-> new RuntimeException("Cet analyse n'existe pas"));
+                .orElseThrow(() -> new RuntimeException("Cet analyse n'existe pas"));
         vote.setPredictibilityAnalysis(analysis);
         vote.setIsConfirmed(voteModelRequest.getIsConfirmed());
         vote.setUser(user);
@@ -65,12 +67,13 @@ public class VoteServiceImpl implements VoteService {
                 .forEach(p -> permissions.add(p.getPermission()));
         return permissions;
     }
+
     @Override
     public List<VoteModelResponse> getVote(Long predictibilityAnalysisId) throws UserNotFoundException {
         String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("userEmail"+userEmail);
+        System.out.println("userEmail" + userEmail);
         User user = userRepository.findByUserEmail(userEmail);
-        System.out.println("user"+user);
+        System.out.println("user" + user);
         PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository.findById(predictibilityAnalysisId)
                 .orElseThrow(() -> new RuntimeException("Predictibility Analysis Id non trouvé."));
 

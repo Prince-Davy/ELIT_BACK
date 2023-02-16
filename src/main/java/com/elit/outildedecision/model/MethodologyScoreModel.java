@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor @Builder
+@AllArgsConstructor
+@Builder
 public class MethodologyScoreModel {
     private String name;
     private float value;

@@ -9,11 +9,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -27,14 +29,15 @@ public class PredictibilityAnalysisController {
 
     @PostMapping("/predictibility-analysis/{projectId}")
     //@PreAuthorize("isProjectOwner(#projectId)")
-    ResponseEntity<Long> createPredictibilityAnalysis(@PathVariable Long projectId){
+    ResponseEntity<Long> createPredictibilityAnalysis(@PathVariable Long projectId) {
         return predictibilityAnalysisService.createPredictibilityForm(projectId);
     }
-/*
-    @PostMapping("/predictibility-analysis2/{projectId}")
-    ResponseEntity<String> createPredictibilityAnalysis2(@PathVariable Long projectId) throws IOException, ParseException, org.json.simple.parser.ParseException{
-        return predictibilityAnalysisService.createPredictibilityForm2(projectId);
-    }*/
+
+    /*
+        @PostMapping("/predictibility-analysis2/{projectId}")
+        ResponseEntity<String> createPredictibilityAnalysis2(@PathVariable Long projectId) throws IOException, ParseException, org.json.simple.parser.ParseException{
+            return predictibilityAnalysisService.createPredictibilityForm2(projectId);
+        }*/
 
     @GetMapping("/predictibility/{analyseId}/score")
     public ResponseEntity<PredictibilityScoreModel> getPredictabilityAnalysisScore(@PathVariable Long analyseId) throws ProjectNotFoundException {
@@ -52,7 +55,7 @@ public class PredictibilityAnalysisController {
             @ApiResponse(responseCode = "403", description = " PredictibilityAnaliseNotFoundException, UserNotAuthorizedException")
     })
     @PutMapping("predictibility/iteration/{analyseId}")
-    public ResponseEntity<String> increasePredictibilityAnalyseIterationNumber(@ApiParam(value="Analyse Id.") @PathVariable Long analyseId ) throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException {
+    public ResponseEntity<String> increasePredictibilityAnalyseIterationNumber(@ApiParam(value = "Analyse Id.") @PathVariable Long analyseId) throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException {
         return predictibilityAnalysisService.increasePredictAnalysisIterationNum(analyseId);
     }
 }

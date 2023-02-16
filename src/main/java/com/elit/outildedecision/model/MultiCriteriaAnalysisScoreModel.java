@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class MultiCriteriaAnalysisScoreModel {
     List<MultiCriteriaStepScoreModel> multiCriteriaStepScores;
 }

@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class MulticriteriaAnalyseResponseModel implements Serializable {
     private Long multiCriteriaAnalysisId;
     private Timestamp createdAt;

@@ -2,32 +2,30 @@ package com.elit.outildedecision.controller;
 
 
 import com.elit.outildedecision.entity.FormStep;
-import com.elit.outildedecision.exception.FormAlreadyExistsException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.exception.*;
-
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 
+/**
+ *
+ */
 @RestController
 @RequestMapping("/api")
 public class MultiCriteriaAnalysisController {
-    private final MultiCriteriaAnalysisService multiCriteriaAnalysisService;
-
-    public MultiCriteriaAnalysisController( MultiCriteriaAnalysisService multiCriteriaAnalysisService) {
-        this.multiCriteriaAnalysisService = multiCriteriaAnalysisService;
-    }
+  private final MultiCriteriaAnalysisService multiCriteriaAnalysisService;
+  public MultiCriteriaAnalysisController(MultiCriteriaAnalysisService multiCriteriaAnalysisService){
+    this.multiCriteriaAnalysisService = multiCriteriaAnalysisService;
+  }
 
     @PostMapping("/multi-criteria-analysis/{projectId}")
     @PreAuthorize("isProjectOwner(#projectId)")
-    public ResponseEntity<String> createMultiCriteriaAnalysis(@PathVariable("projectId") Long projectId)
+  public ResponseEntity<String> createMultiCriteriaAnalysis(@PathVariable("projectId") Long projectId)
             throws FormAlreadyExistsException, IOException, ParseException, org.json.simple.parser.ParseException {
         return multiCriteriaAnalysisService.createMulticriteriaAnalysisForm(projectId);
     }
@@ -58,7 +56,6 @@ public class MultiCriteriaAnalysisController {
     public ResponseEntity getMulticriteriaAnalysisScore(@PathVariable Long projectId) throws ProjectNotFoundException, QuestionsNotFoundException, IOException, EscoreException {
         return multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId);
     }
-
 
 
 }

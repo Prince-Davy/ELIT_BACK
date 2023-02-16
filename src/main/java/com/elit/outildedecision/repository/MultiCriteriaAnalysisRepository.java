@@ -14,10 +14,10 @@ public interface MultiCriteriaAnalysisRepository extends JpaRepository<MultiCrit
     @Query("select m from MultiCriteriaAnalysis m where m.multiCriteriaAnalysisId = ?1")
     MultiCriteriaAnalysis findByAnalyseId(Long analyseId);
 
-    @Query("select m from MultiCriteriaAnalysis m " +
-            "where m.project.projectId = ?1 " +
-            "and m.multiCriteriaAnalysisId = (" +
-            "select max (mu.multiCriteriaAnalysisId) from MultiCriteriaAnalysis mu" +
-            " where mu.project.projectId=?1)")
+    @Query("select m from MultiCriteriaAnalysis m "
+            + "where m.project.projectId = ?1 "
+            + "and m.multiCriteriaAnalysisId = ("
+            + "select max (mu.multiCriteriaAnalysisId) from MultiCriteriaAnalysis mu"
+            + " where mu.project.projectId=?1)")
     MultiCriteriaAnalysis findLatestMultiCriteriaAnalysisByProjectId(Long projectId);
 }

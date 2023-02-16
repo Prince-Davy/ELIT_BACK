@@ -34,8 +34,8 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     private final JavaMailSender javaMailSender;
 
 
-    private final Long EXPIRATION_TIME_CONFIRMATION = 2*24*60*60*1000L;
-    private final Long EXPIRATION_TIME_PASSWORD_RECOVERY = 30*60*1000L;
+    private final Long EXPIRATION_TIME_CONFIRMATION = 2 * 24 * 60 * 60 * 1000L;
+    private final Long EXPIRATION_TIME_PASSWORD_RECOVERY = 30 * 60 * 1000L;
 
     public VerificationTokenServiceImpl(PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository, UserRepository userRepository, JavaMailSender javaMailSender) {
         this.passwordEncoder = passwordEncoder;
@@ -54,6 +54,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     public void removeByToken(String token) {
         verificationTokenRepository.removeByToken(token);
     }
+
     @Override
     public VerificationToken createToken(User user, String type) {
         String token = passwordEncoder.encode(user.getUsername() + user.getUserEmail());
@@ -62,7 +63,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         verificationToken.setUser(user);
         verificationToken.setType(type);
         if (Objects.equals(type, "confirm-account")) {
-             verificationToken.setExpiryDate(new Date(System.currentTimeMillis() + EXPIRATION_TIME_CONFIRMATION));
+            verificationToken.setExpiryDate(new Date(System.currentTimeMillis() + EXPIRATION_TIME_CONFIRMATION));
         } else if (Objects.equals(type, "")) {
             verificationToken.setExpiryDate(new Date(System.currentTimeMillis() + EXPIRATION_TIME_PASSWORD_RECOVERY));
         }
@@ -73,10 +74,10 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     @Override
     public ResponseEntity<String> confirmUser(String token) {
         VerificationToken verificationToken = findByToken(token);
-        if(verificationToken == null || !Objects.equals(verificationToken.getType(), "confirm-account")) {
+        if (verificationToken == null || !Objects.equals(verificationToken.getType(), "confirm-account")) {
             return ResponseEntity.badRequest().body("Invalid token");
         }
-        if(verificationToken.getExpiryDate().before(new Date())) {
+        if (verificationToken.getExpiryDate().before(new Date())) {
             removeByToken(token);
             return ResponseEntity.badRequest().body("Token expired");
         }
@@ -91,14 +92,14 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     @Override
     public ResponseEntity<String> reinstateForgotPassword(String token, PasswordChangeModel changePasswordModel) {
         VerificationToken verificationToken = findByToken(token);
-        if(verificationToken == null || !Objects.equals(verificationToken.getType(), "")) {
+        if (verificationToken == null || !Objects.equals(verificationToken.getType(), "")) {
             return ResponseEntity.badRequest().body("le lien est invalide");
         }
-        if(verificationToken.getExpiryDate().before(new Date())) {
+        if (verificationToken.getExpiryDate().before(new Date())) {
             removeByToken(token);
             return ResponseEntity.badRequest().body("le lien est expiré");
         }
-        if(!Objects.equals(changePasswordModel.getNewPassword(),
+        if (!Objects.equals(changePasswordModel.getNewPassword(),
                 changePasswordModel.getConfirmPassword())) {
             return ResponseEntity.badRequest().body("les mots de passes ne sont pas identiques");
         }
@@ -111,20 +112,22 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     public ResponseEntity<String> forgotPassword(String email) throws JsonProcessingException, UserNotVerifiedException {
         Map result = new ObjectMapper().readValue(email, Map.class);
         User user = userRepository.findByUserEmail((String) result.get("email"));
-        if(Objects.isNull(user)) {
+        if (Objects.isNull(user)) {
             return ResponseEntity.badRequest().body("Cet utilisateur n'existe pas !");
         }
-        if (!user.getIsEmailVerified()) throw new UserNotVerifiedException("Votre compte n'est pas vérifié");
+        if (!user.getIsEmailVerified()) {
+            throw new UserNotVerifiedException("Votre compte n'est pas vérifié");
+        }
         VerificationToken verificationToken = createToken(user, "");
         String recoveryUrl = "http://localhost:8080/reset-password?token=" + verificationToken.getToken(); //TODO : to change in production
-        String mailBody = "Bonjour " +
-                " " + user.getUserFirstName() + " " + user.getUserLastName() +
-                ",\n\n" +
-                "Veuillez cliquer sur le lien ci-dessous pour changer le mot de passe de votre compte :\n" +
-                 recoveryUrl +
-                "\n\n" +
-                "Cordialement,\n" +
-                "L'équipe Outil de décision ELIT";
+        String mailBody = "Bonjour "
+                + " " + user.getUserFirstName() + " " + user.getUserLastName()
+                + ",\n\n"
+                + "Veuillez cliquer sur le lien ci-dessous pour changer le mot de passe de votre compte :\n"
+                + recoveryUrl
+                + "\n\n"
+                + "Cordialement,\n"
+                + "L'équipe Outil de décision ELIT";
         String mailSubject = "ELIT : Récupération de mot de passe";
         try {
             // Creating a simple mail message
@@ -145,4 +148,3 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
 }
-

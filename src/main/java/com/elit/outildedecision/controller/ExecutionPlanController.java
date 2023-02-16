@@ -7,7 +7,13 @@ import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
 import com.elit.outildedecision.model.ExecutionVoteRequestModel;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -27,18 +33,18 @@ public class ExecutionPlanController {
 
     @GetMapping("/executionPlan/formConstraints/{executionPlanId}")
     // @PreAuthorize("isContributer(#projectId)")
-    public ResponseEntity<Object> getQuestionsAndAnswers(@PathVariable Long executionPlanId){
+    public ResponseEntity<Object> getQuestionsAndAnswers(@PathVariable Long executionPlanId) {
         return executionPlanService.getQuestionsAndAnswers(executionPlanId);
     }
 
     @PutMapping(value = "/executionPlan/formConstraints/putAnswers/{executionPlanId}")
     // @PreAuthorize("isProjectOwner(#projectId)")
-    public ResponseEntity<Object> updateAnswers(@RequestBody List<ExecutionPlanAnswerModel> executionPlanAnswerModel, @PathVariable Long executionPlanId){
+    public ResponseEntity<Object> updateAnswers(@RequestBody List<ExecutionPlanAnswerModel> executionPlanAnswerModel, @PathVariable Long executionPlanId) {
         return executionPlanService.updateAnswers(executionPlanAnswerModel, executionPlanId);
     }
 
     @GetMapping("/executionPlan/methodologies/{executionPlanId}")
-    public ResponseEntity<Object> getMethodologies(@PathVariable Long executionPlanId){
+    public ResponseEntity<Object> getMethodologies(@PathVariable Long executionPlanId) {
         return executionPlanService.getMethodologies(executionPlanId);
     }
 

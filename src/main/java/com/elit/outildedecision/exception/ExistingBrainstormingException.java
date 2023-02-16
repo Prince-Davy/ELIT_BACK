@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class ExistingBrainstormingException extends Exception{
+public class ExistingBrainstormingException extends Exception {
     public ExistingBrainstormingException() {
     }
 

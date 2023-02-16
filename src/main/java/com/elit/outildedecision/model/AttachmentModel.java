@@ -8,7 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 
 @Data
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class AttachmentModel {
     ArrayList<MultipartFile> attachments;
 }

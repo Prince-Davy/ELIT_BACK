@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity @Builder
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -32,8 +33,8 @@ public class ExecutionPlanAnswer {
     private ExecutionPlan executionPlan;
 
     @ManyToOne(
-        optional = false,
-        cascade = CascadeType.ALL
+            optional = false,
+            cascade = CascadeType.ALL
     )
     @JoinColumn(
             name = "execution_plan_question_id",
@@ -45,7 +46,7 @@ public class ExecutionPlanAnswer {
     @Override
     public String toString() {
         return
-                "executionPlanAnswerId=" + executionPlanAnswerId +
-                "executionPlanQuestion=" + executionPlanQuestion;
+                "executionPlanAnswerId=" + executionPlanAnswerId
+                        + "executionPlanQuestion=" + executionPlanQuestion;
     }
 }

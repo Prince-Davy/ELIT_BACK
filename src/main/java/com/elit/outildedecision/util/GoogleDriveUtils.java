@@ -79,4 +79,7 @@ public class GoogleDriveUtils {
         return _driveService;
     }
 
+    private GoogleDriveUtils() {
+    }
+
 }

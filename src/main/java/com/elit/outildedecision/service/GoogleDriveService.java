@@ -10,11 +10,14 @@ import java.util.List;
 
 public interface GoogleDriveService {
 
-      List<File> getGoogleFilesByName(String fileNameLike) throws IOException;
-      File createGoogleFolder(String folderIdParent, String folderName) throws IOException;
-      File createGoogleFile(String googleFolderIdParent, String contentType, //
-                                          String customFileName, InputStream inputStream) throws IOException;
-       Permission createPublicPermission(String googleFileId) throws IOException;
+    List<File> getGoogleFilesByName(String fileNameLike) throws IOException;
 
-      void deleteFile(String fileId) throws IOException;
+    File createGoogleFolder(String folderIdParent, String folderName) throws IOException;
+
+    File createGoogleFile(String googleFolderIdParent, String contentType, //
+            String customFileName, InputStream inputStream) throws IOException;
+
+    Permission createPublicPermission(String googleFileId) throws IOException;
+
+    void deleteFile(String fileId) throws IOException;
 }

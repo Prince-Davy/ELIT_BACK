@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity@Builder
+@Entity
+@Builder
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Methodology {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,12 +37,12 @@ public class Methodology {
 
     @Override
     public String toString() {
-        return "Methodology{" +
-                "methodologyId=" + methodologyId +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", disadvantages='" + disadvantages + '\'' +
-                ", advantages='" + advantages + '\'' +
-                '}';
+        return "Methodology{"
+                + "methodologyId=" + methodologyId
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", disadvantages='" + disadvantages + '\''
+                + ", advantages='" + advantages + '\''
+                + '}';
     }
 }

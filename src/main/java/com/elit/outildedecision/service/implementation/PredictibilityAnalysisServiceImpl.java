@@ -51,11 +51,13 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
         MultiCriteriaAnalysis lastMultiCriteriaAnalysis = multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(project.getProjectId());
 
         //"Vous n'avez pas encore terminé(e) l'analyse multicritère"
-        if (!lastMultiCriteriaAnalysis.getIsFinished()) return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(-1L);
+        if (!lastMultiCriteriaAnalysis.getIsFinished()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(-1L);
+        }
 
         PredictibilityAnalysis lastPredictibilityAnalysis = predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisId());
-        
+
         int nextIteration = 1;
 
         if (lastPredictibilityAnalysis != null) {
@@ -124,8 +126,9 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
                 predictibilityResults.setName(methodologyScoreModel.getName());
                 predictibilityResults.setValue(methodologyScoreModel.getValue());
                 predictibilityResultsRepository.save(predictibilityResults);
-            } else
+            } else {
                 System.out.println("Les résultats de l'analyse de prévisibilité sont déjà inscris en base de données.");
+            }
         }
         predictibilityResult.setMethodologies(methodologyScoreList);
         predictibilityResult.setAverage(average);
@@ -175,24 +178,27 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
         PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository.findById(analyseId)
                 .orElseThrow(() -> new PredictibilityAnaliseNotFoundException("Cette analyse de prévisibilité n'existe pas."));
         Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
-        if (checkPermissions(project.getProjectId(),ProjectPermession.CDP.name())) {
+        if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
             if (Boolean.FALSE.equals(predictibilityAnalysis.getIsFinished())) {
                 predictibilityAnalysis.setIsFinished(true);
                 predictibilityAnalysisRepository.save(predictibilityAnalysis);
-            } else throw new RuntimeException("L'analyse de prévisibilité est déjà terminée.");
-        } else
+            } else {
+                throw new RuntimeException("L'analyse de prévisibilité est déjà terminée.");
+            }
+        } else {
             throw new UserNotAuthorizedException("Vous n'êtes pas autorisé à changer le statut de cette analyse de prévisibilité.");
+        }
         return ResponseEntity
                 .ok()
                 .body("L'analyse de prévisibilité a bien été enregistré comme terminée.");
     }
 
-    private boolean checkPermissions(Long projectId,String permissionName  ) throws PredictibilityAnaliseNotFoundException, UserNotAuthorizedException {
+    private boolean checkPermissions(Long projectId, String permissionName  ) throws PredictibilityAnaliseNotFoundException, UserNotAuthorizedException {
         String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByUserEmail(userEmail);
 
         ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
-        return (Objects.nonNull(projectUserPermission) && permissionName.equals(projectUserPermission.getPermission()));
+        return Objects.nonNull(projectUserPermission) && permissionName.equals(projectUserPermission.getPermission());
     }
 
     @Override
@@ -200,11 +206,12 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
         PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository.findById(analyseId)
                 .orElseThrow(() -> new PredictibilityAnaliseNotFoundException("Cette analyse de prévisibilité n'existe pas."));
         Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
-        if (checkPermissions(project.getProjectId(),ProjectPermession.CDP.name())) {
+        if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
             predictibilityAnalysis.setPredictibilityAnalysisIteration(predictibilityAnalysis.getPredictibilityAnalysisIteration() + 1);
             predictibilityAnalysisRepository.save(predictibilityAnalysis);
-        } else
+        } else {
             throw new UserNotAuthorizedException("Vous n'êtes pas autorisé à faire de changement dans cette analyse de prévisibilité.");
+        }
         return ResponseEntity
                 .ok()
                 .body("L'analyse de prévisibilité a rentre dans une nouvelle iteration.");

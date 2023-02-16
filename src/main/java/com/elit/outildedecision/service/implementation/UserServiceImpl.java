@@ -1,4 +1,5 @@
 package com.elit.outildedecision.service.implementation;
+
 import  com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 //    private final RoleRepository roleRepository;
 
-     private final JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
     private String SENDER_EMAIL;
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.javaMailSender = javaMailSender;
         this.verificationTokenService = verificationTokenService;
     }
+
     @SneakyThrows
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -83,11 +85,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException {
 
-        if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())){
+        if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())) {
             return new ResponseEntity<>("les mots de passe doivent être identiques", HttpStatus.BAD_REQUEST);
         }
         User userFromDB = userRepository.findByUseremailOrUsername(user.getUserEmail(), user.getUsername());
-        if(!Objects.isNull(userFromDB)) {
+        if (!Objects.isNull(userFromDB)) {
             return new ResponseEntity<>("L'utilisateur existe déjà", HttpStatus.CONFLICT);
         }
         try {
@@ -104,7 +106,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     .isAdmin(false)
                     .build();
             sendRegistrationConfirmationEmail(userRepository.save(userToSave));
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de l'utilisateur");
         }
         return  ResponseEntity.status(HttpStatus.CREATED).body("Votre compte a été créé avec succès");
@@ -116,17 +118,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public  ResponseEntity<String> updatePasswordUserById(Long userId, String oldPass, String newPass) throws  IOException, CouldNotSaveUserException{
+    public  ResponseEntity<String> updatePasswordUserById(Long userId, String oldPass, String newPass) throws  IOException, CouldNotSaveUserException {
         User user = userRepository.getById(userId);
         String currentPass = user.getUserPassword();
-        if(Objects.isNull(user)){
+        if (Objects.isNull(user)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user by this id");
         }
 
         Boolean checkPassword = passwordEncoder.matches(oldPass, currentPass);
-        if(!checkPassword){
+        if (!checkPassword) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Votre ancien mot de passe n'est pas correct");
-        }else {
+        } else {
             user.setUserPassword(passwordEncoder.encode(newPass));
         }
         userRepository.save(user);
@@ -134,16 +136,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public  ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar) throws  IOException, CouldNotSaveUserException{
+    public  ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar) throws  IOException, CouldNotSaveUserException {
         User user = userRepository.getById(userId);
-        if(Objects.isNull(user)){
+        if (Objects.isNull(user)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user by this id");
         }
 
-        if(!Objects.isNull(userAvatar)){
+        if (!Objects.isNull(userAvatar)) {
             try {
                 user.setUserAvatarPath(saveAvatar(userAvatar));
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de l'avatar");
             }
         }
@@ -153,24 +155,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 
     @Override
-    public  ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName) throws  IOException, CouldNotSaveUserException{
+    public  ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName) throws  IOException, CouldNotSaveUserException {
         User user = userRepository.getById(userId);
-        if(Objects.isNull(user)){
+        if (Objects.isNull(user)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user by this id");
         }
 
-        if(!Objects.isNull(userFirstName)){
+        if (!Objects.isNull(userFirstName)) {
             try {
                 user.setUserFirstName(userFirstName);
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de userFisrtName");
             }
         }
 
-        if(!Objects.isNull(userLastName)){
+        if (!Objects.isNull(userLastName)) {
             try {
                 user.setUserLastName(userLastName);
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de userLastName");
             }
         }
@@ -181,12 +183,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
 
-
     @Override
     public void viewAvatarByUserId(Long userId, HttpServletResponse response) throws IOException {
         User user = userRepository.getById(userId);
         String pathAvatar = user.getUserAvatarPath();
-        if(!Objects.isNull((pathAvatar))){
+        if (!Objects.isNull(pathAvatar)) {
             File file = new File(pathAvatar);
             String mimeType = URLConnection.guessContentTypeFromName(file.getName());
             if (mimeType == null) {
@@ -199,7 +200,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
             InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
             FileCopyUtils.copy(inputStream, response.getOutputStream());
-        }else{
+        } else {
             System.out.println("L'avatar n'existe pas.");
         }
     }
@@ -210,48 +211,48 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         String authenticatedUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User userFromDB = userRepository.findByUserEmail(authenticatedUserEmail);
         Map<String, String> errorMap = new HashMap<>();
-        if(Objects.isNull(userFromDB)){
+        if (Objects.isNull(userFromDB)) {
             errorMap.put("NOT_FOUND", "Utilisateur non trouvé");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMap);
         }
-        if(userRepository.findByUserEmail(user.getUserEmail()) != null && !userFromDB.getUserEmail().equals(user.getUserEmail())){
+        if (userRepository.findByUserEmail(user.getUserEmail()) != null && !userFromDB.getUserEmail().equals(user.getUserEmail())) {
             errorMap.put("CONFLICT", "email déjà utilisé");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
         }
-        if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())){
+        if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())) {
             errorMap.put("CONFLICT", "Les mots de passe doivent être identiques");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
         }
-        if(!user.getUserEmail().equals(user.getUserEmailConfirmation())) {
+        if (!user.getUserEmail().equals(user.getUserEmailConfirmation())) {
             errorMap.put("CONFLICT", "Les emails doivent être identiques");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
         }
-        if(userRepository.findByUsername(user.getUsername()) != null && !userFromDB.getUsername().equals(user.getUsername())){
+        if (userRepository.findByUsername(user.getUsername()) != null && !userFromDB.getUsername().equals(user.getUsername())) {
             errorMap.put("CONFLICT", "nom d'utilisateur déjà utilisé");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
         }
-        if(user.getUsername() != null){
+        if (user.getUsername() != null) {
             userFromDB.setUsername(user.getUsername());
         }
-        if(!Objects.isNull(user.getUserPassword())){
+        if (!Objects.isNull(user.getUserPassword())) {
             userFromDB.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
         }
-        if(!Objects.isNull(user.getUserFirstName())){
+        if (!Objects.isNull(user.getUserFirstName())) {
             userFromDB.setUserFirstName(user.getUserFirstName());
         }
-        if(!Objects.isNull(user.getUserLastName())){
+        if (!Objects.isNull(user.getUserLastName())) {
             userFromDB.setUserLastName(user.getUserLastName());
         }
-        if(!Objects.isNull(user.getUserEmail())){
+        if (!Objects.isNull(user.getUserEmail())) {
             userFromDB.setUserEmail(user.getUserEmail());
         }
-        if(!Objects.isNull(user.getUserJob())){
+        if (!Objects.isNull(user.getUserJob())) {
             userFromDB.setUserJob(user.getUserJob());
         }
-        if(!Objects.isNull(user.getUserAvatar())){
+        if (!Objects.isNull(user.getUserAvatar())) {
             try {
                 userFromDB.setUserAvatarPath(saveAvatar(user.getUserAvatar()));
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de l'avatar");
             }
         }
@@ -270,16 +271,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void sendRegistrationConfirmationEmail(User user) {
         //TODO : change he address of localhost to the real one
 
-        VerificationToken verificationToken = verificationTokenService.createToken(user,"confirm-account");
+        VerificationToken verificationToken = verificationTokenService.createToken(user, "confirm-account");
         String confirmationUrl = "http://localhost:8080/confirm-account?token=" + verificationToken.getToken();
-        String mailBody = "Bonjour " +
-                " " + user.getUserFirstName() + " " + user.getUserLastName() +
-                ",\n\n" +
-                "Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :\n" +
-                confirmationUrl +
-                "\n\n" +
-                "Cordialement,\n" +
-                "L'équipe Outil de décision ELIT";
+        String mailBody = "Bonjour "
+                + " " + user.getUserFirstName() + " " + user.getUserLastName()
+                + ",\n\n"
+                + "Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :\n"
+                + confirmationUrl
+                + "\n\n"
+                + "Cordialement,\n"
+                + "L'équipe Outil de décision ELIT";
         String mailSubject = "ELIT : Confirmation de votre compte";
         try {
             // Creating a simple mail message
@@ -294,9 +295,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             javaMailSender.send(mailMessage);
         }
         catch (Exception e) {
-                    throw new RuntimeException("Exception occured while sending email", e);
-                }
-            }
+            throw new RuntimeException("Exception occured while sending email", e);
+        }
+    }
 
     @Override
     public List<User> findAllUsers() {
@@ -319,8 +320,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserResponseModel getAllInfosUserById(Long userId) throws IOException {
         User user = userRepository.getById(userId);
-        System.out.println("fuhziuhfizuefh"+user.getUserId());
-        if(user.getUserAvatarPath() != null){
+        System.out.println("fuhziuhfizuefh" + user.getUserId());
+        if (user.getUserAvatarPath() != null) {
             File file = new File(user.getUserAvatarPath());
             UserResponseModel userResponseModel = UserResponseModel.builder()
                     .userId(user.getUserId())
@@ -334,7 +335,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     .build();
             return userResponseModel;
 
-        }else {
+        } else {
             UserResponseModel userResponseModel = UserResponseModel.builder()
                     .userId(user.getUserId())
                     .userFirstName(user.getUserFirstName())
@@ -351,9 +352,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public List<UserResponseModel> findUsersByKeyword(String keyword) throws IOException {
         List<UserResponseModel> foundUsers = new ArrayList<>();
-        if (keyword == null || keyword.equals("")) {
+        if (keyword == null || "".equals(keyword)) {
             for (User user : userRepository.findAll()) {
-                if(user.getUserAvatarPath() != null){
+                if (user.getUserAvatarPath() != null) {
                     File file = new File(user.getUserAvatarPath());
                     UserResponseModel userResponseModel = UserResponseModel.builder()
                             .userId(user.getUserId())
@@ -367,7 +368,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                             .build();
                     foundUsers.add(userResponseModel);
 
-                }else {
+                } else {
                     UserResponseModel userResponseModel = UserResponseModel.builder()
                             .userId(user.getUserId())
                             .userFirstName(user.getUserFirstName())
@@ -412,6 +413,4 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
 
-
 }
-

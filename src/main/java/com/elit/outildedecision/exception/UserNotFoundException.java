@@ -2,7 +2,7 @@ package com.elit.outildedecision.exception;
 
 
 
-public class UserNotFoundException extends Exception{
+public class UserNotFoundException extends Exception {
     public UserNotFoundException() {
         super();
     }

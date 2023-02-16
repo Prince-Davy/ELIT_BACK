@@ -13,6 +13,6 @@ import org.springframework.test.context.TestPropertySource;
 @DataJpaTest
 class OutildedecisionApplicationTests {
     @Test
-	void contextLoads() {
-	}
+    void contextLoads() {
+    }
 }

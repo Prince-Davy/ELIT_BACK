@@ -9,12 +9,20 @@ import com.elit.outildedecision.service.ProjectService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -75,6 +83,7 @@ public class ProjectController {
     public ResponseEntity deleteProjectAdmin(@PathVariable Long id) throws Exception {
         return projectService.deleteProject(id);
     }
+
     @DeleteMapping("/user/projects/{id}")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and isProjectOwner(#id)")
     public ResponseEntity deleteProject(@PathVariable Long id) throws Exception {
@@ -90,7 +99,7 @@ public class ProjectController {
     @DeleteMapping("/user/projects/{projectId}/delete-contributor/{contributorID}")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and isProjectOwner(#projectId)")
     public ResponseEntity<String> deleteProjectContributor(@PathVariable Long projectId, @PathVariable Long contributorID) throws Exception {
-        return projectService.deleteProjectContributor(projectId,contributorID);
+        return projectService.deleteProjectContributor(projectId, contributorID);
     }
 
 //

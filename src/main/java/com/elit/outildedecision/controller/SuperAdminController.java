@@ -7,7 +7,14 @@ import com.elit.outildedecision.service.SuperAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -40,12 +47,12 @@ public class SuperAdminController {
     } */
 
     @GetMapping("/projects/notConfirmed/{page}")
-    public Page<Project> getAllNonConfirmedProjects(@PathVariable int page){
+    public Page<Project> getAllNonConfirmedProjects(@PathVariable int page) {
         return superAdminService.getAllNonConfirmedProjects(page);
     }
 
     @GetMapping("/projects/notConfirmed/{page}/orderByDate")
-    public Page<Project> getAllConfirmedProjectsOrderByDate(@PathVariable int page, @RequestParam String order){
+    public Page<Project> getAllConfirmedProjectsOrderByDate(@PathVariable int page, @RequestParam String order) {
         return superAdminService.getAllNonConfirmedProjectsOrderByDate(page, order);
     }
 
@@ -55,7 +62,7 @@ public class SuperAdminController {
     }
 
     @GetMapping("/projects/notConfirmed/{page}/search")
-    public Page<Project> findNotConfirmedProjectByKeyword(@RequestParam String keyword, @PathVariable int page){
+    public Page<Project> findNotConfirmedProjectByKeyword(@RequestParam String keyword, @PathVariable int page) {
         System.out.println("keyword = " + keyword);
         return superAdminService.findNotConfirmedProjectByKeyword(keyword, page);
     }

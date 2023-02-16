@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class FormStepAlreadyExistsException extends Exception{
+public class FormStepAlreadyExistsException extends Exception {
     public FormStepAlreadyExistsException() {
         super();
     }

@@ -66,13 +66,13 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", username='" + username + '\'' +
-                ", userLastName='" + userLastName + '\'' +
-                ", userFirstName='" + userFirstName + '\'' +
-                ", userEmail='" + userEmail + '\'' +
-                ", userAvatar='" + userAvatarPath + '\'' +
-                '}';
+        return "User{"
+                + "userId=" + userId
+                + ", username='" + username + '\''
+                + ", userLastName='" + userLastName + '\''
+                + ", userFirstName='" + userFirstName + '\''
+                + ", userEmail='" + userEmail + '\''
+                + ", userAvatar='" + userAvatarPath + '\''
+                + '}';
     }
 }

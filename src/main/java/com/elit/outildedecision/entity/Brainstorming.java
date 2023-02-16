@@ -47,12 +47,13 @@ public class Brainstorming implements Serializable {
     )
     @JsonBackReference("user_brainstorming")
     private User user;
+
     @Override
     public String toString() {
-        return "Brainstorming{" +
-                "brainstormingId=" + brainstormingId +
-                ", brainstormingText='" + brainstormingText + '\'' +
-                ", isChecked='" + isChecked + '\'' +
-                '}';
+        return "Brainstorming{"
+                + "brainstormingId=" + brainstormingId
+                + ", brainstormingText='" + brainstormingText + '\''
+                + ", isChecked='" + isChecked + '\''
+                + '}';
     }
 }

@@ -62,12 +62,12 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
             AnswerType answerType = userAnswer.getAnswerType();
             switch (answerType) {
                 case SELECTED_ANSWER :
-                    if(isAnswerValidated(userAnswer.getAnswerValue())){
+                    if (isAnswerValidated(userAnswer.getAnswerValue())) {
                         response.setType(AnswerType.SELECTED_ANSWER);
                         response.setAnswerValue(userAnswer.getAnswerValue());
                         break;
                     }
-                        throw new ResponseNotValidException("la réponse doit être un entier compris entre 1 et 5");
+                    throw new ResponseNotValidException("la réponse doit être un entier compris entre 1 et 5");
                 case FREE_ANSWER :
                     response.setType(AnswerType.FREE_ANSWER);
                     response.setAnswerValue(userAnswer.getAnswerValue());
@@ -82,15 +82,15 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
 
 
     private boolean isAnswerValidated(String answerValue) throws ResponseNotValidException {
-      try {
-          int value = Integer.parseInt(answerValue);
-          if (value <1 || value >5 ){
-              return false;
-          }
-          return true;
-      }catch (Exception e){
-        throw new ResponseNotValidException("la réponse doit être un entier compris entre 1 et 5");
-      }
+        try {
+            int value = Integer.parseInt(answerValue);
+            if (value < 1 || value > 5) {
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            throw new ResponseNotValidException("la réponse doit être un entier compris entre 1 et 5");
+        }
     }
 
 
@@ -104,19 +104,21 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
 
         List<SurveyAnswerResponseModel> userAnswerList = new ArrayList<>();
 
-        if(!userRepository.existsById(userId)) throw new UserNotFoundException("Utilisateur non identifiable");
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("Utilisateur non identifiable");
+        }
 
-            List<SurveyAnswer> answers = answerRepo.findAll().stream()
-                    .filter(e -> e.getUser().getUserId().equals(userId))
-                    .collect(Collectors.toList());
+        List<SurveyAnswer> answers = answerRepo.findAll().stream()
+                .filter(e -> e.getUser().getUserId().equals(userId))
+                .collect(Collectors.toList());
 
-            for (SurveyAnswer answer : answers) {
-                SurveyAnswerResponseModel surveyAnswerResponseModel = new SurveyAnswerResponseModel();
-                surveyAnswerResponseModel.setUserId(userId);
-                surveyAnswerResponseModel.setQuestionId(answer.getQuestion().getId());
-                surveyAnswerResponseModel.setAnswer(answer.getAnswerValue());
-                userAnswerList.add(surveyAnswerResponseModel);
-            }
+        for (SurveyAnswer answer : answers) {
+            SurveyAnswerResponseModel surveyAnswerResponseModel = new SurveyAnswerResponseModel();
+            surveyAnswerResponseModel.setUserId(userId);
+            surveyAnswerResponseModel.setQuestionId(answer.getQuestion().getId());
+            surveyAnswerResponseModel.setAnswer(answer.getAnswerValue());
+            userAnswerList.add(surveyAnswerResponseModel);
+        }
         return userAnswerList;
     }
 
@@ -127,7 +129,7 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
      */
     @Override
     public List<SurveyAnswerResponseModel> getSurveyReport(int pageNumber) {
-        Page<SurveyAnswer>  surveyAnswers= answerRepo.findAll(PageRequest.of(pageNumber-1,10)); // je récupère toutes mes réponse
+        Page<SurveyAnswer>  surveyAnswers = answerRepo.findAll(PageRequest.of(pageNumber - 1, 10)); // je récupère toutes mes réponse
         List<SurveyAnswerResponseModel> surveyAnswerResponseModelList = new ArrayList<>();
         List<SurveyAnswer> surveyAnswersList = surveyAnswers.getContent();
         for (SurveyAnswer surveyAnswer : surveyAnswersList) {

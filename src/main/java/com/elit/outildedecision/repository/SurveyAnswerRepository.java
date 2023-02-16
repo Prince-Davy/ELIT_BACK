@@ -10,6 +10,5 @@ import java.util.List;
  * interface used to communicate with database and to manage the survey_answer table data
  */
 @Repository
-public interface SurveyAnswerRepository extends JpaRepository<SurveyAnswer,Long> {
+public interface SurveyAnswerRepository extends JpaRepository<SurveyAnswer, Long> {
 }
-

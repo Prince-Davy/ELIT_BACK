@@ -29,7 +29,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     @Override
     public ResponseEntity confirmProject(Long projectId) throws ProjectNotFoundException {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(()->new ProjectNotFoundException("Ce projet n'existe pas!"));
+                .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas!"));
         project.setConfirmationState(ProjectConfirmationState.CONFIRMED.name());
         projectRepository.save(project);
         return ResponseEntity.ok("Votre projet a été confirmé");
@@ -37,8 +37,8 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     @Override
     public ResponseEntity suspendUser(Long userId) throws UserNotFoundException {
-        User user= userRepository.findById(userId)
-                .orElseThrow(()->new UserNotFoundException("Cet utilisateur n'existe pas!"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas!"));
         user.setIsUserActive(false);
         userRepository.save(user);
         return ResponseEntity.ok("L'utilisateur a été suspendu");
@@ -46,8 +46,8 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     @Override
     public ResponseEntity deleteProject(Long projectId) throws ProjectNotFoundException {
-        Project project=projectRepository.findById(projectId)
-                .orElseThrow(()->new ProjectNotFoundException("Ce projet n'existe pas!"));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas!"));
         projectRepository.delete(project);
         return ResponseEntity.ok("Le projet a été supprimé");
     }
@@ -65,7 +65,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     @Override
     public Page<Project> getAllNonConfirmedProjectsOrderByDate(int page, String order) {
-        switch (order){
+        switch (order) {
             case "DESC":
                 return projectRepository.findAllByConfirmationStateOrderByCreatedAtDesc(ProjectConfirmationState.WAITING.name(), PageRequest.of(page, 10));
             case "ASC":
@@ -77,7 +77,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     @Override
     public ResponseEntity confirmProjects(List<Long> projectIds) throws ProjectNotFoundException {
-        for (Long id:projectIds){
+        for (Long id :projectIds) {
             confirmProject(id);
         }
         return ResponseEntity.ok().body("Vos projets sont confirmés");

@@ -236,6 +236,7 @@
         <configuration>
           <activeRecipes>
             <recipe>org.openrewrite.java.cleanup.Cleanup</recipe>
+            <recipe>org.openrewrite.java.format.AutoFormat</recipe>
           </activeRecipes>
         </configuration>
       </plugin>

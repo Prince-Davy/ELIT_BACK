@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class CouldNotSaveUserException extends Exception{
+public class CouldNotSaveUserException extends Exception {
 
     public CouldNotSaveUserException() {
         super();

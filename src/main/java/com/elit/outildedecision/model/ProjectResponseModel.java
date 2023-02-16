@@ -9,7 +9,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectResponseModel implements Serializable {
     private Long projectId;
     private String name;

@@ -28,8 +28,8 @@ public class StepWeightServiceImpl implements StepWeightService {
         FormStep formStepFromDB = formStepRepo.findById(formStepToPersistId)
                 .orElseThrow(() -> new StepFormNotFoundException("This Step Doesn't Exist !"));
         Set<StepWeight> persistedWeights = new HashSet<>();
-        float weightValue = (float) 1/criterias.size();
-        for (Criteria criteria:criterias){
+        float weightValue = (float) 1 / criterias.size();
+        for (Criteria criteria :criterias) {
             StepWeight stepWeight = StepWeight.builder()
                     .criteriaName(criteria.getCriteriaName())
                     .weightValue(weightValue)
@@ -44,9 +44,11 @@ public class StepWeightServiceImpl implements StepWeightService {
     @Override
     public StepWeight updateWeights(StepWeight stepWeight) throws Exception {
         Optional<StepWeight> stepWeightFromDB = stepWeightRepo.findById(stepWeight.getWeightId());
-        if(!stepWeightFromDB.isPresent()) throw new Exception("Le poid du critère "+stepWeight.getCriteriaName()+"n'existe pas !");
+        if (!stepWeightFromDB.isPresent()) {
+            throw new Exception("Le poid du critère " + stepWeight.getCriteriaName() + "n'existe pas !");
+        }
         StepWeight existingStepWeight = stepWeightFromDB.get();
-        if ( Objects.nonNull(stepWeight.getWeightValue())){
+        if (Objects.nonNull(stepWeight.getWeightValue())) {
             existingStepWeight.setWeightValue(stepWeight.getWeightValue());
         }
         return stepWeightRepo.save(existingStepWeight);

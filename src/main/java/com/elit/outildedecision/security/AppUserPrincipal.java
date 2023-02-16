@@ -64,4 +64,3 @@ public class AppUserPrincipal implements UserDetails {
         return authorities;
     }
 }
-

@@ -12,9 +12,10 @@ import java.util.Set;
 
 @Entity
 @Data
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude="formStep")
+@EqualsAndHashCode(exclude = "formStep")
 public class FormQuestion {
     @Id
     @GeneratedValue(
@@ -50,12 +51,13 @@ public class FormQuestion {
     )
     @JsonManagedReference("question_brainstorming")
     private List<Brainstorming> brainstormings;
+
     @Override
     public String toString() {
-        return "FormQuestion{" +
-                "questionId=" + questionId +
-                ", questionText='" + questionText + '\'' +
-                ", answerText='" + answerText + '\'' +
-                '}';
+        return "FormQuestion{"
+                + "questionId=" + questionId
+                + ", questionText='" + questionText + '\''
+                + ", answerText='" + answerText + '\''
+                + '}';
     }
 }

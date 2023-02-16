@@ -1,7 +1,7 @@
 package com.elit.outildedecision.exception;
 
 
-public class UserNotVerifiedException extends Exception{
+public class UserNotVerifiedException extends Exception {
     public UserNotVerifiedException() {
         super();
     }

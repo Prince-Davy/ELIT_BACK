@@ -2,7 +2,7 @@ package com.elit.outildedecision.exception;
 
 
 
-public class ProjectOwnerException extends Exception{
+public class ProjectOwnerException extends Exception {
     public ProjectOwnerException() {
         super();
     }

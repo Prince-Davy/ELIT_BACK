@@ -17,16 +17,22 @@ import java.util.Map;
 
 public interface   UserService {
     User findByUsername(String username);
+
     User findByEmail(String email);
+
     User findByUserId(Long userId);
+
     ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException;
+
     void deleteUserById(Long userId);
+
     ResponseEntity<Map<String, String>> updateUser(UserModel user) throws CouldNotSaveUserException;
 
     ResponseEntity<String> updatePasswordUserById(Long userId, String oldPass, String newPass) throws  IOException, CouldNotSaveUserException;
-    ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar) throws  IOException, CouldNotSaveUserException;
-    ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName) throws  IOException, CouldNotSaveUserException;
 
+    ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar) throws  IOException, CouldNotSaveUserException;
+
+    ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName) throws  IOException, CouldNotSaveUserException;
 
 
     void viewAvatarByUserId(Long userId, HttpServletResponse response) throws IOException;
@@ -37,6 +43,7 @@ public interface   UserService {
     void sendRegistrationConfirmationEmail(User user);
 
     List<User> findAllUsers();
+
     List<User> findAllUsersByPage(Pageable pageable);
 
 

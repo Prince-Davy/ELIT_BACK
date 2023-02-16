@@ -1,4 +1,5 @@
 package com.elit.outildedecision.security;
+
 import com.elit.outildedecision.service.UserService;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.factory.BeanFactory;
@@ -14,7 +15,6 @@ public class CustomMethodSecurityExpressionHandler
             new AuthenticationTrustResolverImpl();
 
     private BeanFactory beanFactory;
-
 
 
     @Override

@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Pattern;
 
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class PasswordChangeModel {
     private String oldPassword;
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$"

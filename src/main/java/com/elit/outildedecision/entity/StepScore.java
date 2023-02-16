@@ -10,7 +10,9 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@NoArgsConstructor @AllArgsConstructor @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StepScore {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

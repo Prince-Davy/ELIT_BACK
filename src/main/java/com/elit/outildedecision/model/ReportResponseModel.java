@@ -6,8 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Date;
 
-@Data @Builder
-@AllArgsConstructor @NoArgsConstructor
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReportResponseModel {
     private Long id;
     private String title;

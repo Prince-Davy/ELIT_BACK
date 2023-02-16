@@ -17,7 +17,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude= {"predictibilityAnalysis"})
+@EqualsAndHashCode(exclude = {"predictibilityAnalysis"})
 public class ExecutionPlan implements Serializable {
     @Id
     @GeneratedValue(
@@ -27,11 +27,11 @@ public class ExecutionPlan implements Serializable {
     private Integer executionIteration;
 
     @CreationTimestamp
-    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
     private Date createdAt;
 
     @UpdateTimestamp
-    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
     private Date updatedAt;
 
     private Boolean isFinished;
@@ -52,12 +52,13 @@ public class ExecutionPlan implements Serializable {
             orphanRemoval = true
     )
     private List<ExecutionPlanAnswer> executionPlanAnswers;
+
     @Override
     public String toString() {
-        return "ExecutionPlan{" +
-                "executionPlanId=" + executionPlanId +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        return "ExecutionPlan{"
+                + "executionPlanId=" + executionPlanId
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
     }
 }

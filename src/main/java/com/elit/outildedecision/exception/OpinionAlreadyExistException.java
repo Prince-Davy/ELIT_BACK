@@ -18,4 +18,3 @@ public class OpinionAlreadyExistException extends Exception {
         super(cause);
     }
 }
-

@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class ResponseNotValidException extends Exception{
+public class ResponseNotValidException extends Exception {
     public ResponseNotValidException() {
         super();
     }

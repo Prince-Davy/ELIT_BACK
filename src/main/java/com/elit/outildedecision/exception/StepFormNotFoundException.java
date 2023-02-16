@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class StepFormNotFoundException extends Exception{
+public class StepFormNotFoundException extends Exception {
     public StepFormNotFoundException() {
         super();
     }

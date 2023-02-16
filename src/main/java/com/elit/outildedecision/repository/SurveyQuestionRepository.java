@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
  * interface used to communicate with database and to manage the survey_question table data
  */
 @Repository
-public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion,Long> {
+public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion, Long> {
     SurveyQuestion findByQuestion(String question);
 }
-

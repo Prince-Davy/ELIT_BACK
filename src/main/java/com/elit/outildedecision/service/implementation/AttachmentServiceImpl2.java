@@ -167,13 +167,13 @@ public class AttachmentServiceImpl2 implements AttachmentService {
 
     @Override
     public ResponseEntity<String> addAttachmentToProject(Long projectId, AttachmentModel files) throws ProjectNotFoundException {
-            Project projectFromDB = projectRepository.findById(projectId)
-                    .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas !"));
+        Project projectFromDB = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas !"));
 
-        String folderPath  = StringUtils.cleanPath(STORING_DIRECTORY+projectFromDB.getFolderPath());
-        for (MultipartFile file: files.getAttachments()){
+        String folderPath  = StringUtils.cleanPath(STORING_DIRECTORY + projectFromDB.getFolderPath());
+        for (MultipartFile file : files.getAttachments()) {
             try {
-                String filePath = StringUtils.cleanPath(folderPath+"\\"+file.getOriginalFilename());
+                String filePath = StringUtils.cleanPath(folderPath + "\\" + file.getOriginalFilename());
                 Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
                 Attachment attachment = Attachment.builder()
                         .filePath(filePath)
@@ -191,9 +191,9 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     }
 
     @Override
-    public ResponseEntity<String> renameAttachment( Long attachmentId, HttpEntity<String> attachmentNameJson) throws AttachmentNotFoundException, IOException {
+    public ResponseEntity<String> renameAttachment(Long attachmentId, HttpEntity<String> attachmentNameJson) throws AttachmentNotFoundException, IOException {
         Attachment attachmentFromDB = attachmentRepository.findById(attachmentId)
-                .orElseThrow(()-> new AttachmentNotFoundException("Ce fichier n'existe pas !"));
+                .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas !"));
 
         Map<String, String> newName = new ObjectMapper().readValue(attachmentNameJson.getBody(), HashMap.class);
 

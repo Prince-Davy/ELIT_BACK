@@ -8,11 +8,12 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 
-@Entity @Builder
+@Entity
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude="formQuestion")
+@EqualsAndHashCode(exclude = "formQuestion")
 public class Criteria {
     @Id
     @GeneratedValue(
@@ -39,10 +40,10 @@ public class Criteria {
 
     @Override
     public String toString() {
-        return "Criteria{" +
-                "criteriaId=" + criteriaId +
-                ", criteriaName='" + criteriaName + '\'' +
-                ", criteriaValue=" + criteriaValue +
-                '}';
+        return "Criteria{"
+                + "criteriaId=" + criteriaId
+                + ", criteriaName='" + criteriaName + '\''
+                + ", criteriaValue=" + criteriaValue
+                + '}';
     }
 }

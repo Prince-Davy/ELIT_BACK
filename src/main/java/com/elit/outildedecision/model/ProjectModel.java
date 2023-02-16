@@ -9,7 +9,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 @Data
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectModel implements Serializable {
     private String name;
     private String description;

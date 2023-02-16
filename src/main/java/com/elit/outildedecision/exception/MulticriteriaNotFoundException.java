@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class MulticriteriaNotFoundException extends Exception{
+public class MulticriteriaNotFoundException extends Exception {
     public MulticriteriaNotFoundException() {
     }
 

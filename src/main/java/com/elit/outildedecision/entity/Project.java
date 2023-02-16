@@ -23,7 +23,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EqualsAndHashCode(exclude= {"reviews"/*,"report"*/})
+@EqualsAndHashCode(exclude = {"reviews"/*,"report"*/})
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,11 +46,11 @@ public class Project {
 
 
     @CreationTimestamp
-    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
     private Timestamp createdAt;
 
     @UpdateTimestamp
-    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
     private Timestamp updatedAt;
 
     @OneToMany(
@@ -93,28 +93,31 @@ public class Project {
     @JsonManagedReference("notification_project")
     private List<Notification> notifications;
 
-    public void addAttachment(Attachment attachment){
+    public void addAttachment(Attachment attachment) {
         this.getAttachments().add(attachment);
 
     }
+
     @JsonManagedReference("project_attachment")
-    public List<Attachment> getAttachments(){
+    public List<Attachment> getAttachments() {
         return this.attachments;
     }
+
     public void detachPermission(ProjectUserPermission projectUserPermission) {
         this.projectUserPermissions.remove(projectUserPermission);
         projectUserPermission.setProject(null);
     }
+
     @Override
     public String toString() {
-        return "Project{" +
-                "projectId=" + projectId +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", folderPath='" + folderPath + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        return "Project{"
+                + "projectId=" + projectId
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", folderPath='" + folderPath + '\''
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
     }
 
 }

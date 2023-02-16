@@ -17,7 +17,8 @@ import java.util.Date;
 
 @Entity
 @Data
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Vote implements Serializable {
     @Id

@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Set;
 
 
-@Entity @Builder
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(exclude={"stepWeights", "form"})
+@EqualsAndHashCode(exclude = {"stepWeights", "form"})
 public class FormStep {
     @Id
     @GeneratedValue(
@@ -29,7 +30,7 @@ public class FormStep {
             optional = false
     )
     @JoinColumn(
-            name ="multi_criteria_analysis_id",
+            name = "multi_criteria_analysis_id",
             referencedColumnName = "multiCriteriaAnalysisId"
     )
     @JsonBackReference("multiCriteria_step")
@@ -62,13 +63,11 @@ public class FormStep {
     private List<StepScore> stepScores;
 
 
-
-
     @Override
     public String toString() {
-        return "FormStep{" +
-                "stepId=" + stepId +
-                ", stepName='" + stepName + '\'' +
-                '}';
+        return "FormStep{"
+                + "stepId=" + stepId
+                + ", stepName='" + stepName + '\''
+                + '}';
     }
 }

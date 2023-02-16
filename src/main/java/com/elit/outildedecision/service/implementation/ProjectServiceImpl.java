@@ -52,7 +52,6 @@ public class ProjectServiceImpl implements ProjectService {
     private final MultiCriteriaAnalysisService multiCriteriaService;
 
 
-
     public ProjectServiceImpl(ProjectRepository projectRepository, UserRepository userRepository, ExecutionPlanService executionPlanService, AttachmentService attachmentService, ProjectUserPermissionRepository projectUserPermissionRepository, MultiCriteriaAnalysisService multiCriteriaService) {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
@@ -72,7 +71,9 @@ public class ProjectServiceImpl implements ProjectService {
         Date dateOfCreation = new Date();
         String folderName = dateOfCreation.getTime() + "_" + project.getName();
         File projectDirectory = new File(STORING_DIRECTORY + folderName.replaceAll(" ", "_").toLowerCase());
-        if (projectDirectory.exists()) throw new Exception("Dossier du projet dupliqué, réessayer plus tard.");
+        if (projectDirectory.exists()) {
+            throw new Exception("Dossier du projet dupliqué, réessayer plus tard.");
+        }
         projectDirectory.mkdirs();
         projectToSave.setFolderPath(folderName.replaceAll(" ", "_").toLowerCase());
         projectToSave.setChefId(chef.getUserId());
@@ -82,7 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectToSave.setIsArchived(false);
         Long projectId = projectRepository.save(projectToSave).getProjectId();
         //adding permissions to project
-        if(Objects.nonNull(project.getContributers())){
+        if (Objects.nonNull(project.getContributers())) {
             for (ContributerModel contributer : project.getContributers()) {
                 User user = userRepository.findById(contributer.getContributerId())
                         .orElseThrow(() -> new Exception("Cet utilisateur n'existe pas."));
@@ -94,7 +95,9 @@ public class ProjectServiceImpl implements ProjectService {
                 projectUserPermissionRepository.save(projectUserPermission);
             }
         }
-        if (Objects.nonNull(project.getFiles())) attachmentService.uploadAttachment(project.getFiles(), projectId);
+        if (Objects.nonNull(project.getFiles())) {
+            attachmentService.uploadAttachment(project.getFiles(), projectId);
+        }
 
         multiCriteriaService.createMulticriteriaAnalysisForm(projectId);
 
@@ -143,7 +146,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         if (keyword != null) {
-            if (!keyword.equals("")) {
+            if (!"".equals(keyword)) {
                 return projects.stream()
                         .filter(project -> (Objects.nonNull(project.getDescription()) && project.getDescription().contains(keyword)) || project.getName().contains(keyword))
                         .collect(Collectors.toList());
@@ -176,11 +179,11 @@ public class ProjectServiceImpl implements ProjectService {
                     contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(), user.getUserLastName(), null, null, null, userPermission.getPermission()));
                 }
 
-                projects.add(new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), null, null, contributorModelList, null,null));
+                projects.add(new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), null, null, contributorModelList, null, null));
             }
         }
         if (keyword != null) {
-            if (!keyword.equals("")) {
+            if (!"".equals(keyword)) {
                 return projects.stream()
                         .filter(project -> (Objects.nonNull(project.getDescription()) && project.getDescription().contains(keyword)) || project.getName().contains(keyword))
                         .collect(Collectors.toList());
@@ -282,31 +285,31 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         ArrayList<MulticriteriaAnalyseResponseModel> multicriteriaAnaliseList = new ArrayList<>();
-        for ( MultiCriteriaAnalysis multicriteriaAnalise  : project.getMultiCriteriaAnalysisList() ){
-            PredictibilityAnalyseResponseModel predictibilityAnalyse=null;
+        for (MultiCriteriaAnalysis multicriteriaAnalise  : project.getMultiCriteriaAnalysisList()) {
+            PredictibilityAnalyseResponseModel predictibilityAnalyse = null;
             PredictibilityAnalysis predictibilityAnalysis = multicriteriaAnalise.getPredictibilityAnalysis();
-            if ( predictibilityAnalysis !=null) {
+            if (predictibilityAnalysis != null) {
                 ExecutionPlanScoreResponseModel executionPlanScore = null;
-                if (predictibilityAnalysis.getExecutionPlan()!=null){
+                if (predictibilityAnalysis.getExecutionPlan() != null) {
                     executionPlanScore = executionPlanService.getExecutionPlanScore(predictibilityAnalysis.getExecutionPlan().getExecutionPlanId());
                 }
-                predictibilityAnalyse= new PredictibilityAnalyseResponseModel(predictibilityAnalysis.getPredictibilityAnalysisId(), predictibilityAnalysis.getIsFinished(),  predictibilityAnalysis.getPredictibilityAnalysisIteration(),executionPlanScore);
+                predictibilityAnalyse = new PredictibilityAnalyseResponseModel(predictibilityAnalysis.getPredictibilityAnalysisId(), predictibilityAnalysis.getIsFinished(),  predictibilityAnalysis.getPredictibilityAnalysisIteration(), executionPlanScore);
             }
-            multicriteriaAnaliseList.add( new MulticriteriaAnalyseResponseModel(multicriteriaAnalise.getMultiCriteriaAnalysisId(),multicriteriaAnalise.getCreatedAt(),multicriteriaAnalise.getUpdatedAt(),multicriteriaAnalise.getMultiCriteriaAnalysisIteration(),multicriteriaAnalise.getIsFinished(),new ArrayList(multicriteriaAnalise.getFormSteps()),predictibilityAnalyse));
+            multicriteriaAnaliseList.add(new MulticriteriaAnalyseResponseModel(multicriteriaAnalise.getMultiCriteriaAnalysisId(), multicriteriaAnalise.getCreatedAt(), multicriteriaAnalise.getUpdatedAt(), multicriteriaAnalise.getMultiCriteriaAnalysisIteration(), multicriteriaAnalise.getIsFinished(), new ArrayList(multicriteriaAnalise.getFormSteps()), predictibilityAnalyse));
         }
 
-        return new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), project.getChefId(), project.getIsArchived(), contributorModelList, attachmentList,multicriteriaAnaliseList);
+        return new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), project.getChefId(), project.getIsArchived(), contributorModelList, attachmentList, multicriteriaAnaliseList);
     }
 
     @Override
     @Transactional
     public ResponseEntity<String> deleteProject(Long projectId) throws ProjectNotFoundException, IOException {
         Project projectToDelete = projectRepository.findById(projectId)
-                .orElseThrow(()-> new ProjectNotFoundException("Ce project n'existe pas !"));
+                .orElseThrow(() -> new ProjectNotFoundException("Ce project n'existe pas !"));
 
         List<ProjectUserPermission> projectUserPermissionList = projectToDelete.getProjectUserPermissions();
 
-        for (ProjectUserPermission pup: projectUserPermissionList){
+        for (ProjectUserPermission pup : projectUserPermissionList) {
             pup.getUser().detachPermission(pup);
             projectUserPermissionRepository.delete(pup);
         }

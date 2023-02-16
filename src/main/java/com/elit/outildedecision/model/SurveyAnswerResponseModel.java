@@ -15,4 +15,3 @@ public class SurveyAnswerResponseModel {
 //    private int answer;
     private String answer;
 }
-

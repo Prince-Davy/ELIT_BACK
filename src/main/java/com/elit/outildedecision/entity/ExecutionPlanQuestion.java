@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity @Builder
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -30,8 +31,8 @@ public class ExecutionPlanQuestion {
 
     @Override
     public String toString() {
-        return "ExecutionPlanQuestion{" +
-                "executionPlanQuestionId=" + executionPlanQuestionId +
-                '}';
+        return "ExecutionPlanQuestion{"
+                + "executionPlanQuestionId=" + executionPlanQuestionId
+                + '}';
     }
 }

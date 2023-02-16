@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class AttachmentNotFoundException extends Exception{
+public class AttachmentNotFoundException extends Exception {
     public AttachmentNotFoundException() {
     }
 

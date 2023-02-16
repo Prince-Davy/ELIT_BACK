@@ -20,7 +20,7 @@ public class CriteriaServiceImpl implements CriteriaService {
     @Override
     public Set<Criteria> createCriterias(Set<Criteria> criterias, FormQuestion formQuestion) {
         Set<Criteria> persistedCriterias = new HashSet<>();
-        for (Criteria criteria : criterias){
+        for (Criteria criteria : criterias) {
             Criteria criteriaToPersist = Criteria.builder()
                     .criteriaName(criteria.getCriteriaName())
                     .formQuestion(formQuestion)
@@ -34,7 +34,9 @@ public class CriteriaServiceImpl implements CriteriaService {
     @Override
     public Criteria updateCriteria(Criteria criteria) {
         Criteria criteriaFromDB = criteriaRepository.findById(criteria.getCriteriaId()).get();
-        if (Objects.nonNull(criteria.getCriteriaValue())) criteriaFromDB.setCriteriaValue(criteria.getCriteriaValue());
+        if (Objects.nonNull(criteria.getCriteriaValue())) {
+            criteriaFromDB.setCriteriaValue(criteria.getCriteriaValue());
+        }
         return criteriaRepository.save(criteriaFromDB);
     }
 }

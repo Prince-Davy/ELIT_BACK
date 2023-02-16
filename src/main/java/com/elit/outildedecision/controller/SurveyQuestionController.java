@@ -3,12 +3,17 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
 import com.elit.outildedecision.service.implementation.SurveyQuestionServiceImpl;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /**
  * class used to root API calls for survey questions management.
@@ -40,7 +45,7 @@ public class SurveyQuestionController {
      * @return updated question. return needed for API testing
      */
     @PutMapping("/{questionId}") // or patch ?
-    public SurveyQuestion modifyQuestion(@PathVariable Long questionId,@RequestBody(required = false) SurveyQuestion question) throws QuestionFormatNotValidException {
+    public SurveyQuestion modifyQuestion(@PathVariable Long questionId, @RequestBody(required = false) SurveyQuestion question) throws QuestionFormatNotValidException {
         return questionService.modifyQuestion(questionId, question);
     }
 
@@ -51,7 +56,7 @@ public class SurveyQuestionController {
      */
     @DeleteMapping("/{questionId}")
     public Optional<SurveyQuestion> deleteQuestion(@PathVariable Long questionId) {
-            return questionService.deleteQuestion(questionId);
+        return questionService.deleteQuestion(questionId);
     }
 
     /**
@@ -61,7 +66,7 @@ public class SurveyQuestionController {
      */
     @GetMapping("/{questionId}")
     public Optional<SurveyQuestion> selectQuestion(@PathVariable Long questionId) {
-            return questionService.selectQuestion(questionId);
+        return questionService.selectQuestion(questionId);
     }
 
     /**

@@ -12,7 +12,8 @@ import java.sql.Timestamp;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data @Builder
+@Data
+@Builder
 public class Report implements Serializable {
     @Id
     @GeneratedValue(
@@ -39,6 +40,6 @@ public class Report implements Serializable {
     private Integer iteration;
 
     @CreationTimestamp
-    @JsonFormat(pattern="dd-MM-yyyy", timezone="Europe/Paris")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
     private Timestamp createdAt;
 }

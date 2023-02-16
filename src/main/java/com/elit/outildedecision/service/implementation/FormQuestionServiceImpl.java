@@ -21,18 +21,19 @@ public class FormQuestionServiceImpl implements FormQuestionService {
     private final FormStepRepo formStepRepo;
 
     public FormQuestionServiceImpl(CriteriaService criteriaService,
-                                   FormQuestionRepository formQuestionRepository,
-                                   FormStepRepo formStepRepo) {
+            FormQuestionRepository formQuestionRepository,
+            FormStepRepo formStepRepo) {
         this.criteriaService = criteriaService;
         this.formQuestionRepository = formQuestionRepository;
         this.formStepRepo = formStepRepo;
     }
+
     @Override
     public Set<FormQuestion> createFormQuestions(Set<FormQuestion> formQuestions, Set<Criteria> criterias, Long stepId) {
         FormStep formStep = formStepRepo.getById(stepId);
         Set<FormQuestion> persistedFormQuestions = new HashSet<>();
 
-        for (FormQuestion question: formQuestions){
+        for (FormQuestion question : formQuestions) {
             FormQuestion questionToPersist = FormQuestion.builder()
                     .questionText(question.getQuestionText())
                     .answerText("")
@@ -48,12 +49,14 @@ public class FormQuestionServiceImpl implements FormQuestionService {
     @Override
     public FormQuestion updateFormQuestion(FormQuestion formQuestion) throws Exception {
         Optional<FormQuestion> formQuestionFromDB = formQuestionRepository.findById(formQuestion.getQuestionId());
-        if(!formQuestionFromDB.isPresent()) throw new Exception("Question n'existe pas");
+        if (!formQuestionFromDB.isPresent()) {
+            throw new Exception("Question n'existe pas");
+        }
         FormQuestion existingFormQuestion = formQuestionFromDB.get();
-        if ( Objects.nonNull(formQuestion.getAnswerText()) && !"".equalsIgnoreCase(formQuestion.getAnswerText()) ){
+        if (Objects.nonNull(formQuestion.getAnswerText()) && !"".equalsIgnoreCase(formQuestion.getAnswerText())) {
             existingFormQuestion.setAnswerText(formQuestion.getAnswerText());
         }
-        for (Criteria criteria : formQuestion.getCriterias()){
+        for (Criteria criteria : formQuestion.getCriterias()) {
             criteriaService.updateCriteria(criteria);
         }
         return formQuestionRepository.save(existingFormQuestion);

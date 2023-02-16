@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 public class GoogleDriveServiceImpl implements GoogleDriveService {
     private static File _createGoogleFile(String googleFolderIdParent, String contentType,
-                                          String customFileName, AbstractInputStreamContent uploadStreamContent) throws IOException {
+            String customFileName, AbstractInputStreamContent uploadStreamContent) throws IOException {
 
         File fileMetadata = new File();
         fileMetadata.setName(customFileName);
@@ -38,26 +38,26 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     @Override
     public List<File> getGoogleFilesByName(String fileNameLike) throws IOException {
 
-            Drive driveService = GoogleDriveUtils.getDriveService();
+        Drive driveService = GoogleDriveUtils.getDriveService();
 
-            String pageToken = null;
-            List<File> list = new ArrayList<File>();
+        String pageToken = null;
+        List<File> list = new ArrayList<File>();
 
-            String query = " name contains '" + fileNameLike + "' " //
-                    + " and mimeType != 'application/vnd.google-apps.folder' ";
+        String query = " name contains '" + fileNameLike + "' " //
+                + " and mimeType != 'application/vnd.google-apps.folder' ";
 
-            do {
-                FileList result = driveService.files().list().setQ(query).setSpaces("drive") //
-                        // Fields will be assigned values: id, name, createdTime, mimeType
-                        .setFields("nextPageToken, files(id, name, createdTime, mimeType)")//
-                        .setPageToken(pageToken).execute();
-                for (File file : result.getFiles()) {
-                    list.add(file);
-                }
-                pageToken = result.getNextPageToken();
-            } while (pageToken != null);
-            return list;
-        }
+        do {
+            FileList result = driveService.files().list().setQ(query).setSpaces("drive") //
+                    // Fields will be assigned values: id, name, createdTime, mimeType
+                    .setFields("nextPageToken, files(id, name, createdTime, mimeType)")//
+                    .setPageToken(pageToken).execute();
+            for (File file : result.getFiles()) {
+                list.add(file);
+            }
+            pageToken = result.getNextPageToken();
+        } while (pageToken != null);
+        return list;
+    }
 
     @Override
     public File createGoogleFolder(String folderIdParent, String folderName) throws IOException {
@@ -88,17 +88,18 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     @Override
     public Permission createPublicPermission(String googleFileId) throws IOException {
-            // All values: user - group - domain - anyone
-            String permissionType = "anyone";
-            // All values: organizer - owner - writer - commenter - reader
-            String permissionRole = "reader";
-            Permission newPermission = new Permission();
-            newPermission.setType(permissionType);
-            newPermission.setRole(permissionRole);
+        // All values: user - group - domain - anyone
+        String permissionType = "anyone";
+        // All values: organizer - owner - writer - commenter - reader
+        String permissionRole = "reader";
+        Permission newPermission = new Permission();
+        newPermission.setType(permissionType);
+        newPermission.setRole(permissionRole);
 
-            Drive driveService = GoogleDriveUtils.getDriveService();
-            return driveService.permissions().create(googleFileId, newPermission).execute();
+        Drive driveService = GoogleDriveUtils.getDriveService();
+        return driveService.permissions().create(googleFileId, newPermission).execute();
     }
+
     @Override
     public void deleteFile(String fileId) throws IOException {
         Drive driveService = GoogleDriveUtils.getDriveService();

@@ -7,10 +7,17 @@ import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.service.FormStepService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/steps")
@@ -22,14 +29,14 @@ public class StepController {
     public FormStep getFormStep(
             @PathVariable Long formId,
             @PathVariable String stepName
-    ) throws StepFormNotFoundException {
-      return formStepService.findStepByNameAndFormId(formId, stepName);
+        ) throws StepFormNotFoundException {
+        return formStepService.findStepByNameAndFormId(formId, stepName);
     }
 
     @PostMapping(consumes = {"application/json"})
     public ResponseEntity<String> createFormStep(
             @RequestBody FormStep formStep
-            ) throws FormStepAlreadyExistsException, StepFormNotFoundException {
+        ) throws FormStepAlreadyExistsException, StepFormNotFoundException {
         Set<Criteria> criterias = new HashSet<>();
         criterias = formStep.getFormQuestions().stream().findFirst().orElse(null).getCriterias();
         return formStepService.createFormStep(

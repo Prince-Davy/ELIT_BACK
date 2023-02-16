@@ -35,8 +35,10 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
      */
     @Override
     public SurveyQuestion createQuestion(SurveyQuestion question) throws QuestionFormatNotValidException {
-        if(Objects.isNull(question)) throw new QuestionFormatNotValidException("question format not valid");
-            return questionRepo.save(question);
+        if (Objects.isNull(question)) {
+            throw new QuestionFormatNotValidException("question format not valid");
+        }
+        return questionRepo.save(question);
     }
 
 //    @Override
@@ -61,9 +63,11 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
      * @return updated question. return needed for API testing
      */
     @Override
-    public SurveyQuestion modifyQuestion(Long questionId,SurveyQuestion question) throws QuestionFormatNotValidException {
-        if(Objects.isNull(question)) throw new QuestionFormatNotValidException("question format not valid");
-        if(!question.getId().equals(questionId)){
+    public SurveyQuestion modifyQuestion(Long questionId, SurveyQuestion question) throws QuestionFormatNotValidException {
+        if (Objects.isNull(question)) {
+            throw new QuestionFormatNotValidException("question format not valid");
+        }
+        if (!question.getId().equals(questionId)) {
             throw new QuestionFormatNotValidException("question not found with this reference");
         }
         Optional<SurveyQuestion> toBeUpdated = questionRepo.findById(questionId);
@@ -79,9 +83,9 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
     @Override
     public Optional<SurveyQuestion> deleteQuestion(Long questionId) {
         Optional<SurveyQuestion> toBeDeleted = questionRepo.findById(questionId);
-        if(questionId.equals(toBeDeleted.get().getId())){
+        if (questionId.equals(toBeDeleted.get().getId())) {
             questionRepo.deleteById(questionId);
-        }else{
+        } else {
             throw new RuntimeException("question to delete not found");
         }
         return toBeDeleted;
@@ -94,10 +98,9 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
      */
     @Override
     public Optional<SurveyQuestion> selectQuestion(Long questionId) {
-        if(questionRepo.findById(questionId).isPresent()){
+        if (questionRepo.findById(questionId).isPresent()) {
             return questionRepo.findById(questionId);
-        }
-        else{
+        } else {
             throw new RuntimeException("unknown question");
         }
     }

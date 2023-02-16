@@ -17,6 +17,7 @@ public interface MultiCriteriaAnalysisService {
     ResponseEntity<Object> getMulticriteriaAnalysis(Long projectId);
 
     ResponseEntity<String> updateMultiCriteriaAnalysis(Long projectId, FormStep multiCriteriaAnalysis);
+
     ResponseEntity<String> updateMultiCriteriaQuestion(FormQuestionModel formQuestion) throws MulticriteriaNotFoundException;
 
     ResponseEntity calculateMultiCriteriaAnalysisScore(Long projectId) throws ProjectNotFoundException, QuestionsNotFoundException, IOException, EscoreException;

@@ -12,7 +12,8 @@ import javax.persistence.*;
 @Entity
 @Data
 @Builder
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class StepWeight {
     @Id
     @GeneratedValue(

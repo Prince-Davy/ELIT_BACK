@@ -2,7 +2,7 @@ package com.elit.outildedecision.exception;
 
 
 
-public class ProjectNotFoundException extends Exception{
+public class ProjectNotFoundException extends Exception {
     public ProjectNotFoundException() {
         super();
     }

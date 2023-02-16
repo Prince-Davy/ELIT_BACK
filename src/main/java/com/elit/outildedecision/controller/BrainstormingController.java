@@ -6,7 +6,14 @@ import com.elit.outildedecision.service.BrainstormingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -15,7 +22,9 @@ import javax.validation.Valid;
 public class BrainstormingController {
     private final BrainstormingService brainstormingService;
 
-    public BrainstormingController(BrainstormingService brainstormingService) { this.brainstormingService = brainstormingService; }
+    public BrainstormingController(BrainstormingService brainstormingService) {
+        this.brainstormingService = brainstormingService;
+    }
 
     @GetMapping("/{predictibilityAnalysisId}")
     public ResponseEntity<Object> getBrainstorming(@PathVariable Long predictibilityAnalysisId) throws Exception {
@@ -33,7 +42,7 @@ public class BrainstormingController {
     }
 
     @PutMapping("")
-    public  ResponseEntity<String> updateBrainstorming( @RequestBody BrainstormingModel brainstormingModel) throws Exception {
+    public  ResponseEntity<String> updateBrainstorming(@RequestBody BrainstormingModel brainstormingModel) throws Exception {
         return brainstormingService.updateBrainstorming(brainstormingModel);
     }
 
@@ -44,7 +53,7 @@ public class BrainstormingController {
 
     @PutMapping("/validate/{brainstormingId}")
     public ResponseEntity<String> validateOrRejectBrainstorming(@PathVariable Long brainstormingId, HttpEntity<String> isChecked) throws BrainstormingNotFoundException, JsonProcessingException {
-        return brainstormingService.validateOrRejectBrainstorming(brainstormingId,isChecked);
+        return brainstormingService.validateOrRejectBrainstorming(brainstormingId, isChecked);
     }
 
 

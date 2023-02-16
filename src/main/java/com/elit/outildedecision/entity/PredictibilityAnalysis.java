@@ -56,7 +56,7 @@ public class PredictibilityAnalysis implements Serializable {
 
     @OneToOne(
             cascade = CascadeType.ALL
-            // orphanRemoval = true
+    // orphanRemoval = true
     )
     @JoinColumn(
             name = "multi_criteria_analysis_id",
@@ -94,10 +94,10 @@ public class PredictibilityAnalysis implements Serializable {
 
     @Override
     public String toString() {
-        return "PredictibilityAnalysis{" +
-                "predictibilityAnalysisId=" + predictibilityAnalysisId +
-                ", predictibilityAnalysisIteration='" + predictibilityAnalysisIteration + '\'' +
-                ", isFinished='" + isFinished + '\'' +
-                '}';
+        return "PredictibilityAnalysis{"
+                + "predictibilityAnalysisId=" + predictibilityAnalysisId
+                + ", predictibilityAnalysisIteration='" + predictibilityAnalysisIteration + '\''
+                + ", isFinished='" + isFinished + '\''
+                + '}';
     }
 }

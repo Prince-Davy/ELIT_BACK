@@ -49,7 +49,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public ResponseEntity<Object> uploadReport(Long projectId, Long analyseId, String type, MultipartFile file) throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException, MulticriteriaNotFoundException, ExecutionPlanNotFoundException {
         Report reportFromDB = reportRepository.findReportByAnalyseIdAndType(analyseId, type);
-        if(!Objects.isNull(reportFromDB)) {
+        if (!Objects.isNull(reportFromDB)) {
             return new ResponseEntity<>("Le rapport a déjà été généré pour cette analyse.", HttpStatus.CONFLICT);
         }
 
@@ -95,7 +95,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public ResponseEntity<Object> uploadReport2(Long projectId, Long analyseId, String type, MultipartFile file, Integer iteration) throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException, MulticriteriaNotFoundException, ExecutionPlanNotFoundException {
         Report reportFromDB = reportRepository.findReportByAnalyseIdAndType2(analyseId, type, iteration);
-        if(!Objects.isNull(reportFromDB)) {
+        if (!Objects.isNull(reportFromDB)) {
             return new ResponseEntity<>("Le rapport a déjà été généré pour cette analyse.", HttpStatus.CONFLICT);
         }
 

@@ -7,8 +7,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Data @Builder
-@AllArgsConstructor @NoArgsConstructor
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MultiCriteriaStepScoreModel {
     private String stepName;
     private float eScore;

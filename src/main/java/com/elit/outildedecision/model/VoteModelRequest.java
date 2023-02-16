@@ -13,11 +13,12 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Builder
 public class VoteModelRequest {
-    private Long voteId = null;
+    private Long voteId;
     private String chosenPMM;
     private String justification;
     private Integer predictibilityValue;
-    @NotNull(message = "Vous devez renseigner l'id de l'analyse de prévisibilité.") @Min(1)
+    @NotNull(message = "Vous devez renseigner l'id de l'analyse de prévisibilité.")
+    @Min(1)
     private Long predictibilityAnalysisId;
     private Boolean isConfirmed;
     private Long userId;

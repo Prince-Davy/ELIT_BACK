@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface BrainstormingRepository extends JpaRepository<Brainstorming, Long> {
 
-    @Query("SELECT b FROM Brainstorming b WHERE b.user.userId = ?1 and b.formQuestion.questionId = ?2 and b.predictibilityAnalysis.predictibilityAnalysisId = ?3" )
+    @Query("SELECT b FROM Brainstorming b WHERE b.user.userId = ?1 and b.formQuestion.questionId = ?2 and b.predictibilityAnalysis.predictibilityAnalysisId = ?3")
     Brainstorming findByUserQuestionPredictibilityId(Long userID, Long questionID, Long predictibilityAnalysisId);
 
 }
