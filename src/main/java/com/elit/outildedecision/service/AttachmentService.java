@@ -11,14 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface AttachmentService {
 
     ResponseEntity deleteAttachment(Long attachmentId) throws AttachmentNotFoundException, ProjectNotFoundException;
 
 
-    ResponseEntity<Object> uploadAttachment(ArrayList<MultipartFile> files, Long projectId) throws IOException, ProjectNotFoundException;
+    ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId) throws IOException, ProjectNotFoundException;
 
 
     ResponseEntity<String> addAttachmentToProject(Long projectId, AttachmentModel files) throws ProjectNotFoundException;

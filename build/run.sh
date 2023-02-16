@@ -1,20 +1,14 @@
 #!/bin/bash
 
-# Be aware to put site at the end of the command, exitcode bug.
-
-## Final command to execute 
-# mvn -ntp checkstyle:check pmd:check clean verify site
-
-# simplified temporary command, no checkstyle
-mvn -ntp clean verify site
+# Be aware to put site at the end of the command, exitcode bug. 
+mvn -ntp checkstyle:check pmd:check clean verify site
 
 export exitcode=$?
 
 #check mvn result and exitcode=1 if failed
 if [ "$exitcode" -ne "0" ]; then
   echo "mvn failed"
-  export exitcode=1
-fi
+  # export exitcode=1   ## Warning : uncomment after the end of migration
 
 # Print coverage total for gitlab badge
 awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print "Total",  int(100*covered/instructions), "%" }' target/site/jacoco/jacoco.csv > target/coverage-output.txt
@@ -29,12 +23,12 @@ if [ "${PIPESTATUS[0]}" -ne "0" ] ; then
 #in other case print anybadge
 elif [[ $(bc -l <<< "$cov<30.0") -eq 1 ]] ; then
   export color=red
-  # export exitcode=1
+  # export exitcode=1          ## Warning : uncomment after the end of migration
   echo "Coverage under 30%"
   anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
 elif [[ $(bc -l <<< "$cov<60.0") -eq 1 ]] ; then
   export color=orange
-  # export exitcode=1
+  # export exitcode=1          ## Warning : uncomment after the end of migration
   echo "Coverage under 60%"
   anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
 elif [[ $(bc -l <<< "$cov>=60.0") -eq 1 ]] ; then
@@ -49,10 +43,10 @@ else
   anybadge --value="Failed" --file=./target/coverage.svg --label=coverage -c $color -o
 fi
 
-# # Create output file for coverage summary so it can be send to ELK
-# # echo "Hit Total Coverage" > target/coverage.summary.txt
-# # cat target/coverage-output.txt | grep -oP "([0-9]+)" | awk  '{ printf( "%s ", $1 ); } END { printf( "\n" ); }' >> target/coverage.summary.txt
-# # rm target/coverage-output.txt
+# Create output file for coverage summary so it can be send to ELK
+# echo "Hit Total Coverage" > target/coverage.summary.txt
+# cat target/coverage-output.txt | grep -oP "([0-9]+)" | awk  '{ printf( "%s ", $1 ); } END { printf( "\n" ); }' >> target/coverage.summary.txt
+# rm target/coverage-output.txt
 
 exec "$@"
 exit $exitcode
