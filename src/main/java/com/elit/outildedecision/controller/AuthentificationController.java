@@ -22,10 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -58,18 +55,19 @@ public AuthentificationController(UserService userService) {
                 DecodedJWT decodedJWT = verifier.verify(refresh_token);
                 String userEmail = decodedJWT.getSubject();
                 User user = userService.findByEmail(userEmail);
+                List<String> roles = new ArrayList<>();
+                roles.add(user.getIsAdmin()? "ADMIN" : "USER");
                 String access_token = JWT.create()
                         .withSubject(user.getUserEmail())
                         .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                         .withIssuer(request.getRequestURL().toString())
-                        .withClaim("roles", List.of(user.getIsAdmin()? "ADMIN" : "USER"))
+                        .withClaim("roles", roles)
                         .withClaim("firstname",user.getUserFirstName())
                         .withClaim("lastname",user.getUserLastName())
                         .withClaim("id",user.getUserId())
                         .sign(algorithm);
 
                Map<String, String> tokens = new HashMap<>();
-                System.out.println("List.of(user.getIsAdmin()?\"ADMIN\":\"USER\") = " + List.of(user.getIsAdmin()?"ADMIN":"USER"));
                tokens.put("access-token", access_token);
                tokens.put("refresh-token", refresh_token);
                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
