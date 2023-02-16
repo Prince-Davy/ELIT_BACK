@@ -24,8 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -42,7 +42,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     }
 
     @Override
-    public ResponseEntity<Object> uploadAttachment(ArrayList<MultipartFile> files, Long projectId) throws ProjectNotFoundException {
+    public ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId) throws ProjectNotFoundException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas !"));
         String folderPath = StringUtils.cleanPath(STORING_DIRECTORY + project.getFolderPath());

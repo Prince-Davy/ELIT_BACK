@@ -20,28 +20,27 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/attachments")
-public class AttachementController {
-    private final AttachmentService attachmentService;
+public class AttachementController{
+  private final AttachmentService attachmentService;
 
-    public AttachementController(AttachmentService attachmentService) {
-        this.attachmentService = attachmentService;
-    }
+  public AttachementController(AttachmentService attachmentService){
+    this.attachmentService = attachmentService;
+  }
+  @PostMapping(value = "/upload/{projectId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Object> uploadAttachment(@PathVariable Long projectId,
+                                                 @RequestParam("files") List<MultipartFile> files)
+                                                  throws ProjectNotFoundException, IOException{
+    return attachmentService.uploadAttachment(files, projectId);
+}
 
-    @PostMapping(value = "/upload/{projectId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Object> uploadAttachment(@PathVariable Long projectId, @RequestParam("files") ArrayList<MultipartFile> files) throws ProjectNotFoundException, IOException {
-        System.out.println("files = " + files.toString());
-        System.out.println("filesLeng = " + files.size());
-        return attachmentService.uploadAttachment(files, projectId);
-    }
-
-    @PutMapping("/edit/{attachmentId}")
-    public ResponseEntity<String> editAttachment(@PathVariable Long attachmentId,
+  @PutMapping("/edit/{attachmentId}")
+  public ResponseEntity<String> editAttachment(@PathVariable Long attachmentId,
             HttpEntity<String> newAttachmentName) throws AttachmentNotFoundException, IOException {
-        return attachmentService.renameAttachment(attachmentId, newAttachmentName);
+    return attachmentService.renameAttachment(attachmentId, newAttachmentName);
     }
 
 
