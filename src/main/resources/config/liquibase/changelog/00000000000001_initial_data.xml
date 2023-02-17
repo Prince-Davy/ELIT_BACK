@@ -11,12 +11,12 @@
 
     <!-- init method -->
     <changeSet author="jlacour" id="160500499300-2" context="data">
-        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/method.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
+        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/methodology.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
     </changeSet>
 
     <!-- init methodology -->
     <changeSet author="jlacour" id="160500499300-3" context="data">
-        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/methodology.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
+        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/method.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
     </changeSet>
 
     <!-- init fake_users -->
