@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class MethodologyScoreModel {
-    private String name;
-    private float value;
-    private Integer valueVoteSum;
-    private Integer nbVotes;
+  private String name;
+  private float value;
+  private Integer valueVoteSum;
+  private Integer nbVotes;
 }

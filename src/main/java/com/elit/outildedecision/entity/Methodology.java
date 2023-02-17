@@ -6,7 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
@@ -14,35 +21,47 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Methodology {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long methodologyId;
-    private String name; /* Classic, Hybrid ou Agile */
-    @Column(columnDefinition = "TEXT")
-    private String description;
-    @Column(columnDefinition = "TEXT")
-    private String disadvantages;
-    @Column(columnDefinition = "TEXT")
-    private String advantages;
+public class Methodology{
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long methodologyId;
 
-    @OneToMany(
-            mappedBy = "methodology",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
-    )
-    @JsonManagedReference("methodology_predictibility")
-    private List<Method> methods;
+  /* Classic, Hybrid ou Agile */
+  private String name;
 
+  @Column(columnDefinition = "TEXT")
+  private String description;
 
-    @Override
-    public String toString() {
-        return "Methodology{"
-                + "methodologyId=" + methodologyId
-                + ", name='" + name + '\''
-                + ", description='" + description + '\''
-                + ", disadvantages='" + disadvantages + '\''
-                + ", advantages='" + advantages + '\''
-                + '}';
-    }
+  @Column(columnDefinition = "TEXT")
+  private String disadvantages;
+
+  @Column(columnDefinition = "TEXT")
+  private String advantages;
+
+  @OneToMany(mappedBy = "methodology", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JsonManagedReference("methodology_predictibility")
+  private List<Method> methods;
+
+  /**
+   * @return String
+   */
+  @Override
+  public String toString(){
+    return "Methodology{"
+        + "methodologyId="
+        + methodologyId
+        + ", name='"
+        + name
+        + '\''
+        + ", description='"
+        + description
+        + '\''
+        + ", disadvantages='"
+        + disadvantages
+        + '\''
+        + ", advantages='"
+        + advantages
+        + '\''
+        + '}';
+  }
 }

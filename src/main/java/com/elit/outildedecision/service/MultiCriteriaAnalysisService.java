@@ -1,6 +1,5 @@
 package com.elit.outildedecision.service;
 
-
 import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.FormQuestionModel;
@@ -12,16 +11,21 @@ import java.io.IOException;
 import java.util.Set;
 
 public interface MultiCriteriaAnalysisService {
-    ResponseEntity<String> createMulticriteriaAnalysisForm(Long projectId) throws FormAlreadyExistsException, IOException, ParseException, org.json.simple.parser.ParseException;
+  ResponseEntity<String> createMulticriteriaAnalysisForm(Long projectId)
+      throws FormAlreadyExistsException, IOException, ParseException,
+          org.json.simple.parser.ParseException;
 
-    ResponseEntity<Object> getMulticriteriaAnalysis(Long projectId);
+  ResponseEntity<Object> getMulticriteriaAnalysis(Long projectId);
 
-    ResponseEntity<String> updateMultiCriteriaAnalysis(Long projectId, FormStep multiCriteriaAnalysis);
+  ResponseEntity<String> updateMultiCriteriaAnalysis(
+      Long projectId, FormStep multiCriteriaAnalysis);
 
-    ResponseEntity<String> updateMultiCriteriaQuestion(FormQuestionModel formQuestion) throws MulticriteriaNotFoundException;
+  ResponseEntity<String> updateMultiCriteriaQuestion(FormQuestionModel formQuestion)
+      throws MulticriteriaNotFoundException;
 
-    ResponseEntity calculateMultiCriteriaAnalysisScore(Long projectId) throws ProjectNotFoundException, QuestionsNotFoundException, IOException, EscoreException;
+  ResponseEntity calculateMultiCriteriaAnalysisScore(Long projectId)
+      throws ProjectNotFoundException, QuestionsNotFoundException, IOException, EscoreException;
 
-
-    ResponseEntity<String> increaseMulticriteriaIteration(Long analyseId) throws MulticriteriaNotFoundException, UserNotAuthorizedException;
+  ResponseEntity<String> increaseMulticriteriaIteration(Long analyseId)
+      throws MulticriteriaNotFoundException, UserNotAuthorizedException;
 }

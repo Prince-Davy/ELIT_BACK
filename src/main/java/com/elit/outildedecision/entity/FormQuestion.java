@@ -1,12 +1,22 @@
 package com.elit.outildedecision.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.util.List;
 import java.util.Set;
 
@@ -17,47 +27,45 @@ import java.util.Set;
 @Builder
 @EqualsAndHashCode(exclude = "formStep")
 public class FormQuestion {
-    @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
-    private Long questionId;
-    private String questionText;
-    private String answerText;
-    private String questionRef;
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "step_id", referencedColumnName = "stepId")
+  @JsonBackReference("question_step")
+  FormStep formStep;
 
-    @ManyToOne(
-            optional = false
-    )
-    @JoinColumn(
-            name = "step_id",
-            referencedColumnName = "stepId"
-    )
-    @JsonBackReference("question_step")
-    FormStep formStep;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long questionId;
 
-    @JsonManagedReference("question_criteria")
-    @OneToMany(
-            mappedBy = "formQuestion",
-            fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<Criteria> criterias;
+  private String questionText;
+  private String answerText;
+  private String questionRef;
 
-    @OneToMany(
-            mappedBy = "formQuestion",
-            fetch = FetchType.LAZY
-    )
-    @JsonManagedReference("question_brainstorming")
-    private List<Brainstorming> brainstormings;
+  @JsonManagedReference("question_criteria")
+  @OneToMany(
+      mappedBy = "formQuestion",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private Set<Criteria> criterias;
 
-    @Override
-    public String toString() {
-        return "FormQuestion{"
-                + "questionId=" + questionId
-                + ", questionText='" + questionText + '\''
-                + ", answerText='" + answerText + '\''
-                + '}';
-    }
+  @OneToMany(mappedBy = "formQuestion", fetch = FetchType.LAZY)
+  @JsonManagedReference("question_brainstorming")
+  private List<Brainstorming> brainstormings;
+
+  /**
+   * @return String
+   */
+  @Override
+  public String toString() {
+    return "FormQuestion{"
+        + "questionId="
+        + questionId
+        + ", questionText='"
+        + questionText
+        + '\''
+        + ", answerText='"
+        + answerText
+        + '\''
+        + '}';
+  }
 }

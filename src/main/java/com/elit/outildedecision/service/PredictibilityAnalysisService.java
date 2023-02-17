@@ -11,11 +11,14 @@ import java.io.IOException;
 
 public interface PredictibilityAnalysisService {
 
-    ResponseEntity<Long> createPredictibilityForm(Long projectId);
+  ResponseEntity<Long> createPredictibilityForm(Long projectId);
 
-    ResponseEntity<PredictibilityScoreModel>  calculatePredictibilityAnalysisScore(Long analyseId) throws ProjectNotFoundException;
+  ResponseEntity<PredictibilityScoreModel> calculatePredictibilityAnalysisScore(Long analyseId)
+      throws ProjectNotFoundException;
 
-    ResponseEntity<String> putIsFinishedPredictibilityAnalysis(Long analyseId) throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException;
+  ResponseEntity<String> putIsFinishedPredictibilityAnalysis(Long analyseId)
+      throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException;
 
-    ResponseEntity<String> increasePredictAnalysisIterationNum(Long analyseId) throws PredictibilityAnaliseNotFoundException, UserNotAuthorizedException;
+  ResponseEntity<String> increasePredictAnalysisIterationNum(Long analyseId)
+      throws PredictibilityAnaliseNotFoundException, UserNotAuthorizedException;
 }

@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 
 public interface OpinionService {
 
-    ResponseEntity<String> createOpinion(OpinionModel opinionModel) throws UserNotFoundException, OpinionAlreadyExistException;
+  ResponseEntity<String> createOpinion(OpinionModel opinionModel)
+      throws UserNotFoundException, OpinionAlreadyExistException;
 
-    Boolean getOpinionIsAlreadyExist();
+  Boolean getOpinionIsAlreadyExist();
 }

@@ -11,9 +11,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportResponseModel {
-    private Long id;
-    private String title;
-    private String type;
-    private Integer iteration;
-    private Date creationDate;
+  private Long id;
+  private String title;
+  private String type;
+  private Integer iteration;
+  private Date creationDate;
 }

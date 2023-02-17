@@ -20,24 +20,32 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class VoteController {
-    private final VoteService voteService;
+  private final VoteService voteService;
 
-    public VoteController(VoteService voteService) {
-        this.voteService = voteService;
-    }
+  public VoteController(VoteService voteService) {
+    this.voteService = voteService;
+  }
 
-    @PostMapping("/vote")
-    public ResponseEntity<String> createVote(@Valid @RequestBody VoteModelRequest voteModelRequest) throws VoteAlreadyExistException {
-        return voteService.createVote(voteModelRequest);
-    }
+  /**
+   * @param voteModelRequest
+   * @return ResponseEntity<String>
+   * @throws VoteAlreadyExistException
+   */
+  @PostMapping("/vote")
+  public ResponseEntity<String> createVote(@Valid @RequestBody VoteModelRequest voteModelRequest)
+      throws VoteAlreadyExistException {
+    return voteService.createVote(voteModelRequest);
+  }
 
-    @GetMapping("/vote/{predictibilityAnalysisId}")
-    public List<VoteModelResponse> getVote(@PathVariable Long predictibilityAnalysisId) throws UserNotFoundException {
-        return voteService.getVote(predictibilityAnalysisId);
-    }
+  @GetMapping("/vote/{predictibilityAnalysisId}")
+  public List<VoteModelResponse> getVote(@PathVariable Long predictibilityAnalysisId)
+      throws UserNotFoundException {
+    return voteService.getVote(predictibilityAnalysisId);
+  }
 
-    @PutMapping("/vote/{voteId}")
-    public ResponseEntity<String> updateVote(@PathVariable Long voteId, @RequestBody VoteModelRequest voteModelRequest) {
-        return voteService.updateVote(voteId, voteModelRequest);
-    }
+  @PutMapping("/vote/{voteId}")
+  public ResponseEntity<String> updateVote(
+      @PathVariable Long voteId, @RequestBody VoteModelRequest voteModelRequest) {
+    return voteService.updateVote(voteId, voteModelRequest);
+  }
 }

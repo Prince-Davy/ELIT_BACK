@@ -11,5 +11,5 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttachmentModel {
-    ArrayList<MultipartFile> attachments;
+  private ArrayList<MultipartFile> attachments;
 }

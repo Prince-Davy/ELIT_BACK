@@ -10,17 +10,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseModel {
-    private Long userId;
+  private Long userId;
 
-    private String username;
+  private String username;
 
-    private String userLastName;
+  private String userLastName;
 
-    private String userFirstName;
+  private String userFirstName;
 
-    private String userEmail;
+  private String userEmail;
 
-    private String userJob;
+  private String userJob;
 
-    private byte[] userAvatar;
+  private byte[] userAvatar;
 }

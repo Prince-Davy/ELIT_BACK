@@ -27,44 +27,78 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/report/")
 public class ReportController {
-    private final ReportService reportService;
+  private final ReportService reportService;
 
-    public ReportController(ReportService reportService) {
-        this.reportService = reportService;
-    }
+  public ReportController(ReportService reportService) {
+    this.reportService = reportService;
+  }
 
-    @PostMapping(value = "upload/{projectId}/{analyseId}/{type}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Object> uploadReport(@PathVariable Long projectId, @PathVariable Long analyseId, @PathVariable String type, @RequestParam("file") MultipartFile file) throws ProjectNotFoundException, MulticriteriaNotFoundException, ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
-        return reportService.uploadReport(projectId, analyseId, type, file);
-    }
+  /**
+   * @param projectId
+   * @param analyseId
+   * @param type
+   * @param file
+   * @return ResponseEntity<Object>
+   * @throws ProjectNotFoundException
+   * @throws MulticriteriaNotFoundException
+   * @throws ExecutionPlanNotFoundException
+   * @throws PredictibilityAnaliseNotFoundException
+   */
+  @PostMapping(
+      value = "upload/{projectId}/{analyseId}/{type}",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Object> uploadReport(
+      @PathVariable Long projectId,
+      @PathVariable Long analyseId,
+      @PathVariable String type,
+      @RequestParam("file") MultipartFile file)
+      throws ProjectNotFoundException, MulticriteriaNotFoundException,
+          ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
+    return reportService.uploadReport(projectId, analyseId, type, file);
+  }
 
-    @PostMapping(value = "upload/{projectId}/{analyseId}/{type}/{iteration}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Object> uploadReport2(@PathVariable Long projectId, @PathVariable Long analyseId, @PathVariable String type,  @RequestParam("file") MultipartFile file, @PathVariable Integer iteration) throws ProjectNotFoundException, MulticriteriaNotFoundException, ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
-        return reportService.uploadReport2(projectId, analyseId, type, file, iteration);
-    }
+  @PostMapping(
+      value = "upload/{projectId}/{analyseId}/{type}/{iteration}",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Object> uploadReport2(
+      @PathVariable Long projectId,
+      @PathVariable Long analyseId,
+      @PathVariable String type,
+      @RequestParam("file") MultipartFile file,
+      @PathVariable Integer iteration)
+      throws ProjectNotFoundException, MulticriteriaNotFoundException,
+          ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
+    return reportService.uploadReport2(projectId, analyseId, type, file, iteration);
+  }
 
-    @RequestMapping("/preview/{reportId}")
-    public void previewReport(HttpServletResponse response, @PathVariable Long reportId) throws IOException, ReportNotFoundException {
-        reportService.previewReport(reportId, response);
-    }
+  @RequestMapping("/preview/{reportId}")
+  public void previewReport(HttpServletResponse response, @PathVariable Long reportId)
+      throws IOException, ReportNotFoundException {
+    reportService.previewReport(reportId, response);
+  }
 
-    @RequestMapping("download/{reportId}")
-    public void downloadReport(@PathVariable Long reportId, HttpServletResponse response) throws IOException, ReportNotFoundException {
-        reportService.downloadReport(reportId, response);
-    }
+  @RequestMapping("download/{reportId}")
+  public void downloadReport(@PathVariable Long reportId, HttpServletResponse response)
+      throws IOException, ReportNotFoundException {
+    reportService.downloadReport(reportId, response);
+  }
 
-    @GetMapping("{projectId}")
-    public List<ReportResponseModel> getReportsByProjectId(@PathVariable Long projectId) throws ProjectNotFoundException {
-        return reportService.getReportsByProjectId(projectId);
-    }
+  @GetMapping("{projectId}")
+  public List<ReportResponseModel> getReportsByProjectId(@PathVariable Long projectId)
+      throws ProjectNotFoundException {
+    return reportService.getReportsByProjectId(projectId);
+  }
 
-    @DeleteMapping("{reportId}")
-    public ResponseEntity<String> deleteReportById(@PathVariable Long reportId) throws ReportNotFoundException {
-        return reportService.deleteReportById(reportId);
-    }
+  @DeleteMapping("{reportId}")
+  public ResponseEntity<String> deleteReportById(@PathVariable Long reportId)
+      throws ReportNotFoundException {
+    return reportService.deleteReportById(reportId);
+  }
 
-    @PutMapping("{reportId}")
-    public ResponseEntity<String> renameReportById(@PathVariable Long reportId, HttpEntity<String> name) throws IOException, ReportNotFoundException {
-        return reportService.renameReportById(reportId, name);
-    }
+  @PutMapping("{reportId}")
+  public ResponseEntity<String> renameReportById(
+      @PathVariable Long reportId, HttpEntity<String> name)
+      throws IOException, ReportNotFoundException {
+    return reportService.renameReportById(reportId, name);
+  }
 }

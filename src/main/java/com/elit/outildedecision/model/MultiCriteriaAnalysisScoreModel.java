@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MultiCriteriaAnalysisScoreModel {
-    List<MultiCriteriaStepScoreModel> multiCriteriaStepScores;
+  private List<MultiCriteriaStepScoreModel> multiCriteriaStepScores;
 }

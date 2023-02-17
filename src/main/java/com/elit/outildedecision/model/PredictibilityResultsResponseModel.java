@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PredictibilityResultsResponseModel {
-    private String name;
-    private Float value;
+  private String name;
+  private Float value;
 }

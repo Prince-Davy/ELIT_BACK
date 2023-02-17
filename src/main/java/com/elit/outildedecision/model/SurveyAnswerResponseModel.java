@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SurveyAnswerResponseModel {
-    private Long userId;
-    private Long questionId;
-//    private int answer;
-    private String answer;
+  private Long userId;
+  private Long questionId;
+  private String answer;
 }

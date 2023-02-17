@@ -5,19 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CriteriaModel implements Serializable {
-    private Long criteriaId;
+  private Long criteriaId;
 
-    private String criteriaName;
+  private String criteriaName;
 
-    private int criteriaValue;
+  private int criteriaValue;
 
-    // private float score;
-
-    private Long questionId;
+  private Long questionId;
 }

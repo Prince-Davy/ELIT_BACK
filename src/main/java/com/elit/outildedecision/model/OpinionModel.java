@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OpinionModel {
-    private Integer rating;
-    private String description;
+  private Integer rating;
+  private String description;
 }

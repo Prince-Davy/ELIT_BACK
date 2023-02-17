@@ -6,7 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Data
@@ -14,17 +19,15 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 public class StepScore {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
-    private String criteriaName;
-    private float value;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long Id;
 
-    @ManyToOne()
-    @JoinColumn(
-            name = "step_id",
-            referencedColumnName = "stepId"
-    )
-    @JsonBackReference("step_score")
-    private FormStep formStep;
+  private String criteriaName;
+  private float value;
+
+  @ManyToOne()
+  @JoinColumn(name = "step_id", referencedColumnName = "stepId")
+  @JsonBackReference("step_score")
+  private FormStep formStep;
 }

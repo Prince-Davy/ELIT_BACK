@@ -2,15 +2,25 @@ package com.elit.outildedecision.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -19,46 +29,44 @@ import java.util.Set;
 @NoArgsConstructor
 @EqualsAndHashCode(exclude = {"predictibilityAnalysis"})
 public class ExecutionPlan implements Serializable {
-    @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
-    private Long executionPlanId;
-    private Integer executionIteration;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long executionPlanId;
 
-    @CreationTimestamp
-    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
-    private Date createdAt;
+  private Integer executionIteration;
 
-    @UpdateTimestamp
-    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
-    private Date updatedAt;
+  @CreationTimestamp
+  @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
+  private Date createdAt;
 
-    private Boolean isFinished;
+  @UpdateTimestamp
+  @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
+  private Date updatedAt;
 
-    @OneToOne(
-            cascade = CascadeType.ALL
-    )
-    @JoinColumn(
-            name = "predictibility_analysis_id",
-            referencedColumnName = "predictibility_analysis_id"
-    )
-    @JsonManagedReference("execution_previsibility")
-    private PredictibilityAnalysis predictibilityAnalysis;
+  private Boolean isFinished;
 
-    @OneToMany(
-            mappedBy = "executionPlan",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<ExecutionPlanAnswer> executionPlanAnswers;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(
+      name = "predictibility_analysis_id",
+      referencedColumnName = "predictibility_analysis_id")
+  @JsonManagedReference("execution_previsibility")
+  private PredictibilityAnalysis predictibilityAnalysis;
 
-    @Override
-    public String toString() {
-        return "ExecutionPlan{"
-                + "executionPlanId=" + executionPlanId
-                + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt
-                + '}';
-    }
+  @OneToMany(mappedBy = "executionPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ExecutionPlanAnswer> executionPlanAnswers;
+
+  /**
+   * @return String
+   */
+  @Override
+  public String toString() {
+    return "ExecutionPlan{"
+        + "executionPlanId="
+        + executionPlanId
+        + ", createdAt="
+        + createdAt
+        + ", updatedAt="
+        + updatedAt
+        + '}';
+  }
 }

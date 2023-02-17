@@ -18,39 +18,47 @@ import java.util.Set;
 @Service
 public class StepWeightServiceImpl implements StepWeightService {
 
-    @Autowired
-    StepWeightRepo stepWeightRepo;
-    @Autowired
-    FormStepRepo formStepRepo;
+  @Autowired StepWeightRepo stepWeightRepo;
+  @Autowired FormStepRepo formStepRepo;
 
-    @Override
-    public Set<StepWeight> createWeights(Set<Criteria> criterias, Long formStepToPersistId) throws StepFormNotFoundException {
-        FormStep formStepFromDB = formStepRepo.findById(formStepToPersistId)
-                .orElseThrow(() -> new StepFormNotFoundException("This Step Doesn't Exist !"));
-        Set<StepWeight> persistedWeights = new HashSet<>();
-        float weightValue = (float) 1 / criterias.size();
-        for (Criteria criteria :criterias) {
-            StepWeight stepWeight = StepWeight.builder()
-                    .criteriaName(criteria.getCriteriaName())
-                    .weightValue(weightValue)
-                    .formStep(formStepFromDB)
-                    .build();
-            StepWeight persistedWeight = stepWeightRepo.save(stepWeight);
-            persistedWeights.add(persistedWeight);
-        }
-        return persistedWeights;
+  /**
+   * @param criterias
+   * @param formStepToPersistId
+   * @return Set<StepWeight>
+   * @throws StepFormNotFoundException
+   */
+  @Override
+  public Set<StepWeight> createWeights(Set<Criteria> criterias, Long formStepToPersistId)
+      throws StepFormNotFoundException {
+    FormStep formStepFromDB =
+        formStepRepo
+            .findById(formStepToPersistId)
+            .orElseThrow(() -> new StepFormNotFoundException("This Step Doesn't Exist !"));
+    Set<StepWeight> persistedWeights = new HashSet<>();
+    float weightValue = (float) 1 / criterias.size();
+    for (Criteria criteria : criterias) {
+      StepWeight stepWeight =
+          StepWeight.builder()
+              .criteriaName(criteria.getCriteriaName())
+              .weightValue(weightValue)
+              .formStep(formStepFromDB)
+              .build();
+      StepWeight persistedWeight = stepWeightRepo.save(stepWeight);
+      persistedWeights.add(persistedWeight);
     }
+    return persistedWeights;
+  }
 
-    @Override
-    public StepWeight updateWeights(StepWeight stepWeight) throws Exception {
-        Optional<StepWeight> stepWeightFromDB = stepWeightRepo.findById(stepWeight.getWeightId());
-        if (!stepWeightFromDB.isPresent()) {
-            throw new Exception("Le poid du critère " + stepWeight.getCriteriaName() + "n'existe pas !");
-        }
-        StepWeight existingStepWeight = stepWeightFromDB.get();
-        if (Objects.nonNull(stepWeight.getWeightValue())) {
-            existingStepWeight.setWeightValue(stepWeight.getWeightValue());
-        }
-        return stepWeightRepo.save(existingStepWeight);
+  @Override
+  public StepWeight updateWeights(StepWeight stepWeight) throws Exception {
+    Optional<StepWeight> stepWeightFromDB = stepWeightRepo.findById(stepWeight.getWeightId());
+    if (!stepWeightFromDB.isPresent()) {
+      throw new Exception("Le poid du critère " + stepWeight.getCriteriaName() + "n'existe pas !");
     }
+    StepWeight existingStepWeight = stepWeightFromDB.get();
+    if (Objects.nonNull(stepWeight.getWeightValue())) {
+      existingStepWeight.setWeightValue(stepWeight.getWeightValue());
+    }
+    return stepWeightRepo.save(existingStepWeight);
+  }
 }

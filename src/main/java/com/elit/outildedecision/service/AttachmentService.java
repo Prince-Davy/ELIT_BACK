@@ -15,18 +15,21 @@ import java.util.List;
 
 public interface AttachmentService {
 
-    ResponseEntity deleteAttachment(Long attachmentId) throws AttachmentNotFoundException, ProjectNotFoundException;
+  ResponseEntity deleteAttachment(Long attachmentId)
+      throws AttachmentNotFoundException, ProjectNotFoundException;
 
+  ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId)
+      throws IOException, ProjectNotFoundException;
 
-    ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId) throws IOException, ProjectNotFoundException;
+  ResponseEntity<String> addAttachmentToProject(Long projectId, AttachmentModel files)
+      throws ProjectNotFoundException;
 
+  ResponseEntity<String> renameAttachment(Long projectId, HttpEntity<String> newAttachmentName)
+      throws AttachmentNotFoundException, IOException;
 
-    ResponseEntity<String> addAttachmentToProject(Long projectId, AttachmentModel files) throws ProjectNotFoundException;
+  void openAttachment(Long attachmentId, HttpServletResponse response)
+      throws AttachmentNotFoundException, IOException;
 
-    ResponseEntity<String> renameAttachment(Long projectId, HttpEntity<String> newAttachmentName) throws AttachmentNotFoundException, IOException;
-
-    void openAttachment(Long attachmentId, HttpServletResponse response) throws AttachmentNotFoundException, IOException ;
-
-    void downloadAttachment(Long attachmentId, HttpServletResponse response) throws AttachmentNotFoundException, IOException;
-
+  void downloadAttachment(Long attachmentId, HttpServletResponse response)
+      throws AttachmentNotFoundException, IOException;
 }

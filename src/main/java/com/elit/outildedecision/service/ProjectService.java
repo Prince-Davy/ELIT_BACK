@@ -12,26 +12,28 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ProjectService {
-    ProjectResponseModel persistProject(ProjectModel project) throws Exception;
+  ProjectResponseModel persistProject(ProjectModel project) throws Exception;
 
-    List<Project> getAllProjects();
+  List<Project> getAllProjects();
 
-    ResponseEntity<String> deleteProject(Long id) throws ProjectNotFoundException, IOException;
+  ResponseEntity<String> deleteProject(Long id) throws ProjectNotFoundException, IOException;
 
-    Project updateProject(Long id, Project project) throws ProjectNotFoundException;
+  Project updateProject(Long id, Project project) throws ProjectNotFoundException;
 
-    Project getProjectById(Long projectId) throws ProjectNotFoundException;
+  Project getProjectById(Long projectId) throws ProjectNotFoundException;
 
-    List<Project> getUserProjects(String keyword);
+  List<Project> getUserProjects(String keyword);
 
-    List<ProjectResponseModel> getUserProjectList(String keyword);
+  List<ProjectResponseModel> getUserProjectList(String keyword);
 
-    ResponseEntity<String> validateOrRejectProject(Long id, HttpEntity<String> isConfirmed) throws ProjectNotFoundException, IOException;
+  ResponseEntity<String> validateOrRejectProject(Long id, HttpEntity<String> isConfirmed)
+      throws ProjectNotFoundException, IOException;
 
-    ResponseEntity<String> addProjectContributor(Long projectId, ContributerModel contributor) throws Exception;
+  ResponseEntity<String> addProjectContributor(Long projectId, ContributerModel contributor)
+      throws Exception;
 
-    ResponseEntity<String> deleteProjectContributor(Long projectId, Long contributorID) throws Exception;
+  ResponseEntity<String> deleteProjectContributor(Long projectId, Long contributorID)
+      throws Exception;
 
-
-    ProjectResponseModel getProjectData(Long projectId) throws ProjectNotFoundException;
+  ProjectResponseModel getProjectData(Long projectId) throws ProjectNotFoundException;
 }

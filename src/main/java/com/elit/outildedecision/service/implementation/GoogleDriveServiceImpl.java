@@ -18,97 +18,128 @@ import java.util.List;
 
 @Service
 public class GoogleDriveServiceImpl implements GoogleDriveService {
-    private static File _createGoogleFile(String googleFolderIdParent, String contentType,
-            String customFileName, AbstractInputStreamContent uploadStreamContent) throws IOException {
 
-        File fileMetadata = new File();
-        fileMetadata.setName(customFileName);
+  /**
+   * @param googleFolderIdParent
+   * @param contentType
+   * @param customFileName
+   * @param uploadStreamContent
+   * @return File
+   * @throws IOException
+   */
+  private static File _createGoogleFile(
+      String googleFolderIdParent,
+      String contentType,
+      String customFileName,
+      AbstractInputStreamContent uploadStreamContent)
+      throws IOException {
 
-        List<String> parents = Arrays.asList(googleFolderIdParent);
-        fileMetadata.setParents(parents);
-        //
-        Drive driveService = GoogleDriveUtils.getDriveService();
+    File fileMetadata = new File();
+    fileMetadata.setName(customFileName);
 
-        File file = driveService.files().create(fileMetadata, uploadStreamContent)
-                .setFields("id, webContentLink, webViewLink, parents").execute();
+    List<String> parents = Arrays.asList(googleFolderIdParent);
+    fileMetadata.setParents(parents);
+    //
+    Drive driveService = GoogleDriveUtils.getDriveService();
 
-        return file;
+    File file =
+        driveService
+            .files()
+            .create(fileMetadata, uploadStreamContent)
+            .setFields("id, webContentLink, webViewLink, parents")
+            .execute();
+
+    return file;
+  }
+
+  @Override
+  public List<File> getGoogleFilesByName(String fileNameLike) throws IOException {
+
+    Drive driveService = GoogleDriveUtils.getDriveService();
+
+    String pageToken = null;
+    List<File> list = new ArrayList<File>();
+
+    String query =
+        " name contains '"
+            + fileNameLike
+            + "' " //
+            + " and mimeType != 'application/vnd.google-apps.folder' ";
+
+    do {
+      FileList result =
+          driveService
+              .files()
+              .list()
+              .setQ(query)
+              .setSpaces("drive") //
+              // Fields will be assigned values: id, name, createdTime, mimeType
+              .setFields("nextPageToken, files(id, name, createdTime, mimeType)") //
+              .setPageToken(pageToken)
+              .execute();
+      for (File file : result.getFiles()) {
+        list.add(file);
+      }
+      pageToken = result.getNextPageToken();
+    } while (pageToken != null);
+    return list;
+  }
+
+  @Override
+  public File createGoogleFolder(String folderIdParent, String folderName) throws IOException {
+    File fileMetadata = new File();
+
+    fileMetadata.setName(folderName);
+    fileMetadata.setMimeType("application/vnd.google-apps.folder");
+
+    if (folderIdParent != null) {
+      List<String> parents = Arrays.asList(folderIdParent);
+
+      fileMetadata.setParents(parents);
     }
+    Drive driveService = GoogleDriveUtils.getDriveService();
 
-    @Override
-    public List<File> getGoogleFilesByName(String fileNameLike) throws IOException {
+    // Create a Folder.
+    // Returns File object with id & name fields will be assigned values
+    File file = driveService.files().create(fileMetadata).setFields("id, name").execute();
 
-        Drive driveService = GoogleDriveUtils.getDriveService();
+    return file;
+  }
 
-        String pageToken = null;
-        List<File> list = new ArrayList<File>();
+  @Override
+  public File createGoogleFile(
+      String googleFolderIdParent,
+      String contentType,
+      String customFileName,
+      InputStream inputStream)
+      throws IOException {
+    AbstractInputStreamContent uploadStreamContent =
+        new InputStreamContent(contentType, inputStream);
+    return _createGoogleFile(
+        googleFolderIdParent, contentType, customFileName, uploadStreamContent);
+  }
 
-        String query = " name contains '" + fileNameLike + "' " //
-                + " and mimeType != 'application/vnd.google-apps.folder' ";
+  @Override
+  public Permission createPublicPermission(String googleFileId) throws IOException {
+    // All values: user - group - domain - anyone
+    String permissionType = "anyone";
+    // All values: organizer - owner - writer - commenter - reader
+    String permissionRole = "reader";
+    Permission newPermission = new Permission();
+    newPermission.setType(permissionType);
+    newPermission.setRole(permissionRole);
 
-        do {
-            FileList result = driveService.files().list().setQ(query).setSpaces("drive") //
-                    // Fields will be assigned values: id, name, createdTime, mimeType
-                    .setFields("nextPageToken, files(id, name, createdTime, mimeType)")//
-                    .setPageToken(pageToken).execute();
-            for (File file : result.getFiles()) {
-                list.add(file);
-            }
-            pageToken = result.getNextPageToken();
-        } while (pageToken != null);
-        return list;
+    Drive driveService = GoogleDriveUtils.getDriveService();
+    return driveService.permissions().create(googleFileId, newPermission).execute();
+  }
+
+  @Override
+  public void deleteFile(String fileId) throws IOException {
+    Drive driveService = GoogleDriveUtils.getDriveService();
+    try {
+      driveService.files().delete(fileId).execute();
+    } catch (IOException e) {
+      System.out.println("An error occurred: " + e);
     }
-
-    @Override
-    public File createGoogleFolder(String folderIdParent, String folderName) throws IOException {
-        File fileMetadata = new File();
-
-        fileMetadata.setName(folderName);
-        fileMetadata.setMimeType("application/vnd.google-apps.folder");
-
-        if (folderIdParent != null) {
-            List<String> parents = Arrays.asList(folderIdParent);
-
-            fileMetadata.setParents(parents);
-        }
-        Drive driveService = GoogleDriveUtils.getDriveService();
-
-        // Create a Folder.
-        // Returns File object with id & name fields will be assigned values
-        File file = driveService.files().create(fileMetadata).setFields("id, name").execute();
-
-        return file;
-    }
-
-    @Override
-    public File createGoogleFile(String googleFolderIdParent, String contentType, String customFileName, InputStream inputStream) throws IOException {
-        AbstractInputStreamContent uploadStreamContent = new InputStreamContent(contentType, inputStream);
-        return _createGoogleFile(googleFolderIdParent, contentType, customFileName, uploadStreamContent);
-    }
-
-    @Override
-    public Permission createPublicPermission(String googleFileId) throws IOException {
-        // All values: user - group - domain - anyone
-        String permissionType = "anyone";
-        // All values: organizer - owner - writer - commenter - reader
-        String permissionRole = "reader";
-        Permission newPermission = new Permission();
-        newPermission.setType(permissionType);
-        newPermission.setRole(permissionRole);
-
-        Drive driveService = GoogleDriveUtils.getDriveService();
-        return driveService.permissions().create(googleFileId, newPermission).execute();
-    }
-
-    @Override
-    public void deleteFile(String fileId) throws IOException {
-        Drive driveService = GoogleDriveUtils.getDriveService();
-        try {
-            driveService.files().delete(fileId).execute();
-        } catch (IOException e) {
-            System.out.println("An error occurred: " + e);
-        }
-    }
-
-
+  }
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class  ExecutionPlanAnswerModel {
-    private Long executionPlanQuestionId;
-    private String answer;
+public class ExecutionPlanAnswerModel{
+  private Long executionPlanQuestionId;
+  private String answer;
 }

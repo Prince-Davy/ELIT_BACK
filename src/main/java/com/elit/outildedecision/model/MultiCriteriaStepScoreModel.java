@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MultiCriteriaStepScoreModel {
-    private String stepName;
-    private float eScore;
-    private List<CriteriaScoreModel> criteriaScores;
+  private String stepName;
+  private float eScore;
+  private List<CriteriaScoreModel> criteriaScores;
 }

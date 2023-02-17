@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BrainstormingModel {
-    private Long brainstormingId;
-    private String brainstormingText;
-    private Boolean isChecked;
-    private Long questionId;
-    private Long predictibilityAnalysisId;
-    private Long userId;
-    private String firstName;
-    private String lastName;
-    private String role;
+  private Long brainstormingId;
+  private String brainstormingText;
+  private Boolean isChecked;
+  private Long questionId;
+  private Long predictibilityAnalysisId;
+  private Long userId;
+  private String firstName;
+  private String lastName;
+  private String role;
 }

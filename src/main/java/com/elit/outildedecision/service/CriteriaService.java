@@ -6,7 +6,7 @@ import com.elit.outildedecision.entity.FormQuestion;
 import java.util.Set;
 
 public interface CriteriaService {
-    Set<Criteria> createCriterias(Set<Criteria> criterias, FormQuestion formQuestion);
+  Set<Criteria> createCriterias(Set<Criteria> criterias, FormQuestion formQuestion);
 
-    Criteria updateCriteria(Criteria criterias);
+  Criteria updateCriteria(Criteria criterias);
 }

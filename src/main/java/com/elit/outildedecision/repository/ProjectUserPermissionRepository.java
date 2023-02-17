@@ -10,16 +10,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUserPermission, ProjectPropertyKey> {
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM ProjectUserPermission WHERE  project_id=:pProjectID and user_id=:pUserId")
-    void deleteByProjectUser(@Param("pProjectID") Long projectId, @Param("pUserId") Long userID);
+public interface ProjectUserPermissionRepository
+    extends JpaRepository<ProjectUserPermission, ProjectPropertyKey> {
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM ProjectUserPermission pp " +
+    "WHERE  pp.project.projectId=:pProjectID " +
+    "and pp.user.userId=:pUserId")
+  void deleteByProjectUser(@Param("pProjectID") Long projectId, @Param("pUserId") Long userID);
 
-    @Query("SELECT p FROM ProjectUserPermission p WHERE  project_id=:pProjectID and user_id=:pUserId")
-    ProjectUserPermission findByProjectIdUserID(@Param("pProjectID") Long projectId, @Param("pUserId") Long userID);
+  @Query("SELECT p FROM ProjectUserPermission p " +
+    "WHERE  p.project.projectId=:pProjectID " +
+    "and p.user.userId=:pUserId")
+  ProjectUserPermission findByProjectIdUserID(
+      @Param("pProjectID") Long projectId, @Param("pUserId") Long userID);
 
-    @Query("SELECT p FROM ProjectUserPermission p WHERE p.project.projectId=:pProjectID")
-    List<ProjectUserPermission> findAllByProjectId(@Param("pProjectID") Long projectId);
-
+  @Query("SELECT p FROM ProjectUserPermission p " +
+    "WHERE p.project.projectId=:pProjectID")
+  List<ProjectUserPermission> findAllByProjectId(@Param("pProjectID") Long projectId);
 }

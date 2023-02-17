@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface VoteService {
-    ResponseEntity<String> createVote(VoteModelRequest voteModelRequest) throws VoteAlreadyExistException;
+  ResponseEntity<String> createVote(VoteModelRequest voteModelRequest)
+      throws VoteAlreadyExistException;
 
-    List<VoteModelResponse> getVote(Long predictibilityAnalysisId) throws UserNotFoundException;
+  List<VoteModelResponse> getVote(Long predictibilityAnalysisId) throws UserNotFoundException;
 
-    ResponseEntity<String> updateVote(Long voteId, VoteModelRequest voteModelRequest);
+  ResponseEntity<String> updateVote(Long voteId, VoteModelRequest voteModelRequest);
 }

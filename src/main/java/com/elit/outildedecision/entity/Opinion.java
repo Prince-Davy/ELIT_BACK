@@ -7,7 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import java.util.Date;
 
 @Entity
@@ -16,24 +21,19 @@ import java.util.Date;
 @Data
 @Builder
 public class Opinion {
-    @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
-    private Long opinionId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long opinionId;
 
-    private Integer rating;
+  private Integer rating;
 
-    private String description;
+  private String description;
 
-    @OneToOne
-    @JoinColumn(
-            name = "userId",
-            referencedColumnName = "userId"
-    )
-    private User user;
+  @OneToOne
+  @JoinColumn(name = "userId", referencedColumnName = "userId")
+  private User user;
 
-    @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Europe/Paris")
-    private Date createdAt;
+  @CreationTimestamp
+  @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Europe/Paris")
+  private Date createdAt;
 }

@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface CriteriaRepository extends JpaRepository<Criteria, Long> {
-    @Query("select c from Criteria c where c.formQuestion.formStep.stepId = ?1 and c.criteriaName=?2")
-    List<Criteria> getCriteriaByStepIdAndCriteriaName(Long stepId, String criteriaName);
+  @Query("select c from Criteria c where c.formQuestion.formStep.stepId = ?1 and c.criteriaName=?2")
+  List<Criteria> getCriteriaByStepIdAndCriteriaName(Long stepId, String criteriaName);
 }

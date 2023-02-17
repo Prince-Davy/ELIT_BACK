@@ -10,12 +10,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContributerModel implements Serializable {
-    private Long contributerId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String job;
-    private Boolean isAdmin;
-    private String role;
-
+  private Long contributerId;
+  private String firstName;
+  private String lastName;
+  private String email;
+  private String job;
+  private Boolean isAdmin;
+  private String role;
 }

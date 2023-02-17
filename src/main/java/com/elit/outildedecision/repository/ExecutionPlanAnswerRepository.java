@@ -7,6 +7,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ExecutionPlanAnswerRepository extends JpaRepository<ExecutionPlanAnswer, Long> {
-    @Query("SELECT a FROM ExecutionPlanAnswer a WHERE a.executionPlan.executionPlanId=?1 and a.executionPlanQuestion.id = ?2")
-    ExecutionPlanAnswer findByExecutionPlanIdAndExecutionPlanQuestionId(Long executionPlanId, Long executionPlanQuestionId);
+  @Query(
+      "SELECT a FROM ExecutionPlanAnswer a " +
+        "WHERE a.executionPlan.executionPlanId=?1 " +
+        "and a.executionPlanQuestion.id = ?2")
+  ExecutionPlanAnswer findByExecutionPlanIdAndExecutionPlanQuestionId(
+      Long executionPlanId, Long executionPlanQuestionId);
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExecutionVoteModel {
-    private Long id;
-    private Long userId;
+public class ExecutionVoteModel{
+  private Long id;
+  private Long userId;
 }

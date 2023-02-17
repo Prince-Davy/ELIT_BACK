@@ -15,43 +15,43 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public interface   UserService {
-    User findByUsername(String username);
+public interface UserService {
+  User findByUsername(String username);
 
-    User findByEmail(String email);
+  User findByEmail(String email);
 
-    User findByUserId(Long userId);
+  User findByUserId(Long userId);
 
-    ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException;
+  ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException;
 
-    void deleteUserById(Long userId);
+  void deleteUserById(Long userId);
 
-    ResponseEntity<Map<String, String>> updateUser(UserModel user) throws CouldNotSaveUserException;
+  ResponseEntity<Map<String, String>> updateUser(UserModel user) throws CouldNotSaveUserException;
 
-    ResponseEntity<String> updatePasswordUserById(Long userId, String oldPass, String newPass) throws  IOException, CouldNotSaveUserException;
+  ResponseEntity<String> updatePasswordUserById(Long userId, String oldPass, String newPass)
+      throws IOException, CouldNotSaveUserException;
 
-    ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar) throws  IOException, CouldNotSaveUserException;
+  ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar)
+      throws IOException, CouldNotSaveUserException;
 
-    ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName) throws  IOException, CouldNotSaveUserException;
+  ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName)
+      throws IOException, CouldNotSaveUserException;
 
+  void viewAvatarByUserId(Long userId, HttpServletResponse response) throws IOException;
 
-    void viewAvatarByUserId(Long userId, HttpServletResponse response) throws IOException;
+  ResponseEntity<Object> uploadAttachment(File file, Long userId) throws UserNotFoundException;
 
+  void sendRegistrationConfirmationEmail(User user);
 
-    ResponseEntity<Object> uploadAttachment(File file, Long userId) throws UserNotFoundException;
+  List<User> findAllUsers();
 
-    void sendRegistrationConfirmationEmail(User user);
+  List<User> findAllUsersByPage(Pageable pageable);
 
-    List<User> findAllUsers();
+  void confirmUser(User user);
 
-    List<User> findAllUsersByPage(Pageable pageable);
+  List<UserResponseModel> findUsersByKeyword(String keyword) throws IOException;
 
+  UserResponseModel getAllInfosUserById(Long userId) throws IOException;
 
-    void confirmUser(User user);
-
-    List<UserResponseModel> findUsersByKeyword(String keyword) throws IOException;
-
-    UserResponseModel getAllInfosUserById(Long userId) throws IOException;
-
-    String saveAvatar(MultipartFile avatar) throws UserNotFoundException;
+  String saveAvatar(MultipartFile avatar) throws UserNotFoundException;
 }

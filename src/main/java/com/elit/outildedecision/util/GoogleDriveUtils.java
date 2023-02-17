@@ -23,63 +23,71 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
 public class GoogleDriveUtils {
-    private static final String APPLICATION_NAME = "ELIT";
+  private static final String APPLICATION_NAME = "ELIT";
 
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    // Directory to store user credentials for this application.
-    private static final java.io.File CREDENTIALS_FOLDER //
-            = new java.io.File("/googleCredentials");
+  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+  // Directory to store user credentials for this application.
+  private static final java.io.File CREDENTIALS_FOLDER //
+      = new java.io.File("/googleCredentials");
 
-    private static final String CREDENTIALS_FILE_PATH = "/googleCredentials/Creds.json";
+  private static final String CREDENTIALS_FILE_PATH = "/googleCredentials/Creds.json";
 
-    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
+  private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
 
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
+  private static FileDataStoreFactory DATA_STORE_FACTORY;
 
-    // Global instance of the HTTP transport.
-    private static HttpTransport HTTP_TRANSPORT;
+  // Global instance of the HTTP transport.
+  private static HttpTransport HTTP_TRANSPORT;
 
-    private static Drive _driveService;
+  private static Drive _driveService;
 
-    static {
-        try {
-            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            DATA_STORE_FACTORY = new FileDataStoreFactory(CREDENTIALS_FOLDER);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.exit(1);
-        }
+  static {
+    try {
+      HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+      DATA_STORE_FACTORY = new FileDataStoreFactory(CREDENTIALS_FOLDER);
+    } catch (Throwable t) {
+      t.printStackTrace();
+      System.exit(1);
     }
+  }
 
-    public static Credential getCredentials() throws IOException {
+  private GoogleDriveUtils() {}
 
-        InputStream in = OutildedecisionApplication.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+  /**
+   * @return Credential
+   * @throws IOException
+   */
+  public static Credential getCredentials() throws IOException {
 
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-                clientSecrets, SCOPES).setDataStoreFactory(DATA_STORE_FACTORY).setAccessType("offline").build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8081).build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-
-        return credential;
+    InputStream in = OutildedecisionApplication.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+    if (in == null) {
+      throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
     }
+    GoogleClientSecrets clientSecrets =
+        GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-    public static Drive getDriveService() throws IOException {
-        if (_driveService != null) {
-            return _driveService;
-        }
-        Credential credential = getCredentials();
-        //
-        _driveService = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential) //
-                .setApplicationName(APPLICATION_NAME).build();
-        return _driveService;
+    // Build flow and trigger user authorization request.
+    GoogleAuthorizationCodeFlow flow =
+        new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+            .setDataStoreFactory(DATA_STORE_FACTORY)
+            .setAccessType("offline")
+            .build();
+    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8081).build();
+    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+
+    return credential;
+  }
+
+  public static Drive getDriveService() throws IOException {
+    if (_driveService != null) {
+      return _driveService;
     }
-
-    private GoogleDriveUtils() {
-    }
-
+    Credential credential = getCredentials();
+    //
+    _driveService =
+        new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential) //
+            .setApplicationName(APPLICATION_NAME)
+            .build();
+    return _driveService;
+  }
 }

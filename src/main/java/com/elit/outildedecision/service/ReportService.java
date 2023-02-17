@@ -13,17 +13,26 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ReportService {
-    ResponseEntity<Object> uploadReport(Long projectId, Long analyseId, String type, MultipartFile file) throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException, MulticriteriaNotFoundException, ExecutionPlanNotFoundException;
+  ResponseEntity<Object> uploadReport(
+      Long projectId, Long analyseId, String type, MultipartFile file)
+      throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException,
+          MulticriteriaNotFoundException, ExecutionPlanNotFoundException;
 
-    ResponseEntity<Object> uploadReport2(Long projectId, Long analyseId, String type, MultipartFile file, Integer iteration) throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException, MulticriteriaNotFoundException, ExecutionPlanNotFoundException;
+  ResponseEntity<Object> uploadReport2(
+      Long projectId, Long analyseId, String type, MultipartFile file, Integer iteration)
+      throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException,
+          MulticriteriaNotFoundException, ExecutionPlanNotFoundException;
 
-    void previewReport(Long reportId, HttpServletResponse response) throws ReportNotFoundException, IOException;
+  void previewReport(Long reportId, HttpServletResponse response)
+      throws ReportNotFoundException, IOException;
 
-    void downloadReport(Long reportId, HttpServletResponse response) throws IOException, ReportNotFoundException;
+  void downloadReport(Long reportId, HttpServletResponse response)
+      throws IOException, ReportNotFoundException;
 
-    List<ReportResponseModel> getReportsByProjectId(Long projectId) throws ProjectNotFoundException;
+  List<ReportResponseModel> getReportsByProjectId(Long projectId) throws ProjectNotFoundException;
 
-    ResponseEntity<String> deleteReportById(Long reportId) throws ReportNotFoundException;
+  ResponseEntity<String> deleteReportById(Long reportId) throws ReportNotFoundException;
 
-    ResponseEntity<String> renameReportById(Long reportId, HttpEntity<String> name) throws IOException, ReportNotFoundException;
+  ResponseEntity<String> renameReportById(Long reportId, HttpEntity<String> name)
+      throws IOException, ReportNotFoundException;
 }

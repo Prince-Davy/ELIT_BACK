@@ -12,27 +12,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 public class VerificationController {
-    private final VerificationTokenService verificationTokenService;
+  private final VerificationTokenService verificationTokenService;
 
-    public VerificationController(VerificationTokenService verificationTokenService) {
-        this.verificationTokenService = verificationTokenService;
-    }
+  public VerificationController(VerificationTokenService verificationTokenService) {
+    this.verificationTokenService = verificationTokenService;
+  }
 
-    @GetMapping("/confirm-account")
-    public ResponseEntity<String> confirmAccount(@RequestParam("token") String token) {
-        return verificationTokenService.confirmUser(token);
-    }
+  /**
+   * @param token
+   * @return ResponseEntity<String>
+   */
+  @GetMapping("/confirm-account")
+  public ResponseEntity<String> confirmAccount(@RequestParam("token") String token) {
+    return verificationTokenService.confirmUser(token);
+  }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> reinstateForgotPassword(@RequestParam("token") String token, @RequestBody PasswordChangeModel changePasswordModel) {
-        return verificationTokenService.reinstateForgotPassword(token, changePasswordModel);
-    }
+  @PostMapping("/reset-password")
+  public ResponseEntity<String> reinstateForgotPassword(
+      @RequestParam("token") String token, @RequestBody PasswordChangeModel changePasswordModel) {
+    return verificationTokenService.reinstateForgotPassword(token, changePasswordModel);
+  }
 
-    @GetMapping(value = "/reset-password", consumes = "application/json")
-    public ResponseEntity<String> forgotPassword(HttpEntity<String> email) throws JsonProcessingException, UserNotVerifiedException {
-        return verificationTokenService.forgotPassword(email.getBody());
-    }
+  @GetMapping(value = "/reset-password", consumes = "application/json")
+  public ResponseEntity<String> forgotPassword(HttpEntity<String> email)
+      throws JsonProcessingException, UserNotVerifiedException {
+    return verificationTokenService.forgotPassword(email.getBody());
+  }
 }

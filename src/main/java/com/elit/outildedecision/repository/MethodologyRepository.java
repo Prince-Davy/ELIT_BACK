@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MethodologyRepository extends JpaRepository<Methodology, Long> {
 
-    @Query("SELECT m FROM Methodology m WHERE m.name = ?1")
-    Methodology findMethodologyByName(String methodologyName);
-
+  @Query("SELECT m FROM Methodology m " +
+    "WHERE m.name = ?1")
+  Methodology findMethodologyByName(String methodologyName);
 }

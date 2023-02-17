@@ -18,53 +18,62 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api")
 public class SuperAdminController {
 
-    @Autowired
-    SuperAdminService superAdminService;
+  @Autowired SuperAdminService superAdminService;
 
-    @PutMapping("/projects/{projectId}")
-    public ResponseEntity confirmProject(@PathVariable Long projectId) throws ProjectNotFoundException {
-        return superAdminService.confirmProject(projectId);
-    }
+  /**
+   * @param projectId
+   * @return ResponseEntity
+   * @throws ProjectNotFoundException
+   */
+  @PutMapping("/projects/{projectId}")
+  public ResponseEntity confirmProject(@PathVariable Long projectId)
+      throws ProjectNotFoundException {
+    return superAdminService.confirmProject(projectId);
+  }
 
-    @PutMapping("/users/{userId}")
-    public ResponseEntity suspendUser(@PathVariable Long userId) throws UserNotFoundException {
-        return superAdminService.suspendUser(userId);
-    }
+  @PutMapping("/users/{userId}")
+  public ResponseEntity suspendUser(@PathVariable Long userId) throws UserNotFoundException {
+    return superAdminService.suspendUser(userId);
+  }
 
-    @DeleteMapping("/projects/{projectId}")
-    public ResponseEntity deleteProject(@PathVariable Long projectId) throws ProjectNotFoundException {
-        return superAdminService.deleteProject(projectId);
-    }
+  @DeleteMapping("/projects/{projectId}")
+  public ResponseEntity deleteProject(@PathVariable Long projectId)
+      throws ProjectNotFoundException {
+    return superAdminService.deleteProject(projectId);
+  }
 
-    /* @GetMapping("/projects/notConfirmed")
-    public List<Project> getAllNonConfirmedProjects(){
-        return superAdminService.getAllNonConfirmedProjects();
-    } */
+  /*
+   * @GetMapping("/projects/notConfirmed")
+   * public List<Project> getAllNonConfirmedProjects(){
+   * return superAdminService.getAllNonConfirmedProjects();
+   * }
+   */
 
-    @GetMapping("/projects/notConfirmed/{page}")
-    public Page<Project> getAllNonConfirmedProjects(@PathVariable int page) {
-        return superAdminService.getAllNonConfirmedProjects(page);
-    }
+  @GetMapping("/projects/notConfirmed/{page}")
+  public Page<Project> getAllNonConfirmedProjects(@PathVariable int page) {
+    return superAdminService.getAllNonConfirmedProjects(page);
+  }
 
-    @GetMapping("/projects/notConfirmed/{page}/orderByDate")
-    public Page<Project> getAllConfirmedProjectsOrderByDate(@PathVariable int page, @RequestParam String order) {
-        return superAdminService.getAllNonConfirmedProjectsOrderByDate(page, order);
-    }
+  @GetMapping("/projects/notConfirmed/{page}/orderByDate")
+  public Page<Project> getAllConfirmedProjectsOrderByDate(
+      @PathVariable int page, @RequestParam String order) {
+    return superAdminService.getAllNonConfirmedProjectsOrderByDate(page, order);
+  }
 
-    @PutMapping("/projects/confirmProjects")
-    public ResponseEntity confirmProjects(@RequestBody List<Long> projectIds) throws ProjectNotFoundException {
-        return superAdminService.confirmProjects(projectIds);
-    }
+  @PutMapping("/projects/confirmProjects")
+  public ResponseEntity confirmProjects(@RequestBody List<Long> projectIds)
+      throws ProjectNotFoundException {
+    return superAdminService.confirmProjects(projectIds);
+  }
 
-    @GetMapping("/projects/notConfirmed/{page}/search")
-    public Page<Project> findNotConfirmedProjectByKeyword(@RequestParam String keyword, @PathVariable int page) {
-        System.out.println("keyword = " + keyword);
-        return superAdminService.findNotConfirmedProjectByKeyword(keyword, page);
-    }
-
+  @GetMapping("/projects/notConfirmed/{page}/search")
+  public Page<Project> findNotConfirmedProjectByKeyword(
+      @RequestParam String keyword, @PathVariable int page) {
+    System.out.println("keyword = " + keyword);
+    return superAdminService.findNotConfirmedProjectByKeyword(keyword, page);
+  }
 }

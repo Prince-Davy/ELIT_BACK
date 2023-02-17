@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExecutionPlanFormModel {
-    private String answer;
-    private String title;
-    private String description;
-    private Long executionQuestionId;
+  private String answer;
+  private String title;
+  private String description;
+  private Long executionQuestionId;
 }

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MethodModel {
-    private String name;
-    private Integer votes;
+  private String name;
+  private Integer votes;
 }

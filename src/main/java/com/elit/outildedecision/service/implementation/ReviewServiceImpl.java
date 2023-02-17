@@ -1,16 +1,16 @@
-//package com.elit.outildedecision.service.implementation;
+// package com.elit.outildedecision.service.implementation;
 //
-//import com.elit.outildedecision.entity.Project;
-//import com.elit.outildedecision.exception.ProjectNotFoundException;
-//import com.elit.outildedecision.repository.ProjectRepository;
-//import com.elit.outildedecision.service.ReviewService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//import java.util.List;
-//import java.util.Optional;
+// import com.elit.outildedecision.entity.Project;
+// import com.elit.outildedecision.exception.ProjectNotFoundException;
+// import com.elit.outildedecision.repository.ProjectRepository;
+// import com.elit.outildedecision.service.ReviewService;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Service;
+// import java.util.List;
+// import java.util.Optional;
 //
-//@Service
-//public class ReviewServiceImpl implements ReviewService {
+// @Service
+// public class ReviewServiceImpl implements ReviewService {
 //    @Autowired
 //    ReviewRepositpory reviewRepositpory;
 //    @Autowired
@@ -32,8 +32,4 @@
 //    public List<Review> getProjectReviews(Long projectId) {
 //        return reviewRepositpory.findAllByProjectId(projectId);
 //    }
-//}
-
-
-
-
+// }

@@ -12,8 +12,8 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectModel implements Serializable {
-    private String name;
-    private String description;
-    private ArrayList<ContributerModel> contributers;
-    private ArrayList<MultipartFile> files;
+  private String name;
+  private String description;
+  private ArrayList<ContributerModel> contributers;
+  private ArrayList<MultipartFile> files;
 }

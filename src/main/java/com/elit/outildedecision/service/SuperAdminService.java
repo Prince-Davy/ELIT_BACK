@@ -9,19 +9,19 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface SuperAdminService {
-    ResponseEntity confirmProject(Long projectId) throws ProjectNotFoundException;
+  ResponseEntity confirmProject(Long projectId) throws ProjectNotFoundException;
 
-    ResponseEntity suspendUser(Long userId) throws UserNotFoundException;
+  ResponseEntity suspendUser(Long userId) throws UserNotFoundException;
 
-    ResponseEntity deleteProject(Long projectId) throws ProjectNotFoundException;
+  ResponseEntity deleteProject(Long projectId) throws ProjectNotFoundException;
 
-    List<Project> getAllNonConfirmedProjects();
+  List<Project> getAllNonConfirmedProjects();
 
-    Page<Project> getAllNonConfirmedProjects(int page);
+  Page<Project> getAllNonConfirmedProjects(int page);
 
-    Page<Project> getAllNonConfirmedProjectsOrderByDate(int page, String order);
+  Page<Project> getAllNonConfirmedProjectsOrderByDate(int page, String order);
 
-    ResponseEntity confirmProjects(List<Long> projectIds) throws ProjectNotFoundException;
+  ResponseEntity confirmProjects(List<Long> projectIds) throws ProjectNotFoundException;
 
-    Page<Project> findNotConfirmedProjectByKeyword(String keyword, int page);
+  Page<Project> findNotConfirmedProjectByKeyword(String keyword, int page);
 }

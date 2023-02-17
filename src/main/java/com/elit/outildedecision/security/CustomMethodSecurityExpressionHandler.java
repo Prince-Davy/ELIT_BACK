@@ -9,29 +9,30 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 
-public class CustomMethodSecurityExpressionHandler
-        extends DefaultMethodSecurityExpressionHandler {
-    private final AuthenticationTrustResolver trustResolver =
-            new AuthenticationTrustResolverImpl();
+public class CustomMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
+  private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
-    private BeanFactory beanFactory;
+  private BeanFactory beanFactory;
 
+  /**
+   * @param authentication
+   * @param invocation
+   * @return MethodSecurityExpressionOperations
+   */
+  @Override
+  protected MethodSecurityExpressionOperations createSecurityExpressionRoot(
+      Authentication authentication, MethodInvocation invocation) {
+    CustomMethodSecurityExpressionRoot root =
+        new CustomMethodSecurityExpressionRoot(authentication);
+    root.setThis(invocation.getThis());
+    root.setPermissionEvaluator(getPermissionEvaluator());
+    root.setTrustResolver(this.trustResolver);
+    root.setRoleHierarchy(getRoleHierarchy());
+    root.setUserService(beanFactory.getBean(UserService.class));
+    return root;
+  }
 
-    @Override
-    protected MethodSecurityExpressionOperations createSecurityExpressionRoot(
-            Authentication authentication, MethodInvocation invocation) {
-        CustomMethodSecurityExpressionRoot root =
-                new CustomMethodSecurityExpressionRoot(authentication);
-        root.setThis(invocation.getThis());
-        root.setPermissionEvaluator(getPermissionEvaluator());
-        root.setTrustResolver(this.trustResolver);
-        root.setRoleHierarchy(getRoleHierarchy());
-        root.setUserService(beanFactory.getBean(UserService.class));
-        return root;
-    }
-
-
-    public void setBeanFactory(BeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
-    }
+  public void setBeanFactory(BeanFactory beanFactory) {
+    this.beanFactory = beanFactory;
+  }
 }

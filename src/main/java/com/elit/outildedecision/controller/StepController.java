@@ -22,34 +22,32 @@ import java.util.Set;
 @RestController
 @RequestMapping("/steps")
 public class StepController {
-    @Autowired
-    FormStepService formStepService;
+  @Autowired FormStepService formStepService;
 
-    @GetMapping("/{formId}/{stepName}")
-    public FormStep getFormStep(
-            @PathVariable Long formId,
-            @PathVariable String stepName
-        ) throws StepFormNotFoundException {
-        return formStepService.findStepByNameAndFormId(formId, stepName);
-    }
+  /**
+   * @return FormStep
+   * @throws StepFormNotFoundException
+   */
+  @GetMapping("/{formId}/{stepName}")
+  public FormStep getFormStep(@PathVariable Long formId, @PathVariable String stepName)
+      throws StepFormNotFoundException {
+    return formStepService.findStepByNameAndFormId(formId, stepName);
+  }
 
-    @PostMapping(consumes = {"application/json"})
-    public ResponseEntity<String> createFormStep(
-            @RequestBody FormStep formStep
-        ) throws FormStepAlreadyExistsException, StepFormNotFoundException {
-        Set<Criteria> criterias = new HashSet<>();
-        criterias = formStep.getFormQuestions().stream().findFirst().orElse(null).getCriterias();
-        return formStepService.createFormStep(
-                formStep.getMultiCriteriaAnalysis().getMultiCriteriaAnalysisId(),
-                formStep.getStepName(),
-                criterias,
-                formStep.getFormQuestions()
-        );
-    }
+  @PostMapping(consumes = {"application/json"})
+  public ResponseEntity<String> createFormStep(@RequestBody FormStep formStep)
+      throws FormStepAlreadyExistsException, StepFormNotFoundException {
+    Set<Criteria> criterias = new HashSet<>();
+    criterias = formStep.getFormQuestions().stream().findFirst().orElse(null).getCriterias();
+    return formStepService.createFormStep(
+        formStep.getMultiCriteriaAnalysis().getMultiCriteriaAnalysisId(),
+        formStep.getStepName(),
+        criterias,
+        formStep.getFormQuestions());
+  }
 
-    @PutMapping
-    public ResponseEntity updateFormStep(@Valid @RequestBody FormStep step) throws Exception {
-        return formStepService.updateFormStep(step);
-    }
-
+  @PutMapping
+  public ResponseEntity updateFormStep(@Valid @RequestBody FormStep step) throws Exception {
+    return formStepService.updateFormStep(step);
+  }
 }

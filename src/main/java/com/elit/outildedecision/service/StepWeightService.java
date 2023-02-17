@@ -8,7 +8,8 @@ import com.elit.outildedecision.exception.StepFormNotFoundException;
 import java.util.Set;
 
 public interface StepWeightService {
-    Set<StepWeight> createWeights(Set<Criteria> criterias, Long formStepToPersistId) throws StepFormNotFoundException;
+  Set<StepWeight> createWeights(Set<Criteria> criterias, Long formStepToPersistId)
+      throws StepFormNotFoundException;
 
-    StepWeight updateWeights(StepWeight stepWeight) throws Exception;
+  StepWeight updateWeights(StepWeight stepWeight) throws Exception;
 }

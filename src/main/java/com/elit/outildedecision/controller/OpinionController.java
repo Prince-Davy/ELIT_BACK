@@ -14,21 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class OpinionController {
-    private final OpinionService opinionService;
+  private final OpinionService opinionService;
 
-    public OpinionController(OpinionService opinionService) {
-        this.opinionService = opinionService;
-    }
+  public OpinionController(OpinionService opinionService) {
+    this.opinionService = opinionService;
+  }
 
-    @PostMapping("/opinion")
-    public ResponseEntity<String> createOpinion(@RequestBody OpinionModel opinionModel)
-            throws UserNotFoundException, OpinionAlreadyExistException {
-        return opinionService.createOpinion(opinionModel);
-    }
+  /**
+   * @param opinionModel
+   * @return ResponseEntity<String>
+   * @throws UserNotFoundException
+   * @throws OpinionAlreadyExistException
+   */
+  @PostMapping("/opinion")
+  public ResponseEntity<String> createOpinion(@RequestBody OpinionModel opinionModel)
+      throws UserNotFoundException, OpinionAlreadyExistException {
+    return opinionService.createOpinion(opinionModel);
+  }
 
-    @GetMapping("/opinion/user")
-    public Boolean getOpinionIsAlreadyExist() {
-        return opinionService.getOpinionIsAlreadyExist();
-    }
-
+  @GetMapping("/opinion/user")
+  public Boolean getOpinionIsAlreadyExist() {
+    return opinionService.getOpinionIsAlreadyExist();
+  }
 }

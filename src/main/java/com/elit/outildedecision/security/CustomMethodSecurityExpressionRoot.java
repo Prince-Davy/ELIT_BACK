@@ -10,83 +10,87 @@ import org.springframework.security.core.Authentication;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomMethodSecurityExpressionRoot
-        extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
-    private Object filterObject;
-    private Object returnObject;
-    private Object target;
-    private UserService userService;
+public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot
+    implements MethodSecurityExpressionOperations {
+  private Object filterObject;
+  private Object returnObject;
+  private Object target;
+  private UserService userService;
 
-    public CustomMethodSecurityExpressionRoot(Authentication authentication) {
-        super(authentication);
+  public CustomMethodSecurityExpressionRoot(Authentication authentication) {
+    super(authentication);
+  }
+
+  /**
+   * @param projectId
+   * @return boolean
+   */
+  public boolean isProjectOwner(Long projectId) {
+    List<String> permissions = new ArrayList<>();
+    try {
+      User user = userService.findByEmail((String) this.getPrincipal());
+
+      user.getUserProjectPermissions().stream()
+          .filter(p -> p.getProject().getProjectId().equals(projectId))
+          .forEach(p -> permissions.add(p.getPermission()));
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
     }
+    return permissions.contains(ProjectPermession.CDP.name());
+  }
 
-    public boolean isProjectOwner(Long projectId) {
-        List<String> permissions = new ArrayList<>();
-        try {
-            User user = userService.findByEmail((String) this.getPrincipal());
-
-            user.getUserProjectPermissions().stream()
-                    .filter(p -> p.getProject().getProjectId().equals(projectId))
-                    .forEach(p -> permissions.add(p.getPermission()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return permissions.contains(ProjectPermession.CDP.name());
+  public boolean isContributer(Long projectId) {
+    List<String> permissions = new ArrayList<>();
+    try {
+      User user = userService.findByEmail((String) this.getPrincipal());
+      user.getUserProjectPermissions().stream()
+          .filter(p -> p.getProject().getProjectId().equals(projectId))
+          .forEach(p -> permissions.add(p.getPermission()));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
     }
+    System.out.println(
+        permissions.contains(ProjectPermession.CDP.name())
+            || permissions.contains(ProjectPermession.CONTRIBUTER.name())
+            || permissions.contains(ProjectPermession.OBSERVER.name()));
+    return permissions.contains(ProjectPermession.CDP.name())
+        || permissions.contains(ProjectPermession.CONTRIBUTER.name())
+        || permissions.contains(ProjectPermession.OBSERVER.name());
+  }
 
-    public boolean isContributer(Long projectId) {
-        List<String> permissions = new ArrayList<>();
-        try {
-            User user = userService.findByEmail((String) this.getPrincipal());
-            user.getUserProjectPermissions().stream()
-                    .filter(p -> p.getProject().getProjectId().equals(projectId))
-                    .forEach(p -> permissions.add(p.getPermission()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        System.out.println(permissions.contains(ProjectPermession.CDP.name())
-                || permissions.contains(ProjectPermession.CONTRIBUTER.name())
-                || permissions.contains(ProjectPermession.OBSERVER.name()));
-        return permissions.contains(ProjectPermession.CDP.name())
-                || permissions.contains(ProjectPermession.CONTRIBUTER.name())
-                || permissions.contains(ProjectPermession.OBSERVER.name());
-    }
+  @Override
+  public Object getFilterObject() {
+    return filterObject;
+  }
 
+  @Override
+  public void setFilterObject(Object filterObject) {
+    this.filterObject = filterObject;
+  }
 
-    @Override
-    public void setFilterObject(Object filterObject) {
-        this.filterObject = filterObject;
-    }
+  @Override
+  public Object getReturnObject() {
+    return returnObject;
+  }
 
-    @Override
-    public Object getFilterObject() {
-        return filterObject;
-    }
+  @Override
+  public void setReturnObject(Object returnObject) {
+    this.returnObject = returnObject;
+  }
 
-    @Override
-    public void setReturnObject(Object returnObject) {
-        this.returnObject = returnObject;
-    }
+  @Override
+  public Object getThis() {
+    return target;
+  }
 
-    @Override
-    public Object getReturnObject() {
-        return returnObject;
-    }
+  public void setThis(Object target) {
+    this.target = target;
+  }
 
-    @Override
-    public Object getThis() {
-        return target;
-    }
-
-    public void setThis(Object target) {
-        this.target = target;
-    }
-
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+  public void setUserService(UserService userService) {
+    this.userService = userService;
+  }
 }

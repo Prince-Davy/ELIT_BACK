@@ -9,19 +9,21 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-
 public interface ExecutionPlanService {
-    ResponseEntity<Long> createExecutionPlan(Long projectId);
+  ResponseEntity<Long> createExecutionPlan(Long projectId);
 
-    ResponseEntity<Object> getQuestionsAndAnswers(Long executionPlanId);
+  ResponseEntity<Object> getQuestionsAndAnswers(Long executionPlanId);
 
-    ResponseEntity<Object> updateAnswers(List<ExecutionPlanAnswerModel> executionPlanAnswerModel, Long executionPlanId);
+  ResponseEntity<Object> updateAnswers(
+      List<ExecutionPlanAnswerModel> executionPlanAnswerModel, Long executionPlanId);
 
-    ResponseEntity<Object> getMethodologies(Long executionPlanId);
+  ResponseEntity<Object> getMethodologies(Long executionPlanId);
 
-    ResponseEntity<String> postMethodologiesVote(ExecutionVoteRequestModel executionVoteRequestModel) throws UserNotAuthorizedException;
+  ResponseEntity<String> postMethodologiesVote(ExecutionVoteRequestModel executionVoteRequestModel)
+      throws UserNotAuthorizedException;
 
-    ExecutionPlanScoreResponseModel getExecutionPlanScore(Long executionPlanId);
+  ExecutionPlanScoreResponseModel getExecutionPlanScore(Long executionPlanId);
 
-    ResponseEntity<Boolean> putIsFinishedExecutionPlan(Long executionPlanId) throws UserNotAuthorizedException, ExecutionPlanNotFoundException;
+  ResponseEntity<Boolean> putIsFinishedExecutionPlan(Long executionPlanId)
+      throws UserNotAuthorizedException, ExecutionPlanNotFoundException;
 }

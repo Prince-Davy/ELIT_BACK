@@ -14,19 +14,19 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectPropertyKey implements Serializable {
-    @Column(name = "project_id")
-    Long projectId;
+  @Column(name = "project_id")
+  Long projectId;
 
-    @Column(name = "user_id")
-    Long userId;
+  @Column(name = "user_id")
+  Long userId;
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Message {
-        private String username;
-        private String avatar;
-        private String message;
-        private String status;
-    }
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Message {
+    private String username;
+    private String avatar;
+    private String message;
+    private String status;
+  }
 }

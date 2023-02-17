@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttachmentResponseModel {
-    private Long attachmentId;
-    private String fileName;
-    private String filePath;
-    private String contentType;
+  private Long attachmentId;
+  private String fileName;
+  private String filePath;
+  private String contentType;
 }

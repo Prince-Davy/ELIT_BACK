@@ -8,8 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PredictibilityResultsRepository extends JpaRepository<PredictibilityResults, Long> {
+public interface PredictibilityResultsRepository
+    extends JpaRepository<PredictibilityResults, Long> {
 
-    @Query("select r from PredictibilityResults r where r.predictibilityAnalysis.predictibilityAnalysisId = ?1")
-    List<PredictibilityResults> findAllPredictibilityResultsByPreAnalysisId(Long predictibilityAnalysisId);
+  @Query(
+      "select r from PredictibilityResults r" +
+        " where r.predictibilityAnalysis.predictibilityAnalysisId = ?1")
+  List<PredictibilityResults> findAllPredictibilityResultsByPreAnalysisId(
+      Long predictibilityAnalysisId);
 }

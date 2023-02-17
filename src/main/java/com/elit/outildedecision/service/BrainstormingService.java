@@ -7,15 +7,20 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 
 public interface BrainstormingService {
-    ResponseEntity<String> createBrainstorming(BrainstormingModel brainstormingModel) throws Exception;
+  ResponseEntity<String> createBrainstorming(BrainstormingModel brainstormingModel)
+      throws Exception;
 
-    ResponseEntity<String> updateBrainstorming(BrainstormingModel brainstormingModel) throws Exception;
+  ResponseEntity<String> updateBrainstorming(BrainstormingModel brainstormingModel)
+      throws Exception;
 
-    ResponseEntity<String> deleteBrainstorming(Long brainstormingId) throws BrainstormingNotFoundException;
+  ResponseEntity<String> deleteBrainstorming(Long brainstormingId)
+      throws BrainstormingNotFoundException;
 
-    ResponseEntity<String> validateOrRejectBrainstorming(Long brainstormingId,  HttpEntity<String> isChecked) throws JsonProcessingException, BrainstormingNotFoundException;
+  ResponseEntity<String> validateOrRejectBrainstorming(
+      Long brainstormingId, HttpEntity<String> isChecked)
+      throws JsonProcessingException, BrainstormingNotFoundException;
 
-    ResponseEntity<Object> getBrainstorming(Long predictibilityAnalysisId) throws Exception;
+  ResponseEntity<Object> getBrainstorming(Long predictibilityAnalysisId) throws Exception;
 
-    ResponseEntity<Object> getBrainstormingAbstract(Long predictibilityAnalysisId) throws Exception;
+  ResponseEntity<Object> getBrainstormingAbstract(Long predictibilityAnalysisId) throws Exception;
 }

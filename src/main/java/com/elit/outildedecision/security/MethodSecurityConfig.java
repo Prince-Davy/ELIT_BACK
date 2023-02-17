@@ -10,19 +10,22 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, proxyTargetClass = false)
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
-    private BeanFactory beanFactory;
+  private BeanFactory beanFactory;
 
-    @Override
-    protected MethodSecurityExpressionHandler createExpressionHandler() {
-        CustomMethodSecurityExpressionHandler expressionHandler =
-                new CustomMethodSecurityExpressionHandler();
-        expressionHandler.setBeanFactory(beanFactory);
-        return expressionHandler;
-    }
+  /**
+   * @return MethodSecurityExpressionHandler
+   */
+  @Override
+  protected MethodSecurityExpressionHandler createExpressionHandler() {
+    CustomMethodSecurityExpressionHandler expressionHandler =
+        new CustomMethodSecurityExpressionHandler();
+    expressionHandler.setBeanFactory(beanFactory);
+    return expressionHandler;
+  }
 
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        super.setBeanFactory(beanFactory);
-        this.beanFactory = beanFactory;
-    }
+  @Override
+  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    super.setBeanFactory(beanFactory);
+    this.beanFactory = beanFactory;
+  }
 }
