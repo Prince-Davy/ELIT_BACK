@@ -23,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/attachments")
+<<<<<<< HEAD
 public class AttachementController {
   private final AttachmentService attachmentService;
 
@@ -45,6 +46,26 @@ public class AttachementController {
       throws AttachmentNotFoundException, IOException {
     return attachmentService.renameAttachment(attachmentId, newAttachmentName);
   }
+=======
+public class AttachementController{
+  private final AttachmentService attachmentService;
+
+  public AttachementController(AttachmentService attachmentService){
+    this.attachmentService = attachmentService;
+  }
+  @PostMapping(value = "/upload/{projectId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Object> uploadAttachment(@PathVariable Long projectId,
+                                                 @RequestParam("files") List<MultipartFile> files)
+                                                  throws ProjectNotFoundException, IOException{
+    return attachmentService.uploadAttachment(files, projectId);
+}
+
+  @PutMapping("/edit/{attachmentId}")
+  public ResponseEntity<String> editAttachment(@PathVariable Long attachmentId,
+            HttpEntity<String> newAttachmentName) throws AttachmentNotFoundException, IOException {
+    return attachmentService.renameAttachment(attachmentId, newAttachmentName);
+    }
+>>>>>>> 0292700ea2129c507e71508049e07804b2a532f3
 
   @GetMapping("/download/{projectId}/{attachmentId}")
   public void downloadAttachment(

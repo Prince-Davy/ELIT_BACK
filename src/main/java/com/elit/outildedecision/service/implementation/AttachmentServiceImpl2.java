@@ -75,7 +75,6 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     }
     return ResponseEntity.ok().body("Fichiers enregistrés avec succés");
   }
-
   @Override
   public ResponseEntity deleteAttachment(Long attachmentId)
       throws AttachmentNotFoundException, ProjectNotFoundException {
@@ -90,8 +89,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     } else {
       return ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier.");
     }
-  }
-
+}
   @Override
   public void openAttachment(Long attachmentId, HttpServletResponse response)
       throws AttachmentNotFoundException, IOException {
@@ -182,35 +180,6 @@ public class AttachmentServiceImpl2 implements AttachmentService {
   }
 
   @Override
-  public ResponseEntity<String> addAttachmentToProject(Long projectId, AttachmentModel files)
-      throws ProjectNotFoundException {
-    Project projectFromDB =
-        projectRepository
-            .findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas !"));
-
-    String folderPath = StringUtils.cleanPath(STORING_DIRECTORY + projectFromDB.getFolderPath());
-    for (MultipartFile file : files.getAttachments()) {
-      try {
-        String filePath = StringUtils.cleanPath(folderPath + "\\" + file.getOriginalFilename());
-        Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
-        Attachment attachment =
-            Attachment.builder()
-                .filePath(filePath)
-                .fileName(file.getOriginalFilename())
-                .contentType(file.getContentType())
-                .project(projectFromDB)
-                .build();
-        attachmentRepository.save(attachment);
-      } catch (IOException e) {
-        throw new RuntimeException(
-            "Erreur lors de l'enregistrement du fichier : " + file.getOriginalFilename());
-      }
-    }
-    return ResponseEntity.ok().body("Votre Fichier est bien enregistré");
-  }
-
-  @Override
   public ResponseEntity<String> renameAttachment(
       Long attachmentId, HttpEntity<String> attachmentNameJson)
       throws AttachmentNotFoundException, IOException {
@@ -230,3 +199,4 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     return ResponseEntity.ok().body("Votre fichier a été mis à jour");
   }
 }
+

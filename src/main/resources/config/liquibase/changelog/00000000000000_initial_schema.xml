@@ -1,10 +1,567 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-
-  <!-- Add your change sets here -->
-
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="jlacour (generated)" id="1676626649892-1">
+        <createTable tableName="attachment">
+            <column autoIncrement="true" name="attachment_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="content_type" type="VARCHAR(255)"/>
+            <column name="file_name" type="VARCHAR(255)"/>
+            <column name="file_path" type="VARCHAR(255)"/>
+            <column name="project_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-2">
+        <createTable tableName="brainstorming">
+            <column autoIncrement="true" name="brainstorming_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="brainstorming_text" type="VARCHAR(255)"/>
+            <column name="is_checked" type="BIT(1)"/>
+            <column name="question_id" type="BIGINT"/>
+            <column name="predictibility_analysis_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-3">
+        <createTable tableName="criteria">
+            <column autoIncrement="true" name="criteria_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="criteria_name" type="VARCHAR(255)"/>
+            <column name="criteria_value" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="FLOAT(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-6">
+        <createTable tableName="execution_plan">
+            <column autoIncrement="true" name="execution_plan_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="created_at" type="datetime"/>
+            <column name="execution_iteration" type="INT"/>
+            <column name="is_finished" type="BIT(1)"/>
+            <column name="updated_at" type="datetime"/>
+            <column name="predictibility_analysis_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-7">
+        <createTable tableName="execution_plan_answer">
+            <column autoIncrement="true" name="execution_plan_answer_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="answer" type="VARCHAR(255)"/>
+            <column name="execution_plan_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execution_plan_question_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-8">
+        <createTable tableName="execution_plan_question">
+            <column autoIncrement="true" name="execution_plan_question_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="question" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-9">
+        <createTable tableName="execution_plan_vote">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="execution_plan_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="method_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-10">
+        <createTable tableName="form_question">
+            <column autoIncrement="true" name="question_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="answer_text" type="VARCHAR(255)"/>
+            <column name="question_ref" type="VARCHAR(255)"/>
+            <column name="question_text" type="VARCHAR(255)"/>
+            <column name="step_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-11">
+        <createTable tableName="form_step">
+            <column autoIncrement="true" name="step_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="e_score" type="FLOAT(12)"/>
+            <column name="step_name" type="VARCHAR(255)"/>
+            <column name="step_ref" type="BIGINT"/>
+            <column name="multi_criteria_analysis_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-12">
+        <createTable tableName="method">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="advantages" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="disadvantages" type="TEXT"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="methodology_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-13">
+        <createTable tableName="methodology">
+            <column autoIncrement="true" name="methodology_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="advantages" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="disadvantages" type="TEXT"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-14">
+        <createTable tableName="multi_criteria_analysis">
+            <column autoIncrement="true" name="multi_criteria_analysis_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="created_at" type="datetime"/>
+            <column name="is_finished" type="BIT(1)"/>
+            <column name="multi_criteria_analysis_iteration" type="INT"/>
+            <column name="updated_at" type="datetime"/>
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-15">
+        <createTable tableName="notification">
+            <column autoIncrement="true" name="notification_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="body" type="VARCHAR(255)"/>
+            <column name="icon" type="VARCHAR(255)"/>
+            <column name="notification_date" type="datetime"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="project_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-16">
+        <createTable tableName="opinion">
+            <column autoIncrement="true" name="opinion_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="created_at" type="datetime"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="rating" type="INT"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-17">
+        <createTable tableName="predictibility_analysis">
+            <column autoIncrement="true" name="predictibility_analysis_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="created_at" type="datetime"/>
+            <column name="is_finished" type="BIT(1)"/>
+            <column name="predictibility_analysis_iteration" type="INT"/>
+            <column name="updated_at" type="datetime"/>
+            <column name="methodology_id" type="BIGINT"/>
+            <column name="multi_criteria_analysis_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-18">
+        <createTable tableName="predictibility_results">
+            <column autoIncrement="true" name="predictibility_results_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="value" type="FLOAT(12)"/>
+            <column name="predictibility_analysis_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-19">
+        <createTable tableName="project">
+            <column autoIncrement="true" name="project_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="chef_id" type="BIGINT"/>
+            <column name="confirmation_state" type="VARCHAR(255)"/>
+            <column name="created_at" type="datetime"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="folder_path" type="VARCHAR(255)"/>
+            <column name="is_archived" type="BIT(1)"/>
+            <column name="name" type="VARCHAR(20)"/>
+            <column name="updated_at" type="datetime"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-20">
+        <createTable tableName="project_user_permission">
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="permission" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-21">
+        <createTable tableName="report">
+            <column autoIncrement="true" name="report_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="analyse_id" type="BIGINT"/>
+            <column name="created_at" type="datetime"/>
+            <column name="iteration" type="INT"/>
+            <column name="report_path" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-22">
+        <createTable tableName="step_score">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="criteria_name" type="VARCHAR(255)"/>
+            <column name="value" type="FLOAT(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="step_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-23">
+        <createTable tableName="step_weight">
+            <column autoIncrement="true" name="weight_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="criteria_description" type="VARCHAR(255)"/>
+            <column name="criteria_name" type="VARCHAR(255)"/>
+            <column name="weight_value" type="FLOAT(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="step_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-24">
+        <createTable tableName="survey_answer">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="answer_value" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="question_id" type="BIGINT"/>
+            <column name="user_user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-25">
+        <createTable tableName="survey_question">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="question" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-26">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="is_admin" type="BIT(1)"/>
+            <column name="is_email_verified" type="BIT(1)"/>
+            <column name="is_user_active" type="BIT(1)"/>
+            <column name="user_avatar_path" type="VARCHAR(255)"/>
+            <column name="user_email" type="VARCHAR(255)"/>
+            <column name="user_first_name" type="VARCHAR(255)"/>
+            <column name="user_job" type="VARCHAR(255)"/>
+            <column name="user_last_name" type="VARCHAR(255)"/>
+            <column name="user_password" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-27">
+        <createTable tableName="verification_token">
+            <column name="token" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="expiry_date" type="datetime"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="user_user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-28">
+        <createTable tableName="vote">
+            <column autoIncrement="true" name="vote_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="chosenpmm" type="VARCHAR(255)"/>
+            <column name="created_at" type="datetime"/>
+            <column name="is_confirmed" type="BIT(1)"/>
+            <column name="justification" type="VARCHAR(255)"/>
+            <column name="predictibility_value" type="INT"/>
+            <column name="predictibility_analysis_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-29">
+        <createIndex indexName="FK1wbgwm5o1l5k1u1lam1ckr9u0" tableName="execution_plan_answer">
+            <column name="execution_plan_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-30">
+        <createIndex indexName="FK55jkg2gh1llpc2qj6xnkc5fo9" tableName="criteria">
+            <column name="question_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-31">
+        <createIndex indexName="FK6jfj5n9bkdigrbnjxaccs3rm4" tableName="brainstorming">
+            <column name="question_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-32">
+        <createIndex indexName="FK90hyl0aqvbftorw5pgywmxa61" tableName="multi_criteria_analysis">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-33">
+        <createIndex indexName="FK993cqhubf1010427vvk9qn89t" tableName="execution_plan">
+            <column name="predictibility_analysis_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-34">
+        <createIndex indexName="FK9e39l3hpd1ty9vi78jil2hhlq" tableName="predictibility_results">
+            <column name="predictibility_analysis_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-35">
+        <createIndex indexName="FKa65t460f1anrd58b4o7bmxueu" tableName="brainstorming">
+            <column name="predictibility_analysis_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-36">
+        <createIndex indexName="FKckwhud91k2g60biwi44ssgcbv" tableName="method">
+            <column name="methodology_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-37">
+        <createIndex indexName="FKcsaksoe2iepaj8birrmithwve" tableName="vote">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-38">
+        <createIndex indexName="FKdcmo89sbvh0wyky75gmscs8oy" tableName="verification_token">
+            <column name="user_user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-39">
+        <createIndex indexName="FKejrwenvm0adtwx9gmxx2i0ldt" tableName="attachment">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-40">
+        <createIndex indexName="FKf4eo83lspu93txmp308npp6xo" tableName="step_score">
+            <column name="step_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-41">
+        <createIndex indexName="FKfnnocmijquwcjacohjsip23ks" tableName="form_step">
+            <column name="multi_criteria_analysis_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-42">
+        <createIndex indexName="FKg2oydn3yy94g1pw46xpaswljl" tableName="execution_plan_vote">
+            <column name="method_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-43">
+        <createIndex indexName="FKgamhwale20d7cd3a5pwte8o69" tableName="execution_plan_answer">
+            <column name="execution_plan_question_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-44">
+        <createIndex indexName="FKh32gc76xc48f7s9rasca3vpbs" tableName="execution_plan_vote">
+            <column name="execution_plan_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-45">
+        <createIndex indexName="FKhjyrsmewfq55daxse9yg1ua1v" tableName="execution_plan_vote">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-46">
+        <createIndex indexName="FKi35sfx0x08fonfxf2l8cp2xcp" tableName="notification">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-47">
+        <createIndex indexName="FKi4hmlvb7nbns9qq93k9y0gfav" tableName="predictibility_analysis">
+            <column name="multi_criteria_analysis_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-48">
+        <createIndex indexName="FKj9au5x2ip2ngsj8upph59fafw" tableName="vote">
+            <column name="predictibility_analysis_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-49">
+        <createIndex indexName="FKmhmkw3svs5stc3014gwkldrmg" tableName="form_question">
+            <column name="step_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-50">
+        <createIndex indexName="FKmqaf91m9oq7ddhg56qa5fq4ne" tableName="predictibility_analysis">
+            <column name="methodology_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-51">
+        <createIndex indexName="FKnifwjuxuse33c615nw3cb6r7x" tableName="opinion">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-52">
+        <createIndex indexName="FKnmgttlbet0x8pg05d606g1r84" tableName="brainstorming">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-53">
+        <createIndex indexName="FKojyw3iny2kexh8fsgmgglftxr" tableName="step_weight">
+            <column name="step_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-54">
+        <createIndex indexName="FKqwtmrl3o9adh9v8th4uf5fl8u" tableName="survey_answer">
+            <column name="user_user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-55">
+        <createIndex indexName="FKsmngcm3g1yf412nsre7h8j32e" tableName="survey_answer">
+            <column name="question_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-56">
+        <createIndex indexName="FKtjmiihqmjx7ygdqty7wwnk9qo" tableName="project_user_permission">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-57">
+        <createIndex indexName="FKu0aet5iacre336f6exgr32nk" tableName="report">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-58">
+        <addForeignKeyConstraint baseColumnNames="execution_plan_id" baseTableName="execution_plan_answer" constraintName="FK1wbgwm5o1l5k1u1lam1ckr9u0" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="execution_plan_id" referencedTableName="execution_plan" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-59">
+        <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="criteria" constraintName="FK55jkg2gh1llpc2qj6xnkc5fo9" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="question_id" referencedTableName="form_question" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-60">
+        <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="brainstorming" constraintName="FK6jfj5n9bkdigrbnjxaccs3rm4" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="question_id" referencedTableName="form_question" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-61">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_user_permission" constraintName="FK8dep088ep5vul6yb6jdm56vgo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="project_id" referencedTableName="project" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-62">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="multi_criteria_analysis" constraintName="FK90hyl0aqvbftorw5pgywmxa61" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="project_id" referencedTableName="project" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-63">
+        <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="execution_plan" constraintName="FK993cqhubf1010427vvk9qn89t" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-64">
+        <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="predictibility_results" constraintName="FK9e39l3hpd1ty9vi78jil2hhlq" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-65">
+        <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="brainstorming" constraintName="FKa65t460f1anrd58b4o7bmxueu" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-66">
+        <addForeignKeyConstraint baseColumnNames="methodology_id" baseTableName="method" constraintName="FKckwhud91k2g60biwi44ssgcbv" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="methodology_id" referencedTableName="methodology" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-67">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="vote" constraintName="FKcsaksoe2iepaj8birrmithwve" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-68">
+        <addForeignKeyConstraint baseColumnNames="user_user_id" baseTableName="verification_token" constraintName="FKdcmo89sbvh0wyky75gmscs8oy" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-69">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="attachment" constraintName="FKejrwenvm0adtwx9gmxx2i0ldt" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="project_id" referencedTableName="project" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-70">
+        <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="step_score" constraintName="FKf4eo83lspu93txmp308npp6xo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="step_id" referencedTableName="form_step" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-71">
+        <addForeignKeyConstraint baseColumnNames="multi_criteria_analysis_id" baseTableName="form_step" constraintName="FKfnnocmijquwcjacohjsip23ks" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="multi_criteria_analysis_id" referencedTableName="multi_criteria_analysis" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-72">
+        <addForeignKeyConstraint baseColumnNames="method_id" baseTableName="execution_plan_vote" constraintName="FKg2oydn3yy94g1pw46xpaswljl" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="method" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-73">
+        <addForeignKeyConstraint baseColumnNames="execution_plan_question_id" baseTableName="execution_plan_answer" constraintName="FKgamhwale20d7cd3a5pwte8o69" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="execution_plan_question_id" referencedTableName="execution_plan_question" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-74">
+        <addForeignKeyConstraint baseColumnNames="execution_plan_id" baseTableName="execution_plan_vote" constraintName="FKh32gc76xc48f7s9rasca3vpbs" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="execution_plan_id" referencedTableName="execution_plan" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-75">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="execution_plan_vote" constraintName="FKhjyrsmewfq55daxse9yg1ua1v" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-76">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="notification" constraintName="FKi35sfx0x08fonfxf2l8cp2xcp" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="project_id" referencedTableName="project" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-77">
+        <addForeignKeyConstraint baseColumnNames="multi_criteria_analysis_id" baseTableName="predictibility_analysis" constraintName="FKi4hmlvb7nbns9qq93k9y0gfav" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="multi_criteria_analysis_id" referencedTableName="multi_criteria_analysis" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-78">
+        <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="vote" constraintName="FKj9au5x2ip2ngsj8upph59fafw" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-79">
+        <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="form_question" constraintName="FKmhmkw3svs5stc3014gwkldrmg" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="step_id" referencedTableName="form_step" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-80">
+        <addForeignKeyConstraint baseColumnNames="methodology_id" baseTableName="predictibility_analysis" constraintName="FKmqaf91m9oq7ddhg56qa5fq4ne" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="methodology_id" referencedTableName="methodology" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-81">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="opinion" constraintName="FKnifwjuxuse33c615nw3cb6r7x" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-82">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="brainstorming" constraintName="FKnmgttlbet0x8pg05d606g1r84" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-83">
+        <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="step_weight" constraintName="FKojyw3iny2kexh8fsgmgglftxr" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="step_id" referencedTableName="form_step" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-84">
+        <addForeignKeyConstraint baseColumnNames="user_user_id" baseTableName="survey_answer" constraintName="FKqwtmrl3o9adh9v8th4uf5fl8u" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-85">
+        <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="survey_answer" constraintName="FKsmngcm3g1yf412nsre7h8j32e" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="survey_question" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-86">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project_user_permission" constraintName="FKtjmiihqmjx7ygdqty7wwnk9qo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="jlacour (generated)" id="1676626649892-87">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="report" constraintName="FKu0aet5iacre336f6exgr32nk" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="project_id" referencedTableName="project" validate="true"/>
+    </changeSet>
 </databaseChangeLog>

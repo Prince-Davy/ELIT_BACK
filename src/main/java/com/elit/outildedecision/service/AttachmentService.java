@@ -20,10 +20,6 @@ public interface AttachmentService {
 
   ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId)
       throws IOException, ProjectNotFoundException;
-
-  ResponseEntity<String> addAttachmentToProject(Long projectId, AttachmentModel files)
-      throws ProjectNotFoundException;
-
   ResponseEntity<String> renameAttachment(Long projectId, HttpEntity<String> newAttachmentName)
       throws AttachmentNotFoundException, IOException;
 
