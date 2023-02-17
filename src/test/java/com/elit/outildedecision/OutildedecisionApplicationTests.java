@@ -8,10 +8,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-//@ActiveProfiles("test")
+@ActiveProfiles("test")
 
 class OutildedecisionApplicationTests {
     @Test
     void contextLoads() {
+
+
     }
 }
