@@ -7,10 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-//@SpringBootTest
-//@ActiveProfiles("non-existing")
-//@TestPropertySource(locations = "/application-test.properties")
-@DataJpaTest
+@SpringBootTest
+//@ActiveProfiles("test")
+
 class OutildedecisionApplicationTests {
     @Test
     void contextLoads() {

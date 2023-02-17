@@ -50,9 +50,7 @@ services:
   elit-back-mysql-test:
     image: mysql:5.7
     env_file: ../.env
-    volumes:
-      - mysql-data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3311:3306"
 
 
