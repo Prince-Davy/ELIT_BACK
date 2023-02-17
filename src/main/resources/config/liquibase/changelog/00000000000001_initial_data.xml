@@ -1,0 +1,31 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- init execution_plan_question -->
+    <changeSet author="jlacour" id="160500499300-1" context="data">
+        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/execution_plan_question.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
+    </changeSet>
+
+    <!-- init method -->
+    <changeSet author="jlacour" id="160500499300-2" context="data">
+        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/method.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
+    </changeSet>
+
+    <!-- init methodology -->
+    <changeSet author="jlacour" id="160500499300-3" context="data">
+        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/methodology.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
+    </changeSet>
+
+    <!-- init fake_users -->
+    <changeSet author="jlacour" id="160500499300-4" context="data">
+        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/survey_question.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
+    </changeSet>
+
+    <!-- init forums -->
+    <changeSet author="jlacour" id="160500499300-5" context="data">
+        <sqlFile dbms="h2, !sqlite,postgresql,mysql" encoding="UTF-8" endDelimiter=";" path="../sql_001/user.sql" relativeToChangelogFile="true" splitStatements="true" stripComments="true"/>
+    </changeSet>
+</databaseChangeLog>
