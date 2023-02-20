@@ -9,22 +9,23 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
   /**
-   * @param registry
+   * cette methode permet de configurer les endpoints de websockets.
    */
   @Override
-  public void registerStompEndpoints(StompEndpointRegistry registry) {
+  public void registerStompEndpoints(final StompEndpointRegistry registry) {
     registry
         .addEndpoint("/mywebsockets/**")
-        // .setAllowedOrigins("*")
-        .setAllowedOriginPatterns("*") // allow all origins like CORS
-        .withSockJS(); // this allows our webSockets works even if the browser doesn't support
-    // webSockets protocol
+        // allow all origins like CORS
+        .setAllowedOriginPatterns("*")
+        // this allows our webSockets works even if the browser doesn't support
+        .withSockJS();
   }
-
+  /**
+   * cette methode permet de configurer le broker de message.
+   */
   @Override
-  public void configureMessageBroker(MessageBrokerRegistry registry) {
+  public void configureMessageBroker(final MessageBrokerRegistry registry) {
     /*
      * the prefix /app is used to prefix the messages sent from the client to the
      * server.

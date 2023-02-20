@@ -13,16 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,9 +29,7 @@ public class ProjectController {
   }
 
   /**
-   * @param project
-   * @return ProjectResponseModel
-   * @throws Exception
+   * Create a new project
    */
   @PostMapping(value = "/user/projects", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
@@ -48,6 +37,9 @@ public class ProjectController {
     return projectService.persistProject(project);
   }
 
+  /**
+   * Get a project by id
+   */
   @ApiOperation(value = "Get a product by id", notes = "Returns a product as per the id")
   @ApiResponses(
       value = {
@@ -56,7 +48,7 @@ public class ProjectController {
       })
   @GetMapping("/user/projects/getdata/{projectId}")
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-  public ProjectResponseModel getProjectData(@PathVariable Long projectId)
+  public ProjectResponseModel getProjectData(@PathVariable final Long projectId)
       throws ProjectNotFoundException {
     return projectService.getProjectData(projectId);
   }
@@ -69,7 +61,7 @@ public class ProjectController {
 
   @GetMapping("/admin/projects")
   @PreAuthorize("hasAnyAuthority('ADMIN')")
-  public List<Project> getAllProjects(@RequestParam(required = false) String keyword) {
+  public List<Project> getAllProjects() {
     return projectService.getAllProjects();
   }
 
@@ -82,19 +74,19 @@ public class ProjectController {
   @PutMapping("/admin/projects/{id}")
   @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<String> validateOrRejectProject(
-      @PathVariable Long id, HttpEntity<String> isConfirmed) throws Exception {
+      @PathVariable Long id, HttpEntity<String> isConfirmed) throws ProjectNotFoundException, java.io.IOException {
     return projectService.validateOrRejectProject(id, isConfirmed);
   }
 
   @DeleteMapping("/admin/projects/{id}")
   @PreAuthorize("hasAnyAuthority('ADMIN')")
-  public ResponseEntity deleteProjectAdmin(@PathVariable Long id) throws Exception {
+  public ResponseEntity<String> deleteProjectAdmin(@PathVariable Long id) throws Exception {
     return projectService.deleteProject(id);
   }
 
   @DeleteMapping("/user/projects/{id}")
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and isProjectOwner(#id)")
-  public ResponseEntity deleteProject(@PathVariable Long id) throws Exception {
+  public ResponseEntity<String> deleteProject(@PathVariable Long id) throws Exception {
     return projectService.deleteProject(id);
   }
 
@@ -111,25 +103,4 @@ public class ProjectController {
       @PathVariable Long projectId, @PathVariable Long contributorID) throws Exception {
     return projectService.deleteProjectContributor(projectId, contributorID);
   }
-
-  //
-  // @DeleteMapping("/{id}")
-  // public ResponseEntity deleteProject(@PathVariable Long id) throws
-  // ProjectNotFoundException, IOException {
-  // return projectService.deleteProject(id);
-  // }
-  //
-  // @PutMapping("/{id}")
-  // public Project updateProject(@PathVariable Long id,
-  // @Valid @RequestBody Project project) throws ProjectNotFoundException {
-  // return projectService.updateProject(id, project);
-  // }
-  //
-  //
-  // @GetMapping("/{id}")
-  // public Project getProjectById(@PathVariable("id") Long projectId) throws
-  // ProjectNotFoundException{
-  // return projectService.getProjectById(projectId);
-  // }
-
 }

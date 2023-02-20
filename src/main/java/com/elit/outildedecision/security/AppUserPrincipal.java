@@ -14,28 +14,24 @@ public class AppUserPrincipal implements UserDetails {
   private static final long serialVersionUID = 1L;
   private final User user;
 
-  public AppUserPrincipal(User user) {
+  public AppUserPrincipal(User user){
     this.user = user;
   }
-
-  /**
-   * @return String
-   */
   @Override
-  public String getUsername() {
-    return user.getUserEmail(); // getUsername();
+  public String getUsername(){
+    return user.getUserEmail();
   }
 
-  public String getUserFirstName() {
+  public String getUserFirstName(){
     return user.getUserFirstName();
   }
 
-  public String getUserLastName() {
+  public String getUserLastName(){
     return user.getUserLastName();
   }
 
   @Override
-  public boolean isAccountNonExpired() {
+  public boolean isAccountNonExpired(){
     return true;
   }
 

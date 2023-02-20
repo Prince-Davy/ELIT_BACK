@@ -35,7 +35,7 @@ public class AuthentificationController {
   private static final long EXPIRATION_TIME = 5 * 60 * 1000;
 
   @Value("${jwt.secret}")
-  private static String JWT_SECRET;
+  private static String jwtSecret;
 
   private final UserService userService;
 
@@ -62,7 +62,7 @@ public class AuthentificationController {
       try {
 
         String refresh_token = jwtAuthorizationToken.substring("Bearer ".length());
-        Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET.getBytes());
+        Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(refresh_token);
         String userEmail = decodedJWT.getSubject();
