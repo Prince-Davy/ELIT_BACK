@@ -16,36 +16,62 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-
+/**
+ * class used to root API calls for vote management. Contains methods to call to create
+ * and update votes.
+ *
+ */
 @RestController
 @RequestMapping("/api")
 public class VoteController {
+  /**
+   * VoteService the service used to manage votes.
+   */
   private final VoteService voteService;
-
-  public VoteController(VoteService voteService) {
+  /**
+   * Constructor of VoteController.
+   *
+   * dependency injection of VoteService to manage votes.
+   * @param voteService VoteService
+   */
+  public VoteController(final VoteService voteService) {
     this.voteService = voteService;
   }
-
   /**
-   * @param voteModelRequest
+   * method called to add a new vote.
+   *
+   * @param voteModelRequest the vote to create
+   *
    * @return ResponseEntity<String>
    * @throws VoteAlreadyExistException
    */
   @PostMapping("/vote")
-  public ResponseEntity<String> createVote(@Valid @RequestBody VoteModelRequest voteModelRequest)
+  public ResponseEntity<String> createVote(@Valid @RequestBody final VoteModelRequest voteModelRequest)
       throws VoteAlreadyExistException {
     return voteService.createVote(voteModelRequest);
   }
-
+  /**
+   * method called to get all votes for a predictibility analysis.
+   *
+   * @param predictibilityAnalysisId the id of the predictibility analysis
+   * @return List<VoteModelResponse> the list of votes
+   * @throws UserNotFoundException if the user is not found
+   */
   @GetMapping("/vote/{predictibilityAnalysisId}")
-  public List<VoteModelResponse> getVote(@PathVariable Long predictibilityAnalysisId)
+  public List<VoteModelResponse> getVote(@PathVariable final Long predictibilityAnalysisId)
       throws UserNotFoundException {
     return voteService.getVote(predictibilityAnalysisId);
   }
-
+  /**
+   * method called to update a vote.
+   *
+   * @param voteId the id of the vote to update
+   * @param voteModelRequest the vote to update
+   * @return ResponseEntity<String>
+   */
   @PutMapping("/vote/{voteId}")
   public ResponseEntity<String> updateVote(
-      @PathVariable Long voteId, @RequestBody VoteModelRequest voteModelRequest) {
+      @PathVariable final Long voteId, @RequestBody final VoteModelRequest voteModelRequest) {
     return voteService.updateVote(voteId, voteModelRequest);
   }
 }

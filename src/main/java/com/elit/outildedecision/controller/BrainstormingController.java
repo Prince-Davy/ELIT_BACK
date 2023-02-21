@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.BrainstormingNotFoundException;
@@ -20,50 +21,87 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/brainstorming")
 public class BrainstormingController {
+  /**
+   * The brainstorming service.
+   */
   private final BrainstormingService brainstormingService;
 
-  public BrainstormingController(BrainstormingService brainstormingService) {
+  /**
+   * BrainstormingController Constructor.
+   * Dependency Injection of BrainstormingService
+   * @param brainstormingService : the brainstorming service
+   */
+  public BrainstormingController(final BrainstormingService brainstormingService) {
     this.brainstormingService = brainstormingService;
   }
 
   /**
-   * @param predictibilityAnalysisId
+   * @param predictibilityAnalysisId : the predictibility analysis id
    * @return ResponseEntity<Object>
-   * @throws Exception
+   * @throws Exception  : if the brainstorming is not found
    */
   @GetMapping("/{predictibilityAnalysisId}")
-  public ResponseEntity<Object> getBrainstorming(@PathVariable Long predictibilityAnalysisId)
+  public ResponseEntity<Object> getBrainstorming(@PathVariable final Long predictibilityAnalysisId)
       throws Exception {
     return brainstormingService.getBrainstorming(predictibilityAnalysisId);
   }
 
+  /**
+   * Get the brainstormings.
+   * @param predictibilityAnalysisId : the predictibility analysis id
+   * @return ResponseEntity<Object>
+   * @throws Exception : if the brainstorming is not found
+   */
   @GetMapping("/abstract/{predictibilityAnalysisId}")
   public ResponseEntity<Object> getBrainstormingAbstract(
-      @PathVariable Long predictibilityAnalysisId) throws Exception {
+      @PathVariable final Long predictibilityAnalysisId) throws Exception {
     return brainstormingService.getBrainstormingAbstract(predictibilityAnalysisId);
   }
 
+  /**
+   * Create a new brainstorming.
+   * @param brainstormingModel : the brainstorming model
+   * @return ResponseEntity<String>
+   * @throws Exception : if the brainstorming is not found
+   */
   @PostMapping("")
   public ResponseEntity<String> createBrainstorming(
-      @Valid @RequestBody BrainstormingModel brainstormingModel) throws Exception {
+      @Valid @RequestBody final BrainstormingModel brainstormingModel) throws Exception {
     return brainstormingService.createBrainstorming(brainstormingModel);
   }
-
+  /**
+   * Update a brainstorming.
+   * @param brainstormingModel : the brainstorming model
+   * @return ResponseEntity<String>
+   * @throws Exception : if the brainstorming is not found
+   */
   @PutMapping("")
   public ResponseEntity<String> updateBrainstorming(
-      @RequestBody BrainstormingModel brainstormingModel) throws Exception {
+      @RequestBody final BrainstormingModel brainstormingModel) throws Exception {
     return brainstormingService.updateBrainstorming(brainstormingModel);
   }
-
+  /**
+   * Delete a brainstorming.
+   * @param brainstormingId : the brainstorming id
+   * @return ResponseEntity<String>
+   * @throws BrainstormingNotFoundException : if the brainstorming is not found
+   */
   @DeleteMapping("/{brainstormingId}")
-  public ResponseEntity<String> removeBrainstorming(@PathVariable Long brainstormingId)
+  public ResponseEntity<String> removeBrainstorming(@PathVariable final Long brainstormingId)
       throws BrainstormingNotFoundException {
     return brainstormingService.deleteBrainstorming(brainstormingId);
   }
-
+  /**
+   * Validate or reject a brainstorming.
+   * @param brainstormingId : the brainstorming id
+   * @param isChecked : true if the brainstorming is validated, false if it is rejected
+   * @return ResponseEntity<String>
+   * @throws BrainstormingNotFoundException : if the brainstorming is not found
+   * @throws JsonProcessingException : if the json is not well formatted
+   */
   @PutMapping("/validate/{brainstormingId}")
   public ResponseEntity<String> validateOrRejectBrainstorming(
-      @PathVariable Long brainstormingId, HttpEntity<String> isChecked)
+      @PathVariable final Long brainstormingId, final HttpEntity<String> isChecked)
       throws BrainstormingNotFoundException, JsonProcessingException {
     return brainstormingService.validateOrRejectBrainstorming(brainstormingId, isChecked);
   }

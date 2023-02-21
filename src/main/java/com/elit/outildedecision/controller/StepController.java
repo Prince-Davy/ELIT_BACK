@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Criteria;
@@ -5,7 +6,6 @@ import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.FormStepAlreadyExistsException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.service.FormStepService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,23 +19,43 @@ import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Multi criteria Step Controller.
+ **/
 @RestController
 @RequestMapping("/steps")
 public class StepController {
-  @Autowired FormStepService formStepService;
+  /**
+   * FormStepService.
+   */
+  private final FormStepService formStepService;
+  /**
+   * Constructor of StepController.
+   * @param formStepService FormStepService
+   */
+  public StepController(final FormStepService formStepService) {
+    this.formStepService = formStepService;
+  }
 
   /**
+   * Get a step by its name and form id.
+   * @param formId the form id
+   * @param stepName the step name
    * @return FormStep
-   * @throws StepFormNotFoundException
    */
   @GetMapping("/{formId}/{stepName}")
-  public FormStep getFormStep(@PathVariable Long formId, @PathVariable String stepName)
+  public FormStep getFormStep(@PathVariable final Long formId,
+                              @PathVariable final String stepName)
       throws StepFormNotFoundException {
     return formStepService.findStepByNameAndFormId(formId, stepName);
   }
-
+  /**
+   * Create a step.
+   * @param formStep FormStep object
+   * @return FormStep
+   */
   @PostMapping(consumes = {"application/json"})
-  public ResponseEntity<String> createFormStep(@RequestBody FormStep formStep)
+  public ResponseEntity<String> createFormStep(@RequestBody final FormStep formStep)
       throws FormStepAlreadyExistsException, StepFormNotFoundException {
     Set<Criteria> criterias = new HashSet<>();
     criterias = formStep.getFormQuestions().stream().findFirst().orElse(null).getCriterias();
@@ -45,9 +65,13 @@ public class StepController {
         criterias,
         formStep.getFormQuestions());
   }
-
+  /**
+   * Update a step.
+   * @param step FormStep object
+   * @return FormStep
+   */
   @PutMapping
-  public ResponseEntity updateFormStep(@Valid @RequestBody FormStep step) throws Exception {
+  public ResponseEntity updateFormStep(@Valid @RequestBody final FormStep step) throws Exception {
     return formStepService.updateFormStep(step);
   }
 }

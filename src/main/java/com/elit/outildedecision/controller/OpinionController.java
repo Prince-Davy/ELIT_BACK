@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.OpinionAlreadyExistException;
@@ -11,27 +12,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Opinion controller.
+ */
 @RestController
 @RequestMapping("/api")
 public class OpinionController {
+  /**
+   * Opinion Service.
+   */
   private final OpinionService opinionService;
-
-  public OpinionController(OpinionService opinionService) {
+  /**
+   * Constructor for OpinionController.
+   * dependency injection for OpinionService
+   * @param opinionService OpinionService
+   */
+  public OpinionController(final OpinionService opinionService) {
     this.opinionService = opinionService;
   }
 
   /**
-   * @param opinionModel
+   * @param opinionModel OpinionModel
    * @return ResponseEntity<String>
-   * @throws UserNotFoundException
-   * @throws OpinionAlreadyExistException
+   * @throws UserNotFoundException UserNotFoundException
+   * @throws OpinionAlreadyExistException OpinionAlreadyExistException
    */
   @PostMapping("/opinion")
-  public ResponseEntity<String> createOpinion(@RequestBody OpinionModel opinionModel)
+  public ResponseEntity<String> createOpinion(@RequestBody final OpinionModel opinionModel)
       throws UserNotFoundException, OpinionAlreadyExistException {
     return opinionService.createOpinion(opinionModel);
   }
 
+  /**
+   * check if opinion is already exist.
+   * @return Boolean
+   */
   @GetMapping("/opinion/user")
   public Boolean getOpinionIsAlreadyExist() {
     return opinionService.getOpinionIsAlreadyExist();

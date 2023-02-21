@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.PredictibilityAnaliseNotFoundException;
@@ -17,48 +18,66 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * PredictibilityAnalysisController.
+ */
 @RestController
 @RequestMapping("/api")
 public class PredictibilityAnalysisController {
 
+  /**
+   * PredictibilityAnalysisService.
+   */
   private final PredictibilityAnalysisService predictibilityAnalysisService;
-
+  /**
+   * Constructor for PredictibilityAnalysisController.
+   * dependency injection for PredictibilityAnalysisService
+   * @param predictibilityAnalysisService PredictibilityAnalysisService
+   */
   public PredictibilityAnalysisController(
-      PredictibilityAnalysisService predictibilityAnalysisService) {
+      final PredictibilityAnalysisService predictibilityAnalysisService) {
     this.predictibilityAnalysisService = predictibilityAnalysisService;
   }
 
   /**
-   * @param projectId
+   * Create a new predictability analyse.
+   * @param projectId projectId
    * @return ResponseEntity<Long>
    */
   @PostMapping("/predictibility-analysis/{projectId}")
   // @PreAuthorize("isProjectOwner(#projectId)")
-  ResponseEntity<Long> createPredictibilityAnalysis(@PathVariable Long projectId) {
+  ResponseEntity<Long> createPredictibilityAnalysis(@PathVariable final Long projectId) {
     return predictibilityAnalysisService.createPredictibilityForm(projectId);
   }
-
-  /*
-   * @PostMapping("/predictibility-analysis2/{projectId}")
-   * ResponseEntity<String> createPredictibilityAnalysis2(@PathVariable Long
-   * projectId) throws IOException, ParseException,
-   * org.json.simple.parser.ParseException{
-   * return predictibilityAnalysisService.createPredictibilityForm2(projectId);
-   * }
+  /**
+   * Get the predictability analyse score.
+   * @param analyseId analyseId
+   * @return ResponseEntity<PredictibilityScoreModel>
+   * @throws ProjectNotFoundException ProjectNotFoundException
    */
-
   @GetMapping("/predictibility/{analyseId}/score")
   public ResponseEntity<PredictibilityScoreModel> getPredictabilityAnalysisScore(
-      @PathVariable Long analyseId) throws ProjectNotFoundException {
+      @PathVariable final Long analyseId) throws ProjectNotFoundException {
     return predictibilityAnalysisService.calculatePredictibilityAnalysisScore(analyseId);
   }
-
+  /**
+   * Get the predictability analyse score.
+   * @param analyseId analyseId
+   * @return ResponseEntity<PredictibilityScoreModel>
+   * @throws ProjectNotFoundException ProjectNotFoundException
+   */
   @PutMapping("predictibility/isFinished/{analyseId}")
-  public ResponseEntity<String> putIsFinishedPredictibilityAnalysis(@PathVariable Long analyseId)
+  public ResponseEntity<String> putIsFinishedPredictibilityAnalysis(@PathVariable final Long analyseId)
       throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException {
     return predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(analyseId);
   }
-
+  /**
+   * Increase the iteration number of the predictibility analyse.
+   * @param analyseId analyseId
+   * @return ResponseEntity<String>
+   * @throws UserNotAuthorizedException UserNotAuthorizedException
+   * @throws PredictibilityAnaliseNotFoundException PredictibilityAnaliseNotFoundException
+   */
   @ApiOperation(value = "Increase the iteration number of the predictibility analyse")
   @ApiResponses(
       value = {
@@ -69,7 +88,7 @@ public class PredictibilityAnalysisController {
       })
   @PutMapping("predictibility/iteration/{analyseId}")
   public ResponseEntity<String> increasePredictibilityAnalyseIterationNumber(
-      @ApiParam(value = "Analyse Id.") @PathVariable Long analyseId)
+      @ApiParam(value = "Analyse Id.") @PathVariable final Long analyseId)
       throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException {
     return predictibilityAnalysisService.increasePredictAnalysisIterationNum(analyseId);
   }

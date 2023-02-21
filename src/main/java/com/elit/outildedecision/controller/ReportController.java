@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
@@ -24,80 +25,129 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Report controller.
+ */
 @RestController
 @RequestMapping("/api/report/")
 public class ReportController {
+  /**
+   * Report service.
+   */
   private final ReportService reportService;
-
-  public ReportController(ReportService reportService) {
+  /**
+   * Constructor of ReportController.
+   * dependency injection of ReportService
+   * @param reportService ReportService
+   */
+  public ReportController(final ReportService reportService) {
     this.reportService = reportService;
   }
 
   /**
-   * @param projectId
-   * @param analyseId
-   * @param type
-   * @param file
-   * @return ResponseEntity<Object>
-   * @throws ProjectNotFoundException
-   * @throws MulticriteriaNotFoundException
-   * @throws ExecutionPlanNotFoundException
-   * @throws PredictibilityAnaliseNotFoundException
+   * Upload report to database.
+   * @param projectId Project id
+   * @param analyseId Analyse id
+   * @param type Type of report
+   * @param file File
+   * @return ResponseEntity
+   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws MulticriteriaNotFoundException MulticriteriaNotFoundException
+   * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException
+   * @throws PredictibilityAnaliseNotFoundException PredictibilityAnaliseNotFoundException
    */
   @PostMapping(
       value = "upload/{projectId}/{analyseId}/{type}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Object> uploadReport(
-      @PathVariable Long projectId,
-      @PathVariable Long analyseId,
-      @PathVariable String type,
-      @RequestParam("file") MultipartFile file)
+      @PathVariable final Long projectId,
+      @PathVariable final Long analyseId,
+      @PathVariable final String type,
+      @RequestParam("file") final MultipartFile file)
       throws ProjectNotFoundException, MulticriteriaNotFoundException,
           ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
     return reportService.uploadReport(projectId, analyseId, type, file);
   }
-
+  /**
+   * the second method to Upload report to database.
+   * @param projectId Project id
+   * @param analyseId Analyse id
+   * @param type Type of report
+   * @param file File
+   * @param iteration Iteration
+   * @return ResponseEntity
+   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws MulticriteriaNotFoundException MulticriteriaNotFoundException
+   * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException
+   * @throws PredictibilityAnaliseNotFoundException PredictibilityAnaliseNotFoundException
+   */
   @PostMapping(
       value = "upload/{projectId}/{analyseId}/{type}/{iteration}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Object> uploadReport2(
-      @PathVariable Long projectId,
-      @PathVariable Long analyseId,
-      @PathVariable String type,
-      @RequestParam("file") MultipartFile file,
-      @PathVariable Integer iteration)
+      @PathVariable final Long projectId,
+      @PathVariable final Long analyseId,
+      @PathVariable final String type,
+      @RequestParam("file") final MultipartFile file,
+      @PathVariable final Integer iteration)
       throws ProjectNotFoundException, MulticriteriaNotFoundException,
           ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
     return reportService.uploadReport2(projectId, analyseId, type, file, iteration);
   }
-
+ /**
+   * Preview report by id.
+   * @param reportId Report id
+  * @param response HttpServletResponse
+   * @throws ReportNotFoundException ReportNotFoundException
+   */
   @RequestMapping("/preview/{reportId}")
-  public void previewReport(HttpServletResponse response, @PathVariable Long reportId)
+  public void previewReport(final HttpServletResponse response, @PathVariable final Long reportId)
       throws IOException, ReportNotFoundException {
     reportService.previewReport(reportId, response);
   }
-
+  /**
+   * Download report by id.
+   * @param reportId Report id
+   * @param response HttpServletResponse
+   * @throws ReportNotFoundException ReportNotFoundException
+   * @throws IOException IOException
+   */
   @RequestMapping("download/{reportId}")
-  public void downloadReport(@PathVariable Long reportId, HttpServletResponse response)
+  public void downloadReport(@PathVariable final Long reportId, final HttpServletResponse response)
       throws IOException, ReportNotFoundException {
     reportService.downloadReport(reportId, response);
   }
-
+  /**
+   * Get all reports of a project.
+   * @param projectId Project id
+   * @return List of ReportResponseModel
+   */
   @GetMapping("{projectId}")
-  public List<ReportResponseModel> getReportsByProjectId(@PathVariable Long projectId)
+  public List<ReportResponseModel> getReportsByProjectId(@PathVariable final Long projectId)
       throws ProjectNotFoundException {
     return reportService.getReportsByProjectId(projectId);
   }
-
+  /**
+   * Get all reports of a project.
+   * @param reportId report id
+   * @return List of ReportResponseModel
+   */
   @DeleteMapping("{reportId}")
-  public ResponseEntity<String> deleteReportById(@PathVariable Long reportId)
+  public ResponseEntity<String> deleteReportById(@PathVariable final Long reportId)
       throws ReportNotFoundException {
     return reportService.deleteReportById(reportId);
   }
-
+  /**
+   * Rename report by id.
+   * @param reportId Report id
+   * @param name New name
+   * @return ResponseEntity
+   * @throws ReportNotFoundException ReportNotFoundException
+   * @throws IOException IOException
+   */
   @PutMapping("{reportId}")
   public ResponseEntity<String> renameReportById(
-      @PathVariable Long reportId, HttpEntity<String> name)
+      @PathVariable final Long reportId, final HttpEntity<String> name)
       throws IOException, ReportNotFoundException {
     return reportService.renameReportById(reportId, name);
   }

@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
@@ -17,57 +18,93 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * the controller for execution plan.
+ */
 @RestController
 @RequestMapping("/api")
 public class ExecutionPlanController {
+  /**
+   * the execution plan service.
+   */
   private final ExecutionPlanService executionPlanService;
 
-  public ExecutionPlanController(ExecutionPlanService executionPlanService) {
+  /**
+   * the constructor for execution plan controller.
+   * dependency injection for execution plan service.
+   * @param executionPlanService the execution plan service
+   */
+  public ExecutionPlanController(final ExecutionPlanService executionPlanService) {
     this.executionPlanService = executionPlanService;
   }
-
   /**
-   * @param projectId
+   * Create a new execution plan for a project.
+   * @param projectId the project id
    * @return ResponseEntity<Long>
    */
   @PostMapping("/executionPlan/create/{projectId}")
-  ResponseEntity<Long> createExecutionPlan(@PathVariable Long projectId) {
+  ResponseEntity<Long> createExecutionPlan(@PathVariable final Long projectId) {
     return executionPlanService.createExecutionPlan(projectId);
   }
-
+  /**
+   * Get questions and answers for of an execution plan.
+   * @param executionPlanId the execution plan id
+   * @return ResponseEntity<Long>
+   */
   @GetMapping("/executionPlan/formConstraints/{executionPlanId}")
   // @PreAuthorize("isContributer(#projectId)")
-  public ResponseEntity<Object> getQuestionsAndAnswers(@PathVariable Long executionPlanId) {
+  public ResponseEntity<Object> getQuestionsAndAnswers(@PathVariable final Long executionPlanId) {
     return executionPlanService.getQuestionsAndAnswers(executionPlanId);
   }
-
+  /**
+   * Update answers of an execution plan.
+   * @param executionPlanAnswerModel the execution plan answer model
+   * @param executionPlanId the execution plan id
+   * @return ResponseEntity<Long>
+   */
   @PutMapping(value = "/executionPlan/formConstraints/putAnswers/{executionPlanId}")
   // @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<Object> updateAnswers(
-      @RequestBody List<ExecutionPlanAnswerModel> executionPlanAnswerModel,
-      @PathVariable Long executionPlanId) {
+      @RequestBody final List<ExecutionPlanAnswerModel> executionPlanAnswerModel,
+      @PathVariable final Long executionPlanId) {
     return executionPlanService.updateAnswers(executionPlanAnswerModel, executionPlanId);
   }
-
+  /**
+   * Get methodologies for an execution plan.
+   * @param executionPlanId the execution plan id
+   * @return ResponseEntity<Long>
+   */
   @GetMapping("/executionPlan/methodologies/{executionPlanId}")
-  public ResponseEntity<Object> getMethodologies(@PathVariable Long executionPlanId) {
+  public ResponseEntity<Object> getMethodologies(@PathVariable final Long executionPlanId) {
     return executionPlanService.getMethodologies(executionPlanId);
   }
-
+  /**
+   * Vote for a methodology.
+   * @param executionVoteRequestModel the execution vote request model
+   * @return ResponseEntity<Long>
+   */
   @PostMapping("/executionPlan/methodologies/vote")
   public ResponseEntity<String> postMethodologiesVote(
-      @RequestBody ExecutionVoteRequestModel executionVoteRequestModel)
+      @RequestBody final ExecutionVoteRequestModel executionVoteRequestModel)
       throws UserNotAuthorizedException {
     return executionPlanService.postMethodologiesVote(executionVoteRequestModel);
   }
-
+  /**
+   * Get execution plan score.
+   * @param executionPlanId the execution plan id
+   * @return ExecutionPlanScoreResponseModel
+   */
   @GetMapping("/executionPlan/{executionPlanId}/score")
-  public ExecutionPlanScoreResponseModel getExecutionPlanScore(@PathVariable Long executionPlanId) {
+  public ExecutionPlanScoreResponseModel getExecutionPlanScore(@PathVariable final Long executionPlanId) {
     return executionPlanService.getExecutionPlanScore(executionPlanId);
   }
-
+  /**
+   * Get execution plan score.
+   * @param executionPlanId the execution plan id
+   * @return ExecutionPlanScoreResponseModel
+   */
   @PostMapping("/executionPlan/isFinished/{executionPlanId}")
-  public ResponseEntity<Boolean> putIsFinishedExecutionPlan(@PathVariable Long executionPlanId)
+  public ResponseEntity<Boolean> putIsFinishedExecutionPlan(@PathVariable final Long executionPlanId)
       throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     return executionPlanService.putIsFinishedExecutionPlan(executionPlanId);
   }

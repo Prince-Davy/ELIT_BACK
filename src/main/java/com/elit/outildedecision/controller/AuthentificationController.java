@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.controller;
 
 import com.auth0.jwt.JWT;
@@ -32,44 +33,66 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
 public class AuthentificationController {
+  /**
+   *  The Constant EXPIRATION_TIME.
+   *  The expiration time of the JWT token.
+   */
   private static final long EXPIRATION_TIME = 5 * 60 * 1000;
 
+  /**
+   *  The Constant jwtSecret.
+   *  The secret key used to sign the JWT token.
+   */
   @Value("${jwt.secret}")
   private static String jwtSecret;
-
+  /**
+   *  The User service.
+   *  The service used to manage the user.
+   */
   private final UserService userService;
-
-  public AuthentificationController(UserService userService) {
+  /**
+   * Instantiates a new Authentification controller.
+   * dependency injection via constructor of the user service
+   * @param userService the user service
+   */
+  public AuthentificationController(final UserService userService) {
     this.userService = userService;
   }
 
   /**
+   * Register a new user.
    * @param user
    * @return ResponseEntity<String>
    * @throws CouldNotSaveUserException
    */
   @PostMapping("/register")
-  public ResponseEntity<String> register(@RequestBody @Valid UserModel user)
+  public ResponseEntity<String> register(@RequestBody @Valid final UserModel user)
       throws CouldNotSaveUserException {
     return userService.saveUser(user);
   }
-
+  /**
+   * Generate a refresh token and an access token.
+   * @param request
+   * @param response
+   * @throws IOException
+   */
   @GetMapping("/refreshToken")
-  public void refreshToken(HttpServletRequest request, HttpServletResponse response)
+  public void refreshToken(final HttpServletRequest request,
+                           final  HttpServletResponse response)
       throws IOException {
     String jwtAuthorizationToken = request.getHeader("Authorization");
     if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
       try {
 
-        String refresh_token = jwtAuthorizationToken.substring("Bearer ".length());
+        String refreshToken = jwtAuthorizationToken.substring("Bearer ".length());
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();
-        DecodedJWT decodedJWT = verifier.verify(refresh_token);
+        DecodedJWT decodedJWT = verifier.verify(refreshToken);
         String userEmail = decodedJWT.getSubject();
         User user = userService.findByEmail(userEmail);
         List<String> roles = new ArrayList<>();
         roles.add(user.getIsAdmin() ? "ADMIN" : "USER");
-        String access_token =
+        String accessToken =
             JWT.create()
                 .withSubject(user.getUserEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -81,17 +104,17 @@ public class AuthentificationController {
                 .sign(algorithm);
 
         Map<String, String> tokens = new HashMap<>();
-        tokens.put("access-token", access_token);
-        tokens.put("refresh-token", refresh_token);
+        tokens.put("access-token", accessToken);
+        tokens.put("refresh-token", refreshToken);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
       } catch (Exception e) {
         response.setHeader("error", e.getMessage());
         response.setStatus(FORBIDDEN.value());
-        Map<String, String> error_message = new HashMap<>();
-        error_message.put("error-message", e.getMessage());
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("error-message", e.getMessage());
         response.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), error_message);
+        new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
       }
     } else {
       throw new RuntimeException("Refresh token is missing");
