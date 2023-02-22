@@ -81,7 +81,7 @@ public class AttachementController {
   @GetMapping("/download/{projectId}/{attachmentId}")
   public void downloadAttachment(
       @PathVariable("attachmentId") final Long attachmentId, final HttpServletResponse response)
-      throws ProjectNotFoundException, IOException, AttachmentNotFoundException {
+      throws  IOException, AttachmentNotFoundException {
     attachmentService.downloadAttachment(attachmentId, response);
   }
   /**

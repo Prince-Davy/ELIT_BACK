@@ -61,9 +61,10 @@ public class AuthentificationController {
 
   /**
    * Register a new user.
-   * @param user
+   *
+   * @param user the user to register
    * @return ResponseEntity<String>
-   * @throws CouldNotSaveUserException
+   * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
    */
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid final UserModel user)
@@ -72,9 +73,10 @@ public class AuthentificationController {
   }
   /**
    * Generate a refresh token and an access token.
-   * @param request
-   * @param response
-   * @throws IOException
+   *
+   * @param request the request containing the user credentials
+   * @param response the response containing the tokens or the error message
+   * @throws IOException the exception thrown when the response cannot be written
    */
   @GetMapping("/refreshToken")
   public void refreshToken(final HttpServletRequest request,
@@ -83,7 +85,6 @@ public class AuthentificationController {
     String jwtAuthorizationToken = request.getHeader("Authorization");
     if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
       try {
-
         String refreshToken = jwtAuthorizationToken.substring("Bearer ".length());
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();

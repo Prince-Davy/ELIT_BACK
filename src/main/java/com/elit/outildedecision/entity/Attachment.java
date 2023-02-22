@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
