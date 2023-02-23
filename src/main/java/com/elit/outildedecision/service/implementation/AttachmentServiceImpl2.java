@@ -4,7 +4,6 @@ import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.model.AttachmentModel;
 import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.service.AttachmentService;
@@ -17,6 +16,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLConnection;
@@ -131,7 +131,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       FileCopyUtils.copy(inputStream, response.getOutputStream());
 
     } else {
-      System.out.println("no exitia el file");
+      System.out.println("Ce fichier n'existe pas!");
     }
   }
 
