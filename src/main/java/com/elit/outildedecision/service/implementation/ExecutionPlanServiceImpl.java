@@ -1,53 +1,146 @@
+
 package com.elit.outildedecision.service.implementation;
 
-import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.entity.ExecutionPlan;
+import com.elit.outildedecision.entity.ExecutionPlanAnswer;
+import com.elit.outildedecision.entity.ExecutionPlanQuestion;
+import com.elit.outildedecision.entity.ExecutionPlanVote;
+import com.elit.outildedecision.entity.Method;
 import com.elit.outildedecision.entity.Methodology;
+import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
+import com.elit.outildedecision.entity.PredictibilityAnalysis;
+import com.elit.outildedecision.entity.PredictibilityResults;
+import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.ProjectUserPermission;
+import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
-import com.elit.outildedecision.model.*;
-import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
+import com.elit.outildedecision.model.ExecutionPlanFormModel;
+import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
+import com.elit.outildedecision.model.ExecutionVoteModel;
+import com.elit.outildedecision.model.ExecutionVoteRequestModel;
+import com.elit.outildedecision.model.ExecutionVoteResponseModel;
+import com.elit.outildedecision.model.MethodModel;
+import com.elit.outildedecision.model.PredictibilityResultsResponseModel;
+import com.elit.outildedecision.repository.ExecutionPlanAnswerRepository;
+import com.elit.outildedecision.repository.ExecutionPlanQuestionRepository;
+import com.elit.outildedecision.repository.ExecutionPlanRepository;
+import com.elit.outildedecision.repository.ExecutionPlanVoteRepo;
+import com.elit.outildedecision.repository.MethodRepository;
+import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
+import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
+import com.elit.outildedecision.repository.PredictibilityResultsRepository;
+import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
+import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.util.ProjectPermession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * this class is the implementation of the ExecutionPlanService interface.
+ * it contains all the methods that are used to manage the execution plan
+ */
 @Service
 public class ExecutionPlanServiceImpl implements ExecutionPlanService {
-
-  @Autowired ExecutionPlanAnswerRepository executionPlanAnswerRepository;
-
-  @Autowired ExecutionPlanQuestionRepository executionPlanQuestionRepository;
-
-  @Autowired ExecutionPlanRepository executionPlanRepository;
-
-  @Autowired UserRepository userRepository;
-
-  @Autowired ProjectUserPermissionRepository projectUserPermissionRepository;
-
-  @Autowired MethodRepository methodRepository;
-
-  @Autowired ExecutionPlanVoteRepo executionPlanVoteRepo;
-
-  @Autowired ProjectRepository projectRepository;
-
-  @Autowired PredictibilityAnalysisRepository predictibilityAnalysisRepository;
-
-  @Autowired MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
-
-  @Autowired PredictibilityResultsRepository predictibilityResultsRepository;
+  /**
+   * the execution plan answer repository.
+   */
+  private final ExecutionPlanAnswerRepository executionPlanAnswerRepository;
+  /**
+   * the execution plan question repository.
+   */
+  private final ExecutionPlanQuestionRepository executionPlanQuestionRepository;
+  /**
+   * the execution plan repository.
+   */
+  private final ExecutionPlanRepository executionPlanRepository;
+  /**
+   * the user repository.
+   */
+  private final UserRepository userRepository;
+  /**
+   * the project user permission repository.
+   */
+  private final ProjectUserPermissionRepository projectUserPermissionRepository;
+  /**
+   * the method repository.
+   */
+  private final MethodRepository methodRepository;
+  /**
+   * the execution plan vote repository.
+   */
+  private final ExecutionPlanVoteRepo executionPlanVoteRepo;
+  /**
+   * the project repository.
+   */
+  private final ProjectRepository projectRepository;
+  /**
+   * the predictibility analysis repository.
+   */
+  private final PredictibilityAnalysisRepository predictibilityAnalysisRepository;
+  /**
+   * the multi criteria analysis repository.
+   */
+  private final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
+  /**
+   * the predictibility results repository.
+   */
+  private final PredictibilityResultsRepository predictibilityResultsRepository;
+  /**
+   * the constructor of the class.
+   * it's used to inject the dependencies
+   * @param executionPlanAnswerRepository the execution plan answer repository to inject
+   * @param executionPlanQuestionRepository the execution plan question repository to inject
+   * @param executionPlanRepository the execution plan repository to inject
+   * @param userRepository the user repository to inject
+   * @param projectUserPermissionRepository the project user permission repository to inject
+   * @param methodRepository the method repository to inject
+   * @param executionPlanVoteRepo the execution plan vote repository to inject
+   * @param projectRepository the project repository to inject
+   * @param predictibilityAnalysisRepository the predictibility analysis repository to inject
+   * @param multiCriteriaAnalysisRepository the multi criteria analysis repository to inject
+   * @param predictibilityResultsRepository the predictibility results repository to inject
+   */
+  public ExecutionPlanServiceImpl(final ExecutionPlanAnswerRepository executionPlanAnswerRepository,
+                                  final ExecutionPlanQuestionRepository executionPlanQuestionRepository,
+                                  final ExecutionPlanRepository executionPlanRepository,
+                                  final UserRepository userRepository,
+                                  final ProjectUserPermissionRepository projectUserPermissionRepository,
+                                  final MethodRepository methodRepository,
+                                  final ExecutionPlanVoteRepo executionPlanVoteRepo,
+                                  final ProjectRepository projectRepository,
+                                  final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
+                                  final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
+                                  final PredictibilityResultsRepository predictibilityResultsRepository) {
+    this.executionPlanAnswerRepository = executionPlanAnswerRepository;
+    this.executionPlanQuestionRepository = executionPlanQuestionRepository;
+    this.executionPlanRepository = executionPlanRepository;
+    this.userRepository = userRepository;
+    this.projectUserPermissionRepository = projectUserPermissionRepository;
+    this.methodRepository = methodRepository;
+    this.executionPlanVoteRepo = executionPlanVoteRepo;
+    this.projectRepository = projectRepository;
+    this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
+    this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
+    this.predictibilityResultsRepository = predictibilityResultsRepository;
+  }
 
   /**
-   * @param projectId
-   * @return ResponseEntity<Long>
+   * this method is used to create an execution plan.
+   *
+   * @param projectId the id of the project to which the execution plan belongs
+   * @return the id of the created execution plan
    */
   @Override
-  public ResponseEntity<Long> createExecutionPlan(Long projectId) {
+  public ResponseEntity<Long> createExecutionPlan(final Long projectId) {
     Project project =
         projectRepository
             .findById(projectId)
@@ -101,9 +194,12 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     return ResponseEntity.ok().body(executionPlan.getExecutionPlanId());
   }
-
+  /**
+   * this method is used to get the execution plan questions and answers.
+   * @return the list of the execution plan questions
+   */
   @Override
-  public ResponseEntity<Object> getQuestionsAndAnswers(Long executionPlanId) {
+  public ResponseEntity<Object> getQuestionsAndAnswers(final Long executionPlanId) {
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
@@ -122,10 +218,16 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     return ResponseEntity.ok().body(executionPlanFormModelList);
   }
-
+  /**
+   * this method is used to update the execution plan answers.
+   *
+   * @param executionPlanAnswerModel the list of the execution plan answers
+   * @param executionPlanId the id of the execution plan
+   * @return response entity
+   */
   @Override
-  public ResponseEntity<Object> updateAnswers(
-      List<ExecutionPlanAnswerModel> executionPlanAnswerModel, Long executionPlanId) {
+  public ResponseEntity<Object> updateAnswers(final List<ExecutionPlanAnswerModel> executionPlanAnswerModel,
+                                              final Long executionPlanId) {
     List<Object> result = new ArrayList<>();
     for (ExecutionPlanAnswerModel executionPlanAnswerUnit : executionPlanAnswerModel) {
       ExecutionPlanAnswer executionPlanAnswerFromDB =
@@ -143,9 +245,14 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     }
     return ResponseEntity.ok().body(result);
   }
-
+  /**
+   * this method is used to get the execution plan answers.
+   *
+   * @param executionPlanId the id of the execution plan
+   * @return response entity
+   */
   @Override
-  public ResponseEntity<Object> getMethodologies(Long executionPlanId) {
+  public ResponseEntity<Object> getMethodologies(final Long executionPlanId) {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
@@ -199,12 +306,15 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     return ResponseEntity.ok().body(result);
   }
-
+  /**
+   * this method is used to vote for a method.
+   *
+   * @param executionVoteRequestModel the execution vote request model
+   * @return response entity
+   */
   @Override
   public ResponseEntity<String> postMethodologiesVote(
-      ExecutionVoteRequestModel executionVoteRequestModel) {
-    System.out.println(
-        "=========================))))))" + executionVoteRequestModel.getMethodId2ForHybrid());
+      final ExecutionVoteRequestModel executionVoteRequestModel) {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
@@ -249,9 +359,14 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     return ResponseEntity.ok().body("Le vote a bien été enregistré.");
   }
-
+  /**
+   * this method is used to get the execution plan score.
+   *
+   * @param executionPlanId the id of the execution plan
+   * @return response entity
+   */
   @Override
-  public ExecutionPlanScoreResponseModel getExecutionPlanScore(Long executionPlanId) {
+  public ExecutionPlanScoreResponseModel getExecutionPlanScore(final Long executionPlanId) {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
@@ -332,17 +447,21 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     result.setIsFinished(executionPlan.getIsFinished());
     return result;
   }
-
+  /**
+   * this method is used to get the execution plan score.
+   *
+   * @param executionPlanId the id of the execution plan
+   * @return response entity
+   */
   @Override
-  public ResponseEntity<Boolean> putIsFinishedExecutionPlan(Long executionPlanId)
+  public ResponseEntity<Boolean> putIsFinishedExecutionPlan(final Long executionPlanId)
       throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
             .orElseThrow(
                 () -> new ExecutionPlanNotFoundException("Ce plan d'exécution n'existe pas."));
-    Project project =
-        executionPlan.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject();
+    Project project = executionPlan.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject();
     if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
       if (Boolean.FALSE.equals(executionPlan.getIsFinished())) {
         executionPlan.setIsFinished(true);
@@ -356,8 +475,15 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     }
     return ResponseEntity.ok().body(true);
   }
-
-  private boolean checkPermissions(Long projectId, String permissionName) {
+  /**
+   * this method is used to get the execution plan score.
+   *
+   * @param projectId the id of the project
+   * @param permissionName the name of the permission to check
+   * @return boolean true if the user has the permission
+   */
+  private boolean checkPermissions(final Long projectId,
+                                   final String permissionName) {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
