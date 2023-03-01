@@ -8,7 +8,7 @@ version: '3'
 #Volumes for DB data
 volumes:
   mysql-data:
-      name: data-mysql
+    name: data-mysql
 
 services:
   elit_back:
@@ -23,7 +23,7 @@ services:
       context: .
       dockerfile: Dockerfile
 
-    env_file: ../.env
+    env_file: ../src/main/resources/.env
 
     volumes:
       # Update this to wherever you want VS Code to mount the folder of your project
@@ -49,8 +49,6 @@ services:
 
   elit-back-mysql-test:
     image: mysql:5.7
-    env_file: ../.env
+    env_file: ../src/main/resources/.env
     ports:
       - "3311:3306"
-
-

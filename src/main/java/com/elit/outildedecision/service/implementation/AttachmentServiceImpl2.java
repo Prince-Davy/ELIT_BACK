@@ -152,10 +152,6 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       response.setHeader(
           "Content-Disposition", String.format("inline; filename=\"" + file.getName() + "\""));
 
-      // Here we have mentioned it to show as attachment
-      // response.setHeader("Content-Disposition", String.format("attachment;
-      // filename=\"" + file.getName() + "\""));
-
       response.setContentLength((int) file.length());
 
       InputStream inputStream = new BufferedInputStream(new FileInputStream(file));

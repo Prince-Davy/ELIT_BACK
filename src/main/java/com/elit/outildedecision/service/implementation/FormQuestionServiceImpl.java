@@ -77,7 +77,15 @@ public class FormQuestionServiceImpl implements FormQuestionService {
     }
     return persistedFormQuestions;
   }
-
+  /**
+   * updateFormQuestion is used to update a formQuestion.
+   * using the data entered by the user in the front-end.
+   * this method is used to ensure that the data entered by the user won't be lost
+   *
+   * @param formQuestion is the formQuestion is the data entered by the user
+   * @return the updated formQuestion
+   * @throws Exception if the formQuestion doesn't exist
+   */
   @Override
   public FormQuestion updateFormQuestion(FormQuestion formQuestion) throws Exception {
     Optional<FormQuestion> formQuestionFromDB =
