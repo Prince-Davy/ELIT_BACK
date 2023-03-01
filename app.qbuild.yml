@@ -9,7 +9,7 @@ services:
     networks:
       - innovation_default
     env_file:
-      - src/main/resources/.env
+      - .env
 
 networks:
   innovation_default:
