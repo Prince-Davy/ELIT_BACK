@@ -18,7 +18,7 @@ import javax.persistence.Table;
  * class used as model to : build the survey answer table in database manage answer data in database
  */
 @Entity
-@Table
+@Table(name = "survey_answer")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -17,6 +17,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -159,7 +160,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       FileCopyUtils.copy(inputStream, response.getOutputStream());
 
     } else {
-      System.out.println("no exitia el file");
+      System.out.println("Ce fichier n'existe pas!");
     }
   }
   /**
