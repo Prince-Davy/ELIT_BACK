@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.Criteria;
@@ -8,17 +9,38 @@ import com.elit.outildedecision.repository.FormStepRepo;
 import com.elit.outildedecision.service.CriteriaService;
 import com.elit.outildedecision.service.FormQuestionService;
 import org.springframework.stereotype.Service;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
-import java.util.*;
-
+/**
+ * this class is the implementation of the FormQuestionService interface.
+ * it's used to implement the business logic of the FormQuestion entity
+ */
 @Service
 public class FormQuestionServiceImpl implements FormQuestionService {
+  /**
+   * CriteriaService is the service of the Criteria entity.
+   */
   private final CriteriaService criteriaService;
-
+  /**
+   * FormQuestionRepository is the repository of the FormQuestion entity.
+   */
   private final FormQuestionRepository formQuestionRepository;
-
+  /**
+   * FormStepRepo is the repository of the FormStep entity.
+   * is the repository of the FormStep entity.
+   */
   private final FormStepRepo formStepRepo;
 
+  /**
+   * FormQuestionServiceImpl is the constructor of the class.
+   * it's used to inject the CriteriaService, the FormQuestionRepository and the FormStepRepo
+   * @param criteriaService is the service of the Criteria entity
+   * @param formQuestionRepository is the repository of the FormQuestion entity
+   * @param formStepRepo is the repository of the FormStep entity
+   */
   public FormQuestionServiceImpl(
       CriteriaService criteriaService,
       FormQuestionRepository formQuestionRepository,
@@ -29,10 +51,12 @@ public class FormQuestionServiceImpl implements FormQuestionService {
   }
 
   /**
-   * @param formQuestions
-   * @param criterias
-   * @param stepId
-   * @return Set<FormQuestion>
+   * createFormQuestions is used to create a set of questions and their criterias
+   * for the given step of the multi-criteria analysis.
+   * @param formQuestions is the set of formQuestions to create
+   * @param criterias is the set of criterias to create
+   * @param stepId is the id of the formStep to which the formQuestions are linked
+   * @return the set of created formQuestions
    */
   @Override
   public Set<FormQuestion> createFormQuestions(
@@ -53,7 +77,15 @@ public class FormQuestionServiceImpl implements FormQuestionService {
     }
     return persistedFormQuestions;
   }
-
+  /**
+   * updateFormQuestion is used to update a formQuestion.
+   * using the data entered by the user in the front-end.
+   * this method is used to ensure that the data entered by the user won't be lost
+   *
+   * @param formQuestion is the formQuestion is the data entered by the user
+   * @return the updated formQuestion
+   * @throws Exception if the formQuestion doesn't exist
+   */
   @Override
   public FormQuestion updateFormQuestion(FormQuestion formQuestion) throws Exception {
     Optional<FormQuestion> formQuestionFromDB =

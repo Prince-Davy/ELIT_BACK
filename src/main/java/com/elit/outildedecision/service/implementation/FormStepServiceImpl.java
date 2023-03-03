@@ -16,6 +16,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * this class is the implementation of the FormStepService interface.
+ * it's used to implement the business logic of the FormStep entity
+ * and it contains the methods to create a FormStep, to find a FormStep by its name and its formId
+ * and a method to update the data if a formStep already exists
+ */
 @Service
 public class FormStepServiceImpl implements FormStepService {
 

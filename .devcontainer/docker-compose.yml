@@ -8,7 +8,7 @@ version: '3'
 #Volumes for DB data
 volumes:
   mysql-data:
-      name: data-mysql
+    name: data-mysql
 
 services:
   elit_back:
@@ -52,5 +52,3 @@ services:
     env_file: ../.env
     ports:
       - "3311:3306"
-
-
