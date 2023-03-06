@@ -4,6 +4,7 @@ package com.elit.outildedecision.service.implementation;
 import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormQuestion;
 import com.elit.outildedecision.entity.FormStep;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.repository.FormQuestionRepository;
 import com.elit.outildedecision.repository.FormStepRepo;
 import com.elit.outildedecision.service.CriteriaService;
@@ -87,11 +88,11 @@ public class FormQuestionServiceImpl implements FormQuestionService {
    * @throws Exception if the formQuestion doesn't exist
    */
   @Override
-  public FormQuestion updateFormQuestion(FormQuestion formQuestion) throws Exception {
+  public FormQuestion updateFormQuestion(FormQuestion formQuestion) throws QuestionsNotFoundException {
     Optional<FormQuestion> formQuestionFromDB =
         formQuestionRepository.findById(formQuestion.getQuestionId());
     if (!formQuestionFromDB.isPresent()) {
-      throw new Exception("Question n'existe pas");
+      throw new QuestionsNotFoundException("Question n'existe pas");
     }
     FormQuestion existingFormQuestion = formQuestionFromDB.get();
     if (Objects.nonNull(formQuestion.getAnswerText())

@@ -4,6 +4,7 @@ import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.entity.StepWeight;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.StepWeightNotFoundException;
 import com.elit.outildedecision.repository.FormStepRepo;
 import com.elit.outildedecision.repository.StepWeightRepo;
 import com.elit.outildedecision.service.StepWeightService;
@@ -50,10 +51,10 @@ public class StepWeightServiceImpl implements StepWeightService {
   }
 
   @Override
-  public StepWeight updateWeights(StepWeight stepWeight) throws Exception {
+  public StepWeight updateWeights(StepWeight stepWeight) throws StepWeightNotFoundException {
     Optional<StepWeight> stepWeightFromDB = stepWeightRepo.findById(stepWeight.getWeightId());
     if (!stepWeightFromDB.isPresent()) {
-      throw new Exception("Le poid du critère " + stepWeight.getCriteriaName() + "n'existe pas !");
+      throw new StepWeightNotFoundException("Le poid du critère " + stepWeight.getCriteriaName() + "n'existe pas !");
     }
     StepWeight existingStepWeight = stepWeightFromDB.get();
     if (Objects.nonNull(stepWeight.getWeightValue())) {

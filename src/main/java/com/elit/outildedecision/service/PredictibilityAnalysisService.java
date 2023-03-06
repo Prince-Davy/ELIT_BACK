@@ -1,6 +1,7 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.exception.PredictibilityAnaliseNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisAlreadyUpdated;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.PredictibilityScoreModel;
@@ -17,7 +18,7 @@ public interface PredictibilityAnalysisService {
       throws ProjectNotFoundException;
 
   ResponseEntity<String> putIsFinishedPredictibilityAnalysis(Long analyseId)
-      throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException;
+          throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException, PredictibilityAnalysisAlreadyUpdated;
 
   ResponseEntity<String> increasePredictAnalysisIterationNum(Long analyseId)
       throws PredictibilityAnaliseNotFoundException, UserNotAuthorizedException;

@@ -1,22 +1,36 @@
 package com.elit.outildedecision.service.implementation;
 
-import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.entity.FormStep;
+import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
+import com.elit.outildedecision.entity.PredictibilityAnalysis;
+import com.elit.outildedecision.entity.PredictibilityResults;
+import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.ProjectUserPermission;
+import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.entity.Vote;
 import com.elit.outildedecision.exception.PredictibilityAnaliseNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisAlreadyUpdated;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.FormStepModel;
 import com.elit.outildedecision.model.MethodologyScoreModel;
-import com.elit.outildedecision.model.PredictibilityResultsResponseModel;
 import com.elit.outildedecision.model.PredictibilityScoreModel;
-import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.repository.MethodologyRepository;
+import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
+import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
+import com.elit.outildedecision.repository.PredictibilityResultsRepository;
+import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
+import com.elit.outildedecision.repository.UserRepository;
+import com.elit.outildedecision.repository.VoteRepository;
 import com.elit.outildedecision.service.PredictibilityAnalysisService;
 import com.elit.outildedecision.util.MethodologyTypes;
 import com.elit.outildedecision.util.ProjectPermession;
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +45,8 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
   private final ProjectUserPermissionRepository projectUserPermissionRepository;
   private final MethodologyRepository methodologyRepository;
   private final PredictibilityResultsRepository predictibilityResultsRepository;
+
+  private Logger logger;
 
   public PredictibilityAnalysisServiceImpl(
       ProjectRepository projectRepository,
@@ -78,8 +94,6 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     int nextIteration = 1;
 
     if (lastPredictibilityAnalysis != null) {
-      // "Une Analyse de prévisibilité est déjà en cours"
-      // if (!lastPredictibilityAnalysis.getIsFinished())
       return ResponseEntity.ok().body(lastPredictibilityAnalysis.getPredictibilityAnalysisId());
     }
 
@@ -165,8 +179,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
         predictibilityResults.setValue(methodologyScoreModel.getValue());
         predictibilityResultsRepository.save(predictibilityResults);
       } else {
-        System.out.println(
-            "Les résultats de l'analyse de prévisibilité sont déjà inscris en base de données.");
+        logger.error("Les résultats de l'analyse de prévisibilité sont déjà inscris en base de données.");
       }
     }
     predictibilityResult.setMethodologies(methodologyScoreList);
@@ -204,25 +217,19 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
             methodologyRepository.findMethodologyByName("Hybride"));
         break;
       default:
-        System.out.println("La méthodologie n'est pas reconnue.");
+        logger.error("La méthodologie n'est pas reconnue.");
         break;
     }
 
-    /*
-     * if (average > 0.5) {
-     * predictibilityAnalysis.setIsFinished(true);
-     * predictibilityAnalysisRepository.save(predictibilityAnalysis);
-     * }
-     */
+
     predictibilityAnalysisRepository.save(predictibilityAnalysis);
-    // TODO Missing report creation
 
     return ResponseEntity.ok().body(predictibilityResult);
   }
 
   @Override
   public ResponseEntity<String> putIsFinishedPredictibilityAnalysis(Long analyseId)
-      throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException {
+    throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException, PredictibilityAnalysisAlreadyUpdated {
     PredictibilityAnalysis predictibilityAnalysis =
         predictibilityAnalysisRepository
             .findById(analyseId)
@@ -236,7 +243,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
         predictibilityAnalysis.setIsFinished(true);
         predictibilityAnalysisRepository.save(predictibilityAnalysis);
       } else {
-        throw new RuntimeException("L'analyse de prévisibilité est déjà terminée.");
+        throw new PredictibilityAnalysisAlreadyUpdated("L'analyse de prévisibilité est déjà terminée.");
       }
     } else {
       throw new UserNotAuthorizedException(
@@ -246,8 +253,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
         .body("L'analyse de prévisibilité a bien été enregistré comme terminée.");
   }
 
-  private boolean checkPermissions(Long projectId, String permissionName)
-      throws PredictibilityAnaliseNotFoundException, UserNotAuthorizedException {
+  private boolean checkPermissions(Long projectId, String permissionName) {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);

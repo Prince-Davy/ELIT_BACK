@@ -15,7 +15,7 @@ public interface MultiCriteriaAnalysisService {
       throws FormAlreadyExistsException, IOException, ParseException,
           org.json.simple.parser.ParseException;
 
-  ResponseEntity<Object> getMulticriteriaAnalysis(Long projectId);
+  ResponseEntity<Object> getMulticriteriaAnalysis(Long projectId) throws ProjectNotFoundException;
 
   ResponseEntity<String> updateMultiCriteriaAnalysis(
       Long projectId, FormStep multiCriteriaAnalysis);
