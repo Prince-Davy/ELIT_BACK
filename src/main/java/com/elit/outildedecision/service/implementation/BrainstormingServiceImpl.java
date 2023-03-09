@@ -167,7 +167,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
     for (FormStep formStep : formStepList) {
       List<FormQuestionModel> formQuestionList = new ArrayList<>();
       for (FormQuestion formQuestion : formStep.getFormQuestions()) {
-        List<CriteriaModel> criteriaList = new ArrayList();
+        List<CriteriaModel> criteriaList = new ArrayList<>();
         for (Criteria criteria : formQuestion.getCriterias()) {
           criteriaList.add(
               new CriteriaModel(

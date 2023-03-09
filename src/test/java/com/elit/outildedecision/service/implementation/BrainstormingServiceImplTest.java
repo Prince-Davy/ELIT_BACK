@@ -1,10 +1,4 @@
 package com.elit.outildedecision.service.implementation;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 
 import com.elit.outildedecision.entity.Brainstorming;
 import com.elit.outildedecision.repository.*;
@@ -14,6 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.*;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 class BrainstormingServiceImplTest {
 
@@ -38,6 +37,7 @@ class BrainstormingServiceImplTest {
   void setUp() {
     MockitoAnnotations.openMocks(this);
   }
+
   @Test
   void testValidateOrRejectBrainstorming() throws Exception {
 
@@ -65,5 +65,4 @@ class BrainstormingServiceImplTest {
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("Le commentaire a bien été enregistré.", response.getBody());
   }
-
 }
