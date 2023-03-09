@@ -106,9 +106,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
   }
 
-  @ExceptionHandler(PredictibilityAnaliseNotFoundException.class)
+  @ExceptionHandler(PredictibilityAnalysisNotFoundException.class)
   public ResponseEntity<ErrorMessage> predictibilityAnaliseNotFoundException(
-      PredictibilityAnaliseNotFoundException e, WebRequest webRequest) {
+          PredictibilityAnalysisNotFoundException e, WebRequest webRequest) {
     ErrorMessage errorMessage = new ErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
   }
@@ -198,6 +198,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   @ExceptionHandler(PredictibilityAnalysisAlreadyUpdated.class)
   public ResponseEntity<ErrorMessage> stepWeightNotFoundException(
       PredictibilityAnalysisAlreadyUpdated ex, WebRequest request) {
+    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
+  }
+  @ExceptionHandler(ProjectFolderAlreadyExistsException.class)
+  public ResponseEntity<ErrorMessage> stepWeightNotFoundException(
+      ProjectFolderAlreadyExistsException ex, WebRequest request) {
+    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
+  }
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<ErrorMessage> stepWeightNotFoundException(
+      UserAlreadyExistsException ex, WebRequest request) {
     ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
   }

@@ -119,13 +119,13 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * it's for dependency injection.
    *
    * @param multiCriteriaAnalysisRepository the repository for multi-criteria analysis entities
-   * @param formStepRepo the repository for form step entities
-   * @param formQuestionRepository the repository for form question entities
-   * @param criteriaRepository the repository for criteria entities
-   * @param stepWeightRepo the repository for step weight entities
-   * @param userRepository the repository for user entities
+   * @param formStepRepo                    the repository for form step entities
+   * @param formQuestionRepository          the repository for form question entities
+   * @param criteriaRepository              the repository for criteria entities
+   * @param stepWeightRepo                  the repository for step weight entities
+   * @param userRepository                  the repository for user entities
    * @param projectUserPermissionRepository the repository for project user permission entities
-   * @param projectRepository the repository for project entities
+   * @param projectRepository               the repository for project entities
    */
   public MultiCriteriaServiceImpl(
     final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,

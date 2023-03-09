@@ -8,29 +8,47 @@ import com.elit.outildedecision.exception.StepWeightNotFoundException;
 import com.elit.outildedecision.repository.FormStepRepo;
 import com.elit.outildedecision.repository.StepWeightRepo;
 import com.elit.outildedecision.service.StepWeightService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Service implementation for managing Step Weights.
+ */
 @Service
 public class StepWeightServiceImpl implements StepWeightService {
-
-  @Autowired StepWeightRepo stepWeightRepo;
-  @Autowired FormStepRepo formStepRepo;
-
   /**
-   * @param criterias
-   * @param formStepToPersistId
-   * @return Set<StepWeight>
-   * @throws StepFormNotFoundException
+   * Repository for managing StepWeight entities.
+   */
+  private final StepWeightRepo stepWeightRepo;
+  /**
+   * Repository for managing FormStep entities.
+   */
+  private final FormStepRepo formStepRepo;
+  /**
+   *Constructs a new StepWeightServiceImpl with the given StepWeightRepo and FormStepRepo.
+   *
+   *@param stepWeightRepo the repository for managing Step Weights
+   *@param formStepRepo the repository for managing Form Steps
+   */
+  public StepWeightServiceImpl(final StepWeightRepo stepWeightRepo,
+                               final FormStepRepo formStepRepo) {
+    this.stepWeightRepo = stepWeightRepo;
+    this.formStepRepo = formStepRepo;
+  }
+  /**
+   * Creates a set of Step Weights for the given set of Criteria and Form Step ID.
+   *
+   * @param criterias the set of Criteria for which to create Step Weights
+   * @param formStepToPersistId the ID of the Form Step to which the Step Weights should be persisted
+   * @return the set of persisted Step Weights
+   * @throws StepFormNotFoundException if the Form Step does not exist
    */
   @Override
-  public Set<StepWeight> createWeights(Set<Criteria> criterias, Long formStepToPersistId)
-      throws StepFormNotFoundException {
+  public Set<StepWeight> createWeights(final Set<Criteria> criterias,
+                                       final Long formStepToPersistId) throws StepFormNotFoundException {
     FormStep formStepFromDB =
         formStepRepo
             .findById(formStepToPersistId)
@@ -49,9 +67,15 @@ public class StepWeightServiceImpl implements StepWeightService {
     }
     return persistedWeights;
   }
-
+  /**
+   * Updates an existing Step Weight.
+   *
+   * @param stepWeight the Step Weight to update
+   * @return the updated Step Weight
+   * @throws StepWeightNotFoundException if the Step Weight does not exist
+   */
   @Override
-  public StepWeight updateWeights(StepWeight stepWeight) throws StepWeightNotFoundException {
+  public StepWeight updateWeights(final StepWeight stepWeight) throws StepWeightNotFoundException {
     Optional<StepWeight> stepWeightFromDB = stepWeightRepo.findById(stepWeight.getWeightId());
     if (!stepWeightFromDB.isPresent()) {
       throw new StepWeightNotFoundException("Le poid du critère " + stepWeight.getCriteriaName() + "n'existe pas !");

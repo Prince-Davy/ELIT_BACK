@@ -1,10 +1,24 @@
 package com.elit.outildedecision.service.implementation;
 
-import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.entity.Attachment;
+import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
+import com.elit.outildedecision.entity.PredictibilityAnalysis;
+import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.ProjectPropertyKey;
+import com.elit.outildedecision.entity.ProjectUserPermission;
+import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.FormAlreadyExistsException;
+import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
 import com.elit.outildedecision.exception.UserNotFoundException;
-import com.elit.outildedecision.model.*;
+import com.elit.outildedecision.model.AttachmentResponseModel;
+import com.elit.outildedecision.model.ContributerModel;
+import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
+import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
+import com.elit.outildedecision.model.PredictibilityAnalyseResponseModel;
+import com.elit.outildedecision.model.ProjectModel;
+import com.elit.outildedecision.model.ProjectResponseModel;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
@@ -15,47 +29,80 @@ import com.elit.outildedecision.service.ProjectService;
 import com.elit.outildedecision.util.ProjectConfirmationState;
 import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
-
+/**
+ * The ProjectServiceImpl class implements the ProjectService interface and provides the
+ * implementation of the service methods for managing projects.
+ */
 @Service
-// @Transactional
 public class ProjectServiceImpl implements ProjectService {
-
+  /**
+   * The projectRepository for accessing the project objects in the database.
+   */
   private final ProjectRepository projectRepository;
+  /**
+   * The userRepository for accessing the user objects in the database.
+   */
   private final UserRepository userRepository;
+  /**
+   * The attachmentService for managing the attachments of the projects.
+   */
   private final AttachmentService attachmentService;
+  /**
+   * The executionPlanService for managing the execution plans of the projects.
+   */
   private final ExecutionPlanService executionPlanService;
+  /**
+   * The projectUserPermissionRepository for accessing the project user permission objects in the
+   * database.
+   */
   private final ProjectUserPermissionRepository projectUserPermissionRepository;
+  /**
+   * The multiCriteriaService for managing the multi criteria analysis of the projects.
+   */
   private final MultiCriteriaAnalysisService multiCriteriaService;
-  @Autowired EntityManager entityManager;
+  /**
+   * The STORING_DIRECTORY for storing the projects files and attachments.
+   */
   @Value("${file.upload-dir}")
-  String STORING_DIRECTORY;
-
+  private String storingDirectory;
+  /**
+   * The constructor of the ProjectServiceImpl class.
+   * used for dependency injection.
+   * @param projectRepository The projectRepository for accessing the project objects in the
+   * database.
+   * @param userRepository The userRepository for accessing the user objects in the database.
+   * @param executionPlanService The executionPlanService for managing the execution plans of the
+   * projects.
+   * @param attachmentService The attachmentService for managing the attachments of the projects.
+   * @param projectUserPermissionRepository The projectUserPermissionRepository for accessing the
+   * project user permission objects in the database.
+   * @param multiCriteriaService The multiCriteriaService for managing the multi criteria analysis
+   * of the projects.
+   */
   public ProjectServiceImpl(
-      ProjectRepository projectRepository,
-      UserRepository userRepository,
-      ExecutionPlanService executionPlanService,
-      AttachmentService attachmentService,
-      ProjectUserPermissionRepository projectUserPermissionRepository,
-      MultiCriteriaAnalysisService multiCriteriaService) {
+      final ProjectRepository projectRepository,
+      final UserRepository userRepository,
+      final ExecutionPlanService executionPlanService,
+      final AttachmentService attachmentService,
+      final ProjectUserPermissionRepository projectUserPermissionRepository,
+      final MultiCriteriaAnalysisService multiCriteriaService) {
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
     this.attachmentService = attachmentService;
@@ -65,12 +112,27 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   /**
-   * @param project
-   * @return ProjectResponseModel
-   * @throws Exception
+
+   * Persists a new project in the database with the provided data.
+   * @param project the project model containing the data to persist.
+   * @return the response model of the newly created project.
+   * @throws ProjectFolderAlreadyExistsException if a folder with the same name already exists.
+   * @throws UserNotFoundException if the chef or a contributer user cannot be found.
+   * @throws ProjectNotFoundException if the project cannot be found.
+   * @throws IOException if an I/O error occurs while creating the project directory.
+   * @throws FormAlreadyExistsException if the multicriteria analysis form already exists.
+   * @throws ParseException if there is an error parsing the multicriteria analysis form.
+   * @throws org.json.simple.parser.ParseException if there is an error parsing the multicriteria analysis form JSON.
    */
   @Override
-  public ProjectResponseModel persistProject(ProjectModel project) throws Exception {
+  public ProjectResponseModel persistProject(final ProjectModel project)
+    throws ProjectFolderAlreadyExistsException,
+    UserNotFoundException,
+    ProjectNotFoundException,
+    IOException,
+    FormAlreadyExistsException,
+    ParseException,
+    org.json.simple.parser.ParseException {
     Project projectToSave = new Project();
     // getting the connected user
     String chefEmail =
@@ -79,9 +141,9 @@ public class ProjectServiceImpl implements ProjectService {
     Date dateOfCreation = new Date();
     String folderName = dateOfCreation.getTime() + "_" + project.getName();
     File projectDirectory =
-        new File(STORING_DIRECTORY + folderName.replaceAll(" ", "_").toLowerCase());
+        new File(storingDirectory + folderName.replaceAll(" ", "_").toLowerCase());
     if (projectDirectory.exists()) {
-      throw new Exception("Dossier du projet dupliqué, réessayer plus tard.");
+      throw new ProjectFolderAlreadyExistsException("Dossier du projet dupliqué, réessayer plus tard.");
     }
     projectDirectory.mkdirs();
     projectToSave.setFolderPath(folderName.replaceAll(" ", "_").toLowerCase());
@@ -97,7 +159,7 @@ public class ProjectServiceImpl implements ProjectService {
         User user =
             userRepository
                 .findById(contributer.getContributerId())
-                .orElseThrow(() -> new Exception("Cet utilisateur n'existe pas."));
+                .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas."));
         ProjectUserPermission projectUserPermission = new ProjectUserPermission();
         projectUserPermission.setUser(user);
         projectUserPermission.setProject(projectRepository.getById(projectId));
@@ -128,26 +190,23 @@ public class ProjectServiceImpl implements ProjectService {
     return projectToReturn;
   }
 
+  /**
+   * Retrieves all projects.
+   * @return A list of all the projects.
+   */
   @Override
   public List<Project> getAllProjects() {
     return projectRepository.findAll();
   }
-
-  // @PreAuthorize("isPermittedForTheProject('MANAGER', #projectId)")
+  /**
+   * The method for searching for a project by a keyword.
+   * @param keyword the keyword to search for.
+   * @return the list the projects containing the keyword.
+   */
   @Override
-  public Project getProjectById(Long projectId) throws ProjectNotFoundException {
-    return projectRepository
-        .findById(projectId)
-        .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas!"));
-  }
-
-  @Override
-  public List<Project> getUserProjects(String keyword) {
+  public List<Project> getUserProjects(final String keyword) {
     String principal =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-    System.out.println("principal " + principal);
-
     List<Project> projects = new ArrayList<>();
     List<ProjectUserPermission> projectUserPermissions =
         projectUserPermissionRepository.findAll().stream()
@@ -155,17 +214,12 @@ public class ProjectServiceImpl implements ProjectService {
                 projectUserPermission ->
                     projectUserPermission.getUser().getUserEmail().equals(principal))
             .collect(Collectors.toList());
-    System.out.println("projectUserPermissions = " + projectUserPermissions);
-
     if (!projectUserPermissions.isEmpty()) {
       for (ProjectUserPermission projectUserPermission : projectUserPermissions) {
-        System.out.println(
-            "projectUserPermission.getProject() " + projectUserPermission.getProject());
         projects.add(projectUserPermission.getProject());
       }
     }
-    if (keyword != null) {
-      if (!"".equals(keyword)) {
+    if (keyword != null && !keyword.isEmpty()) {
         return projects.stream()
             .filter(
                 project ->
@@ -173,14 +227,17 @@ public class ProjectServiceImpl implements ProjectService {
                             && project.getDescription().contains(keyword))
                         || project.getName().contains(keyword))
             .collect(Collectors.toList());
-      }
     }
-    System.out.println("projects " + projects);
     return projects;
   }
-
+  /**
+   * The method for getting the list of projects of a user.
+   * @param keyword the keyword to search for.
+   * @return the list of projects of a user.
+   */
+  //TODO : See if this is a duplicated
   @Override
-  public List<ProjectResponseModel> getUserProjectList(String keyword) {
+  public List<ProjectResponseModel> getUserProjectList(final String keyword) {
     String principal =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -245,9 +302,20 @@ public class ProjectServiceImpl implements ProjectService {
     }
     return projects;
   }
-
+  /**
+   * Updates the confirmation state of a project to either CONFIRMED or REJECTED
+   * based on the value of the "isConfirmed" field in the HttpEntity body.
+   * If "isConfirmed" is true, the project's confirmation state is set to CONFIRMED.
+   * If "isConfirmed" is false, the project's confirmation state is set to REJECTED.
+   * @param id the id of the project to update
+   * @param isConfirmed the HttpEntity containing the "isConfirmed" field as a JSON object
+   * @return a ResponseEntity object with a success or error message
+   * @throws ProjectNotFoundException if the project with the given id does not exist
+   * @throws IOException if there is an error parsing the HttpEntity body
+   */
   @Override
-  public ResponseEntity<String> validateOrRejectProject(Long id, HttpEntity<String> isConfirmed)
+  public ResponseEntity<String> validateOrRejectProject(final Long id,
+                                                        final HttpEntity<String> isConfirmed)
       throws ProjectNotFoundException, IOException {
     Project projectToConfirm =
         projectRepository
@@ -279,9 +347,18 @@ public class ProjectServiceImpl implements ProjectService {
       }
     }
   }
-
+  /**
+   * Adds a new contributor to the specified project.
+   * @param projectId the ID of the project to add the contributor to
+   * @param contributor the contributor to add to the project
+   * @return a ResponseEntity with a success message if the operation was successful
+   * @throws ProjectNotFoundException if the specified project does not exist
+   * @throws UserNotFoundException if the specified user does not exist
+   * @throws Exception if an error occurs while adding the contributor to the project
+   */
   @Override
-  public ResponseEntity<String> addProjectContributor(Long projectId, ContributerModel contributor)
+  public ResponseEntity<String> addProjectContributor(final Long projectId,
+                                                      final ContributerModel contributor)
       throws Exception {
     Project project =
         projectRepository
@@ -302,21 +379,32 @@ public class ProjectServiceImpl implements ProjectService {
 
     return ResponseEntity.ok().body("Le collaborateur a été bien enregistré");
   }
-
+  /**
+   * Removes a contributor from a project. If the contributor is the owner of the project,
+   * this method throws a ProjectOwnerException. If the contributor does not exist in the project,
+   * this method throws a UserNotFoundException.
+   * @param projectId the ID of the project
+   * @param contributorID the ID of the contributor to be removed
+   * @return a ResponseEntity with a message indicating that the contributor has been removed
+   * @throws ProjectNotFoundException if the project with the given ID does not exist
+   * @throws UserNotFoundException if the user with the given ID does not exist in the project
+   * @throws ProjectOwnerException if the contributor to be removed is the owner of the project
+   * @throws Exception if an error occurs while removing the contributor
+   */
   @Override
-  public ResponseEntity<String> deleteProjectContributor(Long projectId, Long contributorID)
+  public ResponseEntity<String> deleteProjectContributor(final Long projectId,
+                                                         final Long contributorID)
       throws Exception {
-    projectRepository
-        .findById(projectId)
-        .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas!"));
-
+    Boolean doesProjectExist = projectRepository.existsById(projectId);
+    if (!doesProjectExist) {
+      throw new ProjectNotFoundException("Ce Projet n'existe pas!");
+    }
     ProjectUserPermission projectUserPermission =
         projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID);
 
     if (Objects.isNull(projectUserPermission)) {
       throw new UserNotFoundException("Cet utilisateur n'existe pas dans le projet !");
     }
-    System.out.println("projectUserPermission " + projectUserPermission);
 
     if (projectUserPermission.getPermission().contains(ProjectPermession.CDP.name())) {
       throw new ProjectOwnerException(
@@ -327,9 +415,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     return ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet");
   }
-
+  /**
+   * Retrieves the data for the project with the specified ID.
+   *
+   * @param projectId the ID of the project to retrieve data for
+   * @return a ProjectResponseModel containing the data for the specified project
+   * @throws ProjectNotFoundException if the specified project cannot be found
+   */
   @Override
-  public ProjectResponseModel getProjectData(Long projectId) throws ProjectNotFoundException {
+  public ProjectResponseModel getProjectData(final Long projectId) throws ProjectNotFoundException {
     Project project =
         projectRepository
             .findById(projectId)
@@ -404,10 +498,17 @@ public class ProjectServiceImpl implements ProjectService {
         attachmentList,
         multicriteriaAnaliseList);
   }
-
+  /**
+   * Deletes a project and all its related data from the system.
+   *
+   * @param projectId The ID of the project to be deleted.
+   * @return ResponseEntity with a message indicating the success of the operation.
+   * @throws ProjectNotFoundException if the project with the given ID does not exist.
+   * @throws IOException if there is an error deleting the project files.
+   */
   @Override
   @Transactional
-  public ResponseEntity<String> deleteProject(Long projectId)
+  public ResponseEntity<String> deleteProject(final Long projectId)
       throws ProjectNotFoundException, IOException {
     Project projectToDelete =
         projectRepository
@@ -423,17 +524,5 @@ public class ProjectServiceImpl implements ProjectService {
     }
     projectRepository.delete(projectToDelete);
     return ResponseEntity.ok().body("Le projet a été bien supprimé");
-  }
-
-  @Override
-  public Project updateProject(Long id, Project project) throws ProjectNotFoundException {
-    Project projectFromDB =
-        projectRepository
-            .findById(id)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas!"));
-    projectFromDB.setName(project.getName());
-    projectFromDB.setDescription(project.getDescription());
-    projectFromDB.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-    return projectRepository.save(projectFromDB);
   }
 }

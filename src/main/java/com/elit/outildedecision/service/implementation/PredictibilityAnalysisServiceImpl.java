@@ -8,7 +8,7 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.Vote;
-import com.elit.outildedecision.exception.PredictibilityAnaliseNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisAlreadyUpdated;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.FormStepModel;
@@ -30,33 +30,85 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+/**
+ * The PredictibilityAnalysisServiceImpl class implements the PredictibilityAnalysisService interface
+ * and provides the implementation of the service methods for managing Predictibility Analysis.
+ */
 @Service
 public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysisService {
+  /**
+   * A repository for Projects.
+   */
   private final ProjectRepository projectRepository;
+
+  /**
+   * A repository for Multi-Criteria Analysis.
+   */
   private final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
+
+  /**
+   * A repository for Predictibility Analysis.
+   */
   private final PredictibilityAnalysisRepository predictibilityAnalysisRepository;
+
+  /**
+   * A repository for Votes.
+   */
   private final VoteRepository voteRepository;
+
+  /**
+   * A repository for Users.
+   */
   private final UserRepository userRepository;
+
+  /**
+   * A repository for Project User Permissions.
+   */
   private final ProjectUserPermissionRepository projectUserPermissionRepository;
+
+  /**
+   * A repository for Methodologies.
+   */
   private final MethodologyRepository methodologyRepository;
+
+  /**
+   * A repository for Predictibility Results.
+   */
   private final PredictibilityResultsRepository predictibilityResultsRepository;
+  /**
+   * A constant for the sum formula.
+   */
+  private static final float SUM_CONSTANT = 0.2f;
 
+  /**
+   * A logger for logging application events and errors.
+   */
   private Logger logger;
-
+  /**
+   * Constructs a PredictibilityAnalysisServiceImpl object.
+   * uses the constructor-based dependency injection to inject the repositories.
+   *
+   * @param projectRepository A repository for Projects.
+   * @param multiCriteriaAnalysisRepository A repository for Multi-Criteria Analysis.
+   * @param predictibilityAnalysisRepository A repository for Predictibility Analysis.
+   * @param voteRepository A repository for Votes.
+   * @param userRepository A repository for Users.
+   * @param projectUserPermissionRepository A repository for Project User Permissions.
+   * @param methodologyRepository A repository for Methodologies.
+   * @param predictibilityResultsRepository A repository for Predictibility Results.
+   */
   public PredictibilityAnalysisServiceImpl(
-      ProjectRepository projectRepository,
-      MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
-      PredictibilityAnalysisRepository predictibilityAnalysisRepository,
-      VoteRepository voteRepository,
-      UserRepository userRepository,
-      ProjectUserPermissionRepository projectUserPermissionRepository,
-      MethodologyRepository methodologyRepository,
-      PredictibilityResultsRepository predictibilityResultsRepository) {
+      final ProjectRepository projectRepository,
+      final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
+      final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
+      final VoteRepository voteRepository,
+      final UserRepository userRepository,
+      final ProjectUserPermissionRepository projectUserPermissionRepository,
+      final MethodologyRepository methodologyRepository,
+      final PredictibilityResultsRepository predictibilityResultsRepository) {
     this.projectRepository = projectRepository;
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
@@ -68,12 +120,13 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
   }
 
   /**
-   * @param projectId
-   * @return ResponseEntity<Long>
+   * Creates a Predictibility Analysis for a Project.
+   *
+   * @param projectId The id of the Project.
+   * @return The id of the created Predictibility Analysis.
    */
   @Override
-  // @PreAuthorize("isProjectOwner(#projectId)")
-  public ResponseEntity<Long> createPredictibilityForm(Long projectId) {
+  public ResponseEntity<Long> createPredictibilityForm(final Long projectId) {
     Project project =
         projectRepository
             .findById(projectId)
@@ -107,13 +160,19 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     return ResponseEntity.ok().body(predictibilityAnalysis.getPredictibilityAnalysisId());
   }
 
+  /**
+   * Calculates the predictibility analysis score for a given analysis ID.
+   *
+   * @param analyseId The ID of the predictibility analysis to calculate the score for.
+   * @return A ResponseEntity containing the predictibility score model.
+   * @throws PredictibilityAnalysisNotFoundException If the given analysis ID is invalid.
+   */
   @Override
-  public ResponseEntity<PredictibilityScoreModel> calculatePredictibilityAnalysisScore(
-      Long analyseId) {
+  public ResponseEntity<PredictibilityScoreModel> calculatePredictibilityAnalysisScore(final Long analyseId) throws PredictibilityAnalysisNotFoundException {
     PredictibilityAnalysis predictibilityAnalysis =
         predictibilityAnalysisRepository
             .findById(analyseId)
-            .orElseThrow(() -> new RuntimeException("Cet analyse n'existe pas"));
+            .orElseThrow(() -> new PredictibilityAnalysisNotFoundException("Cet analyse n'existe pas"));
 
     List<FormStepModel> formStepModels = new ArrayList<>();
 
@@ -161,7 +220,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
       // Add in array votes per methodology
       intVotesList.add(voteSum);
 
-      float result = (float) (voteSum * 0.2) / usersCount;
+      float result = (voteSum * SUM_CONSTANT) / usersCount;
       MethodologyScoreModel methodologyScoreModel =
           MethodologyScoreModel.builder()
               .name(methodologyName.name())
@@ -226,16 +285,24 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
 
     return ResponseEntity.ok().body(predictibilityResult);
   }
-
+  /**
+   * Marks a predictibility analysis as finished and saves the changes to the database.
+   *
+   * @param analyseId the ID of the predictibility analysis to update
+   * @return a ResponseEntity containing a success message if the update was successful
+   * @throws UserNotAuthorizedException if the user does not have permission to update the analysis
+   * @throws PredictibilityAnalysisNotFoundException if the specified analysis does not exist
+   * @throws PredictibilityAnalysisAlreadyUpdated if the analysis has already been marked as finished
+   */
   @Override
-  public ResponseEntity<String> putIsFinishedPredictibilityAnalysis(Long analyseId)
-    throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException, PredictibilityAnalysisAlreadyUpdated {
+  public ResponseEntity<String> putIsFinishedPredictibilityAnalysis(final Long analyseId)
+    throws UserNotAuthorizedException, PredictibilityAnalysisNotFoundException, PredictibilityAnalysisAlreadyUpdated {
     PredictibilityAnalysis predictibilityAnalysis =
         predictibilityAnalysisRepository
             .findById(analyseId)
             .orElseThrow(
                 () ->
-                    new PredictibilityAnaliseNotFoundException(
+                    new PredictibilityAnalysisNotFoundException(
                         "Cette analyse de prévisibilité n'existe pas."));
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
     if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
@@ -252,8 +319,14 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     return ResponseEntity.ok()
         .body("L'analyse de prévisibilité a bien été enregistré comme terminée.");
   }
-
-  private boolean checkPermissions(Long projectId, String permissionName) {
+  /**
+   * Checks if the user has the specified permission on the specified project.
+   *
+   * @param projectId the ID of the project to check
+   * @param permissionName the name of the permission to check
+   * @return true if the user has the specified permission on the specified project, false otherwise
+   */
+  private boolean checkPermissions(final Long projectId, final String permissionName) {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
@@ -263,16 +336,23 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     return Objects.nonNull(projectUserPermission)
         && permissionName.equals(projectUserPermission.getPermission());
   }
-
+  /**
+   * Increases the iteration number of the specified predictibility analysis.
+   *
+   * @param analyseId the ID of the predictibility analysis to update
+   * @return a ResponseEntity containing a success message if the update was successful
+   * @throws UserNotAuthorizedException if the user does not have permission to update the analysis
+   * @throws PredictibilityAnalysisNotFoundException if the specified analysis does not exist
+   */
   @Override
-  public ResponseEntity<String> increasePredictAnalysisIterationNum(Long analyseId)
-      throws PredictibilityAnaliseNotFoundException, UserNotAuthorizedException {
+  public ResponseEntity<String> increasePredictAnalysisIterationNum(final Long analyseId)
+      throws PredictibilityAnalysisNotFoundException, UserNotAuthorizedException {
     PredictibilityAnalysis predictibilityAnalysis =
         predictibilityAnalysisRepository
             .findById(analyseId)
             .orElseThrow(
                 () ->
-                    new PredictibilityAnaliseNotFoundException(
+                    new PredictibilityAnalysisNotFoundException(
                         "Cette analyse de prévisibilité n'existe pas."));
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
     if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
