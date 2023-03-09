@@ -1,13 +1,17 @@
 package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.VoteModelRequest;
+import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
+import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.VoteRepository;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,10 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,9 +40,17 @@ public class VoteServiceImplTest {
   @Mock
   private PredictibilityAnalysisRepository predictibilityAnalysisRepository;
 
+  @Mock
+  private ProjectUserPermissionRepository projectUserPermissionRepository;
+
   @InjectMocks
   private VoteServiceImpl voteService;
 
+  @Mock
+  private SecurityContext securityContext;
+
+  @Mock
+  private Authentication authentication;
 
 
   private static final String USER_EMAIL = "test@example.com";
@@ -50,7 +59,8 @@ public class VoteServiceImplTest {
   private static final Long PREDICTIBILITY_ANALYSIS_ID = 1L;
   private static final int PREDICTIBILITY_VALUE = 1;
   private static final String CHOSEN_PMM = "pmm1";
-
+  private static final String JUSTIFICATION = "justification1";
+  private static final Boolean IS_CONFIRMED = true;
 
   private User testUser;
   private PredictibilityAnalysis testPredictabilityAnalysis;
@@ -58,7 +68,7 @@ public class VoteServiceImplTest {
   private ProjectUserPermission testPermission;
   private List<ProjectUserPermission> testPermissions;
   private VoteModelRequest testRequest;
-
+  private Vote testVote;
 
 
   @Before
@@ -143,6 +153,5 @@ public class VoteServiceImplTest {
     assertEquals("Le vote a bien été enregistré.", response.getBody());
     verify(voteRepository, times(1)).save(any(Vote.class));
   }
-
 }
 
