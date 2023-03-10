@@ -1,13 +1,11 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Brainstorming;
-import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
 import com.elit.outildedecision.model.UserResponseModel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ModelSamples {

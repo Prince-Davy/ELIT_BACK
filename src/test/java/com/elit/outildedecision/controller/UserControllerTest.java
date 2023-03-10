@@ -2,9 +2,11 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ class UserControllerTest {
 
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
-  public void findUserByIdExists() throws Exception {
+   void findUserByIdExists() throws Exception {
     UserResponseModel userResponseModel = UserSamples.getUserResponseModel();
     when(userService.getAllInfosUserById(userResponseModel.getUserId())).thenReturn(userResponseModel);
     mockMvc.perform(get("/api/user/"+userResponseModel.getUserId())).andDo(print()).andExpect(status().isOk());
@@ -41,14 +43,14 @@ class UserControllerTest {
 
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
-  public void findUserByIdNotExists() throws Exception {
+   void findUserByIdNotExists() throws Exception {
     when(userService.getAllInfosUserById(UserSamples.notExistUserId)).thenReturn(null);
     mockMvc.perform(get("/api/user/"+UserSamples.notExistUserId)).andDo(print()).andExpect(status().isOk());
   }
 
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
-  void findUserByKeyWordEmpty() throws Exception {
+  void ShouldfindUserByKeyWordEmpty() throws Exception {
     List<UserResponseModel> userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
     when(userService.findUsersByKeyword("")).thenReturn(userResponseModelList);
     mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
@@ -68,5 +70,10 @@ class UserControllerTest {
     List<UserResponseModel> userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
     when(userService.findUsersByKeyword("username")).thenReturn(userResponseModelList);
     mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void updateUserSuccess() {
   }
 }
