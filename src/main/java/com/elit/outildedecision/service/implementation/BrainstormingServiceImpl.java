@@ -10,7 +10,7 @@ import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.BrainstormingNotFoundException;
 import com.elit.outildedecision.exception.ExistingBrainstormingException;
-import com.elit.outildedecision.exception.PredictibilityAnaliseNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.model.CriteriaModel;
@@ -109,7 +109,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         predictibilityAnalysisRepository
             .findById(brainstormingModel.getPredictibilityAnalysisId())
             .orElseThrow(
-                () -> new PredictibilityAnaliseNotFoundException("Ce analysis n'existe pas"));
+                () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
     // TODO : CHECK ONLY ONE QUESTION BY USER
     Brainstorming savedBrainstorming =
         brainstormingRepository.findByUserQuestionPredictibilityId(
@@ -217,7 +217,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         predictibilityAnalysisRepository
             .findById(predictibilityAnalysisId)
             .orElseThrow(
-                () -> new PredictibilityAnaliseNotFoundException("Ce analysis n'existe pas"));
+                () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
 
     List<FormStep> formStepList =
       new ArrayList<>();
@@ -301,7 +301,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         predictibilityAnalysisRepository
             .findById(predictibilityAnalysisId)
             .orElseThrow(
-                () -> new PredictibilityAnaliseNotFoundException("Ce analysis n'existe pas"));
+                () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
 
     // Get the list of the FormStep with brainstorming
     List<FormStep> formStepList =

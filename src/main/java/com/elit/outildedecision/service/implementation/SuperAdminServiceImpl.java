@@ -8,12 +8,10 @@ import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.SuperAdminService;
 import com.elit.outildedecision.util.ProjectConfirmationState;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -21,16 +19,19 @@ import java.util.List;
 @Transactional
 public class SuperAdminServiceImpl implements SuperAdminService {
 
-  @Autowired ProjectRepository projectRepository;
-  @Autowired UserRepository userRepository;
+  private final ProjectRepository projectRepository;
+  private final UserRepository userRepository;
 
-  /**
-   * @param projectId
-   * @return ResponseEntity
-   * @throws ProjectNotFoundException
-   */
+  private static final int PAGE_SIZE = 10;
+
+  public SuperAdminServiceImpl(final ProjectRepository projectRepository,
+                               final UserRepository userRepository) {
+    this.projectRepository = projectRepository;
+    this.userRepository = userRepository;
+  }
+
   @Override
-  public ResponseEntity confirmProject(Long projectId) throws ProjectNotFoundException {
+  public ResponseEntity confirmProject(final Long projectId) throws ProjectNotFoundException {
     Project project =
         projectRepository
             .findById(projectId)
@@ -41,7 +42,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
   }
 
   @Override
-  public ResponseEntity suspendUser(Long userId) throws UserNotFoundException {
+  public ResponseEntity suspendUser(final Long userId) throws UserNotFoundException {
     User user =
         userRepository
             .findById(userId)
@@ -52,7 +53,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
   }
 
   @Override
-  public ResponseEntity deleteProject(Long projectId) throws ProjectNotFoundException {
+  public ResponseEntity deleteProject(final Long projectId) throws ProjectNotFoundException {
     Project project =
         projectRepository
             .findById(projectId)
@@ -63,34 +64,33 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
   @Override
   public List<Project> getAllNonConfirmedProjects() {
-    List<Project> projects =
-        projectRepository.findAllByConfirmationState(ProjectConfirmationState.WAITING.name());
-    return projects;
+    return projectRepository.findAllByConfirmationState(ProjectConfirmationState.WAITING.name());
   }
 
   @Override
-  public Page<Project> getAllNonConfirmedProjects(int page) {
+  public Page<Project> getAllNonConfirmedProjects(final int page) {
     return projectRepository.findAllByConfirmationState(
-        ProjectConfirmationState.WAITING.name(), PageRequest.of(page, 10));
+        ProjectConfirmationState.WAITING.name(), PageRequest.of(page, PAGE_SIZE));
   }
 
   @Override
-  public Page<Project> getAllNonConfirmedProjectsOrderByDate(int page, String order) {
+  public Page<Project> getAllNonConfirmedProjectsOrderByDate(final int page,
+                                                             final String order) {
     switch (order) {
       case "DESC":
         return projectRepository.findAllByConfirmationStateOrderByCreatedAtDesc(
-            ProjectConfirmationState.WAITING.name(), PageRequest.of(page, 10));
+            ProjectConfirmationState.WAITING.name(), PageRequest.of(page, PAGE_SIZE));
       case "ASC":
         return projectRepository.findAllByConfirmationStateOrderByCreatedAtAsc(
-            ProjectConfirmationState.WAITING.name(), PageRequest.of(page, 10));
+            ProjectConfirmationState.WAITING.name(), PageRequest.of(page, PAGE_SIZE));
       default:
         return projectRepository.findAllByConfirmationState(
-            ProjectConfirmationState.WAITING.name(), PageRequest.of(page, 10));
+            ProjectConfirmationState.WAITING.name(), PageRequest.of(page, PAGE_SIZE));
     }
   }
 
   @Override
-  public ResponseEntity confirmProjects(List<Long> projectIds) throws ProjectNotFoundException {
+  public ResponseEntity confirmProjects(final List<Long> projectIds) throws ProjectNotFoundException {
     for (Long id : projectIds) {
       confirmProject(id);
     }
@@ -98,11 +98,9 @@ public class SuperAdminServiceImpl implements SuperAdminService {
   }
 
   @Override
-  public Page<Project> findNotConfirmedProjectByKeyword(String keyword, int page) {
-    Page<Project> projects =
-        projectRepository.findByNameOrDescriptionContainingIgnoreCase(
-            keyword, PageRequest.of(page, 10));
-    System.out.println("projects = " + projects);
-    return projects;
+  public Page<Project> findNotConfirmedProjectByKeyword(final String keyword,
+                                                        final int page) {
+    return projectRepository.findByNameOrDescriptionContainingIgnoreCase(
+            keyword, PageRequest.of(page, PAGE_SIZE));
   }
 }

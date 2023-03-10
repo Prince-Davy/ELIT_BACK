@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
+  @Value("${jwt.secret}")
+  private String jwtSecret;
 
   /**
    * @param request
@@ -39,8 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         try {
           String jwt = jwtAuthorizationToken.substring(7);
           Algorithm algorithm =
-              Algorithm.HMAC256("ELIT2022"); // our JWT secret is "ELIT2022" todo: change
-          // this
+              Algorithm.HMAC256(jwtSecret);
           JWTVerifier verifier =
               JWT.require(algorithm).build(); // Require an algorithm and a secret:
           DecodedJWT decodedJWT = verifier.verify(jwt);

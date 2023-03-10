@@ -2,6 +2,7 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
+import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.UserService;
@@ -112,7 +113,7 @@ public class UserController {
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<String> updateAvatarByIdUser(
       @PathVariable final Long userId, @RequestParam final MultipartFile userAvatar)
-      throws IOException, CouldNotSaveUserException {
+    throws IOException, CouldNotSaveUserException, UserNotFoundException {
     return userService.updateAvatarByIdUser(userId, userAvatar);
   }
   /**

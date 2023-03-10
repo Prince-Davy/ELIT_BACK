@@ -67,7 +67,7 @@ public class MultiCriteriaAnalysisController {
    */
   @GetMapping("/multi-criteria-analysis/{projectId}")
   @PreAuthorize("isContributer(#projectId)")
-  public ResponseEntity<Object> getMultiCriteriaAnalysis(@PathVariable final Long projectId) {
+  public ResponseEntity<Object> getMultiCriteriaAnalysis(@PathVariable final Long projectId) throws ProjectNotFoundException {
     return multiCriteriaAnalysisService.getMulticriteriaAnalysis(projectId);
   }
   /**

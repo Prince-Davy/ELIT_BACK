@@ -2,10 +2,8 @@ package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.ReportResponseModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,13 +13,13 @@ import java.util.List;
 public interface ReportService {
   ResponseEntity<Object> uploadReport(
       Long projectId, Long analyseId, String type, MultipartFile file)
-      throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException,
+      throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException,
           MulticriteriaNotFoundException, ExecutionPlanNotFoundException;
 
   ResponseEntity<Object> uploadReport2(
       Long projectId, Long analyseId, String type, MultipartFile file, Integer iteration)
-      throws ProjectNotFoundException, PredictibilityAnaliseNotFoundException,
-          MulticriteriaNotFoundException, ExecutionPlanNotFoundException;
+    throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException,
+    MulticriteriaNotFoundException, ExecutionPlanNotFoundException, IOException;
 
   void previewReport(Long reportId, HttpServletResponse response)
       throws ReportNotFoundException, IOException;

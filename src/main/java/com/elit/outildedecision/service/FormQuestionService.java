@@ -2,6 +2,7 @@ package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormQuestion;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
 
 import java.util.Set;
 
@@ -15,5 +16,5 @@ public interface FormQuestionService {
   Set<FormQuestion> createFormQuestions(
       Set<FormQuestion> formQuestions, Set<Criteria> criterias, Long stepId);
 
-  FormQuestion updateFormQuestion(FormQuestion formQuestions) throws Exception;
+  FormQuestion updateFormQuestion(FormQuestion formQuestions) throws QuestionsNotFoundException;
 }

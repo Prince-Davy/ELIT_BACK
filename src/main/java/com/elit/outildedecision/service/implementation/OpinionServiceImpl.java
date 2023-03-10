@@ -13,28 +13,44 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+/**
+ * The OpinionServiceImpl class implements the OpinionService interface and provides the
+ * implementation of the service methods for managing opinions.
+ */
 @Service
 public class OpinionServiceImpl implements OpinionService {
-
+  /**
+   * The userRepository field is used to access the user database.
+   */
   private final UserRepository userRepository;
-
+  /**
+   * The opinionRepository field is used to access the opinion database.
+   */
   private final OpinionRepository opinionRepository;
 
-  public OpinionServiceImpl(UserRepository userRepository, OpinionRepository opinionRepository) {
+  /**
+   * Constructor for OpinionServiceImpl class.
+   *
+   * @param userRepository    The UserRepository object.
+   * @param opinionRepository The OpinionRepository object.
+   */
+  public OpinionServiceImpl(final UserRepository userRepository, final OpinionRepository opinionRepository) {
     this.userRepository = userRepository;
     this.opinionRepository = opinionRepository;
   }
 
   /**
-   * @param opinionModel
-   * @return ResponseEntity<String>
-   * @throws OpinionAlreadyExistException
+   * Create an opinion for the current user.
+   *
+   * @param opinionModel The OpinionModel object containing the opinion details.
+   * @return A ResponseEntity object with the success message.
+   * @throws OpinionAlreadyExistException If the user has already submitted an opinion.
    */
   @Override
-  public ResponseEntity<String> createOpinion(OpinionModel opinionModel)
-      throws OpinionAlreadyExistException {
+  public ResponseEntity<String> createOpinion(final OpinionModel opinionModel)
+    throws OpinionAlreadyExistException {
     String userEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
 
     Opinion opinionFromDB = opinionRepository.findByUserId(user.getUserId());
@@ -50,10 +66,15 @@ public class OpinionServiceImpl implements OpinionService {
     return ResponseEntity.ok().body("L'avis a bien été enregistré.");
   }
 
+  /**
+   * Check if the current user has already submitted an opinion.
+   *
+   * @return A Boolean value indicating if the user has already submitted an opinion.
+   */
   @Override
   public Boolean getOpinionIsAlreadyExist() {
     String userEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
 
     Opinion opinionFromDB = opinionRepository.findByUserId(user.getUserId());
