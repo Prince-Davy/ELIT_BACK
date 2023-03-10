@@ -2,9 +2,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.repository.AttachmentRepository;
-import com.elit.outildedecision.repository.ProjectRepository;
-import com.elit.outildedecision.service.AttachmentService;
+
 import com.elit.outildedecision.service.implementation.AttachmentServiceImpl2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -12,11 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.mockito.Mockito.when;
@@ -24,24 +23,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-@AutoConfigureMockMvc
+@WebMvcTest(controllers = AttachementController.class)
 @ExtendWith(MockitoExtension.class)
 class AttachementControllerTest {
   @Autowired
   private MockMvc mockMvc;
-  @InjectMocks
+  @MockBean
   private AttachmentServiceImpl2 attachmentService;
-  @MockBean
-  AttachmentRepository attachmentRepository;
-  @MockBean
-  ProjectRepository  projectRepository;
+
+  @InjectMocks
+  AttachementController attachementController;
+
+
 
   public static String asJsonString(final Object obj) {
     try {
@@ -61,12 +61,13 @@ class AttachementControllerTest {
     projectId = 1L;
     Attachment attachment = new Attachment();
   }
+  @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
   void uploadAttachment() throws Exception {
-    Project proj = new Project();
-    proj.setProjectId(projectId);
-    proj.setName("name projet");
-    projectRepository.save(proj);
+    Project projet = new Project();
+    projet.setProjectId(projectId);
+    projet.setName("name of project");
+    projet.setFolderPath("C:/files/test.txt");
 
     when(attachmentService.uploadAttachment(files, projectId)).thenReturn(ResponseEntity.ok().body("Fichiers enregistrés avec succés"));
     MockHttpServletResponse response = mockMvc.perform(post("/api/user/attachments/upload/{projectId}").contentType(MediaType.APPLICATION_JSON)
