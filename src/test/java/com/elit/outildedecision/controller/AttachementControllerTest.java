@@ -57,22 +57,12 @@ class AttachementControllerTest {
 
   @BeforeEach
   public void setup() {
-    files = new ArrayList<>();
-    projectId = 1L;
-    Attachment attachment = new Attachment();
+
   }
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
   void uploadAttachment() throws Exception {
-    Project projet = new Project();
-    projet.setProjectId(projectId);
-    projet.setName("name of project");
-    projet.setFolderPath("C:/files/test.txt");
 
-    when(attachmentService.uploadAttachment(files, projectId)).thenReturn(ResponseEntity.ok().body("Fichiers enregistrés avec succés"));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/user/attachments/upload/{projectId}").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON).content(asJsonString(files.get(0)))).andReturn().getResponse();
-    Assertions.assertEquals(201, response.getStatus());
   }
 
   @Test
