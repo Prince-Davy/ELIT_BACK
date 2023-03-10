@@ -4,6 +4,7 @@ import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.Project;
 
 import com.elit.outildedecision.service.implementation.AttachmentServiceImpl2;
+import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,15 +19,26 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +50,8 @@ class AttachementControllerTest {
   @MockBean
   private AttachmentServiceImpl2 attachmentService;
 
+  @MockBean
+  private UserServiceImpl userService;
   @InjectMocks
   AttachementController attachementController;
 
@@ -57,8 +71,25 @@ class AttachementControllerTest {
 
   @BeforeEach
   public void setup() {
+    Path path = Paths.get("/path/to/the/file.txt");
+    String name = "file.txt";
+    String originalFileName = "file.txt";
+    String contentType = "text/plain";
+    byte[] content = null;
+    try {
+      content = Files.readAllBytes(path);
+    } catch (final IOException e) {
+    }
+    MockMultipartFile fileMultipart =
+      new MockMultipartFile(
+        "files",
+        "test contract.pdf",
+        MediaType.APPLICATION_PDF_VALUE,
+        "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
     files = new ArrayList<>();
     projectId = 1L;
+
+    files.add(fileMultipart);
     Attachment attachment = new Attachment();
   }
   @WithMockUser(authorities = {"USER", "ADMIN"})
@@ -70,9 +101,8 @@ class AttachementControllerTest {
     projet.setFolderPath("C:/files/test.txt");
 
     when(attachmentService.uploadAttachment(files, projectId)).thenReturn(ResponseEntity.ok().body("Fichiers enregistrés avec succés"));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/user/attachments/upload/{projectId}").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON).content(asJsonString(files.get(0)))).andReturn().getResponse();
-    Assertions.assertEquals(201, response.getStatus());
+    mockMvc.perform(MockMvcRequestBuilders.multipart("/api/user/attachments/upload/"+ projectId)
+      .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(200));
   }
 
   @Test
