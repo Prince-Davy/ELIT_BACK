@@ -2,6 +2,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,10 +32,19 @@ class UserControllerTest {
   @InjectMocks
   UserController userController;
 
+  private List<UserResponseModel> userResponseModelList;
+  private UserResponseModel userResponseModel;
+
+  @BeforeEach
+  public void setup() {
+    userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
+    userResponseModel = UserSamples.getUserResponseModel();
+  }
+
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
    void findUserByIdExists() throws Exception {
-    UserResponseModel userResponseModel = UserSamples.getUserResponseModel();
+    userResponseModel = UserSamples.getUserResponseModel();
     when(userService.getAllInfosUserById(userResponseModel.getUserId())).thenReturn(userResponseModel);
     mockMvc.perform(get("/api/user/"+userResponseModel.getUserId())).andDo(print()).andExpect(status().isOk());
   }
@@ -49,7 +59,7 @@ class UserControllerTest {
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void ShouldfindUserByKeyWordEmpty() throws Exception {
-    List<UserResponseModel> userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
+    userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
     when(userService.findUsersByKeyword("")).thenReturn(userResponseModelList);
     mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
   }
@@ -57,7 +67,7 @@ class UserControllerTest {
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void findUserByKeyWordExists() throws Exception {
-    List<UserResponseModel> userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
+    userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
     when(userService.findUsersByKeyword("username")).thenReturn(userResponseModelList);
     mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
   }
@@ -65,9 +75,8 @@ class UserControllerTest {
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void findUserByKeyWordNotExists() throws Exception {
-    List<UserResponseModel> userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
+    userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
     when(userService.findUsersByKeyword("username")).thenReturn(userResponseModelList);
     mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
   }
-
 }
