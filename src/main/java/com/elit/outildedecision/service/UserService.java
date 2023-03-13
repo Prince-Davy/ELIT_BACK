@@ -2,6 +2,7 @@ package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
+import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
@@ -22,7 +23,7 @@ public interface UserService {
 
   User findByUserId(Long userId);
 
-  ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException;
+  ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException, UserAlreadyExistsException;
 
   void deleteUserById(Long userId);
 
@@ -32,7 +33,7 @@ public interface UserService {
       throws IOException, CouldNotSaveUserException;
 
   ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar)
-      throws IOException, CouldNotSaveUserException;
+    throws IOException, CouldNotSaveUserException, UserNotFoundException;
 
   ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName)
       throws IOException, CouldNotSaveUserException;
@@ -53,5 +54,5 @@ public interface UserService {
 
   UserResponseModel getAllInfosUserById(Long userId) throws IOException;
 
-  String saveAvatar(MultipartFile avatar) throws UserNotFoundException;
+  String saveAvatar(MultipartFile avatar) throws UserNotFoundException, IOException;
 }

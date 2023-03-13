@@ -18,10 +18,6 @@ public interface ProjectService {
 
   ResponseEntity<String> deleteProject(Long id) throws ProjectNotFoundException, IOException;
 
-  Project updateProject(Long id, Project project) throws ProjectNotFoundException;
-
-  Project getProjectById(Long projectId) throws ProjectNotFoundException;
-
   List<Project> getUserProjects(String keyword);
 
   List<ProjectResponseModel> getUserProjectList(String keyword);
