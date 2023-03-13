@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = SurveyQuestionController.class)
 @ExtendWith(MockitoExtension.class)
-public class SurveyQuestionControllerTest {
+public class SurveyQuestionControllerTests {
 
   @Autowired
   private MockMvc mockMvc;

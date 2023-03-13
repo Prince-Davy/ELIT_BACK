@@ -1,6 +1,5 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.exception.AttachmentNotFoundException;
 import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.service.implementation.AttachmentServiceImpl2;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
@@ -27,7 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.Optional;
 
 @WebMvcTest(controllers = AttachementController.class)
 @ExtendWith(MockitoExtension.class)
-class AttachementControllerTest {
+class AttachementControllerTests {
   @Autowired
   private MockMvc mockMvc;
   @MockBean

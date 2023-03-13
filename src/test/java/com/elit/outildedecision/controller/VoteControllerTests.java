@@ -2,6 +2,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
+import com.elit.outildedecision.service.UserService;
 import com.elit.outildedecision.service.VoteService;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,12 +40,13 @@ public class VoteControllerTests {
   private MockMvc mockMvc;
   @MockBean
   VoteService voteService;
-  @MockBean
-  private UserServiceImpl userService;
+
   @InjectMocks
   VoteController voteController;
   private VoteModelRequest voteModelRequest;
 
+  @MockBean
+  private UserServiceImpl userService;
   @BeforeEach
   public void setup() {
      voteModelRequest = VoteSamples.getVoteModelRequest();
