@@ -3,6 +3,7 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.entity.Brainstorming;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
+import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
 
 import java.util.ArrayList;
@@ -18,6 +19,11 @@ public class ModelSamples {
              "firstname", "user@user.com", "developer",
               null, "password", true,
         true,true, new ArrayList<>(), new ArrayList<>());
+    }
+
+    public static UserModel getUserModel() {
+      return createUserModel("username", "lastname",
+        "firstname", "user@user.com", "developer", "Azerty!123");
     }
 
     public static UserResponseModel getUserResponseModel() {
@@ -57,6 +63,26 @@ public class ModelSamples {
         return user;
       }
     }
+
+    public static UserModel createUserModel( String username, String userLastName,
+                                  String userFirstName, String userEmail, String userJob,
+                                  String userPassword
+                                 ) {
+      {
+        UserModel userModel = new UserModel();
+        userModel.setUserFirstName(userFirstName);
+        userModel.setUserLastName(userLastName);
+        userModel.setUsername(username);
+        userModel.setUserPassword(userPassword);
+        userModel.setUserEmail(userEmail);
+        userModel.setUserJob(userJob);
+        userModel.setUserEmailConfirmation(userEmail);
+        userModel.setUserPasswordConfirmation(userPassword);
+
+        return userModel;
+      }
+    }
+
   }
 
 }

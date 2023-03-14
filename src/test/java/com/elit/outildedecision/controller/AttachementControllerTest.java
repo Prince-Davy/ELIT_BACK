@@ -119,7 +119,7 @@ class AttachementControllerTest {
   }
 
   @Test
-  void downloadAttachment_whenAttachmentAndFile_doseExist() throws Exception {
+  void downloadAttachment_whenAttachmentAndFile_exists() throws Exception {
     HttpServletResponse httpServletResponse = new MockHttpServletResponse();
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(attachmentId);

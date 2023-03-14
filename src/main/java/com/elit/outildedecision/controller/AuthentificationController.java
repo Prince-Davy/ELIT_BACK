@@ -35,22 +35,23 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RestController
 public class AuthentificationController {
   /**
-   *  The Constant EXPIRATION_TIME.
-   *  The expiration time of the JWT token.
+   * The Constant EXPIRATION_TIME.
+   * The expiration time of the JWT token.
    */
   private static final long EXPIRATION_TIME = 5 * 60 * 1000;
 
   /**
-   *  The Constant jwtSecret.
-   *  The secret key used to sign the JWT token.
+   * The Constant jwtSecret.
+   * The secret key used to sign the JWT token.
    */
 
   private final String jwtSecret;
   /**
-   *  The User service.
-   *  The service used to manage the user.
+   * The User service.
+   * The service used to manage the user.
    */
   private final UserService userService;
+
   /**
    * Instantiates a new Authentification controller.
    * dependency injection via constructor of the user service
@@ -75,17 +76,18 @@ public class AuthentificationController {
     throws CouldNotSaveUserException, UserAlreadyExistsException {
     return userService.saveUser(user);
   }
+
   /**
    * Generate a refresh token and an access token.
    *
-   * @param request the request containing the user credentials
+   * @param request  the request containing the user credentials
    * @param response the response containing the tokens or the error message
    * @throws IOException the exception thrown when the response cannot be written
    */
   @GetMapping("/refreshToken")
   public void refreshToken(final HttpServletRequest request,
-                           final  HttpServletResponse response)
-      throws IOException {
+                           final HttpServletResponse response)
+    throws IOException {
     String jwtAuthorizationToken = request.getHeader("Authorization");
     if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
       try {
@@ -102,15 +104,15 @@ public class AuthentificationController {
         List<String> roles = new ArrayList<>();
         roles.add(user.getIsAdmin() ? "ADMIN" : "USER");
         String accessToken =
-            JWT.create()
-                .withSubject(user.getUserEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", roles)
-                .withClaim("firstname", user.getUserFirstName())
-                .withClaim("lastname", user.getUserLastName())
-                .withClaim("id", user.getUserId())
-                .sign(algorithm);
+          JWT.create()
+            .withSubject(user.getUserEmail())
+            .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+            .withIssuer(request.getRequestURL().toString())
+            .withClaim("roles", roles)
+            .withClaim("firstname", user.getUserFirstName())
+            .withClaim("lastname", user.getUserLastName())
+            .withClaim("id", user.getUserId())
+            .sign(algorithm);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access-token", accessToken);
