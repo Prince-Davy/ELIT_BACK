@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.repository;
 
 import com.elit.outildedecision.entity.Method;
@@ -9,11 +10,13 @@ import java.util.List;
 
 @Repository
 public interface MethodRepository extends JpaRepository<Method, Long> {
-
-  @Query("SELECT m FROM Method m " +
-    "WHERE m.methodology.methodologyId = ?1")
+  /**
+   * Find a list of Method Objects by methodology id.
+   *
+   * @param methodologyId the methodology id
+   * @return the method matching the methodology id
+   */
+  @Query("SELECT m FROM Method m "
+    + "WHERE m.methodology.methodologyId = ?1")
   List<Method> findAllMethodsByMethodologyId(Long methodologyId);
-
-  @Query("SELECT m FROM Method m")
-  List<Method> findAllMethods();
 }

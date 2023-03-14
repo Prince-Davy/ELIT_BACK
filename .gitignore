@@ -45,3 +45,6 @@ logs/**
 
 #node dependencies (husky)
 /node_modules
+
+#ignore maven dependencies
+.m2/

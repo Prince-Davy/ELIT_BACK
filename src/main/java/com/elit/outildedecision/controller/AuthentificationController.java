@@ -38,7 +38,7 @@ public class AuthentificationController {
    *  The Constant EXPIRATION_TIME.
    *  The expiration time of the JWT token.
    */
-  private static final long EXPIRATION_TIME = 5 * 60 * 1000;
+  private static final long EXPIRATION_TIME = 5L * 60L * 1000L;
 
   /**
    *  The Constant jwtSecret.
