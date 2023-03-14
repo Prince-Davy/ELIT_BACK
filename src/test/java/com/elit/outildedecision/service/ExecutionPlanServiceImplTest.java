@@ -24,8 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @ExtendWith(MockitoExtension.class)
-@TestComponent
-class ExampleTest {
+class ExecutionPlanServiceImplTest {
 
   @Mock
   private ExecutionPlanRepository executionPlanRepository;
@@ -70,7 +69,7 @@ class ExampleTest {
   }
 
   @Test
-  public void testGetQuestionsAndAnswers() {
+  void testGetQuestionsAndAnswers() {
     Long executionPlanId = 1L;
 
     // Mock the execution plan
