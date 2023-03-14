@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.repository;
 
 import com.elit.outildedecision.entity.ProjectPropertyKey;
@@ -6,26 +7,50 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface ProjectUserPermissionRepository
-    extends JpaRepository<ProjectUserPermission, ProjectPropertyKey> {
+/**
+ * Repository interface for managing project user permissions.
+ */
+@Repository
+public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUserPermission, ProjectPropertyKey> {
+
+  /**
+   * Deletes the project user permission with the given project ID and user ID.
+   *
+   * @param projectId the ID of the project
+   * @param userId the ID of the user
+   */
   @Transactional
   @Modifying
-  @Query("DELETE FROM ProjectUserPermission pp " +
-    "WHERE  pp.project.projectId=:pProjectID " +
-    "and pp.user.userId=:pUserId")
-  void deleteByProjectUser(@Param("pProjectID") Long projectId, @Param("pUserId") Long userID);
+  @Query("DELETE FROM ProjectUserPermission pp "
+    + "WHERE  pp.project.projectId=:pProjectID "
+    + "and pp.user.userId=:pUserId")
+  void deleteByProjectUser(@Param("pProjectID") Long projectId, @Param("pUserId") Long userId);
 
-  @Query("SELECT p FROM ProjectUserPermission p " +
-    "WHERE  p.project.projectId=:pProjectID " +
-    "and p.user.userId=:pUserId")
+  /**
+   * Finds the project user permission with the given project ID and user ID.
+   *
+   * @param projectId the ID of the project
+   * @param userId the ID of the user
+   * @return the project user permission with the given project ID and user ID, or null if not found
+   */
+  @Query("SELECT p FROM ProjectUserPermission p "
+    + "WHERE  p.project.projectId=:pProjectID "
+    + "and p.user.userId=:pUserId")
   ProjectUserPermission findByProjectIdUserID(
-      @Param("pProjectID") Long projectId, @Param("pUserId") Long userID);
+    @Param("pProjectID") Long projectId, @Param("pUserId") Long userId);
 
-  @Query("SELECT p FROM ProjectUserPermission p " +
-    "WHERE p.project.projectId=:pProjectID")
+  /**
+   * Finds all project user permissions for the given project ID.
+   *
+   * @param projectId the ID of the project
+   * @return a list of all project user permissions for the given project ID
+   */
+  @Query("SELECT p FROM ProjectUserPermission p "
+    + "WHERE p.project.projectId=:pProjectID")
   List<ProjectUserPermission> findAllByProjectId(@Param("pProjectID") Long projectId);
 }

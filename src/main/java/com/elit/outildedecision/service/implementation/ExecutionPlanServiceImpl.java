@@ -270,7 +270,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     Methodology methodology = predictibilityAnalysis.getMethodology();
     List<Method> methodList;
     if (methodology.getName().equals("Hybride")) {
-      methodList = methodRepository.findAllMethods();
+      methodList = methodRepository.findAll();
     } else {
       methodList = methodology.getMethods();
     }
@@ -394,7 +394,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
           methodRepository.findAllMethodsByMethodologyId(
               predictibilityAnalysis.getMethodology().getMethodologyId());
     } else {
-      allMethods = methodRepository.findAllMethods();
+      allMethods = methodRepository.findAll();
     }
     List<MethodModel> allMethodsModel = new ArrayList<>();
 

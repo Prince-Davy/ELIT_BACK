@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.repository;
 
 import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
@@ -8,6 +9,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MultiCriteriaAnalysisRepository
     extends JpaRepository<MultiCriteriaAnalysis, Long> {
+  /**
+   * Find the latest MultiCriteriaAnalysis Iteration by project id.
+   *
+   * @param projectId the project id
+   * @return MultiCriteriaAnalysis Object of the latest iteration
+   */
   @Query(
       "select m from MultiCriteriaAnalysis m "
           + "where m.project.projectId = ?1 "
