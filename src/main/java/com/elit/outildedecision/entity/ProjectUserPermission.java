@@ -7,7 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "project_user_permission")
@@ -17,7 +23,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @JsonIgnoreProperties("id")
 public class ProjectUserPermission {
-  @EmbeddedId private ProjectPropertyKey id;
+  @EmbeddedId
+  private ProjectPropertyKey id;
   private String permission;
 
   @ManyToOne(optional = false, fetch = FetchType.EAGER)
@@ -31,9 +38,4 @@ public class ProjectUserPermission {
   @JoinColumn(name = "user_id", nullable = true)
   @JsonBackReference("user_permissions")
   private User user;
-
-  public void detach() {
-    this.project = null;
-    this.user = null;
-  }
 }

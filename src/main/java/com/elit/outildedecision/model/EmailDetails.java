@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * EmailDetails
- * this class is used to store email details
- * @author Elit
- * @version 1.0
+ * this class is used to store email details.
  */
 @Data
 @AllArgsConstructor

@@ -1,24 +1,12 @@
 package com.elit.outildedecision.exception;
 
 public class ProjectNotFoundException extends Exception {
-  public ProjectNotFoundException() {
-    super();
-  }
-
-  public ProjectNotFoundException(String message) {
+  /**
+   * Constructor for ProjectNotFoundException.
+   * Exception thrown when a project is not found in the database.
+   * @param message the message to be displayed
+   */
+  public ProjectNotFoundException(final String message) {
     super(message);
-  }
-
-  public ProjectNotFoundException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public ProjectNotFoundException(Throwable cause) {
-    super(cause);
-  }
-
-  protected ProjectNotFoundException(
-      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
   }
 }

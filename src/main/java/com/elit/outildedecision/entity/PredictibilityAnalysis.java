@@ -10,8 +10,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -24,18 +33,6 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode(exclude = "multiCriteriaAnalysis")
 public class PredictibilityAnalysis implements Serializable {
-  @OneToMany(mappedBy = "predictibilityAnalysis", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JsonManagedReference("predictibility_analysis_vote")
-  List<Vote> votes;
-
-  @OneToMany(
-      mappedBy = "predictibilityAnalysis",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
-  @JsonManagedReference("predictibility_analysis_brainstorming")
-  List<Brainstorming> brainstormings;
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "predictibility_analysis_id")
@@ -55,6 +52,18 @@ public class PredictibilityAnalysis implements Serializable {
   @OneToOne(mappedBy = "predictibilityAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonBackReference("execution_previsibility")
   private ExecutionPlan executionPlan;
+
+  @OneToMany(mappedBy = "predictibilityAnalysis", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonManagedReference("predictibility_analysis_vote")
+  private List<Vote> votes;
+
+  @OneToMany(
+    mappedBy = "predictibilityAnalysis",
+    cascade = CascadeType.ALL,
+    fetch = FetchType.LAZY,
+    orphanRemoval = true)
+  @JsonManagedReference("predictibility_analysis_brainstorming")
+  private List<Brainstorming> brainstormings;
 
   @OneToOne(
       cascade = CascadeType.ALL

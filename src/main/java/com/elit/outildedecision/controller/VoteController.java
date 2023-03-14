@@ -43,7 +43,7 @@ public class VoteController {
    * @param voteModelRequest the vote to create
    *
    * @return ResponseEntity<String>
-   * @throws VoteAlreadyExistException
+   * @throws VoteAlreadyExistException when the vote already exist in database for the same user and predictibility analysis id combination.
    */
   @PostMapping("/vote")
   public ResponseEntity<String> createVote(@Valid @RequestBody final VoteModelRequest voteModelRequest)

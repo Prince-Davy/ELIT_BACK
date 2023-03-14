@@ -26,7 +26,7 @@ public class VerificationController {
    *
    * dependency injection of VerificationTokenService.
    *
-   * @param verificationTokenService
+   * @param verificationTokenService the service that used to verify user account and reset password.
    */
   public VerificationController(final VerificationTokenService verificationTokenService) {
     this.verificationTokenService = verificationTokenService;
@@ -58,8 +58,8 @@ public class VerificationController {
    * method used to send email to user to reset password.
    * @param email the email of user.
    * @return ResponseEntity<String> the response of sending email.
-   * @throws JsonProcessingException
-   * @throws UserNotVerifiedException
+   * @throws JsonProcessingException when there is an error in parsing json.
+   * @throws UserNotVerifiedException when user could not be verified.
    */
   @GetMapping(value = "/reset-password", consumes = "application/json")
   public ResponseEntity<String> forgotPassword(final HttpEntity<String> email)

@@ -61,6 +61,7 @@ public class UserController {
    *
    * @param userModel UserModel that contains the new informations
    * @return List of UserResponseModel that match the keyword
+   * @throws CouldNotSaveUserException when the user could not be saved in database
    * @throws IOException IOException
    */
   @PutMapping(
@@ -90,6 +91,7 @@ public class UserController {
    * @param newPass new password of the user
    * @return UserResponseModel that contains the user's informations
    * @throws IOException IOException
+   * @throws CouldNotSaveUserException when the user could not be saved in database
    */
   @PutMapping(
       value = "/user/password/{userId}",
@@ -107,6 +109,8 @@ public class UserController {
    * @param userAvatar the new avatar of the user
    * @return UserResponseModel that contains the user's informations
    * @throws IOException IOException
+   * @throws CouldNotSaveUserException when the user could not be saved in database
+   * @throws UserNotFoundException when the user could not be found in database
    */
   @PutMapping(
       value = "/user/avatar/{userId}",
@@ -124,6 +128,7 @@ public class UserController {
    * @param userLastName the new last name of the user
    * @return UserResponseModel that contains the user's informations
    * @throws IOException IOException
+   * @throws CouldNotSaveUserException when the user could not be saved in database
    */
   @PutMapping(
       value = "/user/info/{userId}",

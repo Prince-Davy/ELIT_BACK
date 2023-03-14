@@ -37,9 +37,9 @@ public class UserModel implements Serializable {
   @Pattern(
       regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
       message =
-          "le mot de passe doit contenir au moins 8 caractères," +
-            " une lettre majuscule, une lettre minuscule," +
-            " un chiffre et un caractère spécial")
+          "le mot de passe doit contenir au moins 8 caractères,"
+            + " une lettre majuscule, une lettre minuscule,"
+            + " un chiffre et un caractère spécial")
   private String userPassword;
 
   private String userEmailConfirmation;

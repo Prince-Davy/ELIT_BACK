@@ -54,7 +54,8 @@ public class PredictibilityAnalysisController {
    * Get the predictability analyse score.
    * @param analyseId analyseId
    * @return ResponseEntity<PredictibilityScoreModel>
-   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws PredictibilityAnalysisNotFoundException when the predictibility analyse is not found in the database
    */
   @GetMapping("/predictibility/{analyseId}/score")
   public ResponseEntity<PredictibilityScoreModel> getPredictabilityAnalysisScore(
@@ -65,7 +66,9 @@ public class PredictibilityAnalysisController {
    * Get the predictability analyse score.
    * @param analyseId analyseId
    * @return ResponseEntity<PredictibilityScoreModel>
-   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws PredictibilityAnalysisNotFoundException when the predictibility analyse is not found in the database
+   * @throws UserNotAuthorizedException when the user is not authorized to access the project
+   * @throws PredictibilityAnalysisAlreadyUpdated when the predictibility analyse is already updated
    */
   @PutMapping("predictibility/isFinished/{analyseId}")
   public ResponseEntity<String> putIsFinishedPredictibilityAnalysis(@PathVariable final Long analyseId)

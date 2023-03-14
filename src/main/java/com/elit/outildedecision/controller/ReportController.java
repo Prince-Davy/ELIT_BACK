@@ -80,6 +80,7 @@ public class ReportController {
    * @throws MulticriteriaNotFoundException MulticriteriaNotFoundException
    * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException
    * @throws PredictibilityAnalysisNotFoundException PredictibilityAnaliseNotFoundException
+   * @throws IOException when there is a problem with the report file
    */
   @PostMapping(
       value = "upload/{projectId}/{analyseId}/{type}/{iteration}",
@@ -97,8 +98,9 @@ public class ReportController {
  /**
    * Preview report by id.
    * @param reportId Report id
-  * @param response HttpServletResponse
+  *  @param response HttpServletResponse
    * @throws ReportNotFoundException ReportNotFoundException
+  *  @throws IOException when there is a problem with the report file
    */
   @RequestMapping("/preview/{reportId}")
   public void previewReport(final HttpServletResponse response, @PathVariable final Long reportId)
@@ -120,6 +122,7 @@ public class ReportController {
   /**
    * Get all reports of a project.
    * @param projectId Project id
+   * @throws ProjectNotFoundException when the project is not found in the database
    * @return List of ReportResponseModel
    */
   @GetMapping("{projectId}")
@@ -129,7 +132,9 @@ public class ReportController {
   }
   /**
    * Get all reports of a project.
+   *
    * @param reportId report id
+   * @throws ReportNotFoundException when the report is not found in the database
    * @return List of ReportResponseModel
    */
   @DeleteMapping("{reportId}")

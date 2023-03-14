@@ -1,24 +1,12 @@
 package com.elit.outildedecision.exception;
 
 public class UserNotFoundException extends Exception {
-  public UserNotFoundException() {
-    super();
-  }
-
-  public UserNotFoundException(String message) {
+  /**
+   * Constructor for UserNotFoundException.
+   * Exception thrown when a user is not found.
+   * @param message the message to be displayed
+   */
+  public UserNotFoundException(final String message) {
     super(message);
-  }
-
-  public UserNotFoundException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public UserNotFoundException(Throwable cause) {
-    super(cause);
-  }
-
-  protected UserNotFoundException(
-      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
   }
 }

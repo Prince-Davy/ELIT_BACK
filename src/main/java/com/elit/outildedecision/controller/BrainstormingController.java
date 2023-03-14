@@ -60,7 +60,7 @@ public class BrainstormingController {
 
   /**
    * Create a new brainstorming.
-   * 
+   *
    * @param brainstormingModel : the brainstorming model
    * @return ResponseEntity<String>
    * @throws Exception : if the brainstorming is not found

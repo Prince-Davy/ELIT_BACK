@@ -4,7 +4,6 @@ import com.elit.outildedecision.entity.FormStep;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -18,7 +17,6 @@ public class MulticriteriaAnalyseResponseModel implements Serializable {
   private Timestamp updatedAt;
   private Integer multiCriteriaAnalysisIteration;
   private Boolean isFinished;
-  // TODO: change to FormStepResponseModel
   private List<FormStep> formSteps;
   private PredictibilityAnalyseResponseModel predictibilityAnalysis;
 }

@@ -55,7 +55,7 @@ public class AuthentificationController {
    * Instantiates a new Authentification controller.
    * dependency injection via constructor of the user service
    *
-   * @param jwtSecret
+   * @param jwtSecret the jwt secret
    * @param userService the user service
    */
   public AuthentificationController(@Value("${jwt.secret}") final String jwtSecret, final UserService userService) {
@@ -69,6 +69,7 @@ public class AuthentificationController {
    * @param user the user to register
    * @return ResponseEntity<String>
    * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
+   * @throws UserAlreadyExistsException the exception thrown when the user already exists
    */
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid final UserModel user)
@@ -90,15 +91,11 @@ public class AuthentificationController {
     if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
       try {
         String refreshToken = jwtAuthorizationToken.substring("Bearer ".length());
-        System.out.println("jwtSecret = " + jwtSecret);
-        System.out.println("refreshToken = " + refreshToken);
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(refreshToken);
-        System.out.println("decodedJWT = " + decodedJWT);
         String userEmail = decodedJWT.getSubject();
         User user = userService.findByEmail(userEmail);
-        System.out.println("user = " + user);
         List<String> roles = new ArrayList<>();
         roles.add(user.getIsAdmin() ? "ADMIN" : "USER");
         String accessToken =
@@ -111,7 +108,6 @@ public class AuthentificationController {
                 .withClaim("lastname", user.getUserLastName())
                 .withClaim("id", user.getUserId())
                 .sign(algorithm);
-
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access-token", accessToken);
         tokens.put("refresh-token", refreshToken);

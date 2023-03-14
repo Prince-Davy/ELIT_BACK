@@ -10,7 +10,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,15 +23,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   private String jwtSecret;
 
   /**
-   * @param request
-   * @param response
-   * @param filterChain
-   * @throws ServletException
-   * @throws IOException
+   * This method is called by the servlet container each time a request/response pair is passed
+   * through the chain due to a client request for a resource at the end of the chain.
+   *
+   * @param request  The request to process
+   * @param response The response associated with the request
+   * @param filterChain The filter chain
+   * @throws ServletException if the processing fails for any other reason
+   * @throws IOException if an I/O error occurs during this filter's processing of the request
    */
   @Override
-  protected void doFilterInternal(
-      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(final HttpServletRequest request,
+                                  final HttpServletResponse response,
+                                  final FilterChain filterChain)
       throws ServletException, IOException {
     if ("/refreshToken".equals(request.getServletPath())) {
       filterChain.doFilter(request, response);

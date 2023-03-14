@@ -8,8 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.OneToMany;
+import javax.persistence.Id;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.List;
 
 @Entity
@@ -23,7 +27,7 @@ public class User {
   @OneToMany(mappedBy = "user")
   @JsonIgnore
   @JsonManagedReference("user_permissions")
-  List<ProjectUserPermission> userProjectPermissions;
+  private List<ProjectUserPermission> userProjectPermissions;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,13 +55,15 @@ public class User {
   private List<Brainstorming> brainstormings;
 
   /**
-   * @param projectUserPermission
+   * @param projectUserPermission the projectUserPermission to detach.
    */
-  public void detachPermission(ProjectUserPermission projectUserPermission) {
+  public void detachPermission(final ProjectUserPermission projectUserPermission) {
     this.userProjectPermissions.remove(projectUserPermission);
     projectUserPermission.setUser(null);
   }
-
+  /**
+   * @return a string representation of the user.
+   */
   @Override
   public String toString() {
     return "User{"

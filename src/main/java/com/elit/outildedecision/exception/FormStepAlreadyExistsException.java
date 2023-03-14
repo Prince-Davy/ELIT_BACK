@@ -1,24 +1,12 @@
 package com.elit.outildedecision.exception;
 
 public class FormStepAlreadyExistsException extends Exception {
-  public FormStepAlreadyExistsException() {
-    super();
-  }
-
-  public FormStepAlreadyExistsException(String message) {
+  /**
+   * Constructor for FormStepAlreadyExistsException.
+   * Exception thrown when a form step already exists.
+   * @param message the message to be displayed
+   */
+  public FormStepAlreadyExistsException(final String message) {
     super(message);
-  }
-
-  public FormStepAlreadyExistsException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public FormStepAlreadyExistsException(Throwable cause) {
-    super(cause);
-  }
-
-  protected FormStepAlreadyExistsException(
-      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
   }
 }

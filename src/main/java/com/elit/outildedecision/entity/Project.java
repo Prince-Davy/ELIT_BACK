@@ -11,7 +11,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
@@ -27,7 +34,7 @@ import java.util.List;
 public class Project {
   @OneToMany(mappedBy = "project")
   @JsonManagedReference("project_permissions")
-  List<ProjectUserPermission> projectUserPermissions;
+  private List<ProjectUserPermission> projectUserPermissions;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,22 +83,17 @@ public class Project {
   private List<Notification> notifications;
 
   /**
-   * @param attachment
+   * get the list of attachments of the project.
+   * @return list of attachments
    */
-  public void addAttachment(Attachment attachment) {
-    this.getAttachments().add(attachment);
-  }
-
   @JsonManagedReference("project_attachment")
   public List<Attachment> getAttachments() {
     return this.attachments;
   }
-
-  public void detachPermission(ProjectUserPermission projectUserPermission) {
-    this.projectUserPermissions.remove(projectUserPermission);
-    projectUserPermission.setProject(null);
-  }
-
+  /**
+   * return the project as a string.
+   * @return project as a string
+   */
   @Override
   public String toString() {
     return "Project{"
