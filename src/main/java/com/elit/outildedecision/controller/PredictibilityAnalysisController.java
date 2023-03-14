@@ -1,7 +1,8 @@
 
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.exception.PredictibilityAnaliseNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisAlreadyUpdated;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.PredictibilityScoreModel;
@@ -53,22 +54,25 @@ public class PredictibilityAnalysisController {
    * Get the predictability analyse score.
    * @param analyseId analyseId
    * @return ResponseEntity<PredictibilityScoreModel>
-   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws PredictibilityAnalysisNotFoundException when the predictibility analyse is not found in the database
    */
   @GetMapping("/predictibility/{analyseId}/score")
   public ResponseEntity<PredictibilityScoreModel> getPredictabilityAnalysisScore(
-      @PathVariable final Long analyseId) throws ProjectNotFoundException {
+      @PathVariable final Long analyseId) throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
     return predictibilityAnalysisService.calculatePredictibilityAnalysisScore(analyseId);
   }
   /**
    * Get the predictability analyse score.
    * @param analyseId analyseId
    * @return ResponseEntity<PredictibilityScoreModel>
-   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws PredictibilityAnalysisNotFoundException when the predictibility analyse is not found in the database
+   * @throws UserNotAuthorizedException when the user is not authorized to access the project
+   * @throws PredictibilityAnalysisAlreadyUpdated when the predictibility analyse is already updated
    */
   @PutMapping("predictibility/isFinished/{analyseId}")
   public ResponseEntity<String> putIsFinishedPredictibilityAnalysis(@PathVariable final Long analyseId)
-      throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException {
+    throws UserNotAuthorizedException, PredictibilityAnalysisNotFoundException, PredictibilityAnalysisAlreadyUpdated {
     return predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(analyseId);
   }
   /**
@@ -76,7 +80,7 @@ public class PredictibilityAnalysisController {
    * @param analyseId analyseId
    * @return ResponseEntity<String>
    * @throws UserNotAuthorizedException UserNotAuthorizedException
-   * @throws PredictibilityAnaliseNotFoundException PredictibilityAnaliseNotFoundException
+   * @throws PredictibilityAnalysisNotFoundException PredictibilityAnaliseNotFoundException
    */
   @ApiOperation(value = "Increase the iteration number of the predictibility analyse")
   @ApiResponses(
@@ -89,7 +93,7 @@ public class PredictibilityAnalysisController {
   @PutMapping("predictibility/iteration/{analyseId}")
   public ResponseEntity<String> increasePredictibilityAnalyseIterationNumber(
       @ApiParam(value = "Analyse Id.") @PathVariable final Long analyseId)
-      throws UserNotAuthorizedException, PredictibilityAnaliseNotFoundException {
+      throws UserNotAuthorizedException, PredictibilityAnalysisNotFoundException {
     return predictibilityAnalysisService.increasePredictAnalysisIterationNum(analyseId);
   }
 }

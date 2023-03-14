@@ -3,7 +3,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.exception.PredictibilityAnaliseNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ReportNotFoundException;
 import com.elit.outildedecision.model.ReportResponseModel;
@@ -54,7 +54,7 @@ public class ReportController {
    * @throws ProjectNotFoundException ProjectNotFoundException
    * @throws MulticriteriaNotFoundException MulticriteriaNotFoundException
    * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException
-   * @throws PredictibilityAnaliseNotFoundException PredictibilityAnaliseNotFoundException
+   * @throws PredictibilityAnalysisNotFoundException PredictibilityAnaliseNotFoundException
    */
   @PostMapping(
       value = "upload/{projectId}/{analyseId}/{type}",
@@ -65,7 +65,7 @@ public class ReportController {
       @PathVariable final String type,
       @RequestParam("file") final MultipartFile file)
       throws ProjectNotFoundException, MulticriteriaNotFoundException,
-          ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
+          ExecutionPlanNotFoundException, PredictibilityAnalysisNotFoundException {
     return reportService.uploadReport(projectId, analyseId, type, file);
   }
   /**
@@ -79,7 +79,8 @@ public class ReportController {
    * @throws ProjectNotFoundException ProjectNotFoundException
    * @throws MulticriteriaNotFoundException MulticriteriaNotFoundException
    * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException
-   * @throws PredictibilityAnaliseNotFoundException PredictibilityAnaliseNotFoundException
+   * @throws PredictibilityAnalysisNotFoundException PredictibilityAnaliseNotFoundException
+   * @throws IOException when there is a problem with the report file
    */
   @PostMapping(
       value = "upload/{projectId}/{analyseId}/{type}/{iteration}",
@@ -90,15 +91,16 @@ public class ReportController {
       @PathVariable final String type,
       @RequestParam("file") final MultipartFile file,
       @PathVariable final Integer iteration)
-      throws ProjectNotFoundException, MulticriteriaNotFoundException,
-          ExecutionPlanNotFoundException, PredictibilityAnaliseNotFoundException {
+    throws ProjectNotFoundException, MulticriteriaNotFoundException,
+    ExecutionPlanNotFoundException, PredictibilityAnalysisNotFoundException, IOException {
     return reportService.uploadReport2(projectId, analyseId, type, file, iteration);
   }
  /**
    * Preview report by id.
    * @param reportId Report id
-  * @param response HttpServletResponse
+  *  @param response HttpServletResponse
    * @throws ReportNotFoundException ReportNotFoundException
+  *  @throws IOException when there is a problem with the report file
    */
   @RequestMapping("/preview/{reportId}")
   public void previewReport(final HttpServletResponse response, @PathVariable final Long reportId)
@@ -120,6 +122,7 @@ public class ReportController {
   /**
    * Get all reports of a project.
    * @param projectId Project id
+   * @throws ProjectNotFoundException when the project is not found in the database
    * @return List of ReportResponseModel
    */
   @GetMapping("{projectId}")
@@ -129,7 +132,9 @@ public class ReportController {
   }
   /**
    * Get all reports of a project.
+   *
    * @param reportId report id
+   * @throws ReportNotFoundException when the report is not found in the database
    * @return List of ReportResponseModel
    */
   @DeleteMapping("{reportId}")

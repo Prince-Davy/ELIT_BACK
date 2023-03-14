@@ -4,21 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectPropertyKey implements Serializable {
   @Column(name = "project_id")
-  Long projectId;
+  private Long projectId;
 
   @Column(name = "user_id")
-  Long userId;
+  private Long userId;
 
   @Data
   @AllArgsConstructor

@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * CriteriaScoreModel
- * this class is used to store criteria score
- * @author Elit
- * @version 1.0
+ * this class is used to store criteria score.
  */
 @Data
 @AllArgsConstructor

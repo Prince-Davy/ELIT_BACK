@@ -40,6 +40,7 @@ public class SuperAdminController {
   /**
    * Confirm a project.
    * @param projectId the project id
+   * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found in the database
    * @return ResponseEntity
    */
   @PutMapping("/projects/{projectId}")
@@ -50,6 +51,7 @@ public class SuperAdminController {
   /**
    * Suspend a user.
    * @param userId the user id
+   * @throws UserNotFoundException UserNotFoundException if the user is not found in the database
    * @return ResponseEntity
    */
   @PutMapping("/users/{userId}")
@@ -58,7 +60,9 @@ public class SuperAdminController {
   }
   /**
    * Delete a project.
+   *
    * @param projectId the project id
+   * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found in the database
    * @return ResponseEntity
    */
   @DeleteMapping("/projects/{projectId}")

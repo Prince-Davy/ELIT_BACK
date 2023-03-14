@@ -48,4 +48,3 @@ extends:
     DEPLOY_INTEG: false
     DEPLOY_PROD: false
     SCAN_SQ: true
-    NO_QUALITY_FAIL: true

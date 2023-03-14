@@ -39,6 +39,7 @@ public class SurveyQuestionController {
    * method called to add a new question to the survey.
    *
    * @param question represents the new question to add on survey
+   * @throws QuestionFormatNotValidException if the format question format is not valid
    * @return added question. return needed for API testing
    */
   @PostMapping("")
@@ -51,6 +52,7 @@ public class SurveyQuestionController {
    *
    * @param question given in parameter and contains modification to apply.
    * @param questionId given in parameter and represents the id of the existing question to modify
+   * @throws QuestionFormatNotValidException if the format question format is not valid
    * @return updated question. return needed for API testing
    */
   @PutMapping("/{questionId}")

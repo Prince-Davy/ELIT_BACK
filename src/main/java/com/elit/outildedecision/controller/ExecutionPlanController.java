@@ -81,6 +81,7 @@ public class ExecutionPlanController {
   /**
    * Vote for a methodology.
    * @param executionVoteRequestModel the execution vote request model
+   * @throws UserNotAuthorizedException when a user is not authorized
    * @return ResponseEntity<Long>
    */
   @PostMapping("/executionPlan/methodologies/vote")
@@ -101,6 +102,8 @@ public class ExecutionPlanController {
   /**
    * Get execution plan score.
    * @param executionPlanId the execution plan id
+   * @throws UserNotAuthorizedException when a user is not authorized
+   * @throws ExecutionPlanNotFoundException when an execution plan is not found
    * @return ExecutionPlanScoreResponseModel
    */
   @PostMapping("/executionPlan/isFinished/{executionPlanId}")

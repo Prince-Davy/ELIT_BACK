@@ -3,7 +3,6 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.FormAlreadyExistsException;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
@@ -47,7 +46,6 @@ public class MultiCriteriaAnalysisController {
   /**
    * @param projectId the project id
    * @return ResponseEntity<String>
-   * @throws FormAlreadyExistsException FormAlreadyExistsException
    * @throws IOException IOException
    * @throws ParseException ParseException
    * @throws org.json.simple.parser.ParseException org.json.simple.parser.ParseException
@@ -56,23 +54,28 @@ public class MultiCriteriaAnalysisController {
   @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<String> createMultiCriteriaAnalysis(
       @PathVariable("projectId") final Long projectId)
-      throws FormAlreadyExistsException, IOException, ParseException,
+      throws IOException, ParseException,
           org.json.simple.parser.ParseException {
     return multiCriteriaAnalysisService.createMulticriteriaAnalysisForm(projectId);
   }
   /**
    * get the multi-criteria analysis components.
+   *
    * @param projectId the project id
+   * @throws ProjectNotFoundException when the project is not found in the database
    * @return ResponseEntity<Object>
    */
   @GetMapping("/multi-criteria-analysis/{projectId}")
   @PreAuthorize("isContributer(#projectId)")
-  public ResponseEntity<Object> getMultiCriteriaAnalysis(@PathVariable final Long projectId) {
+  public ResponseEntity<Object> getMultiCriteriaAnalysis(@PathVariable final Long projectId) throws ProjectNotFoundException {
     return multiCriteriaAnalysisService.getMulticriteriaAnalysis(projectId);
   }
   /**
    * increase the iteration of the multi-criteria analysis.
+   *
    * @param analyseId the multi-criteria analysis id
+   * @throws MulticriteriaNotFoundException when the multi-criteria analysis is not found in the database
+   * @throws UserNotAuthorizedException when the user is not authorized to perform this action
    * @return ResponseEntity<Object>
    */
   @PutMapping("/multi-criteria-analysis/iteration/{analyseId}")
@@ -95,6 +98,7 @@ public class MultiCriteriaAnalysisController {
   /**
    * update the multi-criteria analysis question.
    * @param formQuestion the new multi-criteria analysis question
+   * @throws MulticriteriaNotFoundException when the multi-criteria analysis is not found in the database
    * @return ResponseEntity<Object>
    */
   @PutMapping("/multi-criteria-analysis/question")
@@ -104,12 +108,16 @@ public class MultiCriteriaAnalysisController {
   }
   /**
    * get the multi-criteria analysis score.
+   *
    * @param projectId the project id
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws QuestionsNotFoundException when the questions are not found in the database
+   * @throws EscoreException when there is an error in the escore calculation process
    * @return ResponseEntity<Object>
    */
   @GetMapping("/multi-criteria-analysis/{projectId}/score")
   public ResponseEntity getMulticriteriaAnalysisScore(@PathVariable final Long projectId)
-      throws ProjectNotFoundException, QuestionsNotFoundException, IOException, EscoreException {
+      throws ProjectNotFoundException, QuestionsNotFoundException, EscoreException {
     return multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId);
   }
 }

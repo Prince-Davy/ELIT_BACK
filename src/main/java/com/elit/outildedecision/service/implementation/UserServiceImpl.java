@@ -3,6 +3,7 @@ package com.elit.outildedecision.service.implementation;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
+import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
@@ -26,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.awt.print.Pageable;
 import java.io.*;
@@ -89,18 +89,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   }
 
   @Override
-  public ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException {
-
-    if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())) {
-      return new ResponseEntity<>(
-          "les mots de passe doivent être identiques", HttpStatus.BAD_REQUEST);
+  public ResponseEntity<String> saveUser(UserModel user) throws CouldNotSaveUserException, UserAlreadyExistsException {
+    // Verify if the user already exists
+    if(userRepository.existsByUserEmailOrUsername(user.getUserEmail(), user.getUsername())){
+      throw new UserAlreadyExistsException("Utilisateur déjà existant");
     }
-    User userFromDB =
-        userRepository.findByUseremailOrUsername(user.getUserEmail(), user.getUsername());
-    if (!Objects.isNull(userFromDB)) {
-      return new ResponseEntity<>("L'utilisateur existe déjà", HttpStatus.CONFLICT);
-    }
-    try {
       User userToSave =
           User.builder()
               .userEmail(user.getUserEmail())
@@ -111,13 +104,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
               .userLastName(user.getUserLastName())
               .userPassword(passwordEncoder.encode(user.getUserPassword()))
               .userJob(user.getUserJob())
-              .userAvatarPath(saveAvatar(user.getUserAvatar()))
               .isAdmin(false)
               .build();
-      sendRegistrationConfirmationEmail(userRepository.save(userToSave));
-    } catch (Exception e) {
-      throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de l'utilisateur");
-    }
+    sendRegistrationConfirmationEmail(userRepository.save(userToSave));
     return ResponseEntity.status(HttpStatus.CREATED).body("Votre compte a été créé avec succès");
   }
 
@@ -147,22 +136,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   }
 
   @Override
-  public ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar)
-      throws IOException, CouldNotSaveUserException {
-    User user = userRepository.getById(userId);
-    if (Objects.isNull(user)) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user by this id");
-    }
-
-    if (!Objects.isNull(userAvatar)) {
-      try {
-        user.setUserAvatarPath(saveAvatar(userAvatar));
-      } catch (Exception e) {
-        throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de l'avatar");
-      }
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).body("Successful Update");
+  public ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar) throws UserNotFoundException, IOException {
+    User user = userRepository.findById(userId)
+      .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
+    // save avatar and get path
+    String avatarPath = saveAvatar(userAvatar);
+    user.setUserAvatarPath(avatarPath);
+    userRepository.save(user);
+    return ResponseEntity.status(HttpStatus.OK).body("Votre Photo de profil a été modifiée avec succès");
   }
 
   @Override
@@ -425,16 +406,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   }
 
   @Override
-  public String saveAvatar(MultipartFile avatar) throws UserNotFoundException {
+  public String saveAvatar(MultipartFile avatar) throws UserNotFoundException, IOException {
 
     String filePath;
     String folderPath = StringUtils.cleanPath(AVATAR_UPLOAD_DIR);
-    try {
-      filePath = StringUtils.cleanPath(folderPath + avatar.getOriginalFilename());
-      Files.copy(avatar.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) {
-      throw new RuntimeException("Erreur lors de l'enregistrement de l'avatar");
-    }
+    filePath = StringUtils.cleanPath(folderPath + avatar.getOriginalFilename());
+    Files.copy(avatar.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
     return filePath;
   }
 }

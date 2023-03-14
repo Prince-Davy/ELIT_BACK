@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
+import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,8 +44,8 @@ public class AuthentificationController {
    *  The Constant jwtSecret.
    *  The secret key used to sign the JWT token.
    */
-  @Value("${jwt.secret}")
-  private static String jwtSecret;
+
+  private final String jwtSecret;
   /**
    *  The User service.
    *  The service used to manage the user.
@@ -53,9 +54,12 @@ public class AuthentificationController {
   /**
    * Instantiates a new Authentification controller.
    * dependency injection via constructor of the user service
+   *
+   * @param jwtSecret the jwt secret
    * @param userService the user service
    */
-  public AuthentificationController(final UserService userService) {
+  public AuthentificationController(@Value("${jwt.secret}") final String jwtSecret, final UserService userService) {
+    this.jwtSecret = jwtSecret;
     this.userService = userService;
   }
 
@@ -65,10 +69,11 @@ public class AuthentificationController {
    * @param user the user to register
    * @return ResponseEntity<String>
    * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
+   * @throws UserAlreadyExistsException the exception thrown when the user already exists
    */
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid final UserModel user)
-      throws CouldNotSaveUserException {
+    throws CouldNotSaveUserException, UserAlreadyExistsException {
     return userService.saveUser(user);
   }
   /**
@@ -103,7 +108,6 @@ public class AuthentificationController {
                 .withClaim("lastname", user.getUserLastName())
                 .withClaim("id", user.getUserId())
                 .sign(algorithm);
-
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access-token", accessToken);
         tokens.put("refresh-token", refreshToken);
