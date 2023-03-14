@@ -2,7 +2,6 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
-import com.elit.outildedecision.service.UserService;
 import com.elit.outildedecision.service.VoteService;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +102,7 @@ public class VoteControllerTests {
     voteModelRequest = VoteSamples.getVoteModelRequest();
     when(voteService.updateVote(voteModelRequest.getVoteId(), voteModelRequest)).thenReturn(ResponseEntity.status(HttpStatus.CONFLICT).body("Vous n'êtes pas autorisé à modifier ce vote."));
     mockMvc.perform(MockMvcRequestBuilders.put("/api/vote/"+ voteModelRequest.getVoteId()).contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON).content(toJson(voteModelRequest))).andDo(print()).andExpect(status().isConflict());
+      .accept(MediaType.APPLICATION_JSON).content(toJson(voteModelRequest)))
+      .andDo(print()).andExpect(status().isConflict());
   }
 }
