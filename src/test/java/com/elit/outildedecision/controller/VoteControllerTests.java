@@ -3,19 +3,18 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.service.VoteService;
-import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import com.elit.outildedecision.controller.ModelSamples.VoteSamples;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -32,20 +31,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(controllers = VoteController.class)
-@ExtendWith(MockitoExtension.class)
-public class VoteControllerTests {
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+class VoteControllerTests {
   @Autowired
   private MockMvc mockMvc;
+
   @MockBean
   VoteService voteService;
 
   @InjectMocks
   VoteController voteController;
+
   private VoteModelRequest voteModelRequest;
 
-  @MockBean
-  private UserServiceImpl userService;
+
   @BeforeEach
   public void setup() {
      voteModelRequest = VoteSamples.getVoteModelRequest();

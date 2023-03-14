@@ -1,14 +1,11 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.entity.Brainstorming;
-import com.elit.outildedecision.entity.SurveyQuestion;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.entity.VerificationToken;
-import com.elit.outildedecision.model.UserResponseModel;
-import com.elit.outildedecision.model.VoteModelRequest;
-import com.elit.outildedecision.model.VoteModelResponse;
+import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.model.*;
+import com.elit.outildedecision.util.AnswerType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +27,11 @@ public class ModelSamples {
         null);
     }
 
+    public static User getUser () {
+      return createUser(1L, "username", "userLastName", "userFirstName",
+                               "user@user.com", "developper", "useravatarPath", "userPassword", true,true, true,
+        new ArrayList<VerificationToken>(), new ArrayList<Brainstorming>());
+    }
     public static User createUser(Long userId, String username, String userLastName,
                                   String userFirstName, String userEmail, String userJob,
                                   String userAvatarPath, String userPassword, Boolean isEmailVerified,
@@ -71,5 +73,24 @@ public class ModelSamples {
       return new SurveyQuestion(1L, "is this a question", "yes/no question");
     }
 
+  }
+
+  public static class SurveyAnswerSamples {
+    public static SurveyAnswerRequestModel getSurveyAnswerRequestModel() {
+      SurveyAnswerRequestModel surveyAnswerRequestModel = new SurveyAnswerRequestModel();
+      surveyAnswerRequestModel.setUserId(1L);
+      surveyAnswerRequestModel.setQuestionId(1L);
+      surveyAnswerRequestModel.setAnswerType(AnswerType.FREE_ANSWER);
+      surveyAnswerRequestModel.setAnswerValue("the answer of the question");
+      return surveyAnswerRequestModel;
+    }
+
+    public static SurveyAnswerResponseModel getSurveyAnswerResponseModel() {
+      SurveyAnswerResponseModel surveyAnswerResponseModel = new SurveyAnswerResponseModel();
+      surveyAnswerResponseModel.setAnswer("the answer of the question");
+      surveyAnswerResponseModel.setQuestionId(1L);
+      surveyAnswerResponseModel.setUserId(1L);
+      return surveyAnswerResponseModel;
+    }
   }
 }

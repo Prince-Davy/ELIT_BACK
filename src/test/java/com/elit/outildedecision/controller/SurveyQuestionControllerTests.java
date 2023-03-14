@@ -3,17 +3,16 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
 import com.elit.outildedecision.service.SurveyQuestionService;
-import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -24,19 +23,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = SurveyQuestionController.class)
-@ExtendWith(MockitoExtension.class)
-public class SurveyQuestionControllerTests {
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+class SurveyQuestionControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
+
   @MockBean
   SurveyQuestionService surveyQuestionService;
-  @MockBean
-  UserServiceImpl userService;
+
   @InjectMocks
   SurveyQuestionController surveyQuestionController;
-  private static Long notFoundQuestionId = 2L;
+
   private SurveyQuestion question;
 
   @BeforeEach
