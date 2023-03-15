@@ -146,9 +146,7 @@ class AttachementControllerTest {
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(attachmentId);
     when(attachmentService.deleteAttachment(attachmentId)).thenReturn(ResponseEntity.ok().body("Fichier supprimé avec succès."));
-    // when -  action or the behaviour that we are going test
     ResultActions response = mockMvc.perform(delete("/api/user/attachments/"+ attachmentId));
-    // then - verify the output
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());

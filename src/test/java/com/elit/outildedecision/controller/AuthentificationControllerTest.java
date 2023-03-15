@@ -10,6 +10,7 @@ import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import com.elit.outildedecision.service.implementation.VerificationTokenServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -30,7 +32,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -48,6 +52,9 @@ class AuthentificationControllerTest {
   private UserServiceImpl userService;
   @MockBean
   private UserRepository userRepository;
+
+  @MockBean
+  private PasswordEncoder passwordEncoder;
 
   public static String asJsonString(final Object obj) {
     try {
@@ -78,17 +85,40 @@ class AuthentificationControllerTest {
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
   void refreshToken() throws Exception {
-   /* HttpServletResponse httpServletResponse = new MockHttpServletResponse();
-    String jwtToken = "eyJ0eXAiOiJKV1QiLCJraWQiOiJzaWduYXR1cmUta2V5IiwiYWxnIjoiUlMyNTYifQ.eyJzY29wZSI6eyJlbWFpbCI6ImRlbW9AZW1haWwuY29tIiwiY2l2aWxpdGUiOiJNIiwibmFtZSI6ImRlbW9OYW1lIiwidXNlck5hbWUiOiJkZW1vIiwiYXV0b3Jpc2F0aW9uIjoidHJ1ZSIsIm1zaXNkbiI6IjA2MTEyMjMzNDQiLCJwYXJ0bmVybmFtZSI6Ik9DUyIsImFkcmVzc2UiOiIxMyBhdmVudWUgZHUgTWFyZWNoYWwgSlVJTiIsImNwIjoiOTI1MDAiLCJ2aWxsZSI6Ik1ldWRvbiIsImRhdGVfZGVfbmFpc3NhbmNlIjoiMDEvMDEvMTk5MCIsImxpZXVfZGVfbmFpc3NhbmNlIjoiUEFSSVMifX0.K7rQGLpO4zBzwz2DfolAJCUuoG9W55bhIGHEtPtryREodZx1XooPwAQWU8rbaNIuNpC4iFf_3AzMjfqbBoiBD6y6-n86wTQ2V9SSemm392oEQ4WY_6vIbSq87Z4k9SZlXMv89x9Uv3Oz2GKC8JQl17h2ytVJRsTcpSjv2vNHZf2xeVEF7NiQ0gHuCTNtmC4fHR3Oo7FmuhI770K29yrh7A1xPzfrWi-m1HtFM_teSSabn41UZujRhwf-1G3KNRQ9HGmvev0BUkHQ3nt_9gQNys0Zs8rvFca3l3RHezAd6am6GTv9-7zQwZvB1x6MdJzZ-Fy3WSLurSo6ls_DhwD8Yw";
+  /* HttpServletResponse httpServletResponse = new MockHttpServletResponse();
+   HttpServletRequest request = new MockHttpServletRequest();
+   final long EXPIRATION_TIME = 5 * 60 * 1000;
     String jwtSecret = "ELITE2022";
-
+    Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
     User user = ModelSamples.UserSamples.getUser();
-    String jwtAuthorizationToken = "Bearer " + jwtToken;
+    String access_token =
+      JWT.create()
+        .withSubject(user.getUsername()) // the (email) of the authenticated user
+        .withExpiresAt(
+          new Date(
+            System.currentTimeMillis() + EXPIRATION_TIME)) // the token will expire in 5min
+        .withIssuer(
+          request
+            .getRequestURL()
+            .toString()) // the issuer of the token is the URL of the server
+        .withClaim(
+          "roles","ADMIN")// the
+        // roles
+        // of
+        // the
+        // authenticated
+        // user
+        .withClaim(
+          "firstname", user.getUserFirstName()) // the first name of the authenticated user
+        .withClaim(
+          "lastname", user.getUserLastName()) // the last name of the authenticated user
+        .withClaim("id", user.getUserId()) // the user id of the authenticated user
+        .sign(algorithm);
 
 
     when(userService.findByEmail(user.getUserEmail())).thenReturn(user);
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/refreshToken").header("Authorization", "Bearer " + jwtToken)
-      .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andExpect(status().isBadRequest()).andDo(print()).andReturn().getResponse();
-    Assertions.assertEquals(400, response.getStatus());*/
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/refreshToken").header("Authorization", "Bearer " + access_token)
+      .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andExpect(status().isOk()).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(403, response.getStatus());*/
   }
 }

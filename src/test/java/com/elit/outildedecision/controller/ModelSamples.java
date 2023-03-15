@@ -3,6 +3,8 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.entity.Brainstorming;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
+import com.elit.outildedecision.model.FormQuestionModel;
+import com.elit.outildedecision.model.FormStepModelForBrainstorming;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
 
@@ -30,6 +32,10 @@ public class ModelSamples {
       return createResponseModel(1L, "username", "lastname",
         "firstname", "user@user.com", "developer",
         null);
+    }
+
+    public static FormStepModelForBrainstorming getFormStepModelForBrainstorming(){
+      return createBrainstorming(1L,"StepName",3L, 12F,1L,null);
     }
 
     public static UserResponseModel createResponseModel(Long userId, String username,
@@ -63,7 +69,6 @@ public class ModelSamples {
         return user;
       }
     }
-
     public static UserModel createUserModel( String username, String userLastName,
                                   String userFirstName, String userEmail, String userJob,
                                   String userPassword
@@ -81,6 +86,18 @@ public class ModelSamples {
 
         return userModel;
       }
+    }
+
+    public static FormStepModelForBrainstorming createBrainstorming(Long stepId, String stepName, Long stepRef, Float eScore, Long multiCriteriaAnalysisId,
+    List<FormQuestionModel> formQuestions){
+      FormStepModelForBrainstorming modelForBrainstorming = new FormStepModelForBrainstorming();
+      modelForBrainstorming.setStepId(stepId);
+      modelForBrainstorming.setStepName(stepName);
+      modelForBrainstorming.setStepRef(stepRef);
+      modelForBrainstorming.setEScore(eScore);
+      modelForBrainstorming.setMultiCriteriaAnalysisId(multiCriteriaAnalysisId);
+      modelForBrainstorming.setFormQuestions(formQuestions);
+      return modelForBrainstorming;
     }
 
   }
