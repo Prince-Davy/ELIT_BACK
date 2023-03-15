@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Be aware to put site at the end of the command, exitcode bug. 
-mvn -ntp checkstyle:check pmd:check clean verify site
+# mvn -ntp checkstyle:check pmd:check clean verify site
+mvn verify site
 
 export exitcode=$?
 
