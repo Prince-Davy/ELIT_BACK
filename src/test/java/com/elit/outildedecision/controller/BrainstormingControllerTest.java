@@ -6,7 +6,6 @@ import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundExceptio
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.service.implementation.BrainstormingServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,8 +29,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
