@@ -4,7 +4,14 @@ import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.model.*;
 import com.elit.outildedecision.util.AnswerType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.lang.Nullable;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +39,8 @@ public class ModelSamples {
                                "user@user.com", "developper", "useravatarPath", "userPassword", true,true, true,
         new ArrayList<VerificationToken>(), new ArrayList<Brainstorming>());
     }
+
+
     public static User createUser(Long userId, String username, String userLastName,
                                   String userFirstName, String userEmail, String userJob,
                                   String userAvatarPath, String userPassword, Boolean isEmailVerified,
@@ -92,5 +101,26 @@ public class ModelSamples {
       surveyAnswerResponseModel.setUserId(1L);
       return surveyAnswerResponseModel;
     }
+  }
+
+  public static class ProjectSamples {
+
+    public  static List<Project> getProjects() {
+      Project p1 = getProject();
+      Project p2 = getProject();
+      p2.setProjectId(2l);
+      p2.setCreatedAt(Timestamp.from(Instant.now().minus(1, ChronoUnit.DAYS)));
+      System.out.println(p1.getCreatedAt());
+      System.out.println(p2.getCreatedAt());
+      return Arrays.asList(p1, p2);
+    }
+    public static Project getProject() {
+      Project project = new Project(new ArrayList<>(), 1L, "projectName", "this is a test project", "/test/folder/path", 1L, "confirmed", true, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()) ;
+      ProjectUserPermission projectUserPermission = new ProjectUserPermission();
+      projectUserPermission.setUser(UserSamples.getUser());
+      projectUserPermission.setProject(project);
+      project.setProjectUserPermissions(Arrays.asList(projectUserPermission));
+      return  project;
+      }
   }
 }
