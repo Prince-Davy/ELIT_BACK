@@ -145,8 +145,8 @@ public class SuperAdminControllerTests {
   }
 
   @Test
-  @WithMockUser
-  void shouldFindNotConfirmed_Succee() throws Exception {
+  @WithMockUser(authorities = {"ADMIN"})
+  void shouldFindNotConfirmed_Success() throws Exception {
     Page<Project> page = new PageImpl<>(ModelSamples.ProjectSamples.getProjects());
     when(superAdminService.findNotConfirmedProjectByKeyword(searchKeyWord, pageNumber)).thenReturn(page);
     mockMvc.perform(get("/api/projects/notConfirmed/"+pageNumber+"/search").param("keyword", searchKeyWord))
