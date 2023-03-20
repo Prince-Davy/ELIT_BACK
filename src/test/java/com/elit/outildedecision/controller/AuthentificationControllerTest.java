@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -56,6 +57,9 @@ class AuthentificationControllerTest {
   @MockBean
   private PasswordEncoder passwordEncoder;
 
+  @InjectMocks
+  AuthentificationController authentificationController;
+
   public static String asJsonString(final Object obj) {
     try {
       return new ObjectMapper().writeValueAsString(obj);
@@ -85,40 +89,30 @@ class AuthentificationControllerTest {
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
   void refreshToken() throws Exception {
-  /* HttpServletResponse httpServletResponse = new MockHttpServletResponse();
+  /*HttpServletResponse httpServletResponse = new MockHttpServletResponse();
    HttpServletRequest request = new MockHttpServletRequest();
    final long EXPIRATION_TIME = 5 * 60 * 1000;
     String jwtSecret = "ELITE2022";
+
     Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
     User user = ModelSamples.UserSamples.getUser();
-    String access_token =
+
+    String refresh_token =
       JWT.create()
-        .withSubject(user.getUsername()) // the (email) of the authenticated user
+        .withSubject(user.getUsername()) // the username of the authenticated user
         .withExpiresAt(
           new Date(
-            System.currentTimeMillis() + EXPIRATION_TIME)) // the token will expire in 5min
+            System.currentTimeMillis() + 8640 * EXPIRATION_TIME)) // the token will expire
+        // in 30 days
         .withIssuer(
           request
             .getRequestURL()
             .toString()) // the issuer of the token is the URL of the server
-        .withClaim(
-          "roles","ADMIN")// the
-        // roles
-        // of
-        // the
-        // authenticated
-        // user
-        .withClaim(
-          "firstname", user.getUserFirstName()) // the first name of the authenticated user
-        .withClaim(
-          "lastname", user.getUserLastName()) // the last name of the authenticated user
-        .withClaim("id", user.getUserId()) // the user id of the authenticated user
         .sign(algorithm);
 
-
     when(userService.findByEmail(user.getUserEmail())).thenReturn(user);
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/refreshToken").header("Authorization", "Bearer " + access_token)
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/refreshToken").header("Authorization", "Bearer " + refresh_token)
       .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andExpect(status().isOk()).andDo(print()).andReturn().getResponse();
-    Assertions.assertEquals(403, response.getStatus());*/
+    Assertions.assertEquals(200, response.getStatus());*/
   }
 }
