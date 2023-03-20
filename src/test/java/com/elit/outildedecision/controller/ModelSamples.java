@@ -123,4 +123,11 @@ public class ModelSamples {
       return  project;
       }
   }
+
+  public static class PasswordChangeModelSamples {
+
+    public static PasswordChangeModel getPasswordChangeModel() {
+      return  new PasswordChangeModel("Password1@", "Password2@", "Password2@");
+    }
+  }
 }
