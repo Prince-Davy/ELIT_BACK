@@ -1,10 +1,12 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.exception.AttachmentNotFoundException;
+import com.elit.outildedecision.entity.Attachment;
+
 import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.service.implementation.AttachmentServiceImpl2;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.http.HttpEntity;
@@ -25,9 +30,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,15 +119,68 @@ class AttachementControllerTest {
   }
 
   @Test
-  void downloadAttachment() {
+  void downloadAttachment_whenAttachmentAndFile_doseExist() throws Exception {
+    HttpServletResponse httpServletResponse = new MockHttpServletResponse();
+    Attachment attachment = new Attachment();
+    attachment.setAttachmentId(attachmentId);
+    when(attachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/user/attachments/download/"+projectId+"/"+ attachmentId)
+      .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  void downloadAttachment_whenAttachment_doesNotExists() throws Exception {
+    HttpServletResponse httpServletResponse = new MockHttpServletResponse();
+    Attachment attachment = new Attachment();
+    attachment.setAttachmentId(3L);
+ when(attachmentRepository.findById(attachment.getAttachmentId())).thenReturn(Optional.empty()).thenThrow();
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/user/attachments/download/"+projectId+"/"+3L)
+      .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(200, response.getStatus());
   }
 
 
   @Test
-  void deleteAttachmentById() {
+  void deleteAttachmentById_whenAttachment_exists() throws Exception {
+    Attachment attachment = new Attachment();
+    attachment.setAttachmentId(attachmentId);
+    when(attachmentService.deleteAttachment(attachmentId)).thenReturn(ResponseEntity.ok().body("Fichier supprimé avec succès."));
+    // when -  action or the behaviour that we are going test
+    ResultActions response = mockMvc.perform(delete("/api/user/attachments/"+ attachmentId));
+    // then - verify the output
+    response.andExpect(status().isOk())
+      .andDo(print());
+    Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
   }
 
   @Test
-  void previewAttachmentWithoutDownload() {
+  void deleteAttachmentById_whenAttachment_doseNotExist() throws Exception {
+    Attachment attachment = new Attachment();
+    attachment.setAttachmentId(attachmentId);
+    when(attachmentService.deleteAttachment(attachmentId)).thenReturn(ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier."));
+    ResultActions response = mockMvc.perform(delete("/api/user/attachments/"+ attachmentId));
+    response.andExpect(status().isBadRequest())
+      .andDo(print());
+    Assertions.assertEquals(400, response.andReturn().getResponse().getStatus());
+  }
+
+  @Test
+  void previewAttachmentWithoutDownload_whenAttachment_exists() throws Exception {
+    HttpServletResponse httpServletResponse = new MockHttpServletResponse();
+    willDoNothing().given(attachmentService).openAttachment(attachmentId,httpServletResponse);
+    ResultActions response = mockMvc.perform(get("/api/user/attachments/preview/"+ projectId + "/"+ attachmentId));
+    response.andExpect(status().isOk())
+      .andDo(print());
+    Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
+  }
+
+  @Test
+  void previewAttachmentWithoutDownload_whenAttachment_doseNotexists() throws Exception {
+    when(attachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
+    ResultActions response = mockMvc.perform(get("/api/user/attachments/preview/"+ projectId + "/"+ attachmentId));
+    response.andExpect(status().isOk())
+      .andDo(print());
+    Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
   }
 }
