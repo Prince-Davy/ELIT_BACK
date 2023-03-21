@@ -1,20 +1,12 @@
 package com.elit.outildedecision.exception;
 
 public class QuestionFormatNotValidException extends Exception {
-
-  public QuestionFormatNotValidException() {
-    super();
-  }
-
-  public QuestionFormatNotValidException(String message) {
+  /**
+   * Constructor of QuestionFormatNotValidException.
+   * Exception thrown when the question format is not valid.
+   * @param message the message to display
+   */
+  public QuestionFormatNotValidException(final String message) {
     super(message);
-  }
-
-  public QuestionFormatNotValidException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public QuestionFormatNotValidException(Throwable cause) {
-    super(cause);
   }
 }

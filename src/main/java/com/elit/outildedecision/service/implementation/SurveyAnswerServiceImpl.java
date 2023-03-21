@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.SurveyAnswer;
@@ -16,58 +17,78 @@ import com.elit.outildedecision.service.SurveyAnswerService;
 import com.elit.outildedecision.util.AnswerType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 /**
- * class that allows to manage survey responses. Contains methods to answer to the survey, to get
- * user answers and to get the complete survey answers.
+ * Service implementation for survey answer operations.
+ * it is used to save the answers of the user to the questions
  */
 @Service("SurveyAnswerServiceImpl")
 public class SurveyAnswerServiceImpl implements SurveyAnswerService {
 
+  /**
+   * Repository for accessing survey answer data.
+   */
   private final SurveyAnswerRepository answerRepo;
+
+  /**
+   * Repository for accessing survey question data.
+   */
   private final SurveyQuestionRepository questionRepository;
+
+  /**
+   * Repository for accessing user data.
+   */
   private final UserRepository userRepository;
 
+  /**
+   * Constructor for creating a new SurveyAnswerServiceImpl instance.
+   *
+   * @param answerRepo         The survey answer repository to use.
+   * @param questionRepository The survey question repository to use.
+   * @param userRepository     The user repository to use.
+   */
   public SurveyAnswerServiceImpl(
-      SurveyAnswerRepository answerRepo,
-      SurveyQuestionRepository questionRepository,
-      UserRepository userRepository) {
+    final SurveyAnswerRepository answerRepo,
+    final SurveyQuestionRepository questionRepository,
+    final UserRepository userRepository) {
     this.answerRepo = answerRepo;
     this.questionRepository = questionRepository;
     this.userRepository = userRepository;
   }
 
   /**
-   * method used to answer to a survey
+   * Saves the specified user answers to the database.
    *
-   * @param userAnswerList represents a list of questions that user will respond on
-   * @return a list of questions with their answers.
+   * @param userAnswerList The list of user answers to save.
+   * @return A response entity with a message indicating that the responses have been saved.
+   * @throws UserNotFoundException      If the specified user does not exist.
+   * @throws QuestionsNotFoundException If the specified questions do not exist.
+   * @throws ResponseNotFoundException  If a required answer is missing.
+   * @throws ResponseNotValidException  If an answer is invalid.
    */
   @Override
   @Transactional
-  public ResponseEntity<String> replyToQuestion(List<SurveyAnswerRequestModel> userAnswerList)
-      throws UserNotFoundException, QuestionsNotFoundException, ResponseNotFoundException,
-          ResponseNotValidException {
+  public ResponseEntity<String> replyToQuestion(final List<SurveyAnswerRequestModel> userAnswerList)
+    throws UserNotFoundException, QuestionsNotFoundException, ResponseNotFoundException,
+    ResponseNotValidException {
 
     for (SurveyAnswerRequestModel userAnswer : userAnswerList) {
       SurveyAnswer response = new SurveyAnswer();
       User user =
-          userRepository
-              .findById(userAnswer.getUserId())
-              .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas"));
+        userRepository
+          .findById(userAnswer.getUserId())
+          .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas"));
       SurveyQuestion question =
-          questionRepository
-              .findById(userAnswer.getQuestionId())
-              .orElseThrow(() -> new QuestionsNotFoundException("questionnaire non existant"));
-      // sauvegarde de la réponse dans base de données :
+        questionRepository
+          .findById(userAnswer.getQuestionId())
+          .orElseThrow(() -> new QuestionsNotFoundException("questionnaire non existant"));
       response.setUser(user);
       response.setQuestion(question);
 
@@ -80,7 +101,7 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
             break;
           }
           throw new ResponseNotValidException(
-              "la réponse doit être un entier compris entre 1 et 5");
+            "la réponse doit être un entier compris entre 1 et 5");
         case FREE_ANSWER:
           response.setType(AnswerType.FREE_ANSWER);
           response.setAnswerValue(userAnswer.getAnswerValue());
@@ -94,11 +115,13 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
   }
 
   /**
-   * @param answerValue
-   * @return boolean
-   * @throws ResponseNotValidException
+   * Validates whether the specified answer value is valid for a selected answer.
+   *
+   * @param answerValue The answer value to validate.
+   * @return True if the answer value is valid, false otherwise.
+   * @throws ResponseNotValidException If the answer value is not valid.
    */
-  private boolean isAnswerValidated(String answerValue) throws ResponseNotValidException {
+  private boolean isAnswerValidated(final String answerValue) throws ResponseNotValidException {
     try {
       int value = Integer.parseInt(answerValue);
       return value >= 1 && value <= 5;
@@ -108,15 +131,15 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
   }
 
   /**
-   * method used to display answers for one user
+   * Retrieves the list of user answers for the specified user.
    *
-   * @param userId given in parameter and represents user for whom is asked to display survey
-   *     answers
-   * @return a list of user answers
+   * @param userId The ID of the user to retrieve answers for.
+   * @return A list of SurveyAnswerResponseModel objects representing the user's answers.
+   * @throws UserNotFoundException If the specified user does not exist.
    */
   @Override
-  public List<SurveyAnswerResponseModel> getUserAnswer(Long userId)
-      throws UserNotFoundException, ResponseNotFoundException {
+  public List<SurveyAnswerResponseModel> getUserAnswer(final Long userId)
+    throws UserNotFoundException {
 
     List<SurveyAnswerResponseModel> userAnswerList = new ArrayList<>();
 
@@ -125,9 +148,9 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
     }
 
     List<SurveyAnswer> answers =
-        answerRepo.findAll().stream()
-            .filter(e -> e.getUser().getUserId().equals(userId))
-            .collect(Collectors.toList());
+      answerRepo.findAll().stream()
+        .filter(e -> e.getUser().getUserId().equals(userId))
+        .collect(Collectors.toList());
 
     for (SurveyAnswer answer : answers) {
       SurveyAnswerResponseModel surveyAnswerResponseModel = new SurveyAnswerResponseModel();
@@ -140,36 +163,27 @@ public class SurveyAnswerServiceImpl implements SurveyAnswerService {
   }
 
   /**
-   * method used to display all result of survey
+   * Retrieves a page of survey answers for reporting purposes.
    *
-   * @return a list of survey result
+   * @param pageNumber The page number to retrieve.
+   * @return A list of SurveyAnswerResponseModel objects representing the survey answers.
    */
   @Override
-  public List<SurveyAnswerResponseModel> getSurveyReport(int pageNumber) {
+  public List<SurveyAnswerResponseModel> getSurveyReport(final int pageNumber) {
     Page<SurveyAnswer> surveyAnswers =
-        answerRepo.findAll(PageRequest.of(pageNumber - 1, 10)); // je récupère toutes
-    // mes réponse
+      answerRepo.findAll(PageRequest.of(pageNumber - 1, 10));
     List<SurveyAnswerResponseModel> surveyAnswerResponseModelList = new ArrayList<>();
     List<SurveyAnswer> surveyAnswersList = surveyAnswers.getContent();
     for (SurveyAnswer surveyAnswer : surveyAnswersList) {
-      SurveyAnswerResponseModel surveyAnswerResponseModel =
-          new SurveyAnswerResponseModel(); // je crée un nouvel
-      // object de mon
-      // model
-      // surveyAnswerResponseModel.setAnswer(surveyAnswer.getAnswer()); // je viens
-      // lui attribuer une réponse
-
+      SurveyAnswerResponseModel surveyAnswerResponseModel = new SurveyAnswerResponseModel();
       surveyAnswerResponseModel.setQuestionId(
-          surveyAnswer.getQuestion().getId()); // je viens lui attribuer l'id
-      // d'une question
+        surveyAnswer.getQuestion().getId());
       surveyAnswerResponseModel.setUserId(
-          surveyAnswer.getUser().getUserId()); // je viens lui attribuer l'id d'un
-      // user
+        surveyAnswer.getUser().getUserId());
       surveyAnswerResponseModel.setAnswer(surveyAnswer.getAnswerValue());
-
       surveyAnswerResponseModelList.add(
-          surveyAnswerResponseModel); // j'ajoute ce nouvel object dans mon tableau
+        surveyAnswerResponseModel);
     }
-    return surveyAnswerResponseModelList; // je retourne mon tableau avec mes différents objects.
+    return surveyAnswerResponseModelList;
   }
 }

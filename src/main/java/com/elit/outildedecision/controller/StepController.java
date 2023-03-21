@@ -4,7 +4,9 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.FormStepAlreadyExistsException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.StepWeightNotFoundException;
 import com.elit.outildedecision.service.FormStepService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +43,7 @@ public class StepController {
    * Get a step by its name and form id.
    * @param formId the form id
    * @param stepName the step name
+   * @throws StepFormNotFoundException when the step is not found in the database
    * @return FormStep
    */
   @GetMapping("/{formId}/{stepName}")
@@ -51,7 +54,10 @@ public class StepController {
   }
   /**
    * Create a step.
+   *
    * @param formStep FormStep object
+   * @throws FormStepAlreadyExistsException when the step already exists in the database
+   * @throws StepFormNotFoundException when the form is not found in the database
    * @return FormStep
    */
   @PostMapping(consumes = {"application/json"})
@@ -67,11 +73,16 @@ public class StepController {
   }
   /**
    * Update a step.
+   *
    * @param step FormStep object
+   * @throws StepFormNotFoundException when the step is not found in the database
+   * @throws QuestionsNotFoundException when the questions are not found in the database
+   * @throws StepWeightNotFoundException when the step weight is not found in the database
    * @return FormStep
    */
   @PutMapping
-  public ResponseEntity updateFormStep(@Valid @RequestBody final FormStep step) throws Exception {
+  public ResponseEntity updateFormStep(@Valid @RequestBody final FormStep step)
+    throws StepFormNotFoundException, QuestionsNotFoundException, StepWeightNotFoundException {
     return formStepService.updateFormStep(step);
   }
 }

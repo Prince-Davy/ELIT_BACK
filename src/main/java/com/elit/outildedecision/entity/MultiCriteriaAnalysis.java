@@ -10,8 +10,16 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -23,15 +31,15 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode(exclude = "project")
-public class MultiCriteriaAnalysis implements Serializable{
+public class MultiCriteriaAnalysis implements Serializable {
   @OneToMany(mappedBy = "multiCriteriaAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("multiCriteria_step")
-  List<FormStep> formSteps;
+  private List<FormStep> formSteps;
 
   @ManyToOne(optional = false, cascade = CascadeType.ALL)
   @JoinColumn(name = "project_id", referencedColumnName = "projectId")
   @JsonBackReference("multiCriteria_project")
-  Project project;
+  private Project project;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

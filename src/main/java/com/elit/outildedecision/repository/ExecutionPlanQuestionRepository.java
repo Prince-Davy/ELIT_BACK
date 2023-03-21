@@ -6,4 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ExecutionPlanQuestionRepository
-    extends JpaRepository<ExecutionPlanQuestion, Long> {}
+    extends JpaRepository<ExecutionPlanQuestion, Long> { }

@@ -25,6 +25,7 @@
  *   <li> {@link com.elit.outildedecision.controller.UserController} provides the endpoints to get and manipulate users data</li>
  *   <li> {@link com.elit.outildedecision.controller.VerificationController} provides the endpoints to verify users accounts and reset passwords</li>
  *   <li> {@link com.elit.outildedecision.controller.VoteController} provides the endpoints to manipulate votes in brainstorming sessions</li>
+ *   </ul>
  */
 
 package com.elit.outildedecision.controller;

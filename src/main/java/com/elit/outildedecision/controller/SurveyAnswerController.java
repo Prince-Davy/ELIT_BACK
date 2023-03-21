@@ -44,13 +44,17 @@ public class SurveyAnswerController {
    * method called to answer to a survey.
    *
    * @param userAnswerList represents a list of questions that user will respond on
+   * @throws UserNotFoundException if user is not found in database
+   * @throws QuestionsNotFoundException if questions are not found in database
+   * @throws ResponseNotFoundException if response is not found in database
+   * @throws ResponseNotValidException if the response is not valid
    * @return a list of questions with their answers.
    */
   @PostMapping
-  public ResponseEntity<String> replyToQuestion(
-      @RequestBody final List<@Valid SurveyAnswerRequestModel> userAnswerList)
-      throws UserNotFoundException, QuestionsNotFoundException, ResponseNotFoundException,
-          ResponseNotValidException {
+  public ResponseEntity<String> replyToQuestion(@RequestBody final List<@Valid SurveyAnswerRequestModel> userAnswerList) throws UserNotFoundException,
+    QuestionsNotFoundException,
+    ResponseNotFoundException,
+    ResponseNotValidException {
     return answerService.replyToQuestion(userAnswerList);
   }
   /**
@@ -58,6 +62,8 @@ public class SurveyAnswerController {
    *
    * @param userId given in parameter and represents user for whom is asked to display survey
    *     answers
+   * @throws UserNotFoundException if user is not found in database
+   * @throws ResponseNotFoundException if response is not found in database
    * @return a list of user answers
    */
   @GetMapping("/{userId}")

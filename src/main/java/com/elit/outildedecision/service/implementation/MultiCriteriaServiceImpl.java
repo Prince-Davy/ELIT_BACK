@@ -356,14 +356,13 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @param projectId the ID of the project to calculate the score for
    * @return a ResponseEntity containing the calculated score in a MultiCriteriaAnalysisScoreModel object
    * @throws QuestionsNotFoundException if the questions for the multi-criteria analysis cannot be found
-   * @throws IOException if there is an I/O exception while calculating the score
    * @throws EscoreException if there is an error while calculating the E-score
    */
   @Override
   @Transactional
   @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<MultiCriteriaAnalysisScoreModel> calculateMultiCriteriaAnalysisScore(final Long projectId)
-    throws QuestionsNotFoundException, IOException, EscoreException {
+    throws QuestionsNotFoundException, EscoreException {
     MultiCriteriaAnalysis multiCriteriaAnalysis =
       multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(projectId);
     List<FormStep> multiCriteriaAnalysisFormSteps = multiCriteriaAnalysis.getFormSteps();

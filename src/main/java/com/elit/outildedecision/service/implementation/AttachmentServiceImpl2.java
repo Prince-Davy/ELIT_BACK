@@ -160,7 +160,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       FileCopyUtils.copy(inputStream, response.getOutputStream());
 
     } else {
-      System.out.println("Ce fichier n'existe pas!");
+      System.err.println("Ce fichier n'existe pas!");
     }
   }
   /**
@@ -197,7 +197,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
 
       // Here we have mentioned it to show as attachment
       response.setHeader(
-          "Content-Disposition", String.format("attachment; filename=\"" + file.getName() + "\""));
+          "Content-Disposition", String.format("attachment; filename=\"", file.getName(), "\""));
 
       response.setContentLength((int) file.length());
 

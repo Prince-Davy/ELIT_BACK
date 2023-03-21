@@ -1,17 +1,15 @@
-package com.elit.outildedecision.service.implementation;
+package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.*;
-import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.VoteModelRequest;
-import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.VoteRepository;
+import com.elit.outildedecision.service.implementation.VoteServiceImpl;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,7 +20,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

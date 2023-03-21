@@ -7,7 +7,6 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.FormAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
@@ -120,7 +119,6 @@ public class ProjectServiceImpl implements ProjectService {
    * @throws UserNotFoundException if the chef or a contributer user cannot be found.
    * @throws ProjectNotFoundException if the project cannot be found.
    * @throws IOException if an I/O error occurs while creating the project directory.
-   * @throws FormAlreadyExistsException if the multicriteria analysis form already exists.
    * @throws ParseException if there is an error parsing the multicriteria analysis form.
    * @throws org.json.simple.parser.ParseException if there is an error parsing the multicriteria analysis form JSON.
    */
@@ -130,7 +128,6 @@ public class ProjectServiceImpl implements ProjectService {
     UserNotFoundException,
     ProjectNotFoundException,
     IOException,
-    FormAlreadyExistsException,
     ParseException,
     org.json.simple.parser.ParseException {
     Project projectToSave = new Project();

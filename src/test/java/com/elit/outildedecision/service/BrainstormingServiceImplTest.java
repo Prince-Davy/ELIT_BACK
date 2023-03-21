@@ -1,7 +1,8 @@
-package com.elit.outildedecision.service.implementation;
+package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.Brainstorming;
 import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.service.implementation.BrainstormingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.FormStep;
@@ -266,14 +267,14 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     switch (chooseMethodology.getName()) {
       case "CLASSIC":
         predictibilityAnalysis.setMethodology(
-            methodologyRepository.findMethodologyByName("Classique"));
+            methodologyRepository.findByName("Classique"));
         break;
       case "AGILE":
-        predictibilityAnalysis.setMethodology(methodologyRepository.findMethodologyByName("Agile"));
+        predictibilityAnalysis.setMethodology(methodologyRepository.findByName("Agile"));
         break;
       case "HYBRID":
         predictibilityAnalysis.setMethodology(
-            methodologyRepository.findMethodologyByName("Hybride"));
+            methodologyRepository.findByName("Hybride"));
         break;
       default:
         logger.error("La méthodologie n'est pas reconnue.");

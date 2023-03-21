@@ -5,8 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "step_weight")
@@ -15,16 +20,14 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StepWeight {
-  @ManyToOne()
-  @JoinColumn(name = "stepId", referencedColumnName = "stepId")
-  @JsonBackReference("step_weight")
-  FormStep formStep;
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long weightId;
-
   private String criteriaName;
   private String criteriaDescription;
   private float weightValue;
+  @ManyToOne()
+  @JoinColumn(name = "stepId", referencedColumnName = "stepId")
+  @JsonBackReference("step_weight")
+  private FormStep formStep;
 }

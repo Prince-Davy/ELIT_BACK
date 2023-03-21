@@ -128,7 +128,9 @@ public class FormStepServiceImpl implements FormStepService {
    *
    * @param formStep the FormStep object to update
    * @return a ResponseEntity object indicating the status of the operation
-   * @throws Exception if the FormStep does not exist in the database
+   * @throws StepFormNotFoundException   if the form step is not found.
+   * @throws QuestionsNotFoundException  if the questions are not found.
+   * @throws StepWeightNotFoundException if the step weights are not found.
    */
   @Override
   public ResponseEntity<String> updateFormStep(final FormStep formStep)

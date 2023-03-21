@@ -1,20 +1,12 @@
 package com.elit.outildedecision.exception;
 
 public class CouldNotSaveUserException extends Exception {
-
-  public CouldNotSaveUserException() {
-    super();
-  }
-
-  public CouldNotSaveUserException(String message) {
+  /**
+   * Constructor for CouldNotSaveUserException.
+   * Exception thrown when a user could not be saved.
+   * @param message the message to be displayed
+   */
+  public CouldNotSaveUserException(final String message) {
     super(message);
-  }
-
-  public CouldNotSaveUserException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public CouldNotSaveUserException(Throwable cause) {
-    super(cause);
   }
 }

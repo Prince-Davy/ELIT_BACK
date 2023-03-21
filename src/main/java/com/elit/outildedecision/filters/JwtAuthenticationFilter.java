@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,23 +24,30 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   private static final long EXPIRATION_TIME = 5 * 60 * 1000;
 
   @Value("${jwt.secret}")
-  String jwtSecret;
+  private String jwtSecret;
   private final AuthenticationManager authenticationManager;
-
-  public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-
+  /**
+   * Constructor of JwtAuthenticationFilter.
+   * @param authenticationManager the authentication manager
+   */
+  public JwtAuthenticationFilter(final AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;
   }
 
   /**
-   * @param request
-   * @param response
-   * @return Authentication
-   * @throws AuthenticationException
+   * This method is called when a POST request is made to /login
+   * We get the username and password from the request body
+   * and then we use the authentication manager to authenticate the user
+   * If the authentication is successful, we will generate a JWT token
+   * and send it back to the client.
+   * @param request the request
+   * @param response the response
+   * @return Authentication the authentication object that contains the authenticated user details
+   * @throws AuthenticationException if the authentication fails for any reason.
    */
   @Override
-  public Authentication attemptAuthentication(
-      HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+  public Authentication attemptAuthentication(final HttpServletRequest request,
+                                              final HttpServletResponse response) throws AuthenticationException {
     try {
       Map<String, String> requestMap =
           new ObjectMapper().readValue(request.getInputStream(), Map.class);
@@ -54,20 +60,25 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
       throw new AuthenticationServiceException(e.getMessage(), e);
     }
   }
-
+  /**
+   * This method is called when the authentication is successful
+   * We generate a JWT token and send it back to the client.
+   * @param request the request
+   * @param response the response
+   * @param chain the filter chain
+   * @param authResult the authentication object that contains the authenticated user details
+   * @throws IOException if there is an error while writing the token to the response body
+   */
   @Override
-  protected void successfulAuthentication(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain chain,
-      Authentication authResult)
-      throws IOException, ServletException {
-    System.out.println("jwtSecret = " + jwtSecret);
+  protected void successfulAuthentication(final HttpServletRequest request,
+                                          final HttpServletResponse response,
+                                          final FilterChain chain,
+                                          final Authentication authResult) throws IOException {
     AppUserPrincipal user =
         (AppUserPrincipal) authResult.getPrincipal(); // get the authenticated user
     Algorithm algorithm =
         Algorithm.HMAC256(jwtSecret.getBytes());
-    String access_token =
+    String accessToken =
         JWT.create()
             .withSubject(user.getUsername()) // the (email) of the authenticated user
             .withExpiresAt(
@@ -93,7 +104,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 "lastname", user.getUserLastName()) // the last name of the authenticated user
             .withClaim("id", user.getUser().getUserId()) // the user id of the authenticated user
             .sign(algorithm); // sign the token using our secret
-    String refresh_token =
+    String refreshToken =
         JWT.create()
             .withSubject(user.getUsername()) // the username of the authenticated user
             .withExpiresAt(
@@ -107,8 +118,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .sign(algorithm); // sign the token using our secret
     Map<String, String> tokens = new HashMap<>();
 
-    tokens.put("access-token", access_token);
-    tokens.put("refresh-token", refresh_token);
+    tokens.put("access-token", accessToken);
+    tokens.put("refresh-token", refreshToken);
     // response.addHeader("Access-Control-Allow-Origin", "*"); // this one allows to
     // escape the CORS problem
     new ObjectMapper()
@@ -116,10 +127,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // body
   }
 
+  /**
+   * This method is called when the authentication is unsuccessful.
+   * We send an error message to the client.
+   * @param request the request
+   * @param response the response
+   * @param failed the exception that caused the authentication to fail
+   * @throws IOException if there is an error while writing the error message to the response body
+   */
   @Override
-  protected void unsuccessfulAuthentication(
-      HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
-      throws IOException, ServletException {
+  protected void unsuccessfulAuthentication(final HttpServletRequest request,
+                                            final HttpServletResponse response,
+                                            final AuthenticationException failed) throws IOException {
     // super.unsuccessfulAuthentication(request, response, failed);
     Map<String, String> errors = new HashMap<>();
     errors.put("access-token", "access_token");
