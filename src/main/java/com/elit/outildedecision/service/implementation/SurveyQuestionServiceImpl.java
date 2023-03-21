@@ -1,40 +1,44 @@
+
 package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.SurveyQuestion;
-import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
 import com.elit.outildedecision.repository.SurveyQuestionRepository;
 import com.elit.outildedecision.service.SurveyQuestionService;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+
 /**
- * NOT USED FOR THIS API class used to manage survey questions. Contains methods to display, create,
- * delete or modify survey questions.
+ * Service implementation for survey question operations.
+ * it is used to save, modify and delete the questions of the survey
  */
 @Service
 public class SurveyQuestionServiceImpl implements SurveyQuestionService {
 
   private final SurveyQuestionRepository questionRepo;
 
-  public SurveyQuestionServiceImpl(SurveyQuestionRepository questionRepo) {
+  /**
+   * Constructor for creating a new SurveyQuestionServiceImpl instance.
+   *
+   * @param questionRepo question Repository to use
+   */
+  public SurveyQuestionServiceImpl(final SurveyQuestionRepository questionRepo) {
     this.questionRepo = questionRepo;
   }
 
   /**
-   * method used to add a new question to the survey
+   * Creates a new survey question.
    *
-   * @param question represents the new question to add on survey
-   * @return added question. return needed for API testing
+   * @param question The survey question to create.
+   * @return The created survey question.
+   * @throws QuestionFormatNotValidException If the specified question format is not valid.
    */
   @Override
-  public SurveyQuestion createQuestion(SurveyQuestion question)
-      throws QuestionFormatNotValidException {
+  public SurveyQuestion createQuestion(final SurveyQuestion question)
+    throws QuestionFormatNotValidException {
     if (Objects.isNull(question)) {
       throw new QuestionFormatNotValidException("question format not valid");
     }
@@ -42,36 +46,17 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
   }
 
   /**
-   * @return SurveyQuestion
-   */
-  // @Override
-  // public SurveyQuestion createQuestion(){
-  // String[] questionList = {
-  // "Dans quelle mesure êtes-vous satisfait de l'ensemble de l'experience ?",
-  // "Dans quelle mésure pensez-vous que ce processus de décision a permis de
-  // découvrir des limites? (découverte des limites)",
-  // "Dans quelle mésure le processus de décision a-t-il aidé à résoudre les
-  // problèmes identifiés ?",
-  // "Après avoir participé (individuellement/collectivement) à ce processus, une
-  // execution (individuellement/collectivement) serait-elle plus efficace ?"
-  // };
-  // for (String qst : questionList
-  // ) {
-  // if(Objects.isNull(questionRepo.findByQuestion(qst))){
-  // questionRepo.save(SurveyQuestion.builder().question(qst).build());
-  // }
-  // }
-  // }
-
-  /**
-   * method used to modify an existing question.
+   * Modifies an existing survey question.
    *
-   * @param question given in parameter and contains modification to apply.
-   * @return updated question. return needed for API testing
+   * @param questionId The ID of the survey question to modify.
+   * @param question The modified survey question.
+   * @return The modified survey question.
+   * @throws QuestionFormatNotValidException If the specified question format is not valid.
    */
   @Override
-  public SurveyQuestion modifyQuestion(Long questionId, SurveyQuestion question)
-      throws QuestionFormatNotValidException {
+  public SurveyQuestion modifyQuestion(final Long questionId,
+                                       final SurveyQuestion question)
+    throws QuestionFormatNotValidException {
     if (Objects.isNull(question)) {
       throw new QuestionFormatNotValidException("question format not valid");
     }
@@ -84,13 +69,14 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
   }
 
   /**
-   * method used to remove a question on survey
+   * Deletes a survey question.
    *
-   * @param questionId given in parameter and represents the id of the existing question to delete
-   * @return deleted question. return needed for API testing
+   * @param questionId The ID of the survey question to delete.
+   * @return The deleted survey question, wrapped in an Optional.
+   * @throws RuntimeException If the specified question cannot be found.
    */
   @Override
-  public Optional<SurveyQuestion> deleteQuestion(Long questionId) {
+  public Optional<SurveyQuestion> deleteQuestion(final Long questionId) {
     Optional<SurveyQuestion> toBeDeleted = questionRepo.findById(questionId);
     if (questionId.equals(toBeDeleted.get().getId())) {
       questionRepo.deleteById(questionId);
@@ -101,13 +87,14 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
   }
 
   /**
-   * method used to select and display an existing question
+   * Retrieves a survey question by ID.
    *
-   * @param questionId given in parameter and represents the desired question to display
-   * @return selected question.
+   * @param questionId The ID of the survey question to retrieve.
+   * @return The survey question, wrapped in an Optional.
+   * @throws RuntimeException If the specified question cannot be found.
    */
   @Override
-  public Optional<SurveyQuestion> selectQuestion(Long questionId) {
+  public Optional<SurveyQuestion> selectQuestion(final Long questionId) {
     if (questionRepo.findById(questionId).isPresent()) {
       return questionRepo.findById(questionId);
     } else {
@@ -116,12 +103,13 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
   }
 
   /**
-   * method used to display all questions that belong to the survey
+   * Retrieves a list of all survey questions.
    *
-   * @return a list of all existing questions on survey
+   * @return A list of SurveyQuestion objects representing all survey questions.
    */
   @Override
   public List<SurveyQuestion> getQuestionsList() {
     return questionRepo.findAll();
   }
 }
+

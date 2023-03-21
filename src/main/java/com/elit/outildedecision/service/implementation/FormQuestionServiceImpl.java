@@ -43,9 +43,9 @@ public class FormQuestionServiceImpl implements FormQuestionService {
    * @param formStepRepo is the repository of the FormStep entity
    */
   public FormQuestionServiceImpl(
-      CriteriaService criteriaService,
-      FormQuestionRepository formQuestionRepository,
-      FormStepRepo formStepRepo) {
+      final CriteriaService criteriaService,
+      final FormQuestionRepository formQuestionRepository,
+      final FormStepRepo formStepRepo) {
     this.criteriaService = criteriaService;
     this.formQuestionRepository = formQuestionRepository;
     this.formStepRepo = formStepRepo;
@@ -60,8 +60,9 @@ public class FormQuestionServiceImpl implements FormQuestionService {
    * @return the set of created formQuestions
    */
   @Override
-  public Set<FormQuestion> createFormQuestions(
-      Set<FormQuestion> formQuestions, Set<Criteria> criterias, Long stepId) {
+  public Set<FormQuestion> createFormQuestions(final Set<FormQuestion> formQuestions,
+                                               final Set<Criteria> criterias,
+                                               final Long stepId) {
     FormStep formStep = formStepRepo.getById(stepId);
     Set<FormQuestion> persistedFormQuestions = new HashSet<>();
 
@@ -88,7 +89,7 @@ public class FormQuestionServiceImpl implements FormQuestionService {
    * @throws Exception if the formQuestion doesn't exist
    */
   @Override
-  public FormQuestion updateFormQuestion(FormQuestion formQuestion) throws QuestionsNotFoundException {
+  public FormQuestion updateFormQuestion(final FormQuestion formQuestion) throws QuestionsNotFoundException {
     Optional<FormQuestion> formQuestionFromDB =
         formQuestionRepository.findById(formQuestion.getQuestionId());
     if (!formQuestionFromDB.isPresent()) {

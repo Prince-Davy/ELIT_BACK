@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.util;
 
 public enum ProjectPermession {
@@ -5,8 +6,12 @@ public enum ProjectPermession {
   CONTRIBUTER("Contributeur"),
   CDP("Chef de Projet");
   private final String permessionName;
-
-  ProjectPermession(String permessionName) {
+  /**
+   * Constructor for creating a new ProjectPermession instance.
+   *
+   * @param permessionName The name of the permession.
+   */
+  ProjectPermession(final String permessionName) {
     this.permessionName = permessionName;
   }
 

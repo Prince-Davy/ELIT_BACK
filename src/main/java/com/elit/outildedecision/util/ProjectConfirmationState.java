@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.util;
 
 public enum ProjectConfirmationState {
@@ -7,7 +8,12 @@ public enum ProjectConfirmationState {
 
   private final String stateName;
 
-  ProjectConfirmationState(String stateName) {
+  /**
+   * Constructor for creating a new ProjectConfirmationState instance.
+   *
+   * @param stateName The name of the state.
+   */
+  ProjectConfirmationState(final String stateName) {
     this.stateName = stateName;
   }
 

@@ -1,3 +1,4 @@
+
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
@@ -10,33 +11,44 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-/** interface used to lead the surveyAnswer service class */
+/**
+ * This interface defines the contract for the Survey Answer Service, which provides methods to record and retrieve
+ * survey answers and responses.
+ */
 public interface SurveyAnswerService {
 
   /**
-   * recover answer sent by the user
+   * Records the user's responses to the specified survey questions.
    *
-   * @param userAnswer objet that contain all information about the answer given (user
-   *     identification, question, and response)
-   * @return question and its answer
+   * @param userAnswer a List of SurveyAnswerRequestModel objects representing the user's responses to the survey
+   *                    questions
+   * @return a ResponseEntity indicating the success or failure of the response recording operation
+   * @throws UserNotFoundException if the specified user does not exist
+   * @throws QuestionsNotFoundException if the specified questions do not exist
+   * @throws ResponseNotFoundException if the specified response does not exist
+   * @throws ResponseNotValidException if the specified response is not valid
    */
   ResponseEntity<String> replyToQuestion(List<SurveyAnswerRequestModel> userAnswer)
-      throws UserNotFoundException, QuestionsNotFoundException, ResponseNotFoundException,
-          ResponseNotValidException;
+    throws UserNotFoundException, QuestionsNotFoundException, ResponseNotFoundException,
+    ResponseNotValidException;
 
   /**
-   * display response given by one user on survey
+   * Retrieves the user's responses to survey questions.
    *
-   * @param userId represents user that responding to the survey
-   * @return user answers
+   * @param userId the ID of the user whose survey responses to retrieve
+   * @return a List of SurveyAnswerResponseModel objects representing the user's survey responses
+   * @throws UserNotFoundException if the specified user does not exist
+   * @throws ResponseNotFoundException if the specified response does not exist
    */
   List<SurveyAnswerResponseModel> getUserAnswer(Long userId)
-      throws UserNotFoundException, ResponseNotFoundException;
+    throws UserNotFoundException, ResponseNotFoundException;
 
   /**
-   * display all results for all users on the survey
+   * Retrieves a paginated list of survey responses.
    *
-   * @return satisfactory survey results
+   * @param pageNumber the page number to retrieve
+   * @return a List of SurveyAnswerResponseModel objects representing the survey responses
    */
   List<SurveyAnswerResponseModel> getSurveyReport(int pageNumber);
 }
+

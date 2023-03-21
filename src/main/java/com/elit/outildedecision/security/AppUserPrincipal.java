@@ -32,7 +32,7 @@ public class AppUserPrincipal implements UserDetails {
    * @return the user email associated with the principal.
    */
   @Override
-  public String getUsername(){
+  public String getUsername() {
     return user.getUserEmail();
   }
 
@@ -41,7 +41,7 @@ public class AppUserPrincipal implements UserDetails {
    *
    * @return the first name of the user.
    */
-  public String getUserFirstName(){
+  public String getUserFirstName() {
     return user.getUserFirstName();
   }
 
@@ -50,7 +50,7 @@ public class AppUserPrincipal implements UserDetails {
    *
    * @return the last name of the user.
    */
-  public String getUserLastName(){
+  public String getUserLastName() {
     return user.getUserLastName();
   }
 
@@ -60,7 +60,7 @@ public class AppUserPrincipal implements UserDetails {
    * @return true, as the user account never expires.
    */
   @Override
-  public boolean isAccountNonExpired(){
+  public boolean isAccountNonExpired() {
     return true;
   }
 

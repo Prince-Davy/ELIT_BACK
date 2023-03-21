@@ -7,7 +7,12 @@ public enum MethodologyTypes {
 
   private final String MethodologyTypesName;
 
-  MethodologyTypes(String reportTypeName) {
+  /**
+   * Constructor for creating a new MethodologyTypes instance.
+   *
+   * @param reportTypeName The name of the report type.
+   */
+  MethodologyTypes(final String reportTypeName) {
     this.MethodologyTypesName = reportTypeName;
   }
 
