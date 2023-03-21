@@ -150,8 +150,10 @@ class MultiCriteriaAnalysisControllerTest {
   @Test
   void getMulticriteriaAnalysisScore_whenEscoreQuestionsDoseNotExists() throws Exception {
     Long projectId = 1L;
-    when(multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId)).thenThrow(new EscoreException());
+    when(multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId)).thenThrow(new EscoreException("score n'existe pas"));
     MockHttpServletResponse response = mockMvc.perform(get("/api/multi-criteria-analysis/"+projectId+"/score")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(406, response.getStatus());
   }
 }
+
+
