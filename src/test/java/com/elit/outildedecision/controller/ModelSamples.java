@@ -1,8 +1,6 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.entity.Brainstorming;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.entity.VerificationToken;
+import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.FormStepModelForBrainstorming;
 import com.elit.outildedecision.model.UserModel;
@@ -32,6 +30,11 @@ public class ModelSamples {
       return createResponseModel(1L, "username", "lastname",
         "firstname", "user@user.com", "developer",
         null);
+    }
+
+    public static FormStep getCreateFormStep(){
+      MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+      return createFormStep(1L,"NameStep", 2L,4F,multiCriteriaAnalysis);
     }
 
     public static FormStepModelForBrainstorming getFormStepModelForBrainstorming(){
@@ -98,6 +101,17 @@ public class ModelSamples {
       modelForBrainstorming.setMultiCriteriaAnalysisId(multiCriteriaAnalysisId);
       modelForBrainstorming.setFormQuestions(formQuestions);
       return modelForBrainstorming;
+    }
+
+    public static FormStep createFormStep(Long stepId, String stepName, Long stepRef, Float eScore, MultiCriteriaAnalysis multiCriteriaAnalysis ){
+      FormStep formStep = new FormStep();
+      formStep.setStepId(stepId);
+      formStep.setStepName(stepName);
+      formStep.setStepRef(stepRef);
+      formStep.setEScore(eScore);
+      formStep.setMultiCriteriaAnalysis(multiCriteriaAnalysis);
+
+      return null;
     }
 
   }
