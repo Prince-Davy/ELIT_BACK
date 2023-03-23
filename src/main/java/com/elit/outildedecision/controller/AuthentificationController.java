@@ -56,8 +56,8 @@ public class AuthentificationController {
    * Instantiates a new Authentification controller.
    * dependency injection via constructor of the user service
    *
-   * @param jwtSecret
-   * @param userService the user service
+   * @param jwtSecret a String containing the JWT secret used for authentication and authorization.
+   * @param userService  userService an instance of the UserService class, used to interact with the user data store.
    */
   public AuthentificationController(@Value("${jwt.secret}") final String jwtSecret, final UserService userService) {
     this.jwtSecret = jwtSecret;
@@ -70,6 +70,7 @@ public class AuthentificationController {
    * @param user the user to register
    * @return ResponseEntity<String>
    * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
+   * @throws UserAlreadyExistsException the exception thrown when the user already exist
    */
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid final UserModel user)

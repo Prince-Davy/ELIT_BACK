@@ -501,12 +501,11 @@ public class ProjectServiceImpl implements ProjectService {
    * @param projectId The ID of the project to be deleted.
    * @return ResponseEntity with a message indicating the success of the operation.
    * @throws ProjectNotFoundException if the project with the given ID does not exist.
-   * @throws IOException if there is an error deleting the project files.
    */
   @Override
   @Transactional
   public ResponseEntity<String> deleteProject(final Long projectId)
-      throws ProjectNotFoundException, IOException {
+      throws ProjectNotFoundException {
     Project projectToDelete =
         projectRepository
             .findById(projectId)
