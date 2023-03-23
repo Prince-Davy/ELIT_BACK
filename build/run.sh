@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Be aware to put site at the end of the command, exitcode bug. 
-# mvn -ntp checkstyle:check pmd:check clean verify site
-mvn verify site
-
+# Remove downloading log in order to save VM space
+# Be aware to put site at the end of the command, exitcode bug.
+mvn -ntp checkstyle:check pmd:check clean verify site
 export exitcode=$?
 
 #check mvn result and exitcode=1 if failed
 if [ "$exitcode" -ne "0" ]; then
   echo "mvn failed"
-  # export exitcode=1   ## Warning : uncomment after the end of migration
+  export exitcode=1
+fi
 
 # Print coverage total for gitlab badge
 awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print "Total",  int(100*covered/instructions), "%" }' target/site/jacoco/jacoco.csv > target/coverage-output.txt
@@ -20,16 +20,16 @@ export cov=`grep -E "Total.*?([0-9]{1,3}) %" target/coverage-output.txt | cut -d
 #check coverage result if failed exitcode=1
 if [ "${PIPESTATUS[0]}" -ne "0" ] ; then
   echo "Coverage failed"
-  # export exitcode=1
+  export exitcode=1
 #in other case print anybadge
 elif [[ $(bc -l <<< "$cov<30.0") -eq 1 ]] ; then
   export color=red
-  # export exitcode=1          ## Warning : uncomment after the end of migration
+  export exitcode=1
   echo "Coverage under 30%"
   anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
 elif [[ $(bc -l <<< "$cov<60.0") -eq 1 ]] ; then
   export color=orange
-  # export exitcode=1          ## Warning : uncomment after the end of migration
+  export exitcode=1
   echo "Coverage under 60%"
   anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
 elif [[ $(bc -l <<< "$cov>=60.0") -eq 1 ]] ; then

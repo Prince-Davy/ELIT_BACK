@@ -105,11 +105,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
-      <scope>test</scope>
-    </dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty -->
 		<dependency>
 			<groupId>com.google.oauth-client</groupId>
