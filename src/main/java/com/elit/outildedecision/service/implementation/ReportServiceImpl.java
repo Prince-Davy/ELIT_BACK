@@ -263,20 +263,20 @@ public class ReportServiceImpl implements ReportService {
         .findById(reportId)
         .orElseThrow(() -> new ReportNotFoundException("Ce rapport n'existe pas."));
 
-    File file = new File(report.getReportPath());
+    File fileReport = new File(report.getReportPath());
 
-    if (file.exists()) {
-      String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+    if (fileReport.exists()) {
+      String mimeType = URLConnection.guessContentTypeFromName(fileReport.getName());
       if (mimeType == null) {
         mimeType = "application/octet-stream";
       }
 
       response.setContentType(mimeType);
       response.setHeader(
-        "Content-Disposition", String.format("inline; filename=\"" + file.getName() + "\""));
-      response.setContentLength((int) file.length());
+        "Content-Disposition", String.format("inline; filename=\"" + fileReport.getName() + "\""));
+      response.setContentLength((int) fileReport.length());
 
-      InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+      InputStream inputStream = new BufferedInputStream(new FileInputStream(fileReport));
       FileCopyUtils.copy(inputStream, response.getOutputStream());
     } else {
       throw new ReportNotFoundException("Le rapport n'existe pas.");
