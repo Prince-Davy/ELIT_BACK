@@ -7,8 +7,7 @@ import com.elit.outildedecision.model.PredictibilityScoreModel;
 import com.elit.outildedecision.service.PredictibilityAnalysisService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,12 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
 class PredictibilityAnalysisControllerTest {
   @Autowired
   private MockMvc mockMvc;
   @MockBean
    private PredictibilityAnalysisService predictibilityAnalysisService;
+  @InjectMocks
+  PredictibilityAnalysisController PredictibilityAnalysisController;
 
   @Test
   void createPredictibilityAnalysis() throws Exception {

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
 class MultiCriteriaAnalysisControllerTest {
   @Autowired
   private MockMvc mockMvc;
@@ -39,6 +38,8 @@ class MultiCriteriaAnalysisControllerTest {
   MultiCriteriaAnalysisService multiCriteriaAnalysisService;
   @MockBean
   ProjectRepository projectRepository;
+  @InjectMocks
+  MultiCriteriaAnalysisController MultiCriteriaAnalysisController;
 
   public static String asJsonString(final Object obj) {
     try {
