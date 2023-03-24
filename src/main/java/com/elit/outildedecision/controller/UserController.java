@@ -37,7 +37,6 @@ public class UserController {
   private final UserService userService;
   /**
    * Constructor of UserController.
-   *
    * dependency injection of UserService to manage users.
    * @param userService UserService
    */
@@ -57,12 +56,11 @@ public class UserController {
     return userService.findUsersByKeyword(keyword);
   }
   /**
-   * Method to call to update user's informations.
+   * Method to call to update user's information.
    *
-   * @param userModel UserModel that contains the new informations
+   * @param userModel UserModel that contains the new information
    * @return List of UserResponseModel that match the keyword
    * @throws CouldNotSaveUserException when the user could not be saved in database
-   * @throws IOException IOException
    */
   @PutMapping(
       value = "/user/update",
@@ -72,10 +70,10 @@ public class UserController {
     return userService.updateUser(userModel);
   }
   /**
-   * Method to call to get user's informations by id.
+   * Method to call to get user's information by id.
    *
    * @param userId id of the user
-   * @return UserResponseModel that contains the user's informations
+   * @return UserResponseModel that contains the user's information
    * @throws IOException IOException
    */
   @GetMapping("/user/{userId}")
@@ -89,7 +87,7 @@ public class UserController {
    * @param userId id of the user
    * @param oldPass old password of the user
    * @param newPass new password of the user
-   * @return UserResponseModel that contains the user's informations
+   * @return UserResponseModel that contains the user's information
    * @throws IOException IOException
    * @throws CouldNotSaveUserException when the user could not be saved in database
    */
@@ -107,7 +105,7 @@ public class UserController {
    *
    * @param userId id of the user
    * @param userAvatar the new avatar of the user
-   * @return UserResponseModel that contains the user's informations
+   * @return UserResponseModel that contains the user's information
    * @throws IOException IOException
    * @throws CouldNotSaveUserException when the user could not be saved in database
    * @throws UserNotFoundException when the user could not be found in database
@@ -121,12 +119,12 @@ public class UserController {
     return userService.updateAvatarByIdUser(userId, userAvatar);
   }
   /**
-   * Method to call to update user's informations by id.
+   * Method to call to update user's information by id.
    *
    * @param userId id of the user
    * @param userFirstName the new first name of the user
    * @param userLastName the new last name of the user
-   * @return UserResponseModel that contains the user's informations
+   * @return UserResponseModel that contains the user's information
    * @throws IOException IOException
    * @throws CouldNotSaveUserException when the user could not be saved in database
    */
