@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,8 +24,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+/**
+ * Unit test for PredictibilityAnalysisController
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class PredictibilityAnalysisControllerTest {
   @Autowired
   private MockMvc mockMvc;
@@ -42,7 +47,7 @@ class PredictibilityAnalysisControllerTest {
   }
 
   @Test
-  void createPredictibilityAnalysis_whenProjectDoseNotExist() throws Exception {
+  void createPredictibilityAnalysis_whenProjectDoseNotExist()  {
     Long projectId = 1L;
     when(predictibilityAnalysisService.createPredictibilityForm(projectId)).thenThrow(new RuntimeException("Ce projet n'existe pas"));
     Exception exception = assertThrows(RuntimeException.class, () -> {

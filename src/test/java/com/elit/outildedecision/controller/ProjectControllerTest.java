@@ -1,10 +1,9 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.entity.ProjectUserPermission;
-import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
@@ -23,18 +22,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class ProjectControllerTest {
   @Autowired
   private MockMvc mockMvc;
@@ -192,12 +191,59 @@ class ProjectControllerTest {
     Assertions.assertEquals(404, response.getStatus());
   }
 
-
+  @WithMockUser(authorities = {"ADMIN","USER"})
   @Test
-  void addProjectContributor() {
+  void addProjectContributor() throws Exception {
+    Long projectId = 1L;
+    ContributerModel contributor = new ContributerModel();
+    when(projectService.addProjectContributor(projectId, contributor)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien enregistré"));
+    Assertions.assertEquals("Le collaborateur a été bien enregistré", projectService.addProjectContributor(projectId, contributor).getBody());
   }
-
+  @WithMockUser(authorities = {"ADMIN","USER"})
   @Test
-  void deleteProjectContributor() {
+  void addProjectContributor_whenProjectNotFound() throws Exception {
+    Long projectId = 1L;
+    ContributerModel contributor = new ContributerModel();
+    when(projectService.addProjectContributor(projectId, contributor)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas! "));
+    Exception exception = assertThrows(ProjectNotFoundException.class, () -> {
+      projectService.addProjectContributor(projectId, contributor);
+    });
+    String expectedMessage ="Ce Projet n'existe pas! ";
+    String actualMessage = exception.getMessage();
+    assertTrue(actualMessage.contains(expectedMessage));
+  }
+  @WithMockUser(authorities = {"ADMIN","USER"})
+  @Test
+  void deleteProjectContributor() throws Exception {
+    Long projectId = 1L;
+    Long contributorID =2L;
+    when(projectService.deleteProjectContributor(projectId, contributorID)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet"));
+    Assertions.assertEquals("Le collaborateur a été bien retiré du projet", projectService.deleteProjectContributor(projectId, contributorID).getBody());
+  }
+  @WithMockUser(authorities = {"ADMIN","USER"})
+  @Test
+  void deleteProjectContributor_whenProjectNotFound() throws Exception {
+    Long projectId = 1L;
+    Long contributorID =2L;
+    when(projectService.deleteProjectContributor(projectId, contributorID)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas!"));
+    Exception exception = assertThrows(ProjectNotFoundException.class, () -> {
+      projectService.deleteProjectContributor(projectId, contributorID);
+    });
+    String expectedMessage ="Ce Projet n'existe pas!";
+    String actualMessage = exception.getMessage();
+    assertTrue(actualMessage.contains(expectedMessage));
+  }
+  @WithMockUser(authorities = {"ADMIN","USER"})
+  @Test
+  void deleteProjectContributor_whenUserNotFound() throws Exception {
+    Long projectId = 1L;
+    Long contributorID =2L;
+    when(projectService.deleteProjectContributor(projectId, contributorID)).thenThrow(new ProjectNotFoundException("Cet utilisateur n'existe pas dans le projet !"));
+    Exception exception = assertThrows(ProjectNotFoundException.class, () -> {
+      projectService.deleteProjectContributor(projectId, contributorID);
+    });
+    String expectedMessage ="Cet utilisateur n'existe pas dans le projet !";
+    String actualMessage = exception.getMessage();
+    assertTrue(actualMessage.contains(expectedMessage));
   }
 }
