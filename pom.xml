@@ -33,7 +33,7 @@
     <maven-project-info-reports.version>3.2.2</maven-project-info-reports.version>
     <maven-jxr.version>3.0.0</maven-jxr.version>
     <maven-javadoc.version>3.2.0</maven-javadoc.version>
-    <maven-pmd.version>3.14.0</maven-pmd.version>
+    <maven-pmd.version>3.2.0</maven-pmd.version>
     <maven-surefire-report.version>3.0.0-M5</maven-surefire-report.version>
 	</properties>
 	<dependencies>
