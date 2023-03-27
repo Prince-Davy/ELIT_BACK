@@ -294,7 +294,7 @@ public class ProjectServiceImpl implements ProjectService {
       return projects.stream()
         .filter(
           project ->
-            (Objects.nonNull(project.getDescription()) && project.getDescription().contains(keyword))
+            Objects.nonNull(project.getDescription()) && project.getDescription().contains(keyword)
               || project.getName().contains(keyword))
         .collect(Collectors.toList());
     }
