@@ -41,10 +41,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BrainstormingServiceImpl implements BrainstormingService {
-  /**
-   * the minimum score that a form step must have to be considered as a good one in terms of score.
-   */
-  private static final double MINIMUM_SCORE = 0.5;
+
   /**
    * the brainstorming repository that will be used to access the data.
    */
