@@ -7,6 +7,7 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
@@ -82,6 +83,10 @@ public class ProjectServiceImpl implements ProjectService {
   @Value("${file.upload-dir}")
   private String storingDirectory;
   /**
+   * The PROJECT_NOT_FOUND message.
+   */
+  private static final String PROJECT_NOT_FOUND = "Ce Projet n'existe pas!";
+  /**
    * The constructor of the ProjectServiceImpl class.
    * used for dependency injection.
    * @param projectRepository The projectRepository for accessing the project objects in the
@@ -129,7 +134,7 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectNotFoundException,
     IOException,
     ParseException,
-    org.json.simple.parser.ParseException {
+    org.json.simple.parser.ParseException, FileCouldNotBeSaved {
     Project projectToSave = new Project();
     // getting the connected user
     String chefEmail =
@@ -138,12 +143,12 @@ public class ProjectServiceImpl implements ProjectService {
     Date dateOfCreation = new Date();
     String folderName = dateOfCreation.getTime() + "_" + project.getName();
     File projectDirectory =
-        new File(storingDirectory + folderName.replaceAll(" ", "_").toLowerCase());
+        new File(storingDirectory + folderName.replace(" ", "_").toLowerCase());
     if (projectDirectory.exists()) {
       throw new ProjectFolderAlreadyExistsException("Dossier du projet dupliqué, réessayer plus tard.");
     }
     projectDirectory.mkdirs();
-    projectToSave.setFolderPath(folderName.replaceAll(" ", "_").toLowerCase());
+    projectToSave.setFolderPath(folderName.replace(" ", "_").toLowerCase());
     projectToSave.setChefId(chef.getUserId());
     projectToSave.setDescription(project.getDescription());
     projectToSave.setName(project.getName());
@@ -163,7 +168,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectUserPermission.setPermission(
             user.getUserId().equals(chef.getUserId())
                 ? ProjectPermession.CDP.name()
-                : contributer.getRole()); // TODO : à fixer ajout du CDP
+                : contributer.getRole());
         projectUserPermission.setId(new ProjectPropertyKey(projectId, user.getUserId()));
         projectUserPermissionRepository.save(projectUserPermission);
       }
@@ -232,7 +237,6 @@ public class ProjectServiceImpl implements ProjectService {
    * @param keyword the keyword to search for.
    * @return the list of projects of a user.
    */
-  //TODO : See if this is a duplicated
   @Override
   public List<ProjectResponseModel> getUserProjectList(final String keyword) {
     String principal =
@@ -286,17 +290,15 @@ public class ProjectServiceImpl implements ProjectService {
                 null));
       }
     }
-    if (keyword != null) {
-      if (!"".equals(keyword)) {
-        return projects.stream()
-            .filter(
-                project ->
-                    (Objects.nonNull(project.getDescription())
-                            && project.getDescription().contains(keyword))
-                        || project.getName().contains(keyword))
-            .collect(Collectors.toList());
-      }
+    if (keyword != null && !keyword.isEmpty()) {
+      return projects.stream()
+        .filter(
+          project ->
+            (Objects.nonNull(project.getDescription()) && project.getDescription().contains(keyword))
+              || project.getName().contains(keyword))
+        .collect(Collectors.toList());
     }
+
     return projects;
   }
   /**
@@ -317,30 +319,29 @@ public class ProjectServiceImpl implements ProjectService {
     Project projectToConfirm =
         projectRepository
             .findById(id)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas!"));
+            .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
 
     ProjectConfirmationState projectConfirmationState =
         ProjectConfirmationState.valueOf(projectToConfirm.getConfirmationState());
 
     Map<String, Boolean> result =
         new ObjectMapper().readValue(isConfirmed.getBody(), HashMap.class);
-    if (result.get("isConfirmed")) {
-      switch (projectConfirmationState) {
-        case CONFIRMED:
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ce projet est déjà validé");
-        default:
-          projectToConfirm.setConfirmationState(ProjectConfirmationState.CONFIRMED.name());
-          projectRepository.save(projectToConfirm);
-          return ResponseEntity.ok().body("Le Projet a été validé");
+    if (Boolean.TRUE.equals(result.get("isConfirmed"))) {
+      if (projectConfirmationState == ProjectConfirmationState.CONFIRMED) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ce projet est déjà validé");
+      } else {
+        projectToConfirm.setConfirmationState(ProjectConfirmationState.CONFIRMED.name());
+        projectRepository.save(projectToConfirm);
+        return ResponseEntity.ok().body("Le Projet a été validé");
       }
+
     } else {
-      switch (projectConfirmationState) {
-        case REJECTED:
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ce projet est déjà rejected");
-        default:
-          projectToConfirm.setConfirmationState(ProjectConfirmationState.REJECTED.name());
-          projectRepository.save(projectToConfirm);
-          return ResponseEntity.ok().body("Le Projet a été refusé");
+      if (projectConfirmationState == ProjectConfirmationState.REJECTED) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ce projet est déjà rejected");
+      } else {
+        projectToConfirm.setConfirmationState(ProjectConfirmationState.REJECTED.name());
+        projectRepository.save(projectToConfirm);
+        return ResponseEntity.ok().body("Le Projet a été refusé");
       }
     }
   }
@@ -393,8 +394,8 @@ public class ProjectServiceImpl implements ProjectService {
                                                          final Long contributorID)
       throws Exception {
     Boolean doesProjectExist = projectRepository.existsById(projectId);
-    if (!doesProjectExist) {
-      throw new ProjectNotFoundException("Ce Projet n'existe pas!");
+    if (Boolean.FALSE.equals(doesProjectExist)) {
+      throw new ProjectNotFoundException(PROJECT_NOT_FOUND);
     }
     ProjectUserPermission projectUserPermission =
         projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID);
@@ -424,7 +425,7 @@ public class ProjectServiceImpl implements ProjectService {
     Project project =
         projectRepository
             .findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas!"));
+            .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
 
     List<ProjectUserPermission> userPermissionList = project.getProjectUserPermissions();
 
@@ -478,7 +479,7 @@ public class ProjectServiceImpl implements ProjectService {
               multicriteriaAnalise.getUpdatedAt(),
               multicriteriaAnalise.getMultiCriteriaAnalysisIteration(),
               multicriteriaAnalise.getIsFinished(),
-              new ArrayList(multicriteriaAnalise.getFormSteps()),
+              new ArrayList<>(multicriteriaAnalise.getFormSteps()),
               predictibilityAnalyse));
     }
 

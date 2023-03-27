@@ -1,12 +1,12 @@
 package com.elit.outildedecision.service.implementation;
 
-
 import com.elit.outildedecision.entity.ExecutionPlan;
 import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.entity.PredictibilityAnalysis;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.Report;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
@@ -29,7 +29,6 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -82,7 +81,14 @@ public class ReportServiceImpl implements ReportService {
    */
   @Value("${file.upload-dir}")
   private String storingFolder;
-
+  /**
+   * The message to display when the project with the specified ID cannot be found.
+   */
+  private static final String PROJECT_NOT_FOUND = "Le projet avec l'ID %d n'existe pas.";
+  /**
+   * The message to display when the report with the specified ID cannot be found.
+   */
+  private static final String REPORT_NOT_FOUND = "Le rapport avec l'ID %d n'existe pas.";
   /**
    * Constructs a new ReportServiceImpl with the specified repository instances.
    * it is used to inject the repository instances
@@ -117,6 +123,7 @@ public class ReportServiceImpl implements ReportService {
    * @throws PredictibilityAnalysisNotFoundException If the predictibility analysis with the specified ID cannot be found.
    * @throws MulticriteriaNotFoundException If the multi-criteria analysis with the specified ID cannot be found.
    * @throws ExecutionPlanNotFoundException If the execution plan with the specified ID cannot be found.
+   * @throws FileCouldNotBeSaved If the report could not be saved.
    */
   @Override
   public ResponseEntity<Object> uploadReport(final Long projectId,
@@ -125,7 +132,7 @@ public class ReportServiceImpl implements ReportService {
                                              final MultipartFile file) throws ProjectNotFoundException,
     PredictibilityAnalysisNotFoundException,
     MulticriteriaNotFoundException,
-    ExecutionPlanNotFoundException {
+    ExecutionPlanNotFoundException, FileCouldNotBeSaved {
     Report reportFromDB = reportRepository.findReportByAnalyseIdAndType(analyseId, type);
     if (!Objects.isNull(reportFromDB)) {
       return new ResponseEntity<>(
@@ -135,7 +142,7 @@ public class ReportServiceImpl implements ReportService {
     Project project =
       projectRepository
         .findById(projectId)
-        .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas."));
+        .orElseThrow(() -> new ProjectNotFoundException(String.format(PROJECT_NOT_FOUND, projectId)));
     String folderPath = StringUtils.cleanPath(storingFolder + project.getFolderPath());
 
     int iteration = 0;
@@ -168,7 +175,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     try {
-      String filePath = StringUtils.cleanPath(folderPath + "\\" + file.getOriginalFilename());
+      String filePath = StringUtils.cleanPath(folderPath.concat("\\").concat(file.getOriginalFilename()));
       Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
       Report report =
         Report.builder()
@@ -180,8 +187,7 @@ public class ReportServiceImpl implements ReportService {
           .build();
       reportRepository.save(report);
     } catch (IOException e) {
-      throw new RuntimeException(
-        "Erreur lors de l'enregistrement du fichier : " + file.getOriginalFilename());
+      throw new FileCouldNotBeSaved("Erreur lors de l'enregistrement du fichier : " + file.getOriginalFilename());
     }
     return ResponseEntity.ok().body("Fichier enregistré avec succès.");
   }
@@ -219,7 +225,7 @@ public class ReportServiceImpl implements ReportService {
     Project project =
       projectRepository
         .findById(projectId)
-        .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas."));
+        .orElseThrow(() -> new ProjectNotFoundException(String.format(PROJECT_NOT_FOUND, projectId)));
     String folderPath = StringUtils.cleanPath(storingFolder + project.getFolderPath());
 
     if (type.equals(ReportTypes.MULTI_CRITERIA_ANALYSIS.toString()) && !multiCriteriaAnalysisRepository.existsById(analyseId)) {
@@ -229,8 +235,7 @@ public class ReportServiceImpl implements ReportService {
     } else if (type.equals(ReportTypes.EXECUTION_PLAN.toString()) && !executionPlanRepository.existsById(analyseId)) {
       throw new ExecutionPlanNotFoundException("Ce plan d'exécution n'existe pas.");
     }
-//    try {
-      String filePath = StringUtils.cleanPath(folderPath + "\\" + file.getOriginalFilename());
+      String filePath = StringUtils.cleanPath(folderPath.concat("\\").concat(file.getOriginalFilename()));
       Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
       Report report =
         Report.builder()
@@ -241,10 +246,6 @@ public class ReportServiceImpl implements ReportService {
           .iteration(iteration)
           .build();
       reportRepository.save(report);
-//    } catch (IOException e) {
-//      throw new RuntimeException(
-//        "Erreur lors de l'enregistrement du fichier : " + file.getOriginalFilename());
-//    }
     return ResponseEntity.ok().body("Fichier enregistré avec succès.");
   }
   /**
@@ -261,7 +262,7 @@ public class ReportServiceImpl implements ReportService {
     Report report =
       reportRepository
         .findById(reportId)
-        .orElseThrow(() -> new ReportNotFoundException("Ce rapport n'existe pas."));
+        .orElseThrow(() -> new ReportNotFoundException(String.format(REPORT_NOT_FOUND, reportId)));
 
     File fileReport = new File(report.getReportPath());
 
@@ -273,11 +274,12 @@ public class ReportServiceImpl implements ReportService {
 
       response.setContentType(mimeType);
       response.setHeader(
-        "Content-Disposition", String.format("inline; filename=\"" + fileReport.getName() + "\""));
+        "Content-Disposition", String.format("inline; filename=\"%s\"", fileReport.getName()));
       response.setContentLength((int) fileReport.length());
 
-      InputStream inputStream = new BufferedInputStream(new FileInputStream(fileReport));
-      FileCopyUtils.copy(inputStream, response.getOutputStream());
+      try (InputStream inputStream = new BufferedInputStream(new FileInputStream(fileReport))) {
+        FileCopyUtils.copy(inputStream, response.getOutputStream());
+      }
     } else {
       throw new ReportNotFoundException("Le rapport n'existe pas.");
     }
@@ -296,7 +298,7 @@ public class ReportServiceImpl implements ReportService {
     Report report =
       reportRepository
         .findById(reportId)
-        .orElseThrow(() -> new ReportNotFoundException("Ce rapport n'existe pas."));
+        .orElseThrow(() -> new ReportNotFoundException(String.format(REPORT_NOT_FOUND, reportId)));
 
     File file = new File(report.getReportPath());
 
@@ -308,11 +310,12 @@ public class ReportServiceImpl implements ReportService {
 
       response.setContentType(mimeType);
       response.setHeader(
-        "Content-Disposition", String.format("report; filename=\"" + file.getName() + "\""));
+        "Content-Disposition", String.format("report; filename=\"%s\"", file.getName()));
       response.setContentLength((int) file.length());
 
-      InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-      FileCopyUtils.copy(inputStream, response.getOutputStream());
+      try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+        FileCopyUtils.copy(inputStream, response.getOutputStream());
+      }
     } else {
       throw new ReportNotFoundException("Le rapport n'existe pas.");
     }
@@ -328,7 +331,7 @@ public class ReportServiceImpl implements ReportService {
     Project project =
       projectRepository
         .findById(projectId)
-        .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas."));
+        .orElseThrow(() -> new ProjectNotFoundException(String.format(PROJECT_NOT_FOUND, projectId)));
 
     String folderPath = StringUtils.cleanPath(storingFolder + project.getFolderPath());
 
@@ -358,7 +361,7 @@ public class ReportServiceImpl implements ReportService {
     Report report =
       reportRepository
         .findById(reportId)
-        .orElseThrow(() -> new ReportNotFoundException("Ce rapport n'existe pas."));
+        .orElseThrow(() -> new ReportNotFoundException(String.format(REPORT_NOT_FOUND, reportId)));
 
     File fileToDelete = new File(report.getReportPath());
     if (FileSystemUtils.deleteRecursively(fileToDelete)) {
@@ -383,7 +386,7 @@ public class ReportServiceImpl implements ReportService {
     Report reportFromDB =
       reportRepository
         .findById(reportId)
-        .orElseThrow(() -> new ReportNotFoundException("Ce rapport n'existe pas."));
+        .orElseThrow(() -> new ReportNotFoundException(String.format(REPORT_NOT_FOUND, reportId)));
     Map<String, String> newName = new ObjectMapper().readValue(name.getBody(), HashMap.class);
     reportFromDB.setReportPath(newName.get("newReportName"));
     Path oldFile = Paths.get(reportFromDB.getReportPath());

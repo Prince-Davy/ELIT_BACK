@@ -54,7 +54,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
   private String storingDirectory;
   /** The Logger.*/
   private final Logger logger;
-
+  /** The constant FILE_NOT_FOUND.*/
   private static final String FILE_NOT_FOUND = "Fichier introuvable !";
 
   /**
@@ -78,6 +78,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     * @param projectId the project id to which the files will be attached
     * @return the response entity
     * @throws ProjectNotFoundException the project not found exception if the project does not exist
+    * @throws FileCouldNotBeSaved the file could not be saved exception if the file could not be saved
     */
   @Override
   public ResponseEntity<Object> uploadAttachment(final List<MultipartFile> files, final Long projectId)
@@ -162,10 +163,9 @@ public class AttachmentServiceImpl2 implements AttachmentService {
 
       response.setContentLength((int) file.length());
 
-      InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-
-      FileCopyUtils.copy(inputStream, response.getOutputStream());
-
+      try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+        FileCopyUtils.copy(inputStream, response.getOutputStream());
+      }
     } else {
       logger.error(FILE_NOT_FOUND);
     }
@@ -203,11 +203,10 @@ public class AttachmentServiceImpl2 implements AttachmentService {
           "Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
 
       response.setContentLength((int) file.length());
-      
-      InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
 
-      FileCopyUtils.copy(inputStream, response.getOutputStream());
-
+      try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+        FileCopyUtils.copy(inputStream, response.getOutputStream());
+      }
     } else {
       logger.error(FILE_NOT_FOUND);
     }
