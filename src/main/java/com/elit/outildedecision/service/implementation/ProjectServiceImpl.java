@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -138,7 +139,7 @@ public class ProjectServiceImpl implements ProjectService {
     Date dateOfCreation = new Date();
     String folderName = dateOfCreation.getTime() + "_" + project.getName();
     File projectDirectory =
-        new File(storingDirectory + folderName.replaceAll(" ", "_").toLowerCase());
+        new File(storingDirectory + folderName.replace(" ", "_").toLowerCase());
     if (projectDirectory.exists()) {
       throw new ProjectFolderAlreadyExistsException("Dossier du projet dupliqué, réessayer plus tard.");
     }
@@ -392,7 +393,7 @@ public class ProjectServiceImpl implements ProjectService {
   public ResponseEntity<String> deleteProjectContributor(final Long projectId,
                                                          final Long contributorID)
       throws Exception {
-    Boolean doesProjectExist = projectRepository.existsById(projectId);
+    boolean doesProjectExist = projectRepository.existsById(projectId);
     if (!doesProjectExist) {
       throw new ProjectNotFoundException("Ce Projet n'existe pas!");
     }
@@ -478,7 +479,7 @@ public class ProjectServiceImpl implements ProjectService {
               multicriteriaAnalise.getUpdatedAt(),
               multicriteriaAnalise.getMultiCriteriaAnalysisIteration(),
               multicriteriaAnalise.getIsFinished(),
-              new ArrayList(multicriteriaAnalise.getFormSteps()),
+              new ArrayList<>(multicriteriaAnalise.getFormSteps()),
               predictibilityAnalyse));
     }
 
