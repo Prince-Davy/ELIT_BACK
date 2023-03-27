@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User implements Serializable {
   @OneToMany(mappedBy = "user")
   @JsonIgnore
   @JsonManagedReference("user_permissions")
