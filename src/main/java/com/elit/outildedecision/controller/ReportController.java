@@ -2,6 +2,7 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
@@ -64,8 +65,8 @@ public class ReportController {
       @PathVariable final Long analyseId,
       @PathVariable final String type,
       @RequestParam("file") final MultipartFile file)
-      throws ProjectNotFoundException, MulticriteriaNotFoundException,
-          ExecutionPlanNotFoundException, PredictibilityAnalysisNotFoundException {
+    throws ProjectNotFoundException, MulticriteriaNotFoundException,
+    ExecutionPlanNotFoundException, PredictibilityAnalysisNotFoundException, FileCouldNotBeSaved {
     return reportService.uploadReport(projectId, analyseId, type, file);
   }
   /**

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-  private static final long EXPIRATION_TIME = 5 * 60 * 1000;
+  private static final long EXPIRATION_TIME = 5L * 60L * 1000L;
 
   @Value("${jwt.secret}")
   private String jwtSecret;
