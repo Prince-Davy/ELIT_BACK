@@ -298,7 +298,6 @@ public class ProjectServiceImpl implements ProjectService {
               || project.getName().contains(keyword))
         .collect(Collectors.toList());
     }
-
     return projects;
   }
   /**
@@ -334,7 +333,6 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(projectToConfirm);
         return ResponseEntity.ok().body("Le Projet a été validé");
       }
-
     } else {
       if (projectConfirmationState == ProjectConfirmationState.REJECTED) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ce projet est déjà rejected");
@@ -393,7 +391,7 @@ public class ProjectServiceImpl implements ProjectService {
   public ResponseEntity<String> deleteProjectContributor(final Long projectId,
                                                          final Long contributorID)
       throws Exception {
-    Boolean doesProjectExist = projectRepository.existsById(projectId);
+    boolean doesProjectExist = projectRepository.existsById(projectId);
     if (Boolean.FALSE.equals(doesProjectExist)) {
       throw new ProjectNotFoundException(PROJECT_NOT_FOUND);
     }

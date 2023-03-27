@@ -6,12 +6,10 @@ import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormQuestion;
 import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.entity.PredictibilityAnalysis;
-import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.BrainstormingNotFoundException;
 import com.elit.outildedecision.exception.ExistingBrainstormingException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
-import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.FormQuestionModel;
@@ -35,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 /**
  * this class is the implementation of the BrainstormingService interface.
@@ -44,10 +41,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BrainstormingServiceImpl implements BrainstormingService {
-  /**
-   * the minimum score that a form step must have to be considered as a good one in terms of score.
-   */
-  private static final double MINIMUM_SCORE = 0.5;
+
   /**
    * the brainstorming repository that will be used to access the data.
    */
@@ -219,71 +213,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
             .orElseThrow(
                 () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
 
-    List<FormStep> formStepList =
-      new ArrayList<>();
-    for (FormStep step : predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps()) {
-      if (Optional.ofNullable(step.getEScore()).orElse(0F) < MINIMUM_SCORE) {
-        formStepList.add(step);
-      }
-    }
-    System.out.println("formStepList" + formStepList.size());
-
-    Long projectId = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId();
-
-    List<FormStepModelForBrainstorming> result = new ArrayList<>();
-    for (FormStep formStep : formStepList) {
-      List<FormQuestionModel> formQuestionList = new ArrayList<>();
-      for (FormQuestion formQuestion : formStep.getFormQuestions()) {
-        List<CriteriaModel> criteriaList = new ArrayList<>();
-        for (Criteria criteria : formQuestion.getCriterias()) {
-          criteriaList.add(
-              new CriteriaModel(
-                  criteria.getCriteriaId(),
-                  criteria.getCriteriaName(),
-                  criteria.getCriteriaValue(),
-                  formQuestion.getQuestionId()));
-        }
-        List<BrainstormingModel> braistormingList = new ArrayList<>();
-        for (Brainstorming brainstorming : formQuestion.getBrainstormings()) {
-          User user = userRepository.getById(brainstorming.getUser().getUserId());
-          ProjectUserPermission userPermission =
-              projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
-
-          if (Objects.isNull(userPermission)) {
-            throw new UserNotFoundException("Cet utilisateur n'existe pas dans le projet !");
-          }
-          braistormingList.add(
-              new BrainstormingModel(
-                  brainstorming.getBrainstormingId(),
-                  brainstorming.getBrainstormingText(),
-                  brainstorming.getIsChecked(),
-                  formQuestion.getQuestionId(),
-                  brainstorming.getPredictibilityAnalysis().getPredictibilityAnalysisId(),
-                  user.getUserId(),
-                  user.getUserFirstName(),
-                  user.getUserLastName(),
-                  userPermission.getPermission()));
-        }
-        formQuestionList.add(
-            new FormQuestionModel(
-                formQuestion.getQuestionId(),
-                formQuestion.getQuestionText(),
-                formQuestion.getAnswerText(),
-                formQuestion.getQuestionRef(),
-                formStep.getStepId(),
-                criteriaList,
-                braistormingList));
-      }
-
-      result.add(
-          new FormStepModelForBrainstorming(
-              formStep.getStepId(),
-              formStep.getStepName(),
-              formStep.getStepRef(),
-              formStep.getEScore(),
-              formStep.getMultiCriteriaAnalysis().getMultiCriteriaAnalysisId(),
-              formQuestionList));
-    }
+    List<FormStepModelForBrainstorming> result = getFormStepsWithBrainstorming(predictibilityAnalysis);
 
     return ResponseEntity.ok().body(result);
   }
@@ -303,16 +233,21 @@ public class BrainstormingServiceImpl implements BrainstormingService {
             .orElseThrow(
                 () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
 
-    // Get the list of the FormStep with brainstorming
+    List<FormStepModelForBrainstorming> result = getFormStepsWithBrainstorming(predictibilityAnalysis);
+
+    return ResponseEntity.ok().body(result);
+  }
+
+  private List<FormStepModelForBrainstorming> getFormStepsWithBrainstorming(final PredictibilityAnalysis predictibilityAnalysis) {
     List<FormStep> formStepList =
-        predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps().stream()
-            .filter(
-                formStep ->
-                    formStep.getFormQuestions().stream()
-                            .filter(formQuestion -> formQuestion.getBrainstormings().size() > 0)
-                            .count()
-                        > 0)
-            .collect(Collectors.toList());
+      predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps().stream()
+        .filter(
+          formStep ->
+            formStep.getFormQuestions().stream()
+              .filter(formQuestion -> !formQuestion.getBrainstormings().isEmpty())
+              .count()
+              > 0)
+        .collect(Collectors.toList());
     System.out.println("ABSTRACT formStepList" + formStepList.size());
 
     Long projectId = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId();
@@ -321,55 +256,56 @@ public class BrainstormingServiceImpl implements BrainstormingService {
     for (FormStep formStep : formStepList) {
       List<FormQuestionModel> formQuestionList = new ArrayList<>();
       for (FormQuestion formQuestion : formStep.getFormQuestions()) {
-        List<CriteriaModel> criteriaList = new ArrayList();
+        List<CriteriaModel> criteriaList = new ArrayList<>();
         for (Criteria criteria : formQuestion.getCriterias()) {
           criteriaList.add(
-              new CriteriaModel(
-                  criteria.getCriteriaId(),
-                  criteria.getCriteriaName(),
-                  criteria.getCriteriaValue(),
-                  formQuestion.getQuestionId()));
+            new CriteriaModel(
+              criteria.getCriteriaId(),
+              criteria.getCriteriaName(),
+              criteria.getCriteriaValue(),
+              formQuestion.getQuestionId()));
         }
         List<BrainstormingModel> braistormingList = new ArrayList<>();
         for (Brainstorming brainstorming : formQuestion.getBrainstormings()) {
           User user = userRepository.getById(brainstorming.getUser().getUserId());
           String userRole =
-              projectUserPermissionRepository
-                  .findByProjectIdUserID(projectId, user.getUserId())
-                  .getPermission();
+            projectUserPermissionRepository
+              .findByProjectIdUserID(projectId, user.getUserId())
+              .getPermission();
           braistormingList.add(
-              new BrainstormingModel(
-                  brainstorming.getBrainstormingId(),
-                  brainstorming.getBrainstormingText(),
-                  brainstorming.getIsChecked(),
-                  formQuestion.getQuestionId(),
-                  brainstorming.getPredictibilityAnalysis().getPredictibilityAnalysisId(),
-                  user.getUserId(),
-                  user.getUserFirstName(),
-                  user.getUserLastName(),
-                  userRole));
+            new BrainstormingModel(
+              brainstorming.getBrainstormingId(),
+              brainstorming.getBrainstormingText(),
+              brainstorming.getIsChecked(),
+              formQuestion.getQuestionId(),
+              brainstorming.getPredictibilityAnalysis().getPredictibilityAnalysisId(),
+              user.getUserId(),
+              user.getUserFirstName(),
+              user.getUserLastName(),
+              userRole));
         }
         formQuestionList.add(
-            new FormQuestionModel(
-                formQuestion.getQuestionId(),
-                formQuestion.getQuestionText(),
-                formQuestion.getAnswerText(),
-                formQuestion.getQuestionRef(),
-                formStep.getStepId(),
-                criteriaList,
-                braistormingList));
+          new FormQuestionModel(
+            formQuestion.getQuestionId(),
+            formQuestion.getQuestionText(),
+            formQuestion.getAnswerText(),
+            formQuestion.getQuestionRef(),
+            formStep.getStepId(),
+            criteriaList,
+            braistormingList));
       }
 
       result.add(
-          new FormStepModelForBrainstorming(
-              formStep.getStepId(),
-              formStep.getStepName(),
-              formStep.getStepRef(),
-              formStep.getEScore(),
-              formStep.getMultiCriteriaAnalysis().getMultiCriteriaAnalysisId(),
-              formQuestionList));
+        new FormStepModelForBrainstorming(
+          formStep.getStepId(),
+          formStep.getStepName(),
+          formStep.getStepRef(),
+          formStep.getEScore(),
+          formStep.getMultiCriteriaAnalysis().getMultiCriteriaAnalysisId(),
+          formQuestionList));
     }
 
-    return ResponseEntity.ok().body(result);
+    return result;
   }
+
 }

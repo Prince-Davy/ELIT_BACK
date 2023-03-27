@@ -171,7 +171,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
     MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
     multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(
-      (Objects.nonNull(existingMultiCriteriaAnalysis))
+      Objects.nonNull(existingMultiCriteriaAnalysis)
         ? existingMultiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1
         : 1);
     multiCriteriaAnalysis.setIsFinished(false);
