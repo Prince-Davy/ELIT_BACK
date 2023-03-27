@@ -6,12 +6,10 @@ import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormQuestion;
 import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.entity.PredictibilityAnalysis;
-import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.BrainstormingNotFoundException;
 import com.elit.outildedecision.exception.ExistingBrainstormingException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
-import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.FormQuestionModel;
@@ -35,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 /**
  * this class is the implementation of the BrainstormingService interface.
@@ -244,13 +241,13 @@ public class BrainstormingServiceImpl implements BrainstormingService {
     return ResponseEntity.ok().body(result);
   }
 
-  private List<FormStepModelForBrainstorming> getFormStepsWithBrainstorming(PredictibilityAnalysis predictibilityAnalysis) {
+  private List<FormStepModelForBrainstorming> getFormStepsWithBrainstorming(final PredictibilityAnalysis predictibilityAnalysis) {
     List<FormStep> formStepList =
       predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps().stream()
         .filter(
           formStep ->
             formStep.getFormQuestions().stream()
-              .filter(formQuestion -> formQuestion.getBrainstormings().size() > 0)
+              .filter(formQuestion -> !formQuestion.getBrainstormings().isEmpty())
               .count()
               > 0)
         .collect(Collectors.toList());
