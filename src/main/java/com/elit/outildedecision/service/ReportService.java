@@ -2,6 +2,7 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
@@ -35,7 +36,7 @@ public interface ReportService {
   ResponseEntity<Object> uploadReport(
     Long projectId, Long analyseId, String type, MultipartFile file)
     throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException,
-    MulticriteriaNotFoundException, ExecutionPlanNotFoundException;
+    MulticriteriaNotFoundException, ExecutionPlanNotFoundException, FileCouldNotBeSaved;
 
   /**
    * Uploads a report file with an iteration number for the specified project, analysis, and type.

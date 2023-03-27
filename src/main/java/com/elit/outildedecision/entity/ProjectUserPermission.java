@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "project_user_permission")
@@ -22,7 +23,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties("id")
-public class ProjectUserPermission {
+public class ProjectUserPermission implements Serializable {
   @EmbeddedId
   private ProjectPropertyKey id;
   private String permission;

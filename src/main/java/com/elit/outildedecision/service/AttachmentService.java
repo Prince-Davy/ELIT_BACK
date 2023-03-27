@@ -2,6 +2,7 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public interface AttachmentService {
    * @return a ResponseEntity representing the result of the operation
    */
   ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId)
-    throws IOException, ProjectNotFoundException;
+          throws IOException, ProjectNotFoundException, FileCouldNotBeSaved;
 
   /**
    * Renames the attachment with the given ID.
