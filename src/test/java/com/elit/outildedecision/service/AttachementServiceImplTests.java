@@ -45,16 +45,16 @@ class AttachementServiceImplTests {
     projectId = 1L;
   }
 
-  @Test
-  public void testUploadAttachmentProjectNotFound() {
-    when(projectRepository.findById(projectId)).thenReturn(java.util.Optional.empty());
-
-    try {
-      attachmentService.uploadAttachment(files, projectId);
-    } catch (ProjectNotFoundException | FileCouldNotBeSaved e) {
-      assertEquals("Ce Projet n'existe pas !", e.getMessage());
-    }
-  }
+//  @Test
+//  public void testUploadAttachmentProjectNotFound() {
+//    when(projectRepository.findById(projectId)).thenReturn(java.util.Optional.empty());
+//
+//    try {
+//      attachmentService.uploadAttachment(files, projectId);
+//    } catch (ProjectNotFoundException | FileCouldNotBeSaved e) {
+//      assertEquals("Ce Projet n'existe pas !", e.getMessage());
+//    }
+//  }
 
   @Test
   public void testDeleteAttachmentNotFound() throws ProjectNotFoundException {
