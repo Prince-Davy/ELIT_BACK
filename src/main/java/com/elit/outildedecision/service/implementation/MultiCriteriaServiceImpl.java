@@ -164,7 +164,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
         .orElseThrow(() -> new RuntimeException("Ce projet n'existe pas"));
     MultiCriteriaAnalysis existingMultiCriteriaAnalysis =
       multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(projectId);
-    if (Objects.nonNull(existingMultiCriteriaAnalysis) && !existingMultiCriteriaAnalysis.getIsFinished()) {
+    if (Objects.nonNull(existingMultiCriteriaAnalysis) && Boolean.TRUE.equals(!existingMultiCriteriaAnalysis.getIsFinished())) {
       return ResponseEntity.status(HttpStatus.CONFLICT)
         .body("Une Analyse multicritère est déjà en cours pour ce projet");
     }

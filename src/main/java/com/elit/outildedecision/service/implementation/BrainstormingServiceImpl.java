@@ -1,6 +1,7 @@
 
 package com.elit.outildedecision.service.implementation;
 
+import com.elit.outildedecision.controller.AuthentificationController;
 import com.elit.outildedecision.entity.Brainstorming;
 import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormQuestion;
@@ -22,6 +23,8 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.BrainstormingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.elit.outildedecision.util.Constants.ANALYSIS_DOESNT_EXIST;
+import static com.elit.outildedecision.util.Constants.BRAINSTORMING_DOESNT_EXIST;
+
 /**
  * this class is the implementation of the BrainstormingService interface.
  * and it contains all the methods that are used to manage the brainstorming
@@ -41,6 +48,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BrainstormingServiceImpl implements BrainstormingService {
+
+  private final Logger log = LoggerFactory.getLogger(BrainstormingServiceImpl.class);
 
   /**
    * the brainstorming repository that will be used to access the data.
@@ -94,7 +103,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
    */
   @Override
   public ResponseEntity<String> createBrainstorming(final BrainstormingModel brainstormingModel)
-      throws Exception {
+      throws PredictibilityAnalysisNotFoundException, ExistingBrainstormingException {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
@@ -103,8 +112,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         predictibilityAnalysisRepository
             .findById(brainstormingModel.getPredictibilityAnalysisId())
             .orElseThrow(
-                () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
-    // TODO : CHECK ONLY ONE QUESTION BY USER
+                () -> new PredictibilityAnalysisNotFoundException(ANALYSIS_DOESNT_EXIST));
     Brainstorming savedBrainstorming =
         brainstormingRepository.findByUserQuestionPredictibilityId(
             user.getUserId(),
@@ -134,18 +142,18 @@ public class BrainstormingServiceImpl implements BrainstormingService {
    */
   @Override
   public ResponseEntity<String> updateBrainstorming(final BrainstormingModel brainstormingModel)
-      throws Exception {
+      throws BrainstormingNotFoundException {
     Brainstorming brainstorming =
         brainstormingRepository
             .findById(brainstormingModel.getBrainstormingId())
             .orElseThrow(
-                () -> new BrainstormingNotFoundException("Cet brainstorming n'existe pas"));
+                () -> new BrainstormingNotFoundException(BRAINSTORMING_DOESNT_EXIST));
 
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
 
-    if (brainstorming.getUser().getUserId() != user.getUserId()) {
+    if (!brainstorming.getUser().getUserId().equals(user.getUserId())) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN)
           .body("L'utilisateur enregistré ne correspond pas à l'utilisateur du brainstorming");
     }
@@ -170,7 +178,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         brainstormingRepository
             .findById(brainstormingId)
             .orElseThrow(
-                () -> new BrainstormingNotFoundException("Cet brainstorming n'existe pas"));
+                () -> new BrainstormingNotFoundException(BRAINSTORMING_DOESNT_EXIST));
     brainstormingRepository.delete(brainstorming);
     return ResponseEntity.ok().body("Le commentaire du brainstorming a bien été supprimé.");
   }
@@ -189,7 +197,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         brainstormingRepository
             .findById(brainstormingId)
             .orElseThrow(
-                () -> new BrainstormingNotFoundException("Cet brainstorming n'existe pas"));
+                () -> new BrainstormingNotFoundException(BRAINSTORMING_DOESNT_EXIST));
 
     Map<String, Boolean> result = new ObjectMapper().readValue(isChecked.getBody(), HashMap.class);
 
@@ -201,17 +209,17 @@ public class BrainstormingServiceImpl implements BrainstormingService {
   /**
    * this method is used to get all the brainstorming of a predictability analysis.
    *
-   * @param predictibilityAnalysisId the id of the predictability analysis
+   * @param predictabilityAnalysisId the id of the predictability analysis
    * @return a list of brainstorming
    */
   @Override
-  public ResponseEntity<Object> getBrainstorming(final Long predictibilityAnalysisId) throws Exception {
+  public ResponseEntity<Object> getBrainstorming(final Long predictabilityAnalysisId) throws PredictibilityAnalysisNotFoundException {
 
     PredictibilityAnalysis predictibilityAnalysis =
         predictibilityAnalysisRepository
-            .findById(predictibilityAnalysisId)
+            .findById(predictabilityAnalysisId)
             .orElseThrow(
-                () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
+                () -> new PredictibilityAnalysisNotFoundException(ANALYSIS_DOESNT_EXIST));
 
     List<FormStepModelForBrainstorming> result = getFormStepsWithBrainstorming(predictibilityAnalysis);
 
@@ -219,23 +227,13 @@ public class BrainstormingServiceImpl implements BrainstormingService {
   }
   /**
    * this method is used to get a brainstorming abstract of a predictability analysis.
-   *
-   * @param predictibilityAnalysisId the id of the predictability analysis
+   * @param predictabilityAnalysisId the id of the predictability analysis
    * @return response entity that contains the brainstorming abstract
    */
   @Override
-  public ResponseEntity<Object> getBrainstormingAbstract(final Long predictibilityAnalysisId)
-      throws Exception {
-
-    PredictibilityAnalysis predictibilityAnalysis =
-        predictibilityAnalysisRepository
-            .findById(predictibilityAnalysisId)
-            .orElseThrow(
-                () -> new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
-
-    List<FormStepModelForBrainstorming> result = getFormStepsWithBrainstorming(predictibilityAnalysis);
-
-    return ResponseEntity.ok().body(result);
+  public ResponseEntity<Object> getBrainstormingAbstract(final Long predictabilityAnalysisId)
+      throws PredictibilityAnalysisNotFoundException {
+    return getBrainstorming(predictabilityAnalysisId);
   }
 
   private List<FormStepModelForBrainstorming> getFormStepsWithBrainstorming(final PredictibilityAnalysis predictibilityAnalysis) {
@@ -248,7 +246,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
               .count()
               > 0)
         .collect(Collectors.toList());
-    System.out.println("ABSTRACT formStepList" + formStepList.size());
+    this.log.info("ABSTRACT formStepList size: {}", formStepList.size());
 
     Long projectId = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId();
 

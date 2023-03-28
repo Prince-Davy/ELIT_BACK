@@ -14,6 +14,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectPropertyKey implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   @Column(name = "project_id")
   private Long projectId;
 

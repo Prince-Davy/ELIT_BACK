@@ -73,10 +73,10 @@ class AuthentificationControllerTest {
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(user))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
-  @WithMockUser(authorities = {"USER", "ADMIN"})
+/*  @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
   void refreshToken() throws Exception {
-  /*HttpServletResponse httpServletResponse = new MockHttpServletResponse();
+  HttpServletResponse httpServletResponse = new MockHttpServletResponse();
    HttpServletRequest request = new MockHttpServletRequest();
    final long EXPIRATION_TIME = 5 * 60 * 1000;
     String jwtSecret = "ELITE2022";
@@ -100,8 +100,8 @@ class AuthentificationControllerTest {
     when(userService.findByEmail(user.getUserEmail())).thenReturn(user);
     MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/refreshToken").header("Authorization", "Bearer " + refresh_token)
       .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andExpect(status().isOk()).andDo(print()).andReturn().getResponse();
-    Assertions.assertEquals(200, response.getStatus());*/
-  }
+    Assertions.assertEquals(200, response.getStatus());
+  }*/
 }
 
 

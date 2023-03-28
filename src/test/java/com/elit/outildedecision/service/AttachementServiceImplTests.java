@@ -57,7 +57,7 @@ class AttachementServiceImplTests {
 //  }
 
   @Test
-  public void testDeleteAttachmentNotFound() throws ProjectNotFoundException {
+  void testDeleteAttachmentNotFound() throws ProjectNotFoundException {
     when(attachmentRepository.findById(1L)).thenReturn(java.util.Optional.empty());
 
     try {
@@ -86,7 +86,7 @@ class AttachementServiceImplTests {
   }
 
   @Test
-  public void testRenameAttachmentAttachmentNotFound() throws Exception {
+  void testRenameAttachmentAttachmentNotFound() throws Exception {
 
     when(attachmentRepository.findById(1L)).thenReturn(Optional.empty());
 

@@ -18,6 +18,8 @@ import java.util.ArrayList;
 @NoArgsConstructor
 public class ProjectModel implements Serializable {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * The name of the project.
    */

@@ -115,12 +115,12 @@ public class AttachmentServiceImpl2 implements AttachmentService {
    *     not exist
    */
   @Override
-  public ResponseEntity deleteAttachment(final Long attachmentId)
-      throws AttachmentNotFoundException {
+  public ResponseEntity<String> deleteAttachment(final Long attachmentId)
+    throws AttachmentNotFoundException {
     Attachment attachment =
-        attachmentRepository
-            .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas!"));
+      attachmentRepository
+        .findById(attachmentId)
+        .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas!"));
     File fileToDelete = new File(attachment.getFilePath());
     if (FileSystemUtils.deleteRecursively(fileToDelete)) {
       attachmentRepository.deleteById(attachmentId);
@@ -128,7 +128,8 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     } else {
       return ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier.");
     }
-}
+  }
+
   /**
    * this method is used to Visualize an attachment of a project on the browser.
    *

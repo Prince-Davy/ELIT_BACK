@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -91,7 +92,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .withClaim(
                 "roles",
                 user.getAuthorities().stream()
-                    .map(ga -> ga.getAuthority())
+                    .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList())) // the
             // roles
             // of
@@ -139,11 +140,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   protected void unsuccessfulAuthentication(final HttpServletRequest request,
                                             final HttpServletResponse response,
                                             final AuthenticationException failed) throws IOException {
-    // super.unsuccessfulAuthentication(request, response, failed);
+
     Map<String, String> errors = new HashMap<>();
     errors.put("access-token", "access_token");
     errors.put("refresh-token", "refresh_token");
-    // response.addHeader("Access-Control-Allow-Origin", "*"); // this one allows to
+
     // escape the CORS problem
     response.sendError(1, "error");
     new ObjectMapper().writeValue(response.getOutputStream(), errors); // send the tok

@@ -24,7 +24,7 @@ public interface AttachmentService {
    * @throws ProjectNotFoundException if the project that the attachment belongs to does not exist
    * @return a ResponseEntity representing the result of the operation
    */
-  ResponseEntity deleteAttachment(Long attachmentId)
+  ResponseEntity<String> deleteAttachment(Long attachmentId)
     throws AttachmentNotFoundException, ProjectNotFoundException;
 
   /**

@@ -31,6 +31,8 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(exclude = {"predictibilityAnalysis"})
 public class ExecutionPlan implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long executionPlanId;

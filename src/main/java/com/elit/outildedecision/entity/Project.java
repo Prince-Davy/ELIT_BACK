@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -31,7 +32,9 @@ import java.util.List;
 @Entity
 @Table(name = "project")
 @EqualsAndHashCode(exclude = {"reviews" /* ,"report" */})
-public class Project {
+public class Project implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   @OneToMany(mappedBy = "project")
   @JsonManagedReference("project_permissions")
   private List<ProjectUserPermission> projectUserPermissions;
