@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +28,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(exclude = "formStep")
-public class FormQuestion {
+public class FormQuestion implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   @ManyToOne(optional = false)
   @JoinColumn(name = "step_id", referencedColumnName = "stepId")
   @JsonBackReference("question_step")

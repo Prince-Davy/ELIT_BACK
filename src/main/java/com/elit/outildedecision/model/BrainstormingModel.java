@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * This class represents a brainstorming model containing information about a brainstorming session.
  * It is used to store and manage brainstorming data associated with a specific question and user.
@@ -12,7 +14,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BrainstormingModel {
+public class BrainstormingModel implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * A unique identifier for the brainstorming session.

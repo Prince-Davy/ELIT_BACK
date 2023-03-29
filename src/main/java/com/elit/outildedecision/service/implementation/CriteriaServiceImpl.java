@@ -8,7 +8,7 @@ import com.elit.outildedecision.service.CriteriaService;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.NoSuchElementException;
 import java.util.Set;
 /**
  * this class is the implementation of the CriteriaService interface.
@@ -58,10 +58,10 @@ public class CriteriaServiceImpl implements CriteriaService {
    */
   @Override
   public Criteria updateCriteria(final Criteria criteria) {
-    Criteria criteriaFromDB = criteriaRepository.findById(criteria.getCriteriaId()).get();
-    if (Objects.nonNull(criteria.getCriteriaValue())) {
-      criteriaFromDB.setCriteriaValue(criteria.getCriteriaValue());
-    }
+    Criteria criteriaFromDB = criteriaRepository.findById(criteria.getCriteriaId())
+      .orElseThrow(() -> new NoSuchElementException("Criteria not found with ID: {}" + criteria.getCriteriaId()));
+    criteriaFromDB.setCriteriaValue(criteria.getCriteriaValue());
     return criteriaRepository.save(criteriaFromDB);
   }
+
 }

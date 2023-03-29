@@ -137,7 +137,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
             project.getProjectId());
 
     // "Vous n'avez pas encore terminé(e) l'analyse multicritère"
-    if (!lastMultiCriteriaAnalysis.getIsFinished()) {
+    if (Boolean.FALSE.equals(lastMultiCriteriaAnalysis.getIsFinished())) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(-1L);
     }
 
