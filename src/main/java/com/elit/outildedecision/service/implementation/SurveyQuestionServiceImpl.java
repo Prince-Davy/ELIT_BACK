@@ -64,7 +64,8 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
       throw new QuestionFormatNotValidException("question not found with this reference");
     }
     Optional<SurveyQuestion> toBeUpdated = questionRepo.findById(questionId);
-    toBeUpdated.get().setQuestion(question.getQuestion());
+    if(toBeUpdated.isPresent())
+      toBeUpdated.get().setQuestion(question.getQuestion());
     return question;
   }
 
@@ -78,7 +79,7 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
   @Override
   public Optional<SurveyQuestion> deleteQuestion(final Long questionId) {
     Optional<SurveyQuestion> toBeDeleted = questionRepo.findById(questionId);
-    if (questionId.equals(toBeDeleted.get().getId())) {
+    if (toBeDeleted.isPresent() && questionId.equals(toBeDeleted.get().getId())) {
       questionRepo.deleteById(questionId);
     } else {
       throw new RuntimeException("question to delete not found");

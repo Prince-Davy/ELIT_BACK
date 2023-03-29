@@ -28,7 +28,7 @@ public class ProjectPropertyKey implements Serializable {
   public static class Message {
     private String username;
     private String avatar;
-    private String message;
+    private String messageBody;
     private String status;
   }
 }

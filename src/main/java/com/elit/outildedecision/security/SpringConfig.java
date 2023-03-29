@@ -18,6 +18,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 /**
  * Configuration class for Spring Security.
  */
@@ -88,9 +90,9 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(ImmutableList.of("http://localhost:3000"));
+    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000"));
     configuration.setAllowedMethods(
-      ImmutableList.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+      List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     // setAllowCredentials(true) is important, otherwise
     // The value of the 'Access-Control-Allow-Origin' header in the response must
     // not be the wildcard '*' when the request's credentials mode is 'include'.
@@ -98,7 +100,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
     // setAllowedHeaders is important! Without it, OPTIONS preflight request
     // will fail with 403 Invalid CORS request
     configuration.setAllowedHeaders(
-      ImmutableList.of(
+      List.of(
         "Authorization",
         "Content-Type",
         "X-Requested-With",

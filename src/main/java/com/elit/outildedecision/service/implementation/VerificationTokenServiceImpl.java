@@ -29,6 +29,8 @@ import java.util.Objects;
 public class VerificationTokenServiceImpl implements VerificationTokenService {
 
   /** The sender email address used for sending emails. */
+
+  private static final String FORGOT_PASSWORD = "";
   @Value("${spring.mail.username}")
   private static String senderEmail;
 
@@ -45,10 +47,10 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   private final JavaMailSender javaMailSender;
 
   /** The expiration time for account confirmation tokens. */
-  private final Long expirationTimeConfirmation = 2 * 24 * 60 * 60 * 1000L;
+  private static final Long expirationTimeConfirmation = 2 * 24 * 60 * 60 * 1000L;
 
   /** The expiration time for password recovery tokens. */
-  private final Long expirationTimePasswordRecovery = 30 * 60 * 1000L;
+  private static final Long expirationTimePasswordRecovery = 30 * 60 * 1000L;
 
   /**
    * Constructs a new instance of the verification token service implementation.
@@ -106,7 +108,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     if (Objects.equals(type, "confirm-account")) {
       verificationToken.setExpiryDate(
         new Date(System.currentTimeMillis() + expirationTimeConfirmation));
-    } else if (Objects.equals(type, "")) {
+    } else if (Objects.equals(type, FORGOT_PASSWORD)) {
       verificationToken.setExpiryDate(
         new Date(System.currentTimeMillis() + expirationTimePasswordRecovery));
     }
@@ -153,7 +155,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
                                                         final PasswordChangeModel changePasswordModel) {
     VerificationToken verificationToken = findByToken(token);
     if (verificationToken == null
-        || !Objects.equals(verificationToken.getType(), "")) {
+        || !Objects.equals(verificationToken.getType(), FORGOT_PASSWORD)) {
       return ResponseEntity.badRequest().body("le lien est invalide");
     }
     if (verificationToken.getExpiryDate().before(new Date())) {
@@ -189,7 +191,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     if (!user.getIsEmailVerified()) {
       throw new UserNotVerifiedException("Votre compte n'est pas vérifié");
     }
-    VerificationToken verificationToken = createToken(user, "");
+    VerificationToken verificationToken = createToken(user, FORGOT_PASSWORD);
     String recoveryUrl =
         "http://localhost:8080/reset-password?token=" + verificationToken.getToken();
     String mailBody =

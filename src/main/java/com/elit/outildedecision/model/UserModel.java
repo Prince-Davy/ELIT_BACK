@@ -57,7 +57,7 @@ public class UserModel implements Serializable {
    */
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   @Pattern(
-    regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+    regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
     message =
       "le mot de passe doit contenir au moins 8 caractères,"
         + " une lettre majuscule, une lettre minuscule,"

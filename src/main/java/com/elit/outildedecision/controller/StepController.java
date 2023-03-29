@@ -63,7 +63,7 @@ public class StepController {
   @PostMapping(consumes = {"application/json"})
   public ResponseEntity<String> createFormStep(@RequestBody final FormStep formStep)
       throws FormStepAlreadyExistsException, StepFormNotFoundException {
-    Set<Criteria> criterias = new HashSet<>();
+    Set<Criteria> criterias;
     criterias = formStep.getFormQuestions().stream().findFirst().orElse(null).getCriterias();
     return formStepService.createFormStep(
         formStep.getMultiCriteriaAnalysis().getMultiCriteriaAnalysisId(),
@@ -81,7 +81,7 @@ public class StepController {
    * @return FormStep
    */
   @PutMapping
-  public ResponseEntity updateFormStep(@Valid @RequestBody final FormStep step)
+  public ResponseEntity<String> updateFormStep(@Valid @RequestBody final FormStep step)
     throws StepFormNotFoundException, QuestionsNotFoundException, StepWeightNotFoundException {
     return formStepService.updateFormStep(step);
   }
