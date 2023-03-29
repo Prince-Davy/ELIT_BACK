@@ -58,7 +58,7 @@ public interface UserService {
    * @throws CouldNotSaveUserException if the specified user account could not be updated
    */
   ResponseEntity<String> updatePasswordUserById(Long userId, String oldPass, String newPass)
-    throws IOException, CouldNotSaveUserException;
+    throws IOException, CouldNotSaveUserException, UserNotFoundException;
 
   /**
    * Updates the avatar for the user with the specified ID.
@@ -82,9 +82,10 @@ public interface UserService {
    * @return a ResponseEntity indicating the success or failure of the information update operation
    * @throws IOException               if an I/O error occurs while updating the user account data
    * @throws CouldNotSaveUserException if the specified user account could not be updated
+   * @throws UserNotFoundException     if the specified user account does not exist
    */
   ResponseEntity<String> updateInfosByIdUser(Long userId, String userFirstName, String userLastName)
-    throws IOException, CouldNotSaveUserException;
+    throws IOException, CouldNotSaveUserException, UserNotFoundException;
 
   /**
    * Retrieves the avatar for the user with the specified ID.

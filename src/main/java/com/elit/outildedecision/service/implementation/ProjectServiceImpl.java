@@ -7,10 +7,12 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.AttachmentResponseModel;
 import com.elit.outildedecision.model.ContributerModel;
@@ -350,12 +352,11 @@ public class ProjectServiceImpl implements ProjectService {
    * @return a ResponseEntity with a success message if the operation was successful
    * @throws ProjectNotFoundException if the specified project does not exist
    * @throws UserNotFoundException if the specified user does not exist
-   * @throws Exception if an error occurs while adding the contributor to the project
    */
   @Override
   public ResponseEntity<String> addProjectContributor(final Long projectId,
                                                       final ContributerModel contributor)
-      throws Exception {
+    throws ProjectNotFoundException, UserNotFoundException {
     Project project =
         projectRepository
             .findById(projectId)
@@ -385,12 +386,11 @@ public class ProjectServiceImpl implements ProjectService {
    * @throws ProjectNotFoundException if the project with the given ID does not exist
    * @throws UserNotFoundException if the user with the given ID does not exist in the project
    * @throws ProjectOwnerException if the contributor to be removed is the owner of the project
-   * @throws Exception if an error occurs while removing the contributor
    */
   @Override
   public ResponseEntity<String> deleteProjectContributor(final Long projectId,
                                                          final Long contributorID)
-      throws Exception {
+    throws ProjectOwnerException, UserNotFoundException, ProjectNotFoundException {
     boolean doesProjectExist = projectRepository.existsById(projectId);
     if (Boolean.FALSE.equals(doesProjectExist)) {
       throw new ProjectNotFoundException(PROJECT_NOT_FOUND);
@@ -417,9 +417,11 @@ public class ProjectServiceImpl implements ProjectService {
    * @param projectId the ID of the project to retrieve data for
    * @return a ProjectResponseModel containing the data for the specified project
    * @throws ProjectNotFoundException if the specified project cannot be found
+   * @throws UserNotAuthorizedException if the user is not authorized to vote in the specified execution plan
+   * @throws ExecutionPlanNotFoundException if the specified execution plan cannot be found
    */
   @Override
-  public ProjectResponseModel getProjectData(final Long projectId) throws ProjectNotFoundException {
+  public ProjectResponseModel getProjectData(final Long projectId) throws ProjectNotFoundException, UserNotAuthorizedException, ExecutionPlanNotFoundException {
     Project project =
         projectRepository
             .findById(projectId)

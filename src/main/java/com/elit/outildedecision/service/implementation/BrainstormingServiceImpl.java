@@ -209,6 +209,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
    * this method is used to get all the brainstorming of a predictability analysis.
    *
    * @param predictabilityAnalysisId the id of the predictability analysis
+   * @throws PredictibilityAnalysisNotFoundException if the predictability analysis doesn't exist
    * @return a list of brainstorming
    */
   @Override

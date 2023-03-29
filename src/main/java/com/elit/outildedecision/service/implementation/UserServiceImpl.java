@@ -82,12 +82,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * Directory to store user avatar files.
    */
   @Value("${avatar.upload-dir}")
-  private String AVATAR_UPLOAD_DIR;
+  private String avatarUploadDir;
   /**
    * Email address to send emails from.
    */
   @Value("${spring.mail.username}")
-  private String SENDER_EMAIL;
+  private String senderEmail;
 
   /**
    * Constructor for UserServiceImpl.
@@ -173,13 +173,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public ResponseEntity<String> updatePasswordUserById(final Long userId,
                                                        final String oldPass,
-                                                       final String newPass) {
-    User user = userRepository.getById(userId);
+                                                       final String newPass) throws UserNotFoundException {
+    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas"));
     String currentPass = user.getUserPassword();
-    if (Objects.isNull(user)) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user by this id");
-    }
-    Boolean checkPassword = passwordEncoder.matches(oldPass, currentPass);
+    boolean checkPassword = passwordEncoder.matches(oldPass, currentPass);
     if (!checkPassword) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
         .body("Votre ancien mot de passe n'est pas correct");
@@ -220,15 +217,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * @param userLastName  The user's new last name (may be null).
    * @return A ResponseEntity with a status code and message indicating the outcome of the update.
    * @throws CouldNotSaveUserException If there is an error saving the updated user to the database.
+   * @throws UserNotFoundException     If the specified user cannot be found.
    */
   @Override
   public ResponseEntity<String> updateInfosByIdUser(final Long userId,
                                                     final String userFirstName,
-                                                    final String userLastName) throws CouldNotSaveUserException {
-    User user = userRepository.getById(userId);
-    if (Objects.isNull(user)) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user by this id");
-    }
+                                                    final String userLastName) throws CouldNotSaveUserException, UserNotFoundException {
+    User user = userRepository.findById(userId)
+      .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
     if (!Objects.isNull(userFirstName)) {
       try {
@@ -272,7 +268,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
       response.setContentType(mimeType);
       response.setHeader(
-        "Content-Disposition", String.format("inline; filename=\"" + file.getName() + "\""));
+        "Content-Disposition", String.format("inline; filename=\"%s\"", file.getName()));
       response.setContentLength((int) file.length());
 
       try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
@@ -293,8 +289,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public ResponseEntity<Map<String, String>> updateUser(final UserModel user)
     throws CouldNotSaveUserException {
-    String authenticatedUserEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    String authenticatedUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User userFromDB = userRepository.findByUserEmail(authenticatedUserEmail);
     Map<String, String> errorMap = new HashMap<>();
     if (Objects.isNull(userFromDB)) {
@@ -375,13 +370,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     String mailSubject = "ELIT : Confirmation de votre compte";
     try {
       SimpleMailMessage mailMessage = new SimpleMailMessage();
-      mailMessage.setFrom(SENDER_EMAIL);
+      mailMessage.setFrom(senderEmail);
       mailMessage.setTo(user.getUserEmail());
       mailMessage.setText(mailBody);
       mailMessage.setSubject(mailSubject);
       javaMailSender.send(mailMessage);
     } catch (Exception e) {
-      throw new RuntimeException("Exception occured while sending email", e);
+      logger.error("Erreur lors de l'envoi du mail de confirmation d'inscription");
     }
   }
 
@@ -394,7 +389,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public UserResponseModel getAllInfosUserById(final Long userId) {
     User user = userRepository.getById(userId);
-    if (user.getUserAvatarPath() != null) {
       return UserResponseModel.builder()
         .userId(user.getUserId())
         .userFirstName(user.getUserFirstName())
@@ -403,16 +397,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         .userEmail(user.getUserEmail())
         .userJob(user.getUserJob())
         .build();
-    } else {
-      return UserResponseModel.builder()
-        .userId(user.getUserId())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .userJob(user.getUserJob())
-        .build();
-    }
   }
 
   /**
@@ -481,7 +465,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public String saveAvatar(final MultipartFile avatar) throws IOException {
     String filePath;
-    String folderPath = StringUtils.cleanPath(AVATAR_UPLOAD_DIR);
+    String folderPath = StringUtils.cleanPath(avatarUploadDir);
     filePath = StringUtils.cleanPath(folderPath + avatar.getOriginalFilename());
     Files.copy(avatar.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
     return filePath;

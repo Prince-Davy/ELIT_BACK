@@ -17,6 +17,7 @@ import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.CriteriaScoreModel;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.model.MultiCriteriaStepScoreModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.repository.CriteriaRepository;
@@ -282,7 +283,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   @Override
   @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<String> updateMultiCriteriaAnalysis(
-    final Long projectId, final FormStep multiCriteriaAnalysisStep) {
+    final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) {
     FormStep formStepToUpdate =
       formStepRepo
         .findById(multiCriteriaAnalysisStep.getStepId())

@@ -57,7 +57,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
    * @throws ProjectNotFoundException If the specified project does not exist.
    */
   @Override
-  public ResponseEntity confirmProject(final Long projectId) throws ProjectNotFoundException {
+  public ResponseEntity<String> confirmProject(final Long projectId) throws ProjectNotFoundException {
     Project project =
       projectRepository
         .findById(projectId)
@@ -75,7 +75,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
    * @throws UserNotFoundException If the specified user does not exist.
    */
   @Override
-  public ResponseEntity suspendUser(final Long userId) throws UserNotFoundException {
+  public ResponseEntity<String> suspendUser(final Long userId) throws UserNotFoundException {
     User user =
       userRepository
         .findById(userId)
@@ -93,7 +93,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
    * @throws ProjectNotFoundException If the specified project does not exist.
    */
   @Override
-  public ResponseEntity deleteProject(final Long projectId) throws ProjectNotFoundException {
+  public ResponseEntity<String> deleteProject(final Long projectId) throws ProjectNotFoundException {
     Project project =
       projectRepository
         .findById(projectId)
@@ -147,7 +147,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
    * @throws ProjectNotFoundException If any of the specified projects do not exist.
    */
   @Override
-  public ResponseEntity confirmProjects(final List<Long> projectIds) throws ProjectNotFoundException {
+  public ResponseEntity<String> confirmProjects(final List<Long> projectIds) throws ProjectNotFoundException {
     for (Long id : projectIds) {
       confirmProject(id);
     }

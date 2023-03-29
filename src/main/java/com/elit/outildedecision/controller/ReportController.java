@@ -103,7 +103,7 @@ public class ReportController {
    * @throws ReportNotFoundException ReportNotFoundException
   *  @throws IOException when there is a problem with the report file
    */
-  @RequestMapping("/preview/{reportId}")
+  @GetMapping("/preview/{reportId}")
   public void previewReport(final HttpServletResponse response, @PathVariable final Long reportId)
       throws IOException, ReportNotFoundException {
     reportService.previewReport(reportId, response);
@@ -115,7 +115,7 @@ public class ReportController {
    * @throws ReportNotFoundException ReportNotFoundException
    * @throws IOException IOException
    */
-  @RequestMapping("download/{reportId}")
+  @GetMapping("download/{reportId}")
   public void downloadReport(@PathVariable final Long reportId, final HttpServletResponse response)
       throws IOException, ReportNotFoundException {
     reportService.downloadReport(reportId, response);

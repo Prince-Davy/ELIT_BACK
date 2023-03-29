@@ -10,6 +10,8 @@ import com.elit.outildedecision.repository.VerificationTokenRepository;
 import com.elit.outildedecision.service.VerificationTokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -47,18 +49,19 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   private final JavaMailSender javaMailSender;
 
   /** The expiration time for account confirmation tokens. */
-  private static final Long expirationTimeConfirmation = 2 * 24 * 60 * 60 * 1000L;
+  private static final Long EXPIRATION_TIME_CONFIRMATION = 2 * 24 * 60 * 60 * 1000L;
 
   /** The expiration time for password recovery tokens. */
-  private static final Long expirationTimePasswordRecovery = 30 * 60 * 1000L;
-
+  private static final Long TOKEN_EXPIRATION_TIME = 30 * 60 * 1000L;
+  /** The logger for this class. */
+  private final Logger logger;
   /**
    * Constructs a new instance of the verification token service implementation.
    *
-   * @param passwordEncoder The password encoder used for encoding passwords.
+   * @param passwordEncoder             The password encoder used for encoding passwords.
    * @param verificationTokenRepository The repository for managing verification tokens.
-   * @param userRepository The repository for managing users.
-   * @param javaMailSender The mail sender used for sending emails.
+   * @param userRepository              The repository for managing users.
+   * @param javaMailSender              The mail sender used for sending emails.
    */
   public VerificationTokenServiceImpl(final PasswordEncoder passwordEncoder,
                                       final VerificationTokenRepository verificationTokenRepository,
@@ -68,6 +71,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     this.verificationTokenRepository = verificationTokenRepository;
     this.userRepository = userRepository;
     this.javaMailSender = javaMailSender;
+    this.logger = LoggerFactory.getLogger(VerificationTokenServiceImpl.class);
   }
 
   /**
@@ -107,10 +111,10 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     verificationToken.setType(type);
     if (Objects.equals(type, "confirm-account")) {
       verificationToken.setExpiryDate(
-        new Date(System.currentTimeMillis() + expirationTimeConfirmation));
+        new Date(System.currentTimeMillis() + EXPIRATION_TIME_CONFIRMATION));
     } else if (Objects.equals(type, FORGOT_PASSWORD)) {
       verificationToken.setExpiryDate(
-        new Date(System.currentTimeMillis() + expirationTimePasswordRecovery));
+        new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME));
     }
     verificationTokenRepository.save(verificationToken);
     return verificationToken;
@@ -188,7 +192,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     if (Objects.isNull(user)) {
       return ResponseEntity.badRequest().body("Cet utilisateur n'existe pas !");
     }
-    if (!user.getIsEmailVerified()) {
+    if (Boolean.FALSE.equals(user.getIsEmailVerified())) {
       throw new UserNotVerifiedException("Votre compte n'est pas vérifié");
     }
     VerificationToken verificationToken = createToken(user, FORGOT_PASSWORD);
@@ -216,7 +220,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
       javaMailSender.send(mailMessage);
     } catch (Exception e) {
-      throw new RuntimeException("Exception occurred while sending email", e);
+      logger.error("Exception occurred while sending email", e);
     }
     return ResponseEntity.ok("Email de récupération envoyé");
   }

@@ -118,7 +118,7 @@ class SurveyQuestionControllerTests {
   @Test
   @WithMockUser
   void shouldSelectQuestion_Success() throws Exception {
-    when(surveyQuestionService.selectQuestion(question.getId())).thenReturn(Optional.of(question));
+    when(surveyQuestionService.selectQuestion(question.getId())).thenReturn(question);
     mockMvc.perform(get("/api/survey/question/"+question.getId()))
       .andDo(print())
       .andExpect(status().isOk())

@@ -22,7 +22,7 @@ public interface SuperAdminService {
    * @return a ResponseEntity indicating the success or failure of the confirmation operation
    * @throws ProjectNotFoundException if the specified project does not exist
    */
-  ResponseEntity confirmProject(Long projectId) throws ProjectNotFoundException;
+  ResponseEntity<String> confirmProject(Long projectId) throws ProjectNotFoundException;
 
   /**
    * Suspends the user with the specified ID.
@@ -31,7 +31,7 @@ public interface SuperAdminService {
    * @return a ResponseEntity indicating the success or failure of the suspension operation
    * @throws UserNotFoundException if the specified user does not exist
    */
-  ResponseEntity suspendUser(Long userId) throws UserNotFoundException;
+  ResponseEntity<String> suspendUser(Long userId) throws UserNotFoundException;
 
   /**
    * Deletes the project with the specified ID.
@@ -40,7 +40,7 @@ public interface SuperAdminService {
    * @return a ResponseEntity indicating the success or failure of the deletion operation
    * @throws ProjectNotFoundException if the specified project does not exist
    */
-  ResponseEntity deleteProject(Long projectId) throws ProjectNotFoundException;
+  ResponseEntity<String> deleteProject(Long projectId) throws ProjectNotFoundException;
 
   /**
    * Retrieves a paginated list of non-confirmed projects.
@@ -66,7 +66,7 @@ public interface SuperAdminService {
    * @return a ResponseEntity indicating the success or failure of the confirmation operation
    * @throws ProjectNotFoundException if any of the specified projects do not exist
    */
-  ResponseEntity confirmProjects(List<Long> projectIds) throws ProjectNotFoundException;
+  ResponseEntity<String> confirmProjects(List<Long> projectIds) throws ProjectNotFoundException;
 
   /**
    * Retrieves a paginated list of non-confirmed projects that match the specified keyword.

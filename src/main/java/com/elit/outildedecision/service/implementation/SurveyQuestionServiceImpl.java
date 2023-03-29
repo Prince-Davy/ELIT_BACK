@@ -3,6 +3,7 @@ package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.repository.SurveyQuestionRepository;
 import com.elit.outildedecision.service.SurveyQuestionService;
 import org.springframework.stereotype.Service;
@@ -74,15 +75,15 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
    *
    * @param questionId The ID of the survey question to delete.
    * @return The deleted survey question, wrapped in an Optional.
-   * @throws RuntimeException If the specified question cannot be found.
+   * @throws QuestionsNotFoundException If the specified question cannot be found.
    */
   @Override
-  public Optional<SurveyQuestion> deleteQuestion(final Long questionId) {
+  public Optional<SurveyQuestion> deleteQuestion(final Long questionId) throws QuestionsNotFoundException {
     Optional<SurveyQuestion> toBeDeleted = questionRepo.findById(questionId);
     if (toBeDeleted.isPresent() && questionId.equals(toBeDeleted.get().getId())) {
       questionRepo.deleteById(questionId);
     } else {
-      throw new RuntimeException("question to delete not found");
+      throw new QuestionsNotFoundException("La question que vous voulez supprimer n'existe pas");
     }
     return toBeDeleted;
   }
@@ -92,15 +93,12 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
    *
    * @param questionId The ID of the survey question to retrieve.
    * @return The survey question, wrapped in an Optional.
-   * @throws RuntimeException If the specified question cannot be found.
+   * @throws QuestionsNotFoundException If the specified question cannot be found.
    */
   @Override
-  public Optional<SurveyQuestion> selectQuestion(final Long questionId) {
-    if (questionRepo.findById(questionId).isPresent()) {
-      return questionRepo.findById(questionId);
-    } else {
-      throw new RuntimeException("unknown question");
-    }
+  public SurveyQuestion selectQuestion(final Long questionId) throws QuestionsNotFoundException {
+    return questionRepo.findById(questionId)
+      .orElseThrow(() -> new QuestionsNotFoundException("Question Introuvable"));
   }
 
   /**

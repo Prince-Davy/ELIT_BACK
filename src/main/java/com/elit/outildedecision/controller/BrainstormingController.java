@@ -2,6 +2,8 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.BrainstormingNotFoundException;
+import com.elit.outildedecision.exception.ExistingBrainstormingException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.service.BrainstormingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,11 +40,11 @@ public class BrainstormingController {
   /**
    * @param predictibilityAnalysisId : the predictibility analysis id
    * @return ResponseEntity<Object>
-   * @throws Exception  : if the brainstorming is not found
+   * @throws PredictibilityAnalysisNotFoundException : if the predictibility analysis is not found
    */
   @GetMapping("/{predictibilityAnalysisId}")
   public ResponseEntity<Object> getBrainstorming(@PathVariable final Long predictibilityAnalysisId)
-      throws Exception {
+      throws PredictibilityAnalysisNotFoundException {
     return brainstormingService.getBrainstorming(predictibilityAnalysisId);
   }
 
@@ -50,11 +52,11 @@ public class BrainstormingController {
    * Get the brainstormings.
    * @param predictibilityAnalysisId : the predictibility analysis id
    * @return ResponseEntity<Object>
-   * @throws Exception : if the brainstorming is not found
+   * @throws PredictibilityAnalysisNotFoundException : if the predictibility analysis is not found
    */
   @GetMapping("/abstract/{predictibilityAnalysisId}")
   public ResponseEntity<Object> getBrainstormingAbstract(
-      @PathVariable final Long predictibilityAnalysisId) throws Exception {
+      @PathVariable final Long predictibilityAnalysisId) throws PredictibilityAnalysisNotFoundException {
     return brainstormingService.getBrainstormingAbstract(predictibilityAnalysisId);
   }
 
@@ -63,22 +65,23 @@ public class BrainstormingController {
    *
    * @param brainstormingModel : the brainstorming model
    * @return ResponseEntity<String>
-   * @throws Exception : if the brainstorming is not found
+   * @throws PredictibilityAnalysisNotFoundException : if the predictibility analysis is not found
+   * @throws ExistingBrainstormingException : if the brainstorming already exists
    */
   @PostMapping("")
   public ResponseEntity<String> createBrainstorming(
-      @Valid @RequestBody final BrainstormingModel brainstormingModel) throws Exception {
+      @Valid @RequestBody final BrainstormingModel brainstormingModel) throws PredictibilityAnalysisNotFoundException, ExistingBrainstormingException {
     return brainstormingService.createBrainstorming(brainstormingModel);
   }
   /**
    * Update a brainstorming.
    * @param brainstormingModel : the brainstorming model
    * @return ResponseEntity<String>
-   * @throws Exception : if the brainstorming is not found
+   * @throws BrainstormingNotFoundException : if the brainstorming is not found
    */
   @PutMapping("")
   public ResponseEntity<String> updateBrainstorming(
-      @RequestBody final BrainstormingModel brainstormingModel) throws Exception {
+      @RequestBody final BrainstormingModel brainstormingModel) throws BrainstormingNotFoundException {
     return brainstormingService.updateBrainstorming(brainstormingModel);
   }
   /**

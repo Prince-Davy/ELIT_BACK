@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "step_score")
@@ -19,10 +20,10 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StepScore {
+public class StepScore implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long Id;
+  private Long id;
 
   private String criteriaName;
   private float value;

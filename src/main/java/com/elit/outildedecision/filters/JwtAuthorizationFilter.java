@@ -60,7 +60,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
           SecurityContextHolder.getContext().setAuthentication(authentificationToken);
           filterChain.doFilter(request, response);
         } catch (Exception e) {
-          e.printStackTrace();
           response.setHeader("error", "Invalid token");
           response.sendError(403);
         }

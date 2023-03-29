@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class UserNotAuthorizedException extends Throwable {
+public class UserNotAuthorizedException extends Exception {
   /**
    * Constructor for UserNotAuthorizedException.
    * Exception thrown when a user is not authorized to perform an action.

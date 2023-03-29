@@ -1,7 +1,6 @@
 
 package com.elit.outildedecision.service;
 
-import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.EscoreException;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
@@ -9,6 +8,7 @@ import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.ResponseEntity;
 
@@ -48,7 +48,7 @@ public interface MultiCriteriaAnalysisService {
    * @return a ResponseEntity indicating the success or failure of the update operation
    */
   ResponseEntity<String> updateMultiCriteriaAnalysis(
-    Long projectId, FormStep multiCriteriaAnalysis);
+    Long projectId, MultiCriteriaStepModel multiCriteriaAnalysis);
 
   /**
    * Updates an existing multi-criteria analysis question.

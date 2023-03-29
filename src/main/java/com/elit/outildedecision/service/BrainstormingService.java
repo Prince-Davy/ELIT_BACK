@@ -71,7 +71,7 @@ public interface BrainstormingService {
    * Gets a summary of the brainstorming with the given ID.
    *
    * @param predictibilityAnalysisId the ID of the predictibility analysis to get the brainstorming for
-   * @throws Exception if there is an error getting the brainstorming summary
+   * @throws PredictibilityAnalysisNotFoundException if the predictibility analysis with the given ID does not exist
    * @return a ResponseEntity representing the result of the operation
    */
   ResponseEntity<Object> getBrainstormingAbstract(Long predictibilityAnalysisId) throws PredictibilityAnalysisNotFoundException;

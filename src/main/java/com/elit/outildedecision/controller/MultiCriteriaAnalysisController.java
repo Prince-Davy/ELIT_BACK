@@ -1,13 +1,14 @@
 
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.EscoreException;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.FormQuestionModel;
+import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.ResponseEntity;
@@ -91,7 +92,7 @@ public class MultiCriteriaAnalysisController {
    */
   @PutMapping("/multi-criteria-analysis/{projectId}")
   public ResponseEntity<String> updateMultiCriteriaAnalysis(
-      @PathVariable final Long projectId, @RequestBody final FormStep multiCriteriaAnalysisStep) {
+      @PathVariable final Long projectId, @RequestBody final MultiCriteriaStepModel multiCriteriaAnalysisStep) {
     return multiCriteriaAnalysisService.updateMultiCriteriaAnalysis(
         projectId, multiCriteriaAnalysisStep);
   }
@@ -116,7 +117,7 @@ public class MultiCriteriaAnalysisController {
    * @throws EscoreException            when there is an error in the escore calculation process
    */
   @GetMapping("/multi-criteria-analysis/{projectId}/score")
-  public ResponseEntity getMulticriteriaAnalysisScore(@PathVariable final Long projectId)
+  public ResponseEntity<MultiCriteriaAnalysisScoreModel> getMulticriteriaAnalysisScore(@PathVariable final Long projectId)
       throws ProjectNotFoundException, QuestionsNotFoundException, EscoreException {
     return multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId);
   }

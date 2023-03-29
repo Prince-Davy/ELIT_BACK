@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -31,7 +30,6 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "project")
-@EqualsAndHashCode(exclude = {"reviews" /* ,"report" */})
 public class Project implements Serializable {
 
   private static final long serialVersionUID = 1L;
