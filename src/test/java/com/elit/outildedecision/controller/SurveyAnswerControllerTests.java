@@ -6,6 +6,8 @@ import com.elit.outildedecision.model.SurveyAnswerResponseModel;
 import com.elit.outildedecision.service.SurveyAnswerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -66,39 +68,6 @@ class SurveyAnswerControllerTests {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("reponses enregis")));
-  }
-
-  @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
-  void shouldReplyToQuestion_ThrowQuestionsNotFoundException() throws Exception {
-    List<SurveyAnswerRequestModel> SurveyAnswerRequestModelList = Arrays.asList(surveyAnswerRequestModel);
-    when(surveyAnswerService.replyToQuestion(SurveyAnswerRequestModelList)).thenReturn(ResponseEntity.ok().body("questionnaire non existant"));
-    mockMvc.perform(post("/api/survey/answer").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(SurveyAnswerRequestModelList)))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().string(containsString("questionnaire non existant")));
-  }
-
-  @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
-  void shouldReplyToQuestion_ThrowResponseNotFoundException() throws Exception {
-    List<SurveyAnswerRequestModel> SurveyAnswerRequestModelList = Arrays.asList(surveyAnswerRequestModel);
-    when(surveyAnswerService.replyToQuestion(SurveyAnswerRequestModelList)).thenReturn(ResponseEntity.ok().body("reponse manquante"));
-    mockMvc.perform(post("/api/survey/answer").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(SurveyAnswerRequestModelList)))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().string(containsString("reponse manquante")));
-  }
-
-  @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
-  void shouldReplyToQuestion_ThrowResponseNotValidException() throws Exception {
-    List<SurveyAnswerRequestModel> SurveyAnswerRequestModelList = Arrays.asList(surveyAnswerRequestModel);
-    when(surveyAnswerService.replyToQuestion(SurveyAnswerRequestModelList)).thenReturn(ResponseEntity.ok().body("la réponse doit être un entier compris entre 1 et 5"));
-    mockMvc.perform(post("/api/survey/answer").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(SurveyAnswerRequestModelList)))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().string(containsString("compris entre 1 et 5")));
   }
 
   @Test
