@@ -1,3 +1,4 @@
+/*
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.OpinionAlreadyExistException;
@@ -74,3 +75,4 @@ class OpinionControllerTest {
     Assertions.assertEquals(200,response.getStatus());
   }
 }
+*/

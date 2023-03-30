@@ -4,6 +4,8 @@ package com.elit.outildedecision.security;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.service.UserService;
 import com.elit.outildedecision.util.ProjectPermession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,7 @@ import java.util.List;
  * interface that provides custom security expressions for checking project ownership and contributor permissions.
  */
 public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
+  private final Logger log = LoggerFactory.getLogger(CustomMethodSecurityExpressionRoot.class);
 
   /**
    * The object that was the filter object being processed when the method was invoked.
@@ -87,10 +90,8 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
       return false;
     }
     // Print the result to the console for debugging purposes
-    System.out.println(
-      permissions.contains(ProjectPermession.CDP.name())
-        || permissions.contains(ProjectPermession.CONTRIBUTER.name())
-        || permissions.contains(ProjectPermession.OBSERVER.name()));
+    this.log.info(ProjectPermession.CDP.name());
+
     return permissions.contains(ProjectPermession.CDP.name())
       || permissions.contains(ProjectPermession.CONTRIBUTER.name())
       || permissions.contains(ProjectPermession.OBSERVER.name());

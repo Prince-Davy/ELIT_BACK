@@ -110,10 +110,10 @@ public class MultiCriteriaAnalysisController {
    * get the multi-criteria analysis score.
    *
    * @param projectId the project id
-   * @throws ProjectNotFoundException when the project is not found in the database
-   * @throws QuestionsNotFoundException when the questions are not found in the database
-   * @throws EscoreException when there is an error in the escore calculation process
    * @return ResponseEntity<Object>
+   * @throws ProjectNotFoundException   when the project is not found in the database
+   * @throws QuestionsNotFoundException when the questions are not found in the database
+   * @throws EscoreException            when there is an error in the escore calculation process
    */
   @GetMapping("/multi-criteria-analysis/{projectId}/score")
   public ResponseEntity getMulticriteriaAnalysisScore(@PathVariable final Long projectId)

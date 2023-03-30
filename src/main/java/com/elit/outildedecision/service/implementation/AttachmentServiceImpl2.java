@@ -4,11 +4,14 @@ package com.elit.outildedecision.service.implementation;
 import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.service.AttachmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,6 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -50,17 +52,23 @@ public class AttachmentServiceImpl2 implements AttachmentService {
    */
   @Value("${file.upload-dir}")
   private String storingDirectory;
+  /** The Logger.*/
+  private final Logger logger;
+  /** The constant FILE_NOT_FOUND.*/
+  private static final String FILE_NOT_FOUND = "Fichier introuvable !";
 
   /**
    * Class's Constructor : Instantiates a new Attachment service.
    * dependency injection via constructor of the project repository and the attachment repository
-   * @param projectRepository the project repository
+   *
+   * @param projectRepository    the project repository
    * @param attachmentRepository the attachment repository
    */
   public AttachmentServiceImpl2(
-      final ProjectRepository projectRepository, final AttachmentRepository attachmentRepository) {
+    final ProjectRepository projectRepository, final AttachmentRepository attachmentRepository) {
     this.projectRepository = projectRepository;
     this.attachmentRepository = attachmentRepository;
+    this.logger = LoggerFactory.getLogger(AttachmentServiceImpl2.class);
   }
 
  /**
@@ -70,10 +78,11 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     * @param projectId the project id to which the files will be attached
     * @return the response entity
     * @throws ProjectNotFoundException the project not found exception if the project does not exist
+    * @throws FileCouldNotBeSaved the file could not be saved exception if the file could not be saved
     */
   @Override
   public ResponseEntity<Object> uploadAttachment(final List<MultipartFile> files, final Long projectId)
-      throws ProjectNotFoundException {
+    throws ProjectNotFoundException, FileCouldNotBeSaved {
     Project project =
         projectRepository
             .findById(projectId)
@@ -81,7 +90,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     String folderPath = StringUtils.cleanPath(storingDirectory + project.getFolderPath());
     for (MultipartFile file : files) {
       try {
-        String filePath = StringUtils.cleanPath(folderPath + "\\" + file.getOriginalFilename());
+        String filePath = StringUtils.cleanPath(folderPath.concat("\\").concat(file.getOriginalFilename()));
         Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
         Attachment attachment =
             Attachment.builder()
@@ -92,8 +101,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
                 .build();
         attachmentRepository.save(attachment);
       } catch (IOException e) {
-        throw new RuntimeException(
-            "Erreur lors de l'enregistrement du fichier : " + file.getOriginalFilename());
+        throw new FileCouldNotBeSaved("Erreur lors de l'enregistrement du fichier : " + file.getOriginalFilename());
       }
     }
     return ResponseEntity.ok().body("Fichiers enregistrés avec succés");
@@ -107,12 +115,12 @@ public class AttachmentServiceImpl2 implements AttachmentService {
    *     not exist
    */
   @Override
-  public ResponseEntity deleteAttachment(final Long attachmentId)
-      throws AttachmentNotFoundException {
+  public ResponseEntity<String> deleteAttachment(final Long attachmentId)
+    throws AttachmentNotFoundException {
     Attachment attachment =
-        attachmentRepository
-            .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas!"));
+      attachmentRepository
+        .findById(attachmentId)
+        .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas!"));
     File fileToDelete = new File(attachment.getFilePath());
     if (FileSystemUtils.deleteRecursively(fileToDelete)) {
       attachmentRepository.deleteById(attachmentId);
@@ -120,7 +128,8 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     } else {
       return ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier.");
     }
-}
+  }
+
   /**
    * this method is used to Visualize an attachment of a project on the browser.
    *
@@ -137,7 +146,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     Attachment attachment =
         attachmentRepository
             .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas !"));
+            .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
 
     File file = new File(attachment.getFilePath());
     if (file.exists()) {
@@ -151,16 +160,15 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       response.setContentType(mimeType);
       // Here we have mentioned it to show inline
       response.setHeader(
-          "Content-Disposition", String.format("inline; filename=\"" + file.getName() + "\""));
+          "Content-Disposition", String.format("inline; filename=\"%s\"", file.getName()));
 
       response.setContentLength((int) file.length());
 
-      InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-
-      FileCopyUtils.copy(inputStream, response.getOutputStream());
-
+      try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+        FileCopyUtils.copy(inputStream, response.getOutputStream());
+      }
     } else {
-      System.err.println("Ce fichier n'existe pas!");
+      logger.error(FILE_NOT_FOUND);
     }
   }
   /**
@@ -178,14 +186,10 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     Attachment attachment =
         attachmentRepository
             .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas !"));
+            .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
 
     File file = new File(attachment.getFilePath());
-
-    System.out.println("file " + file.getPath());
-    System.out.println("file.getName() " + file.getName());
     if (file.exists()) {
-
       // get the mimetype
       String mimeType = URLConnection.guessContentTypeFromName(file.getName());
       if (mimeType == null) {
@@ -197,16 +201,15 @@ public class AttachmentServiceImpl2 implements AttachmentService {
 
       // Here we have mentioned it to show as attachment
       response.setHeader(
-          "Content-Disposition", String.format("attachment; filename=\"", file.getName(), "\""));
+          "Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
 
       response.setContentLength((int) file.length());
 
-      InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-
-      FileCopyUtils.copy(inputStream, response.getOutputStream());
-
+      try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+        FileCopyUtils.copy(inputStream, response.getOutputStream());
+      }
     } else {
-      System.out.println("no exitia el file");
+      logger.error(FILE_NOT_FOUND);
     }
   }
   /**
@@ -226,7 +229,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     Attachment attachmentFromDB =
         attachmentRepository
             .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException("Ce fichier n'existe pas !"));
+            .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
 
     Map<String, String> newName =
         new ObjectMapper().readValue(attachmentNameJson.getBody(), HashMap.class);

@@ -2,6 +2,8 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.exception.BrainstormingNotFoundException;
+import com.elit.outildedecision.exception.ExistingBrainstormingException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpEntity;
@@ -16,21 +18,22 @@ public interface BrainstormingService {
    * Creates a new brainstorming with the given model.
    *
    * @param brainstormingModel the model for the brainstorming
-   * @throws Exception if there is an error creating the brainstorming
+   * @throws PredictibilityAnalysisNotFoundException if there is an error creating the brainstorming
+   * @throws ExistingBrainstormingException if there is an error creating the brainstorming
    * @return a ResponseEntity representing the result of the operation
    */
   ResponseEntity<String> createBrainstorming(BrainstormingModel brainstormingModel)
-    throws Exception;
+    throws PredictibilityAnalysisNotFoundException, ExistingBrainstormingException;
 
   /**
    * Updates an existing brainstorming with the given model.
    *
    * @param brainstormingModel the model for the brainstorming
-   * @throws Exception if there is an error updating the brainstorming
+   * @throws BrainstormingNotFoundException if there is an error updating the brainstorming
    * @return a ResponseEntity representing the result of the operation
    */
   ResponseEntity<String> updateBrainstorming(BrainstormingModel brainstormingModel)
-    throws Exception;
+    throws BrainstormingNotFoundException;
 
   /**
    * Deletes the brainstorming with the given ID.
@@ -59,10 +62,10 @@ public interface BrainstormingService {
    * Gets the full details of the brainstorming with the given ID.
    *
    * @param predictibilityAnalysisId the ID of the predictibility analysis to get the brainstorming for
-   * @throws Exception if there is an error getting the brainstorming
+   * @throws PredictibilityAnalysisNotFoundException if there is an error getting the brainstorming
    * @return a ResponseEntity representing the result of the operation
    */
-  ResponseEntity<Object> getBrainstorming(Long predictibilityAnalysisId) throws Exception;
+  ResponseEntity<Object> getBrainstorming(Long predictibilityAnalysisId) throws PredictibilityAnalysisNotFoundException;
 
   /**
    * Gets a summary of the brainstorming with the given ID.
@@ -71,5 +74,5 @@ public interface BrainstormingService {
    * @throws Exception if there is an error getting the brainstorming summary
    * @return a ResponseEntity representing the result of the operation
    */
-  ResponseEntity<Object> getBrainstormingAbstract(Long predictibilityAnalysisId) throws Exception;
+  ResponseEntity<Object> getBrainstormingAbstract(Long predictibilityAnalysisId) throws PredictibilityAnalysisNotFoundException;
 }

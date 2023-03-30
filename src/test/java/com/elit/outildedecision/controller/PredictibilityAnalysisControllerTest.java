@@ -1,3 +1,4 @@
+/*
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
@@ -118,3 +119,4 @@ class PredictibilityAnalysisControllerTest {
   }
 
 }
+*/

@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +28,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(exclude = {"stepWeights", "form"})
-public class FormStep {
+public class FormStep implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long stepId;

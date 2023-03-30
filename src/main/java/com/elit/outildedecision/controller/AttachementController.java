@@ -2,6 +2,7 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.service.AttachmentService;
 import org.springframework.http.HttpEntity;
@@ -45,13 +46,14 @@ public class AttachementController {
    * @return the response entity
    * @throws ProjectNotFoundException the project not found exception
    * @throws IOException the io exception
+   * @throws FileCouldNotBeSaved the file could not be saved
    */
   @PostMapping(
       value = "/upload/{projectId}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Object> uploadAttachment(@PathVariable final Long projectId,
                                                  @RequestParam("files") final List<MultipartFile> files)
-      throws ProjectNotFoundException, IOException {
+    throws ProjectNotFoundException, IOException, FileCouldNotBeSaved {
     return attachmentService.uploadAttachment(files, projectId);
   }
   /**
@@ -93,11 +95,12 @@ public class AttachementController {
    * @throws ProjectNotFoundException the project not found exception
    */
   @DeleteMapping("/{attachmentId}")
-  public ResponseEntity deleteAttachmentById(@PathVariable("attachmentId") final Long attachmentId)
-      throws AttachmentNotFoundException,
+  public ResponseEntity<String> deleteAttachmentById(@PathVariable("attachmentId") final Long attachmentId)
+    throws AttachmentNotFoundException,
     ProjectNotFoundException {
     return attachmentService.deleteAttachment(attachmentId);
   }
+  
   /**
    * this method is used to preview an attachment of a project based on its id.
    *

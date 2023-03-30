@@ -7,10 +7,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
+import com.elit.outildedecision.exception.RefreshTokenException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,11 +37,13 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
 public class AuthentificationController {
+  private final Logger log = LoggerFactory.getLogger(AuthentificationController.class);
+
   /**
    * The Constant EXPIRATION_TIME.
    * The expiration time of the JWT token.
    */
-  private static final long EXPIRATION_TIME = 5 * 60 * 1000;
+  private static final long EXPIRATION_TIME = 5L * 60L * 1000L;
 
   /**
    * The Constant jwtSecret.
@@ -56,8 +61,8 @@ public class AuthentificationController {
    * Instantiates a new Authentification controller.
    * dependency injection via constructor of the user service
    *
-   * @param jwtSecret
-   * @param userService the user service
+   * @param jwtSecret a String containing the JWT secret used for authentication and authorization.
+   * @param userService  userService an instance of the UserService class, used to interact with the user data store.
    */
   public AuthentificationController(@Value("${jwt.secret}") final String jwtSecret, final UserService userService) {
     this.jwtSecret = jwtSecret;
@@ -70,6 +75,7 @@ public class AuthentificationController {
    * @param user the user to register
    * @return ResponseEntity<String>
    * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
+   * @throws UserAlreadyExistsException the exception thrown when the user already exist
    */
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid final UserModel user)
@@ -87,22 +93,22 @@ public class AuthentificationController {
   @GetMapping("/refreshToken")
   public void refreshToken(final HttpServletRequest request,
                            final HttpServletResponse response)
-    throws IOException {
+    throws IOException, RefreshTokenException {
     String jwtAuthorizationToken = request.getHeader("Authorization");
     if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
       try {
         String refreshToken = jwtAuthorizationToken.substring("Bearer ".length());
-        System.out.println("jwtSecret = " + jwtSecret);
-        System.out.println("refreshToken = " + refreshToken);
+        this.log.info("jwtSecret = {}",jwtSecret);
+        this.log.info("refreshToken = {}", refreshToken);
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(refreshToken);
-        System.out.println("decodedJWT = " + decodedJWT);
+        this.log.info("decodedJWT = {}", decodedJWT);
         String userEmail = decodedJWT.getSubject();
         User user = userService.findByEmail(userEmail);
-        System.out.println("user = " + user);
+        this.log.info("user = {}", user);
         List<String> roles = new ArrayList<>();
-        roles.add(user.getIsAdmin() ? "ADMIN" : "USER");
+        roles.add(Boolean.TRUE.equals(user.getIsAdmin()) ? "ADMIN" : "USER");
         String accessToken =
           JWT.create()
             .withSubject(user.getUserEmail())
@@ -128,7 +134,7 @@ public class AuthentificationController {
         new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
       }
     } else {
-      throw new RuntimeException("Refresh token is missing");
+      throw new RefreshTokenException("Refresh token is missing");
     }
   }
 }

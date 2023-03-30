@@ -20,6 +20,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Brainstorming implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "questionId", referencedColumnName = "questionId")
   @JsonBackReference("question_brainstorming")

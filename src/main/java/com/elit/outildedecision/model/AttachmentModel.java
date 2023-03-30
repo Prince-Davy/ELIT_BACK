@@ -7,9 +7,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 
+/**
+ * This class represents an attachment model that holds a list of attachments.
+ * It is a container for MultipartFile objects, which represent uploaded files received in a multipart request.
+ * It uses Lombok annotations to generate constructors, getters, and setters.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttachmentModel {
+
+  /**
+   * A list of attachments represented as MultipartFile objects.
+   */
   private ArrayList<MultipartFile> attachments;
 }

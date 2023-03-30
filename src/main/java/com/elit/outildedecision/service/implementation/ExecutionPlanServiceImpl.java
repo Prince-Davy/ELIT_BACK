@@ -36,6 +36,8 @@ import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.util.ProjectPermession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -133,6 +135,9 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     this.predictibilityResultsRepository = predictibilityResultsRepository;
   }
 
+  private final Logger log = LoggerFactory.getLogger(ExecutionPlanServiceImpl.class);
+
+
   /**
    * this method is used to create an execution plan.
    *
@@ -153,12 +158,6 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
         predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(
             lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisId());
 
-    /*
-     * if (!lastPredictibilityAnalysis.getIsFinished()) return
-     * ResponseEntity.status(HttpStatus.FORBIDDEN)
-     * .body(-1L);
-     */
-
     ExecutionPlan lastExecutionPlan =
         executionPlanRepository.findByLastIterationAndPredictibilityId(
             lastPredictibilityAnalysis.getPredictibilityAnalysisId());
@@ -167,7 +166,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     if (lastExecutionPlan != null) {
       // "Une Analyse de prévisibilité est déjà en cours"
-      if (!lastExecutionPlan.getIsFinished()) {
+      if (Boolean.FALSE.equals(lastExecutionPlan.getIsFinished())) {
         return ResponseEntity.ok().body(lastExecutionPlan.getExecutionPlanId());
       }
       nextIteration = lastExecutionPlan.getExecutionIteration() + 1;
@@ -262,7 +261,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
             .orElseThrow(() -> new RuntimeException("Plan d'exécution introuvable."));
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
-    System.out.println("project = " + project);
+    this.log.info("project = {}", project);
     ProjectUserPermission projectUserPermission =
         projectUserPermissionRepository.findByProjectIdUserID(
             project.getProjectId(), user.getUserId());
