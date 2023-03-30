@@ -98,7 +98,7 @@ public class AuthentificationController {
     if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
       try {
         String refreshToken = jwtAuthorizationToken.substring("Bearer ".length());
-        this.log.info("jwtSecret = {}",jwtSecret);
+        this.log.info("jwtSecret = {}", jwtSecret);
         this.log.info("refreshToken = {}", refreshToken);
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();

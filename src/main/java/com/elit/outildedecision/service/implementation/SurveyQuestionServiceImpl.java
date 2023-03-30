@@ -65,8 +65,9 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
       throw new QuestionFormatNotValidException("question not found with this reference");
     }
     Optional<SurveyQuestion> toBeUpdated = questionRepo.findById(questionId);
-    if(toBeUpdated.isPresent())
+    if (toBeUpdated.isPresent()) {
       toBeUpdated.get().setQuestion(question.getQuestion());
+    }
     return question;
   }
 

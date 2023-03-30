@@ -100,7 +100,6 @@ public class AttachementController {
     ProjectNotFoundException {
     return attachmentService.deleteAttachment(attachmentId);
   }
-  
   /**
    * this method is used to preview an attachment of a project based on its id.
    *
