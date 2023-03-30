@@ -46,7 +46,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     for (FieldError error : fieldErrors) {
       details.put(error.getField(), error.getDefaultMessage());
     }
-    return new ResponseEntity(details, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<Object>(details, HttpStatus.BAD_REQUEST);
   }
   /**
    * Handles SQLIntegrityConstraintViolationException and returns a response with an error message and HTTP status code 409 (CONFLICT).

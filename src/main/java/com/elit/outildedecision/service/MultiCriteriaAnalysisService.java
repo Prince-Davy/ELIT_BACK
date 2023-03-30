@@ -8,6 +8,7 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.FormQuestionModel;
+import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.ResponseEntity;
 
@@ -68,7 +69,7 @@ public interface MultiCriteriaAnalysisService {
    * @throws QuestionsNotFoundException if any of the questions associated with the multi-criteria analysis do not exist
    * @throws EscoreException if an error occurs while calculating the score
    */
-  ResponseEntity calculateMultiCriteriaAnalysisScore(Long projectId)
+  ResponseEntity<MultiCriteriaAnalysisScoreModel> calculateMultiCriteriaAnalysisScore(Long projectId)
     throws ProjectNotFoundException, QuestionsNotFoundException, EscoreException;
 
   /**

@@ -5,16 +5,47 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a response containing vote information.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class VoteModelResponse {
+
+  /**
+   * The ID of the vote.
+   */
   private Long voteId;
+
+  /**
+   * The chosen PMM for the vote.
+   */
   private String chosenPMM;
+
+  /**
+   * The justification for the vote.
+   */
   private String justification;
+
+  /**
+   * The predictability value for the vote.
+   */
   private Integer predictibilityValue;
+
+  /**
+   * The ID of the predictability analysis for the vote.
+   */
   private Long predictibilityAnalysisId;
+
+  /**
+   * Whether the vote has been confirmed.
+   */
   private Boolean isConfirmed;
+
+  /**
+   * The ID of the user who submitted the vote.
+   */
   private Long userId;
 }

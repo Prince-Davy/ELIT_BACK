@@ -12,38 +12,70 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
+/**
+ * Represents a user of the system.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserModel implements Serializable {
+
+  /**
+   * The username of the user.
+   */
   @NotBlank(message = "username est obligatoire")
   private String username;
 
+  /**
+   * The last name of the user.
+   */
   @NotBlank(message = "le nom est requis")
   private String userLastName;
 
+  /**
+   * The first name of the user.
+   */
   @NotBlank(message = "le prenom est requis")
   private String userFirstName;
 
+  /**
+   * The email address of the user.
+   */
   @Email(message = "email invalide")
   @NotBlank(message = "email est obligatoire")
   private String userEmail;
 
+  /**
+   * The job title of the user.
+   */
   @NotBlank(message = "metier est obligatoire")
   private String userJob;
 
+  /**
+   * The password of the user.
+   */
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   @Pattern(
-      regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
-      message =
-          "le mot de passe doit contenir au moins 8 caractères,"
-            + " une lettre majuscule, une lettre minuscule,"
-            + " un chiffre et un caractère spécial")
+    regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+    message =
+      "le mot de passe doit contenir au moins 8 caractères,"
+        + " une lettre majuscule, une lettre minuscule,"
+        + " un chiffre et un caractère spécial")
   private String userPassword;
 
+  /**
+   * The email confirmation of the user.
+   */
   private String userEmailConfirmation;
 
+  /**
+   * The password confirmation of the user.
+   */
   private String userPasswordConfirmation;
+
+  /**
+   * The avatar file of the user.
+   */
   private MultipartFile userAvatar;
 }

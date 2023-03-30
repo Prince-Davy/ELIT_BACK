@@ -5,7 +5,7 @@ public enum MethodologyTypes {
   HYBRID("hybrid"),
   CLASSIC("classique");
 
-  private final String MethodologyTypesName;
+  private final String methodologyTypesName;
 
   /**
    * Constructor for creating a new MethodologyTypes instance.
@@ -13,11 +13,11 @@ public enum MethodologyTypes {
    * @param reportTypeName The name of the report type.
    */
   MethodologyTypes(final String reportTypeName) {
-    this.MethodologyTypesName = reportTypeName;
+    this.methodologyTypesName = reportTypeName;
   }
 
   @Override
   public String toString() {
-    return MethodologyTypesName;
+    return methodologyTypesName;
   }
 }

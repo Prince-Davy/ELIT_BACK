@@ -50,6 +50,6 @@ public interface FormStepService {
    * @throws QuestionsNotFoundException if any of the questions associated with the step do not exist
    * @throws StepWeightNotFoundException if the weight property of the step cannot be found
    */
-  ResponseEntity updateFormStep(FormStep step)
+  ResponseEntity<String> updateFormStep(FormStep step)
     throws StepFormNotFoundException, QuestionsNotFoundException, StepWeightNotFoundException;
 }
