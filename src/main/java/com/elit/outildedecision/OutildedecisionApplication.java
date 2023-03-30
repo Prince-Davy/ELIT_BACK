@@ -25,8 +25,8 @@ public class OutildedecisionApplication {
    * This method is used to create a bean of type {@link PasswordEncoder}.
    * @return a bean of type {@link PasswordEncoder}.
    */
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+ @Bean
+ public PasswordEncoder passwordEncoder() {
+   return new BCryptPasswordEncoder();
+ }
 }

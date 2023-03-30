@@ -1,9 +1,11 @@
 
 package com.elit.outildedecision.security;
 
+import com.elit.outildedecision.config.JwtProperties;
 import com.elit.outildedecision.filters.JwtAuthenticationFilter;
 import com.elit.outildedecision.filters.JwtAuthorizationFilter;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,7 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -29,13 +31,25 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
    * The custom user details service used for authentication.
    */
   private final UserServiceImpl customUserDetailsService;
+  /**
+   * The JWT properties.
+   */
+  @Autowired
+  private JwtProperties jwtProperties;
+  /**
+   * PasswordEncoder instance to encode and decode passwords.
+   */
+  private final PasswordEncoder passwordEncoder;
 
   /**
    * Constructor for SpringConfig.
+   *
    * @param customUserDetailsService the custom user details service used for authentication.
+   * @param passwordEncoder
    */
-  public SpringConfig(final UserServiceImpl customUserDetailsService) {
+  public SpringConfig(final UserServiceImpl customUserDetailsService, final PasswordEncoder passwordEncoder) {
     this.customUserDetailsService = customUserDetailsService;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -46,7 +60,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(customUserDetailsService)
-      .passwordEncoder(new BCryptPasswordEncoder()); //TODO: Check if this is the correct encoder to use.
+      .passwordEncoder(passwordEncoder);
   }
 
   /**
@@ -57,11 +71,13 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(final HttpSecurity http) throws Exception {
     http.csrf().disable();
+    // enable frames for H2
+    http.headers().frameOptions().disable();
     http.cors().configurationSource(corsConfigurationSource());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     http.authorizeRequests().anyRequest().permitAll();
-    http.addFilter(new JwtAuthenticationFilter(authenticationManagerBean()));
-    http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.addFilter(new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean()));
+    http.addFilterBefore(new JwtAuthorizationFilter(jwtProperties), UsernamePasswordAuthenticationFilter.class);
   }
 
   /**

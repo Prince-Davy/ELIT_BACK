@@ -2,9 +2,9 @@ package com.elit.outildedecision.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.elit.outildedecision.config.JwtProperties;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,15 +23,16 @@ import java.util.stream.Collectors;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
   private static final long EXPIRATION_TIME = 5L * 60L * 1000L;
-
-  @Value("${jwt.secret}")
-  private String jwtSecret;
+  private final JwtProperties jwtProperties;
   private final AuthenticationManager authenticationManager;
   /**
    * Constructor of JwtAuthenticationFilter.
+   *
+   * @param jwtProperties
    * @param authenticationManager the authentication manager
    */
-  public JwtAuthenticationFilter(final AuthenticationManager authenticationManager) {
+  public JwtAuthenticationFilter(final JwtProperties jwtProperties, final AuthenticationManager authenticationManager) {
+    this.jwtProperties = jwtProperties;
     this.authenticationManager = authenticationManager;
   }
 
@@ -78,7 +79,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     AppUserPrincipal user =
         (AppUserPrincipal) authResult.getPrincipal(); // get the authenticated user
     Algorithm algorithm =
-        Algorithm.HMAC256(jwtSecret.getBytes());
+        Algorithm.HMAC256(jwtProperties.getSecret().getBytes());
     String accessToken =
         JWT.create()
             .withSubject(user.getUsername()) // the (email) of the authenticated user
