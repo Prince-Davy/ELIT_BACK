@@ -25,6 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+/**
+ * Unit test for PredictibilityAnalysisController
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -45,7 +48,7 @@ class PredictibilityAnalysisControllerTest {
   }
 
   @Test
-  void createPredictibilityAnalysis_whenProjectDoseNotExist() throws Exception {
+  void createPredictibilityAnalysis_whenProjectDoseNotExist()  {
     Long projectId = 1L;
     when(predictibilityAnalysisService.createPredictibilityForm(projectId)).thenThrow(new RuntimeException("Ce projet n'existe pas"));
     Exception exception = assertThrows(RuntimeException.class, () -> {
