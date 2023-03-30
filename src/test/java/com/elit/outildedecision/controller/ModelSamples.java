@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class ModelSamples {
@@ -114,11 +115,6 @@ public class ModelSamples {
 
   }
 
-
-
-
-
-
   public static class SurveyAnswerSamples {
     public static SurveyAnswerRequestModel getSurveyAnswerRequestModel() {
       SurveyAnswerRequestModel surveyAnswerRequestModel = new SurveyAnswerRequestModel();
@@ -135,6 +131,12 @@ public class ModelSamples {
       surveyAnswerResponseModel.setQuestionId(1L);
       surveyAnswerResponseModel.setUserId(1L);
       return surveyAnswerResponseModel;
+    }
+  }
+
+  public static class ReportSamples {
+    public static List<ReportResponseModel> getReportResponseModels() {
+      return Arrays.asList(new ReportResponseModel(1l, "reportTile", "reportType", 1, null));
     }
   }
 
@@ -168,6 +170,47 @@ public class ModelSamples {
   public static class SurveyQuestionSamples {
     public static SurveyQuestion getSurveyQuestion() {
       return new SurveyQuestion(1L, "is this a question", "yes/no question");
+    }
+
+    public static FormQuestion getQuestion() {
+      FormQuestion question = new FormQuestion();
+      question.setQuestionId(1l);
+      question.setQuestionText("is this question?");
+      question.setAnswerText("yes it is");
+      return question;
+    }
+
+  }
+  public static class FormStepSamples {
+    public static FormStep getFormStep() {
+      FormStep formStep = new FormStep();
+      formStep.setStepId(1L);
+      formStep.setStepName("step1");
+      formStep.setStepRef(1L);
+      formStep.setStepScores(Arrays.asList(getStepScore()));
+      formStep.setMultiCriteriaAnalysis(MultiCreteriaAnalysisSamples.getMultiAnalysisCreteria());
+      formStep.setFormQuestions(new HashSet<>(Arrays.asList(SurveyQuestionSamples.getQuestion())));
+      return formStep;
+    }
+
+    public static StepScore getStepScore() {
+      StepScore stepScore = new StepScore();
+      stepScore.setId(1l);
+      stepScore.setValue(4l);
+      stepScore.setCriteriaName("criteriaName");
+      return stepScore;
+    }
+  }
+
+  public static class MultiCreteriaAnalysisSamples {
+    public static MultiCriteriaAnalysis getMultiAnalysisCreteria() {
+      MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+      multiCriteriaAnalysis.setMultiCriteriaAnalysisId(1l);
+      multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(1);
+      multiCriteriaAnalysis.setIsFinished(true);
+      multiCriteriaAnalysis.setProject(ProjectSamples.getProject());
+      multiCriteriaAnalysis.setFormSteps(new ArrayList<>());
+      return  multiCriteriaAnalysis;
     }
   }
 }
