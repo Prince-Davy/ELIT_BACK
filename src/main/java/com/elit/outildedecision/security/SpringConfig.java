@@ -46,7 +46,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(customUserDetailsService)
-      .passwordEncoder(new BCryptPasswordEncoder()); //TODO: Check if this is the correct encoder to use.
+      .passwordEncoder(new BCryptPasswordEncoder()); //TO DO: Check if this is the correct encoder to use.
   }
 
   /**
