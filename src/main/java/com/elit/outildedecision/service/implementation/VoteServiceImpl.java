@@ -126,7 +126,7 @@ public class VoteServiceImpl implements VoteService {
     throws UserNotFoundException {
     String userEmail =
       (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    log.info("userEmail" , userEmail);
+    log.info("userEmail", userEmail);
     User user = userRepository.findByUserEmail(userEmail);
     log.info("user", user);
     PredictibilityAnalysis predictibilityAnalysis =
