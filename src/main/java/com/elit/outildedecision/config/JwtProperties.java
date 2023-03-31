@@ -6,14 +6,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
-
-    private String secret;
-
-    public String getSecret() {
+  /**
+   * The Secret.
+   * The secret key used to sign the JWT token.
+   */
+  private String secret;
+  /**
+   * Gets secret.
+   * @return the secret key used to sign the JWT token.
+   */
+  public String getSecret() {
         return secret;
     }
-
-    public void setSecret(final String secret) {
-        this.secret = secret;
+    /**
+     * Sets secret.
+     * @param jwtSecret the secret key used to sign the JWT token.
+     */
+    public void setSecret(final String jwtSecret) {
+        this.secret = jwtSecret;
     }
 }

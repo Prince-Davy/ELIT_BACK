@@ -127,7 +127,7 @@ public class ProjectController {
   public ResponseEntity<String> validateOrRejectProject(@PathVariable final Long id,
                                                         final HttpEntity<String> isConfirmed)
                                                         throws ProjectNotFoundException,
-                                                        java.io.IOException {
+                                                        IOException {
     return projectService.validateOrRejectProject(id, isConfirmed);
   }
   /**

@@ -40,10 +40,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -210,8 +214,6 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
             .formStep(persistedStep)
             .build());
       }
-
-      Iterator questionIterator= questions.entrySet().iterator();
       while (multiCreteriaIterator.hasNext()) {
         Map.Entry question = (Map.Entry) multiCreteriaIterator.next();
         FormQuestion persistedFormQuestion =

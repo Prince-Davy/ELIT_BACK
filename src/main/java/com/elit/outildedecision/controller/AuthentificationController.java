@@ -13,8 +13,6 @@ import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
@@ -46,7 +44,6 @@ public class AuthentificationController {
    * The Jwt Properties.
    * The properties used to configure the JWT token.
    */
-
   private final JwtProperties jwtProperties;
   /**
    * The User service.
