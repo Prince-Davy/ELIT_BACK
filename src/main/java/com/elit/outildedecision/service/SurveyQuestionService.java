@@ -4,6 +4,7 @@ package com.elit.outildedecision.service;
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.model.SurveyQuestionModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public interface SurveyQuestionService {
    * @return the newly created SurveyQuestion object
    * @throws QuestionFormatNotValidException if the specified question format is not valid
    */
-  SurveyQuestion createQuestion(SurveyQuestion question)
+  SurveyQuestion createQuestion(SurveyQuestionModel question)
     throws QuestionFormatNotValidException;
 
   /**
@@ -31,7 +32,7 @@ public interface SurveyQuestionService {
    * @return the updated SurveyQuestion object
    * @throws QuestionFormatNotValidException if the specified question format is not valid
    */
-  SurveyQuestion modifyQuestion(Long questionId, SurveyQuestion question)
+  SurveyQuestion modifyQuestion(Long questionId, SurveyQuestionModel question)
     throws QuestionFormatNotValidException;
 
   /**

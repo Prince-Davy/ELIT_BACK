@@ -3,6 +3,7 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.model.SurveyQuestionModel;
 import com.elit.outildedecision.service.SurveyQuestionService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +45,7 @@ public class SurveyQuestionController {
    * @return added question. return needed for API testing
    */
   @PostMapping("")
-  public SurveyQuestion createQuestion(@RequestBody(required = false) final SurveyQuestion question)
+  public SurveyQuestion createQuestion(@RequestBody(required = false) final SurveyQuestionModel question)
       throws QuestionFormatNotValidException {
     return questionService.createQuestion(question);
   }
@@ -58,7 +59,7 @@ public class SurveyQuestionController {
    */
   @PutMapping("/{questionId}")
   public SurveyQuestion modifyQuestion(
-      @PathVariable final Long questionId, @RequestBody(required = false) final SurveyQuestion question)
+      @PathVariable final Long questionId, @RequestBody(required = false) final SurveyQuestionModel question)
       throws QuestionFormatNotValidException {
     return questionService.modifyQuestion(questionId, question);
   }

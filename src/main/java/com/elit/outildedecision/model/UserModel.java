@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.io.Serializable;
 
 /**
  * Represents a user of the system.
@@ -19,7 +18,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserModel implements Serializable {
+public class UserModel {
 
   /**
    * The username of the user.

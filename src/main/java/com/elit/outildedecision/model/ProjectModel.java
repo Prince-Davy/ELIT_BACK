@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -16,7 +14,7 @@ import java.util.ArrayList;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectModel implements Serializable {
+public class ProjectModel {
 
   private static final long serialVersionUID = 1L;
 

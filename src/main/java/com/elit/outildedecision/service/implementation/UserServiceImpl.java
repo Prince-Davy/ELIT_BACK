@@ -12,6 +12,7 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.UserService;
 import com.elit.outildedecision.service.VerificationTokenService;
+import com.elit.outildedecision.util.Constants;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +175,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public ResponseEntity<String> updatePasswordUserById(final Long userId,
                                                        final String oldPass,
                                                        final String newPass) throws UserNotFoundException {
-    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas"));
+    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
     String currentPass = user.getUserPassword();
     boolean checkPassword = passwordEncoder.matches(oldPass, currentPass);
     if (!checkPassword) {
@@ -202,7 +203,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     throws UserNotFoundException,
     IOException {
     User user = userRepository.findById(userId)
-      .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
+      .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
     String avatarPath = saveAvatar(userAvatar);
     user.setUserAvatarPath(avatarPath);
     userRepository.save(user);
@@ -224,7 +225,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                                                     final String userFirstName,
                                                     final String userLastName) throws CouldNotSaveUserException, UserNotFoundException {
     User user = userRepository.findById(userId)
-      .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
+      .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
 
     if (!Objects.isNull(userFirstName)) {
       try {
@@ -293,25 +294,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     User userFromDB = userRepository.findByUserEmail(authenticatedUserEmail);
     Map<String, String> errorMap = new HashMap<>();
     if (Objects.isNull(userFromDB)) {
-      errorMap.put("NOT_FOUND", "Utilisateur non trouvé");
+      errorMap.put("NOT_FOUND", Constants.USER_NOT_FOUND);
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMap);
     }
     if (userRepository.findByUserEmail(user.getUserEmail()) != null
       && !userFromDB.getUserEmail().equals(user.getUserEmail())) {
-      errorMap.put("CONFLICT", "email déjà utilisé");
+      errorMap.put(Constants.CONFLICT, "email déjà utilisé");
       return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
     }
     if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())) {
-      errorMap.put("CONFLICT", "Les mots de passe doivent être identiques");
+      errorMap.put(Constants.CONFLICT, "Les mots de passe doivent être identiques");
       return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
     }
     if (!user.getUserEmail().equals(user.getUserEmailConfirmation())) {
-      errorMap.put("CONFLICT", "Les emails doivent être identiques");
+      errorMap.put(Constants.CONFLICT, "Les emails doivent être identiques");
       return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
     }
     if (userRepository.findByUsername(user.getUsername()) != null
       && !userFromDB.getUsername().equals(user.getUsername())) {
-      errorMap.put("CONFLICT", "nom d'utilisateur déjà utilisé");
+      errorMap.put(Constants.CONFLICT, "nom d'utilisateur déjà utilisé");
       return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
     }
     if (user.getUsername() != null) {
