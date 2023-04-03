@@ -162,6 +162,9 @@ public class ModelSamples {
     public static SurveyQuestion getSurveyQuestion() {
       return new SurveyQuestion(1L, "is this a question", "yes/no question");
     }
+    public static SurveyQuestionModel getSurveyQuestionRequestModel() {
+      return new SurveyQuestionModel("is this a question", "yes/no question");
+    }
   }
 }
 

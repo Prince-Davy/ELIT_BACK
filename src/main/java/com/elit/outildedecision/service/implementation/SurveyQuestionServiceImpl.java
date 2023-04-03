@@ -4,9 +4,11 @@ package com.elit.outildedecision.service.implementation;
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.model.SurveyQuestionModel;
 import com.elit.outildedecision.repository.SurveyQuestionRepository;
 import com.elit.outildedecision.service.SurveyQuestionService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,6 +21,9 @@ import java.util.Optional;
 @Service
 public class SurveyQuestionServiceImpl implements SurveyQuestionService {
 
+  /**
+   * The survey question repository.
+   */
   private final SurveyQuestionRepository questionRepo;
 
   /**
@@ -38,12 +43,16 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
    * @throws QuestionFormatNotValidException If the specified question format is not valid.
    */
   @Override
-  public SurveyQuestion createQuestion(final SurveyQuestion question)
+  @Transactional
+  public SurveyQuestion createQuestion(final SurveyQuestionModel question)
     throws QuestionFormatNotValidException {
     if (Objects.isNull(question)) {
       throw new QuestionFormatNotValidException("question format not valid");
     }
-    return questionRepo.save(question);
+    SurveyQuestion newQuestion = new SurveyQuestion();
+    newQuestion.setQuestion(question.getQuestion());
+    newQuestion.setType(question.getType());
+    return questionRepo.save(newQuestion);
   }
 
   /**
@@ -55,20 +64,20 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
    * @throws QuestionFormatNotValidException If the specified question format is not valid.
    */
   @Override
+  @Transactional
   public SurveyQuestion modifyQuestion(final Long questionId,
-                                       final SurveyQuestion question)
+                                       final SurveyQuestionModel question)
     throws QuestionFormatNotValidException {
     if (Objects.isNull(question)) {
-      throw new QuestionFormatNotValidException("question format not valid");
+      throw new QuestionFormatNotValidException("le format de la question n'est pas valide");
     }
-    if (!question.getId().equals(questionId)) {
-      throw new QuestionFormatNotValidException("question not found with this reference");
+    if (questionRepo.existsById(questionId)) {
+      throw new QuestionFormatNotValidException("la question que vous voulez modifier n'existe pas");
     }
-    Optional<SurveyQuestion> toBeUpdated = questionRepo.findById(questionId);
-    if (toBeUpdated.isPresent()) {
-      toBeUpdated.get().setQuestion(question.getQuestion());
-    }
-    return question;
+    // update the field question
+    SurveyQuestion questionToUpdate = questionRepo.getById(questionId);
+    questionToUpdate.setQuestion(question.getQuestion());
+    return questionRepo.save(questionToUpdate);
   }
 
   /**

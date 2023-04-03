@@ -2,7 +2,9 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
+import com.elit.outildedecision.model.SurveyQuestionModel;
 import com.elit.outildedecision.service.SurveyQuestionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -38,16 +40,18 @@ class SurveyQuestionControllerTests {
   SurveyQuestionController surveyQuestionController;
 
   private SurveyQuestion question;
+  private SurveyQuestionModel questionModel;
 
   @BeforeEach
   public void setup() {
+    questionModel = ModelSamples.SurveyQuestionSamples.getSurveyQuestionRequestModel();
      question = ModelSamples.SurveyQuestionSamples.getSurveyQuestion();
   }
 
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldCreateQuestion_Success() throws Exception {
-    when(surveyQuestionService.createQuestion(question)).thenReturn(question);
+    when(surveyQuestionService.createQuestion(questionModel)).thenReturn(question);
     mockMvc.perform(post("/api/survey/question").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(question)))
       .andDo(print())
@@ -68,9 +72,9 @@ class SurveyQuestionControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldModifyQuestion_Success() throws Exception {
     question.setQuestion("this is modified question");
-    when(surveyQuestionService.modifyQuestion(question.getId(), question)).thenReturn(question);
+    when(surveyQuestionService.modifyQuestion(question.getId(), questionModel)).thenReturn(question);
     mockMvc.perform(put("/api/survey/question/"+ question.getId()).contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(question)))
+      .accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(questionModel)))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().json(ModelSamples.toJson(question)));

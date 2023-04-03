@@ -3,8 +3,6 @@ package com.elit.outildedecision.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -18,7 +16,7 @@ import java.util.ArrayList;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectResponseModel implements Serializable {
+public class ProjectResponseModel {
 
   /**
    * The ID of the project.
