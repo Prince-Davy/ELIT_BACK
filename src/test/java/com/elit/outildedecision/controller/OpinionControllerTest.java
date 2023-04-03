@@ -1,4 +1,3 @@
-/*
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.OpinionAlreadyExistException;
@@ -31,6 +30,7 @@ class OpinionControllerTest {
   OpinionService opinionService;
   @InjectMocks
   OpinionController OpinionController;
+
   public static String asJsonString(final Object obj) {
     try {
       return new ObjectMapper().writeValueAsString(obj);
@@ -73,4 +73,3 @@ class OpinionControllerTest {
     Assertions.assertEquals(200,response.getStatus());
   }
 }
-*/

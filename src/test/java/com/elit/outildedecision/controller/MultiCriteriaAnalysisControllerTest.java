@@ -1,7 +1,5 @@
-/*
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.repository.ProjectRepository;
@@ -101,7 +99,7 @@ class MultiCriteriaAnalysisControllerTest {
     MockHttpServletResponse response = mockMvc.perform(put("/api/multi-criteria-analysis/iteration/"+analyseId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
-  @WithMockUser(authorities = {"ADMIN"})
+ /* @WithMockUser(authorities = {"ADMIN"})
   @Test
   void updateMultiCriteriaAnalysis() throws Exception {
     Long projectId = 1L;
@@ -110,8 +108,8 @@ class MultiCriteriaAnalysisControllerTest {
     MockHttpServletResponse response = mockMvc.perform(put("/api/multi-criteria-analysis/"+projectId).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(multiCriteriaAnalysisStep))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
-  }
-  @WithMockUser(authorities = {"ADMIN"})
+  }*/
+/*  @WithMockUser(authorities = {"ADMIN"})
   @Test
   void updateMultiCriteriaAnalysis_whenStepDoseNotExist() {
     Long projectId = 1L;
@@ -123,7 +121,7 @@ class MultiCriteriaAnalysisControllerTest {
     String expectedMessage = "cette étape n'existe pas";
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
-  }
+  }*/
 
   @Test
   void updateQuestion() throws Exception {
@@ -145,7 +143,7 @@ class MultiCriteriaAnalysisControllerTest {
   @Test
   void getMulticriteriaAnalysisScore() throws Exception {
     Long projectId = 1L;
-    when(multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId)).thenReturn(ResponseEntity.ok().body("multiCriteriaAnalysisScore"));
+    when(multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId)).thenReturn(ResponseEntity.ok().body(null));
     MockHttpServletResponse response = mockMvc.perform(get("/api/multi-criteria-analysis/"+projectId+"/score")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -159,4 +157,3 @@ class MultiCriteriaAnalysisControllerTest {
 }
 
 
-*/
