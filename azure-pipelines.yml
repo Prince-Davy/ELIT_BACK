@@ -27,6 +27,7 @@ variables:
     value: SogetiLabsFranceRegistry
   - name: dockerfilePath
     value: $(Build.SourcesDirectory)/Dockerfile
+    
   - name: deploymentName
     value: 'elit-back'
   - name: deploymentIntegName
