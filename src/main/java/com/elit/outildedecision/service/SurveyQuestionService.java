@@ -3,6 +3,8 @@ package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 /**
@@ -39,7 +41,7 @@ public interface SurveyQuestionService {
    * @return an Optional containing the deleted SurveyQuestion object, or an empty Optional if the specified question
    *         does not exist
    */
-  Optional<SurveyQuestion> deleteQuestion(Long questionId);
+  Optional<SurveyQuestion> deleteQuestion(Long questionId) throws QuestionsNotFoundException;
 
   /**
    * Retrieves the survey question with the specified ID.
@@ -47,8 +49,9 @@ public interface SurveyQuestionService {
    * @param questionId the ID of the question to retrieve
    * @return an Optional containing the SurveyQuestion object with the specified ID, or an empty Optional if the
    *         specified question does not exist
+   * @throws QuestionsNotFoundException if the specified question does not exist
    */
-  Optional<SurveyQuestion> selectQuestion(Long questionId);
+  SurveyQuestion selectQuestion(Long questionId) throws QuestionsNotFoundException;
 
   /**
    * Retrieves a list of all survey questions.

@@ -8,6 +8,7 @@ import com.elit.outildedecision.exception.FormStepAlreadyExistsException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.exception.StepWeightNotFoundException;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import org.springframework.http.ResponseEntity;
 import java.util.Set;
 /**
@@ -50,6 +51,6 @@ public interface FormStepService {
    * @throws QuestionsNotFoundException if any of the questions associated with the step do not exist
    * @throws StepWeightNotFoundException if the weight property of the step cannot be found
    */
-  ResponseEntity<String> updateFormStep(FormStep step)
+  ResponseEntity<String> updateFormStep(MultiCriteriaStepModel step)
     throws StepFormNotFoundException, QuestionsNotFoundException, StepWeightNotFoundException;
 }

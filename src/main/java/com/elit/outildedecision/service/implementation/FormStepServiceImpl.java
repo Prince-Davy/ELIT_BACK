@@ -9,6 +9,7 @@ import com.elit.outildedecision.exception.FormStepAlreadyExistsException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.exception.StepWeightNotFoundException;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.repository.FormStepRepo;
 import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
 import com.elit.outildedecision.service.FormQuestionService;
@@ -133,7 +134,7 @@ public class FormStepServiceImpl implements FormStepService {
    * @throws StepWeightNotFoundException if the step weights are not found.
    */
   @Override
-  public ResponseEntity<String> updateFormStep(final FormStep formStep)
+  public ResponseEntity<String> updateFormStep(final MultiCriteriaStepModel formStep)
     throws StepFormNotFoundException, QuestionsNotFoundException, StepWeightNotFoundException {
     Optional<FormStep> formStepFromDB = formStepRepo.findById(formStep.getStepId());
     if (!formStepFromDB.isPresent()) {

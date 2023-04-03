@@ -46,7 +46,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     for (FieldError error : fieldErrors) {
       details.put(error.getField(), error.getDefaultMessage());
     }
-    return new ResponseEntity<Object>(details, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(details, HttpStatus.BAD_REQUEST);
   }
   /**
    * Handles SQLIntegrityConstraintViolationException and returns a response with an error message and HTTP status code 409 (CONFLICT).
@@ -341,6 +341,19 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
    */
   @ExceptionHandler(UserAlreadyExistsException.class)
   public ResponseEntity<ErrorMessage> handleUserAlreadyExistsException(final UserAlreadyExistsException ex,
+                                                                  final WebRequest request) {
+    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
+  }
+  /**
+   * Handles ExecutionPlanException by returning an error response with HTTP status code 409.
+   *
+   * @param ex the ExecutionPlanException instance containing the error message
+   * @param request the web request
+   * @return the ResponseEntity containing the error message and HTTP status code 409
+   */
+  @ExceptionHandler(ExecutionPlanException.class)
+  public ResponseEntity<ErrorMessage> handleExecutionPlanException(final ExecutionPlanException ex,
                                                                   final WebRequest request) {
     ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);

@@ -4,18 +4,11 @@ import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.model.*;
 import com.elit.outildedecision.util.AnswerType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.lang.Nullable;
-import com.elit.outildedecision.entity.*;
-import com.elit.outildedecision.model.FormQuestionModel;
-import com.elit.outildedecision.model.FormStepModelForBrainstorming;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +53,11 @@ public class ModelSamples {
       return createUser(1L, "username", "userLastName", "userFirstName",
         "user@user.com", "developper", "useravatarPath", "userPassword", true, true, true,
         new ArrayList<VerificationToken>(), new ArrayList<Brainstorming>());
+    }
+    public static User getUser2() {
+      return createUser(1L, "user", "Doe", "John",
+        "user@user.com", "Développeur front", null, "user", true, true, false,
+        null, null);
     }
 
     public static UserModel getUserModel() {

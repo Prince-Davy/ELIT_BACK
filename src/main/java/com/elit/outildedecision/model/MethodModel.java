@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * This class represents a method model containing information about a particular method within an execution plan.
  * It is used to store and manage data associated with methods, including method name and the number of votes received.
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MethodModel {
+public class MethodModel implements Serializable {
 
   /**
    * The name of the method.

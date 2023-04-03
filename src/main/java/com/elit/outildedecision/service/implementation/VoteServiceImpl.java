@@ -15,6 +15,7 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.VoteRepository;
 import com.elit.outildedecision.service.VoteService;
 import com.elit.outildedecision.util.ProjectPermession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,7 @@ import java.util.Objects;
  * The VoteServiceImpl class is a service class that implements the VoteService interface and provides the necessary methods for voting and managing votes.
  */
 @Service
+@Slf4j
 public class VoteServiceImpl implements VoteService {
 
   private final VoteRepository voteRepository;
@@ -124,9 +126,9 @@ public class VoteServiceImpl implements VoteService {
     throws UserNotFoundException {
     String userEmail =
       (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    System.out.println("userEmail" + userEmail);
+    log.info("userEmail", userEmail);
     User user = userRepository.findByUserEmail(userEmail);
-    System.out.println("user" + user);
+    log.info("user", user);
     PredictibilityAnalysis predictibilityAnalysis =
       predictibilityAnalysisRepository
         .findById(predictibilityAnalysisId)
@@ -234,7 +236,7 @@ public class VoteServiceImpl implements VoteService {
     ProjectUserPermission projectUserPermission =
       projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
 
-    if (user.getUserId() == voteFromDB.getUser().getUserId()
+    if (user.getUserId().equals(voteFromDB.getUser().getUserId())
       || projectUserPermission.getPermission().contains(ProjectPermession.CDP.name())) {
       voteFromDB.setPredictibilityValue(voteModelRequest.getPredictibilityValue());
       voteFromDB.setChosenPMM(voteModelRequest.getChosenPMM());

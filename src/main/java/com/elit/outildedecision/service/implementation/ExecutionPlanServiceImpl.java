@@ -13,8 +13,10 @@ import com.elit.outildedecision.entity.PredictibilityResults;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.ExecutionPlanException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.VoteAlreadyExistException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionPlanFormModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
@@ -313,7 +315,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    */
   @Override
   public ResponseEntity<String> postMethodologiesVote(
-      final ExecutionVoteRequestModel executionVoteRequestModel) {
+      final ExecutionVoteRequestModel executionVoteRequestModel) throws VoteAlreadyExistException {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
@@ -334,7 +336,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
           executionPlanVoteRepo.findVoteByUserIdAndExecutionPlanId(
               user.getUserId(), executionVoteRequestModel.getExecutionPlanId());
       if (Objects.nonNull(executionPlanVoteFromDB)) {
-        throw new RuntimeException(
+        throw new VoteAlreadyExistException(
             "Cet utilisateur a déjà soumis un vote sur ce plan d'exécution.");
       }
       ExecutionPlanVote executionPlanVote = new ExecutionPlanVote();
@@ -363,16 +365,18 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    *
    * @param executionPlanId the id of the execution plan
    * @return response entity
+   * @throws UserNotAuthorizedException the user not authorized exception if the user is not part of the project
+   * @throws ExecutionPlanNotFoundException the execution plan not found exception if the execution plan is not found
    */
   @Override
-  public ExecutionPlanScoreResponseModel getExecutionPlanScore(final Long executionPlanId) {
+  public ExecutionPlanScoreResponseModel getExecutionPlanScore(final Long executionPlanId) throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     String userEmail =
         (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userEmail);
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
-            .orElseThrow(() -> new RuntimeException("Plan d'exécution introuvable."));
+            .orElseThrow(() -> new ExecutionPlanNotFoundException("Plan d'exécution introuvable."));
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
     ProjectUserPermission projectUserPermission =
@@ -380,7 +384,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
             project.getProjectId(), user.getUserId());
 
     if (Objects.isNull(projectUserPermission)) {
-      throw new RuntimeException("L'utilisateur ne fait pas parti du projet.");
+      throw new UserNotAuthorizedException("L'utilisateur ne fait pas parti du projet.");
     }
 
     List<ExecutionPlanVote> votesList =
@@ -451,10 +455,13 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    *
    * @param executionPlanId the id of the execution plan
    * @return response entity
+   * @throws UserNotAuthorizedException the user not authorized exception if the user is not part of the project
+   * @throws ExecutionPlanNotFoundException the execution plan not found exception if the execution plan is not found
+   * @throws ExecutionPlanException the execution plan exception if the execution plan is already finished
    */
   @Override
   public ResponseEntity<Boolean> putIsFinishedExecutionPlan(final Long executionPlanId)
-      throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
+    throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException {
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
@@ -466,7 +473,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
         executionPlan.setIsFinished(true);
         executionPlanRepository.save(executionPlan);
       } else {
-        throw new RuntimeException("Le plan d'exécution est déjà terminé.");
+        throw new ExecutionPlanException("Le plan d'exécution est déjà terminé.");
       }
     } else {
       throw new UserNotAuthorizedException(

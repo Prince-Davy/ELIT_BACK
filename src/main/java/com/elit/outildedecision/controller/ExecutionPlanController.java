@@ -1,8 +1,10 @@
 
 package com.elit.outildedecision.controller;
 
+import com.elit.outildedecision.exception.ExecutionPlanException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.VoteAlreadyExistException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
 import com.elit.outildedecision.model.ExecutionVoteRequestModel;
@@ -81,22 +83,24 @@ public class ExecutionPlanController {
   /**
    * Vote for a methodology.
    * @param executionVoteRequestModel the execution vote request model
-   * @throws UserNotAuthorizedException when a user is not authorized
+   * @throws VoteAlreadyExistException when a vote already exist by the user
    * @return ResponseEntity<Long>
    */
   @PostMapping("/executionPlan/methodologies/vote")
   public ResponseEntity<String> postMethodologiesVote(
       @RequestBody final ExecutionVoteRequestModel executionVoteRequestModel)
-      throws UserNotAuthorizedException {
+    throws VoteAlreadyExistException {
     return executionPlanService.postMethodologiesVote(executionVoteRequestModel);
   }
   /**
    * Get execution plan score.
    * @param executionPlanId the execution plan id
    * @return ExecutionPlanScoreResponseModel
+   * @throws UserNotAuthorizedException if the user is not authorized to vote in the specified execution plan
+   * @throws ExecutionPlanNotFoundException if the execution plan is not found
    */
   @GetMapping("/executionPlan/{executionPlanId}/score")
-  public ExecutionPlanScoreResponseModel getExecutionPlanScore(@PathVariable final Long executionPlanId) {
+  public ExecutionPlanScoreResponseModel getExecutionPlanScore(@PathVariable final Long executionPlanId) throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     return executionPlanService.getExecutionPlanScore(executionPlanId);
   }
   /**
@@ -104,11 +108,12 @@ public class ExecutionPlanController {
    * @param executionPlanId the execution plan id
    * @throws UserNotAuthorizedException when a user is not authorized
    * @throws ExecutionPlanNotFoundException when an execution plan is not found
+   * @throws ExecutionPlanException when an execution plan is already finished
    * @return ExecutionPlanScoreResponseModel
    */
   @PostMapping("/executionPlan/isFinished/{executionPlanId}")
   public ResponseEntity<Boolean> putIsFinishedExecutionPlan(@PathVariable final Long executionPlanId)
-      throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
+    throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException {
     return executionPlanService.putIsFinishedExecutionPlan(executionPlanId);
   }
 }

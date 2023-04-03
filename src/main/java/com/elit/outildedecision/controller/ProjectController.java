@@ -2,7 +2,9 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -62,7 +65,9 @@ public class ProjectController {
    * get the project data by id.
    * @param projectId the id of the project
    * @return ProjectResponseModel
-   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found
+   * @throws UserNotAuthorizedException UserNotAuthorizedException if the user is not authorized
+   * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException if the execution plan is not found
    */
   @ApiOperation(value = "Get a product by id", notes = "Returns a product as per the id")
   @ApiResponses(
@@ -73,7 +78,7 @@ public class ProjectController {
   @GetMapping("/user/projects/getdata/{projectId}")
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
   public ProjectResponseModel getProjectData(@PathVariable final Long projectId)
-      throws ProjectNotFoundException {
+    throws ProjectNotFoundException, UserNotAuthorizedException, ExecutionPlanNotFoundException {
     return projectService.getProjectData(projectId);
   }
   /** get the project data by id.
@@ -122,29 +127,31 @@ public class ProjectController {
   public ResponseEntity<String> validateOrRejectProject(@PathVariable final Long id,
                                                         final HttpEntity<String> isConfirmed)
                                                         throws ProjectNotFoundException,
-                                                        java.io.IOException {
+                                                        IOException {
     return projectService.validateOrRejectProject(id, isConfirmed);
   }
   /**
    * delete a project.
    * @param id the id of the project
-   * @throws Exception Exception if the project is not found
+   * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found
+   * @throws IOException IOException if an I/O error occurs while deleting the project data
    * @return ResponseEntity<String> the response
    */
   @DeleteMapping("/admin/projects/{id}")
   @PreAuthorize("hasAnyAuthority('ADMIN')")
-  public ResponseEntity<String> deleteProjectAdmin(@PathVariable final Long id) throws Exception {
+  public ResponseEntity<String> deleteProjectAdmin(@PathVariable final Long id) throws ProjectNotFoundException, IOException {
     return projectService.deleteProject(id);
   }
   /**
    * update a project.
    * @param id the id of the project
-   * @throws Exception Exception if the project is not found
+   * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found
+   * @throws IOException IOException if an I/O error occurs while deleting the project data
    * @return ResponseEntity<String> the response
    */
   @DeleteMapping("/user/projects/{id}")
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and isProjectOwner(#id)")
-  public ResponseEntity<String> deleteProject(@PathVariable final Long id) throws Exception {
+  public ResponseEntity<String> deleteProject(@PathVariable final Long id) throws ProjectNotFoundException, IOException {
     return projectService.deleteProject(id);
   }
   /**

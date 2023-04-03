@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-public class RefreshTokenException extends Exception{
+public class RefreshTokenException extends Exception {
     /**
      * Constructor for the RefreshTokenException class.
      * Exception thrown when the refresh token is not valid.

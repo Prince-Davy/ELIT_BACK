@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import org.springframework.beans.factory.annotation.Value;
+import com.elit.outildedecision.config.JwtProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,8 +19,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
-  @Value("${jwt.secret}")
-  private String jwtSecret;
+  /**
+   * The jwt properties used to get the key.
+   */
+  private final JwtProperties jwtProperties;
+  /**
+   * Constructor of JwtAuthorizationFilter.
+   *
+   * @param jwtProperties the jwt properties used to get the secret key
+   */
+  public JwtAuthorizationFilter(final JwtProperties jwtProperties) {
+    this.jwtProperties = jwtProperties;
+  }
 
   /**
    * This method is called by the servlet container each time a request/response pair is passed
@@ -45,7 +55,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         try {
           String jwt = jwtAuthorizationToken.substring(7);
           Algorithm algorithm =
-              Algorithm.HMAC256(jwtSecret);
+              Algorithm.HMAC256(jwtProperties.getSecret().getBytes());
           JWTVerifier verifier =
               JWT.require(algorithm).build(); // Require an algorithm and a secret:
           DecodedJWT decodedJWT = verifier.verify(jwt);
@@ -60,7 +70,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
           SecurityContextHolder.getContext().setAuthentication(authentificationToken);
           filterChain.doFilter(request, response);
         } catch (Exception e) {
-          e.printStackTrace();
           response.setHeader("error", "Invalid token");
           response.sendError(403);
         }

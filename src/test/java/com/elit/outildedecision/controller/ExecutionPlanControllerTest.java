@@ -11,9 +11,7 @@ import com.elit.outildedecision.service.ExecutionPlanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,10 +32,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 class ExecutionPlanControllerTest {
   @Autowired
   private MockMvc mockMvc;
@@ -157,7 +154,7 @@ class ExecutionPlanControllerTest {
   }
 
   @Test
-  void getExecutionPlanScore() throws Exception {
+  void getExecutionPlanScore() throws Exception, UserNotAuthorizedException {
     Long executionPlanId = 1L;
     ExecutionPlanScoreResponseModel executionPlanScoreResponseModel = new ExecutionPlanScoreResponseModel();
     when(executionPlanService.getExecutionPlanScore(executionPlanId)).thenReturn(executionPlanScoreResponseModel);
@@ -168,10 +165,10 @@ class ExecutionPlanControllerTest {
   }
 
   @Test
-  void getExecutionPlanScore_whenExecutionPlanDoseNotExists() throws Exception {
+  void getExecutionPlanScore_whenExecutionPlanDoseNotExists() throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     Long executionPlanId = 1L;
-    when(executionPlanService.getExecutionPlanScore(executionPlanId)).thenThrow(new RuntimeException("Plan d'exécution introuvable."));
-    Exception e = Assertions.assertThrows(RuntimeException.class,
+    when(executionPlanService.getExecutionPlanScore(executionPlanId)).thenThrow(new ExecutionPlanNotFoundException("Plan d'exécution introuvable."));
+    Exception e = Assertions.assertThrows(ExecutionPlanNotFoundException.class,
       () -> executionPlanService.getExecutionPlanScore(executionPlanId));
     Assertions.assertEquals("Plan d'exécution introuvable.", e.getMessage());
   }

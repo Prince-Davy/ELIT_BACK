@@ -1,10 +1,11 @@
 
 package com.elit.outildedecision.security;
 
+import com.elit.outildedecision.config.JwtProperties;
 import com.elit.outildedecision.filters.JwtAuthenticationFilter;
 import com.elit.outildedecision.filters.JwtAuthorizationFilter;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
-import com.google.common.collect.ImmutableList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,10 +14,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.List;
 
 /**
  * Configuration class for Spring Security.
@@ -28,13 +31,25 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
    * The custom user details service used for authentication.
    */
   private final UserServiceImpl customUserDetailsService;
+  /**
+   * The JWT properties.
+   */
+  @Autowired
+  private JwtProperties jwtProperties;
+  /**
+   * PasswordEncoder instance to encode and decode passwords.
+   */
+  private final PasswordEncoder passwordEncoder;
 
   /**
    * Constructor for SpringConfig.
+   *
    * @param customUserDetailsService the custom user details service used for authentication.
+   * @param passwordEncoder
    */
-  public SpringConfig(final UserServiceImpl customUserDetailsService) {
+  public SpringConfig(final UserServiceImpl customUserDetailsService, final PasswordEncoder passwordEncoder) {
     this.customUserDetailsService = customUserDetailsService;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -44,7 +59,8 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
    */
   @Override
   protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(customUserDetailsService);
+    auth.userDetailsService(customUserDetailsService)
+      .passwordEncoder(passwordEncoder);
   }
 
   /**
@@ -55,19 +71,13 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(final HttpSecurity http) throws Exception {
     http.csrf().disable();
-    http.headers().frameOptions().disable(); //TODO : Remove this line in production
+    // enable frames for H2
+    http.headers().frameOptions().disable();
     http.cors().configurationSource(corsConfigurationSource());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    // http.authorizeRequests().antMatchers("/reset-password").permitAll();
-    // http.authorizeRequests().antMatchers("/confirm-account").permitAll();
-    // http.authorizeRequests().antMatchers("/login").permitAll();
-    // http.authorizeRequests().antMatchers("/register").permitAll();
-    // http.authorizeRequests().antMatchers("/refreshToken/**").permitAll();
-    // http.authorizeRequests().antMatchers("/mywebsockets/**").permitAll();
     http.authorizeRequests().anyRequest().permitAll();
-    http.addFilter(new JwtAuthenticationFilter(authenticationManagerBean()));
-    http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-    // http.authorizeRequests().antMatchers("/**").permitAll();
+    http.addFilter(new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean()));
+    http.addFilterBefore(new JwtAuthorizationFilter(jwtProperties), UsernamePasswordAuthenticationFilter.class);
   }
 
   /**
@@ -88,9 +98,9 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(ImmutableList.of("http://localhost:3000"));
+    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000"));
     configuration.setAllowedMethods(
-      ImmutableList.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+      List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     // setAllowCredentials(true) is important, otherwise
     // The value of the 'Access-Control-Allow-Origin' header in the response must
     // not be the wildcard '*' when the request's credentials mode is 'include'.
@@ -98,7 +108,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
     // setAllowedHeaders is important! Without it, OPTIONS preflight request
     // will fail with 403 Invalid CORS request
     configuration.setAllowedHeaders(
-      ImmutableList.of(
+      List.of(
         "Authorization",
         "Content-Type",
         "X-Requested-With",

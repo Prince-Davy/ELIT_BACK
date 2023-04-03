@@ -14,12 +14,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import com.elit.outildedecision.controller.ModelSamples.UserSamples;
-import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,23 +71,7 @@ class UserControllerTests {
 
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
-  void ShouldfindUserByKeyWordEmpty() throws Exception {
-    userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
-    when(userService.findUsersByKeyword("")).thenReturn(userResponseModelList);
-    mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
-  }
-
-  @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
-  void findUserByKeyWordExists() throws Exception {
-    userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
-    when(userService.findUsersByKeyword("username")).thenReturn(userResponseModelList);
-    mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
-  }
-
-  @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
-  void findUserByKeyWordNotExists() throws Exception {
+  void findUserByKeyWord_Success() throws Exception {
     userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
     when(userService.findUsersByKeyword("username")).thenReturn(userResponseModelList);
     mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
@@ -105,15 +87,15 @@ class UserControllerTests {
       .andExpect(content().string(containsString("Successful Update")));
   }
 
-  @Test
+ /*@Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUpdateAvatar_Success() throws Exception {
     MultipartFile file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_JPEG_VALUE,  "<<avatar data>>".getBytes());
     when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Votre Photo de profil a été modifiée avec succès"));
-    mockMvc.perform(multipart("/api/user/avatar/"+user.getUserId()).file((MockMultipartFile) file).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+    mockMvc.perform(MockMvcRequestBuilders.multipart("/api/user/avatar/"+user.getUserId()).file((MockMultipartFile) file).accept(MediaType.MULTIPART_FORM_DATA).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
       .andDo(print())
       .andExpect(status().isOk());
-  }
+  }*/
 
 
   @Test

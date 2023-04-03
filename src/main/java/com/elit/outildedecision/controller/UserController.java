@@ -90,6 +90,7 @@ public class UserController {
    * @return UserResponseModel that contains the user's information
    * @throws IOException IOException
    * @throws CouldNotSaveUserException when the user could not be saved in database
+   * @throws UserNotFoundException when the user could not be found in database
    */
   @PutMapping(
       value = "/user/password/{userId}",
@@ -97,7 +98,7 @@ public class UserController {
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
   public ResponseEntity<String> updatePasswordUserById(
       @PathVariable final Long userId, @RequestParam final String oldPass, @RequestParam final String newPass)
-      throws IOException, CouldNotSaveUserException {
+    throws IOException, CouldNotSaveUserException, UserNotFoundException {
     return userService.updatePasswordUserById(userId, oldPass, newPass);
   }
   /**
@@ -127,6 +128,7 @@ public class UserController {
    * @return UserResponseModel that contains the user's information
    * @throws IOException IOException
    * @throws CouldNotSaveUserException when the user could not be saved in database
+   * @throws UserNotFoundException when the user could not be found in database
    */
   @PutMapping(
       value = "/user/info/{userId}",
@@ -135,7 +137,7 @@ public class UserController {
       @PathVariable final Long userId,
       @RequestParam final String userFirstName,
       @RequestParam final String userLastName)
-      throws IOException, CouldNotSaveUserException {
+    throws IOException, CouldNotSaveUserException, UserNotFoundException {
     return userService.updateInfosByIdUser(userId, userFirstName, userLastName);
   }
   /**
@@ -145,7 +147,7 @@ public class UserController {
    * @param response HttpServletResponse to send the avatar to the client
    * @throws IOException IOException
    */
-  @RequestMapping("/user/avatar/{userId}")
+  @GetMapping("/user/avatar/{userId}")
   public void viewAvatarByUserId(final HttpServletResponse response, @PathVariable final Long userId)
       throws IOException {
     userService.viewAvatarByUserId(userId, response);

@@ -44,7 +44,7 @@ public class SuperAdminController {
    * @return ResponseEntity
    */
   @PutMapping("/projects/{projectId}")
-  public ResponseEntity confirmProject(@PathVariable final Long projectId)
+  public ResponseEntity<String> confirmProject(@PathVariable final Long projectId)
       throws ProjectNotFoundException {
     return superAdminService.confirmProject(projectId);
   }
@@ -55,7 +55,7 @@ public class SuperAdminController {
    * @return ResponseEntity
    */
   @PutMapping("/users/{userId}")
-  public ResponseEntity suspendUser(@PathVariable final Long userId) throws UserNotFoundException {
+  public ResponseEntity<String> suspendUser(@PathVariable final Long userId) throws UserNotFoundException {
     return superAdminService.suspendUser(userId);
   }
   /**
@@ -66,7 +66,7 @@ public class SuperAdminController {
    * @return ResponseEntity
    */
   @DeleteMapping("/projects/{projectId}")
-  public ResponseEntity deleteProject(@PathVariable final Long projectId)
+  public ResponseEntity<String> deleteProject(@PathVariable final Long projectId)
       throws ProjectNotFoundException {
     return superAdminService.deleteProject(projectId);
   }
@@ -99,7 +99,7 @@ public class SuperAdminController {
    * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found
    */
   @PutMapping("/projects/confirmProjects")
-  public ResponseEntity confirmProjects(@RequestBody final List<Long> projectIds)
+  public ResponseEntity<String> confirmProjects(@RequestBody final List<Long> projectIds)
       throws ProjectNotFoundException {
     return superAdminService.confirmProjects(projectIds);
   }

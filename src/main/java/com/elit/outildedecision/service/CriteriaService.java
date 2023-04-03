@@ -23,7 +23,7 @@ public interface CriteriaService {
    * Updates the given criteria.
    *
    * @param criteria the criteria to update
-   * @return
+   * @return Criteria
    */
   Criteria updateCriteria(Criteria criteria);
 }

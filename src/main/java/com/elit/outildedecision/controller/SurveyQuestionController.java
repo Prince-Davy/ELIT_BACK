@@ -2,6 +2,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.service.SurveyQuestionService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,9 +67,10 @@ public class SurveyQuestionController {
    *
    * @param questionId given in parameter and represents the id of the existing question to delete
    * @return deleted question. return needed for API testing
+   * @throws QuestionsNotFoundException if the question is not found in database
    */
   @DeleteMapping("/{questionId}")
-  public Optional<SurveyQuestion> deleteQuestion(@PathVariable final Long questionId) {
+  public Optional<SurveyQuestion> deleteQuestion(@PathVariable final Long questionId) throws QuestionsNotFoundException {
     return questionService.deleteQuestion(questionId);
   }
   /**
@@ -76,9 +78,10 @@ public class SurveyQuestionController {
    *
    * @param questionId given in parameter and represents the desired question to display
    * @return selected question.
+   * @throws QuestionsNotFoundException if the specified question does not exist
    */
   @GetMapping("/{questionId}")
-  public Optional<SurveyQuestion> selectQuestion(@PathVariable final Long questionId) {
+  public SurveyQuestion selectQuestion(@PathVariable final Long questionId) throws QuestionsNotFoundException {
     return questionService.selectQuestion(questionId);
   }
   /**

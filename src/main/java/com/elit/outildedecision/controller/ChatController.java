@@ -32,7 +32,7 @@ public class ChatController {
   @SendTo(CHAT_TOPIC) // we can also use the SimpMessagingTemplate to send messages to the client
   public ProjectPropertyKey.Message receivePublicMessage(
       @Payload final ProjectPropertyKey.Message message) {
-    this.log.info("message : {}" , message);
+    this.log.info("message : {}", message);
     return message;
   }
 }

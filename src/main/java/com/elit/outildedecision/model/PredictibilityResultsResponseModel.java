@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * This class represents a predictibility results response model containing information about a predictibility results.
  * It is used to store and manage data associated with predictibility results, including name and value fields.
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PredictibilityResultsResponseModel {
+public class PredictibilityResultsResponseModel implements Serializable {
 
   /**
    * The name associated with the predictibility results.

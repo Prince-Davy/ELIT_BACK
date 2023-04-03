@@ -17,6 +17,7 @@ import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.CriteriaScoreModel;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.model.MultiCriteriaStepScoreModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.repository.CriteriaRepository;
@@ -39,11 +40,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -183,13 +185,16 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
     JSONParser jsonParser = new JSONParser();
     JSONObject multiCriteriaJson = (JSONObject) jsonParser.parse(reader);
-    for (Object key : multiCriteriaJson.keySet()) {
-      JSONObject step = (JSONObject) multiCriteriaJson.get(key);
+    Iterator multiCreteriaIterator = multiCriteriaJson.entrySet().iterator();
+
+    while (multiCreteriaIterator.hasNext()) {
+      Map.Entry entry = (Map.Entry) multiCreteriaIterator.next();
+      JSONObject step = (JSONObject) multiCriteriaJson.get(entry.getKey());
 
       FormStep persistedStep =
         formStepRepo.save(
           FormStep.builder()
-            .stepName(key.toString())
+            .stepName(entry.getKey().toString())
             .stepRef((Long) step.get("stepRef"))
             .multiCriteriaAnalysis(persistedAnalysis)
             .build());
@@ -209,14 +214,14 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
             .formStep(persistedStep)
             .build());
       }
-
-      for (Object questionKey : questions.keySet()) {
+      while (multiCreteriaIterator.hasNext()) {
+        Map.Entry question = (Map.Entry) multiCreteriaIterator.next();
         FormQuestion persistedFormQuestion =
           formQuestionRepository.save(
             FormQuestion.builder()
               .formStep(persistedStep)
-              .questionText(questions.get(questionKey).toString())
-              .questionRef(questionKey.toString())
+              .questionText(questions.get(question.getKey()).toString())
+              .questionRef(question.getKey().toString())
               .build());
 
         for (int i = 0; i < criterias.size(); i++) {
@@ -282,7 +287,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   @Override
   @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<String> updateMultiCriteriaAnalysis(
-    final Long projectId, final FormStep multiCriteriaAnalysisStep) {
+    final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) {
     FormStep formStepToUpdate =
       formStepRepo
         .findById(multiCriteriaAnalysisStep.getStepId())

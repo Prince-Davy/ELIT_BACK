@@ -27,7 +27,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(exclude = {"stepWeights", "form"})
+@EqualsAndHashCode(exclude = {"stepWeights"})
 public class FormStep implements Serializable {
 
   private static final long serialVersionUID = 1L;

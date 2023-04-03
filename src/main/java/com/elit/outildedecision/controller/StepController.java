@@ -7,6 +7,7 @@ import com.elit.outildedecision.exception.FormStepAlreadyExistsException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.exception.StepWeightNotFoundException;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.service.FormStepService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.validation.Valid;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -58,13 +57,17 @@ public class StepController {
    * @param formStep FormStep object
    * @throws FormStepAlreadyExistsException when the step already exists in the database
    * @throws StepFormNotFoundException when the form is not found in the database
+   * @throws QuestionsNotFoundException when the questions are not found in the form step sent in the request
    * @return FormStep
    */
   @PostMapping(consumes = {"application/json"})
   public ResponseEntity<String> createFormStep(@RequestBody final FormStep formStep)
-      throws FormStepAlreadyExistsException, StepFormNotFoundException {
-    Set<Criteria> criterias = new HashSet<>();
-    criterias = formStep.getFormQuestions().stream().findFirst().orElse(null).getCriterias();
+    throws FormStepAlreadyExistsException, StepFormNotFoundException, QuestionsNotFoundException {
+    Set<Criteria> criterias;
+    criterias = formStep.getFormQuestions().stream()
+      .findFirst()
+      .orElseThrow(() -> new QuestionsNotFoundException("Aucune question n'a été trouvée"))
+      .getCriterias();
     return formStepService.createFormStep(
         formStep.getMultiCriteriaAnalysis().getMultiCriteriaAnalysisId(),
         formStep.getStepName(),
@@ -81,7 +84,7 @@ public class StepController {
    * @return FormStep
    */
   @PutMapping
-  public ResponseEntity updateFormStep(@Valid @RequestBody final FormStep step)
+  public ResponseEntity<String> updateFormStep(@Valid @RequestBody final MultiCriteriaStepModel step)
     throws StepFormNotFoundException, QuestionsNotFoundException, StepWeightNotFoundException {
     return formStepService.updateFormStep(step);
   }

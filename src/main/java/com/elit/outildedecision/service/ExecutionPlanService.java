@@ -1,8 +1,10 @@
 
 package com.elit.outildedecision.service;
 
+import com.elit.outildedecision.exception.ExecutionPlanException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.VoteAlreadyExistException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
 import com.elit.outildedecision.model.ExecutionVoteRequestModel;
@@ -56,15 +58,17 @@ public interface ExecutionPlanService {
    * @throws UserNotAuthorizedException if the user is not authorized to vote in the specified execution plan
    */
   ResponseEntity<String> postMethodologiesVote(ExecutionVoteRequestModel executionVoteRequestModel)
-    throws UserNotAuthorizedException;
+          throws VoteAlreadyExistException;
 
   /**
    * Retrieves the score for the specified execution plan.
    *
    * @param executionPlanId the ID of the execution plan for which to retrieve the score
    * @return an ExecutionPlanScoreResponseModel object containing the score for the specified execution plan
+   * @throws UserNotAuthorizedException if the user doesn't have access to the project associated with the specified execution plan
+   * @throws ExecutionPlanNotFoundException if the specified execution plan does not exist
    */
-  ExecutionPlanScoreResponseModel getExecutionPlanScore(Long executionPlanId);
+  ExecutionPlanScoreResponseModel getExecutionPlanScore(Long executionPlanId) throws UserNotAuthorizedException, ExecutionPlanNotFoundException;
 
   /**
    * Sets the "isFinished" flag for the specified execution plan to true.
@@ -73,7 +77,8 @@ public interface ExecutionPlanService {
    * @return a ResponseEntity indicating the success or failure of the operation
    * @throws UserNotAuthorizedException if the user is not authorized to update the specified execution plan
    * @throws ExecutionPlanNotFoundException if the specified execution plan does not exist
+   * @throws ExecutionPlanException if the specified execution plan is already finished
    */
   ResponseEntity<Boolean> putIsFinishedExecutionPlan(Long executionPlanId)
-    throws UserNotAuthorizedException, ExecutionPlanNotFoundException;
+    throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException;
 }

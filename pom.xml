@@ -101,7 +101,13 @@
 			<artifactId>google-api-client-gson</artifactId>
 			<version>1.33.0</version>
 		</dependency>
-<!--		spring security dependency-->
+<!--    configuration properties dependency-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <!--		spring security dependency-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
