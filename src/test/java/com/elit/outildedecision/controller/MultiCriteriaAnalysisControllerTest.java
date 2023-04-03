@@ -2,6 +2,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.FormQuestionModel;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,21 +102,21 @@ class MultiCriteriaAnalysisControllerTest {
     MockHttpServletResponse response = mockMvc.perform(put("/api/multi-criteria-analysis/iteration/"+analyseId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
- /* @WithMockUser(authorities = {"ADMIN"})
+  @WithMockUser(authorities = {"ADMIN"})
   @Test
   void updateMultiCriteriaAnalysis() throws Exception {
     Long projectId = 1L;
-    FormStep multiCriteriaAnalysisStep = new FormStep();
+    MultiCriteriaStepModel multiCriteriaAnalysisStep = new MultiCriteriaStepModel();
     when(multiCriteriaAnalysisService.updateMultiCriteriaAnalysis(projectId, multiCriteriaAnalysisStep)).thenReturn(ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés"));
     MockHttpServletResponse response = mockMvc.perform(put("/api/multi-criteria-analysis/"+projectId).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(multiCriteriaAnalysisStep))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
-  }*/
-/*  @WithMockUser(authorities = {"ADMIN"})
+  }
+  @WithMockUser(authorities = {"ADMIN"})
   @Test
   void updateMultiCriteriaAnalysis_whenStepDoseNotExist() {
     Long projectId = 1L;
-    FormStep multiCriteriaAnalysisStep = new FormStep();
+    MultiCriteriaStepModel multiCriteriaAnalysisStep = new MultiCriteriaStepModel();
     when(multiCriteriaAnalysisService.updateMultiCriteriaAnalysis(projectId, multiCriteriaAnalysisStep)).thenThrow(new RuntimeException("cette étape n'existe pas"));
     Exception exception = assertThrows(RuntimeException.class, () -> {
       multiCriteriaAnalysisService.updateMultiCriteriaAnalysis(projectId, multiCriteriaAnalysisStep);
@@ -123,7 +124,7 @@ class MultiCriteriaAnalysisControllerTest {
     String expectedMessage = "cette étape n'existe pas";
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
-  }*/
+  }
 
   @Test
   void updateQuestion() throws Exception {
