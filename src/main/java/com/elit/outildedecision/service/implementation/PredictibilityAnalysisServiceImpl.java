@@ -27,6 +27,7 @@ import com.elit.outildedecision.service.PredictibilityAnalysisService;
 import com.elit.outildedecision.util.MethodologyTypes;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,7 +44,8 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
   /**
    * A repository for Projects.
    */
-  private final ProjectRepository projectRepository;
+  @Autowired
+  private ProjectRepository projectRepository;
 
   /**
    * A repository for Multi-Criteria Analysis.
@@ -92,7 +94,6 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
    * Constructs a PredictibilityAnalysisServiceImpl object.
    * uses the constructor-based dependency injection to inject the repositories.
    *
-   * @param projectRepository A repository for Projects.
    * @param multiCriteriaAnalysisRepository A repository for Multi-Criteria Analysis.
    * @param predictibilityAnalysisRepository A repository for Predictibility Analysis.
    * @param voteRepository A repository for Votes.
@@ -102,7 +103,6 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
    * @param predictibilityResultsRepository A repository for Predictibility Results.
    */
   public PredictibilityAnalysisServiceImpl(
-      final ProjectRepository projectRepository,
       final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
       final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
       final VoteRepository voteRepository,
@@ -110,7 +110,6 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
       final ProjectUserPermissionRepository projectUserPermissionRepository,
       final MethodologyRepository methodologyRepository,
       final PredictibilityResultsRepository predictibilityResultsRepository) {
-    this.projectRepository = projectRepository;
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
     this.voteRepository = voteRepository;
