@@ -151,8 +151,14 @@ public class VoteServiceImpl implements VoteService {
 
     return result;
   }
-
-  private List<VoteModelResponse> getAllVotesForCDP(Project project, Long predictibilityAnalysisId) {
+  /**
+   * Retrieves a list of vote model responses for a given predictibility analysis ID.
+   *
+   * @param predictibilityAnalysisId the ID of the predictibility analysis.
+   * @param project the project.
+   * @return a list of vote model responses.
+   */
+  private List<VoteModelResponse> getAllVotesForCDP(final Project project, final Long predictibilityAnalysisId) {
     List<VoteModelResponse> result = new ArrayList<>();
     List<ProjectUserPermission> usersPermission = projectUserPermissionRepository.findAllByProjectId(project.getProjectId());
     for (ProjectUserPermission userP : usersPermission) {
@@ -164,15 +170,27 @@ public class VoteServiceImpl implements VoteService {
     }
     return result;
   }
-
-  private List<VoteModelResponse> getVoteForNonCDPUser(User user, Long predictibilityAnalysisId) {
+  /**
+   * Retreives the vote of a non CDP user.
+   * @param user the user.
+   * @param predictibilityAnalysisId the predictibility analysis id.
+   * @return a list of vote model responses.
+   */
+  private List<VoteModelResponse> getVoteForNonCDPUser(final User user, final Long predictibilityAnalysisId) {
     List<VoteModelResponse> result = new ArrayList<>();
     Vote vote = voteRepository.findByPredictibilityAnalysisAndUserId(predictibilityAnalysisId, user.getUserId());
     result.add(createVoteModelResponse(vote, predictibilityAnalysisId, user.getUserId()));
     return result;
   }
-
-  private VoteModelResponse createVoteModelResponse(Vote vote, Long predictibilityAnalysisId, Long userId) {
+  /**
+   * Creates a vote model response from a vote.
+   *
+   * @param vote the vote.
+   * @param predictibilityAnalysisId the predictibility analysis id.
+   * @param userId the user id.
+   * @return a vote model response.
+   */
+  private VoteModelResponse createVoteModelResponse(final Vote vote, final Long predictibilityAnalysisId, final Long userId) {
     if (Objects.isNull(vote)) {
       return VoteModelResponse.builder()
         .voteId(null)

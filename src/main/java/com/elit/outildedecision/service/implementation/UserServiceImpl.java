@@ -309,8 +309,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     errorMap.put("SUCCESS", "Utilisateur mis à jour");
     return ResponseEntity.status(HttpStatus.OK).body(errorMap);
   }
-
-  private Map<String, String> validateUserUpdate(UserModel user, User userFromDB) {
+  /**
+   * Validates a user details against the user details in the database.
+   *
+   * @param user The UserModel object containing the updated user information.
+   * @param userFromDB The user to update.
+   * @return A Map containing the errors.
+   */
+  private Map<String, String> validateUserUpdate(final UserModel user, final User userFromDB) {
     Map<String, String> errorMap = new HashMap<>();
 
     if (userRepository.findByUserEmail(user.getUserEmail()) != null && !userFromDB.getUserEmail().equals(user.getUserEmail())) {
@@ -326,11 +332,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       && !userFromDB.getUsername().equals(user.getUsername())) {
       errorMap.put(Constants.CONFLICT, "nom d'utilisateur déjà utilisé");
     }
-
     return errorMap;
   }
-
-  private void updateUserFields(UserModel user, User userFromDB) throws CouldNotSaveUserException {
+  /**
+   * Updates a user's fields.
+   *
+   * @param user The UserModel object containing the updated user information.
+   * @param userFromDB The user to update.
+   * @throws CouldNotSaveUserException If there is an error saving the updated user to the database.
+   */
+  private void updateUserFields(final UserModel user, final User userFromDB) throws CouldNotSaveUserException {
     if (user.getUsername() != null) {
       userFromDB.setUsername(user.getUsername());
     }

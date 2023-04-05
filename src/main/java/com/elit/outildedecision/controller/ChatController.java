@@ -34,7 +34,10 @@ public class ChatController {
   @SendTo(CHAT_TOPIC) // we can also use the SimpMessagingTemplate to send messages to the client
   public ChatMessage receivePublicMessage(
       @Payload final ChatMessage message) {
-    this.log.info("message : {}", message);
+    this.log.info("message : {}", message.getMessageBody());
+    this.log.info("avatar : {}", message.getAvatar());
+    this.log.info("status : {}", message.getStatus());
+    this.log.info("username : {}", message.getUsername());
     return message;
   }
 }
