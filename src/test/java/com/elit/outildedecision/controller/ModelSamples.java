@@ -166,7 +166,23 @@ public class ModelSamples {
       return new SurveyQuestionModel("is this a question", "yes/no question");
     }
   }
+
+  public static class ReportSamples {
+    public static List<ReportResponseModel> getReportResponseModels() {
+      return List.of(new ReportResponseModel(1L, "title", "type1", 1, null ));
+    }
+  }
+
+  public static class FormStepSamples {
+    public static FormStep getFormStep() {
+      FormStep formStep = new FormStep();
+      formStep.setStepName("step1");
+      formStep.setStepId(1l);
+      return formStep;
+    }
+
+    public static MultiCriteriaStepModel getFormStepMultiCreteria() {
+      return new MultiCriteriaStepModel(1l, "step2", 2f, null, null);
+    }
+  }
 }
-
-
-
