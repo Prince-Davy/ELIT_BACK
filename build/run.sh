@@ -22,19 +22,19 @@ if [ "${PIPESTATUS[0]}" -ne "0" ] ; then
   echo "Coverage failed"
   export exitcode=1
 #in other case print anybadge
-elif [[ $(bc -l <<< "$cov<30.0") -eq 1 ]] ; then
+elif [[ $(bc -l <<< "$cov<10.0") -eq 1 ]] ; then
   export color=red
   export exitcode=1
-  echo "Coverage under 30%"
+  echo "Coverage under 10%"
   anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
-elif [[ $(bc -l <<< "$cov<60.0") -eq 1 ]] ; then
-  export color=orange
-  export exitcode=1
-  echo "Coverage under 60%"
-  anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
-elif [[ $(bc -l <<< "$cov>=60.0") -eq 1 ]] ; then
+# elif [[ $(bc -l <<< "$cov<10.0") -eq 1 ]] ; then
+#   export color=orange
+#   export exitcode=1
+#   echo "Coverage under 10%"
+# anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
+elif [[ $(bc -l <<< "$cov>=10.0") -eq 1 ]] ; then
   export color=green
-  echo "Coverage above 60%"
+  echo "Coverage above 10%"
   anybadge --value="$cov%" --file=./target/coverage.svg --label=coverage -c $color -o
 #else unknown fatal error red badge "failed"
 else

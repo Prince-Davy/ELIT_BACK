@@ -13,39 +13,37 @@ resources:
       endpoint: SogetiLabsFranceRepository
       name: LGE_Templates/LGE_Templates
 
-
 pool: labs-pool
 
 variables:
   - name: project_group
-    value: 'ELIT'
+    value: "ELIT"
   - name: project_name
-    value: 'lge_elit_back'
+    value: "lge_elit_back"
   - name: imageRepository
-    value: lge-elit/lge-elit-back     
+    value: lge-elit/lge-elit-back
   - name: dockerRegistryServiceConnection
     value: SogetiLabsFranceRegistry
   - name: dockerfilePath
     value: $(Build.SourcesDirectory)/Dockerfile
-    
   - name: deploymentName
-    value: 'elit-back'
+    value: "elit-back"
   - name: deploymentIntegName
-    value: 'elit-back-integ'          
+    value: "elit-back-integ"
   - name: kubernetesNamespace
-    value: 'lge-elit'     
+    value: "lge-elit"
   - name: kubernetesIntegNamespace
-    value: 'lge-elit-production'      
+    value: "lge-elit-production"
   - name: kubernetesSecret
-    value: 'lge-elit-config'          
+    value: "lge-elit-config"
   - name: kubernetesIntegSecret
-    value: 'lge-elit-config-integ'   
+    value: "lge-elit-config-integ"
   # Include template variables
-  -  template: templates-general/variables.yml@templates
+  - template: templates-general/variables.yml@templates
 
 extends:
   template: templates-general/azure-general-java-tpl.yml@templates
   parameters:
-    DEPLOY_INTEG: false
+    DEPLOY_INTEG: true
     DEPLOY_PROD: false
     SCAN_SQ: true
