@@ -297,24 +297,51 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       errorMap.put("NOT_FOUND", Constants.USER_NOT_FOUND);
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMap);
     }
-    if (userRepository.findByUserEmail(user.getUserEmail()) != null
-      && !userFromDB.getUserEmail().equals(user.getUserEmail())) {
-      errorMap.put(Constants.CONFLICT, "email déjà utilisé");
+
+    errorMap = validateUserUpdate(user, userFromDB);
+    if (!errorMap.isEmpty()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
+    }
+
+    updateUserFields(user, userFromDB);
+    userRepository.save(userFromDB);
+
+    errorMap.put("SUCCESS", "Utilisateur mis à jour");
+    return ResponseEntity.status(HttpStatus.OK).body(errorMap);
+  }
+  /**
+   * Validates a user details against the user details in the database.
+   *
+   * @param user The UserModel object containing the updated user information.
+   * @param userFromDB The user to update.
+   * @return A Map containing the errors.
+   */
+  private Map<String, String> validateUserUpdate(final UserModel user, final User userFromDB) {
+    Map<String, String> errorMap = new HashMap<>();
+
+    if (userRepository.findByUserEmail(user.getUserEmail()) != null && !userFromDB.getUserEmail().equals(user.getUserEmail())) {
+      errorMap.put(Constants.CONFLICT, "email déjà utilisé");
     }
     if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())) {
       errorMap.put(Constants.CONFLICT, "Les mots de passe doivent être identiques");
-      return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
     }
     if (!user.getUserEmail().equals(user.getUserEmailConfirmation())) {
       errorMap.put(Constants.CONFLICT, "Les emails doivent être identiques");
-      return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
     }
     if (userRepository.findByUsername(user.getUsername()) != null
       && !userFromDB.getUsername().equals(user.getUsername())) {
       errorMap.put(Constants.CONFLICT, "nom d'utilisateur déjà utilisé");
-      return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMap);
     }
+    return errorMap;
+  }
+  /**
+   * Updates a user's fields.
+   *
+   * @param user The UserModel object containing the updated user information.
+   * @param userFromDB The user to update.
+   * @throws CouldNotSaveUserException If there is an error saving the updated user to the database.
+   */
+  private void updateUserFields(final UserModel user, final User userFromDB) throws CouldNotSaveUserException {
     if (user.getUsername() != null) {
       userFromDB.setUsername(user.getUsername());
     }
@@ -340,10 +367,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de l'avatar");
       }
     }
-    userRepository.save(userFromDB);
-    errorMap.put("SUCCESS", "Utilisateur mis à jour");
-    return ResponseEntity.status(HttpStatus.OK).body(errorMap);
   }
+
 
   /**
    * Sends a registration confirmation email to a user containing a verification token.

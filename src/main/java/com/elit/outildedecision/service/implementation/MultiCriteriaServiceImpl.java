@@ -185,16 +185,16 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
     JSONParser jsonParser = new JSONParser();
     JSONObject multiCriteriaJson = (JSONObject) jsonParser.parse(reader);
-    Iterator multiCreteriaIterator = multiCriteriaJson.entrySet().iterator();
+    Iterator<Map.Entry<String, JSONObject>> multiCreteriaIterator = multiCriteriaJson.entrySet().iterator();
 
     while (multiCreteriaIterator.hasNext()) {
-      Map.Entry entry = (Map.Entry) multiCreteriaIterator.next();
+      Map.Entry<String, JSONObject> entry = multiCreteriaIterator.next();
       JSONObject step = (JSONObject) multiCriteriaJson.get(entry.getKey());
 
       FormStep persistedStep =
         formStepRepo.save(
           FormStep.builder()
-            .stepName(entry.getKey().toString())
+            .stepName(entry.getKey())
             .stepRef((Long) step.get("stepRef"))
             .multiCriteriaAnalysis(persistedAnalysis)
             .build());
@@ -215,13 +215,12 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
             .build());
       }
       while (multiCreteriaIterator.hasNext()) {
-        Map.Entry question = (Map.Entry) multiCreteriaIterator.next();
-        FormQuestion persistedFormQuestion =
-          formQuestionRepository.save(
+        Map.Entry<String, JSONObject> question = multiCreteriaIterator.next();
+        FormQuestion persistedFormQuestion = formQuestionRepository.save(
             FormQuestion.builder()
               .formStep(persistedStep)
               .questionText(questions.get(question.getKey()).toString())
-              .questionRef(question.getKey().toString())
+              .questionRef(question.getKey())
               .build());
 
         for (int i = 0; i < criterias.size(); i++) {

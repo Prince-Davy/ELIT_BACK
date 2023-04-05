@@ -1,7 +1,7 @@
 
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.entity.ProjectPropertyKey;
+import com.elit.outildedecision.model.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class ChatController {
+  /**
+   * the logger.
+   */
   private final Logger log = LoggerFactory.getLogger(ChatController.class);
-
   /**
    * the topic to which the messages will be sent.
    */
@@ -30,9 +32,12 @@ public class ChatController {
    */
   @MessageMapping("/chatroom")
   @SendTo(CHAT_TOPIC) // we can also use the SimpMessagingTemplate to send messages to the client
-  public ProjectPropertyKey.Message receivePublicMessage(
-      @Payload final ProjectPropertyKey.Message message) {
-    this.log.info("message : {}", message);
+  public ChatMessage receivePublicMessage(
+      @Payload final ChatMessage message) {
+    this.log.info("message : {}", message.getMessageBody());
+    this.log.info("avatar : {}", message.getAvatar());
+    this.log.info("status : {}", message.getStatus());
+    this.log.info("username : {}", message.getUsername());
     return message;
   }
 }

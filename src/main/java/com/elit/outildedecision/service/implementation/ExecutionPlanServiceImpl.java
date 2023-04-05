@@ -40,6 +40,7 @@ import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -57,19 +58,23 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   /**
    * the execution plan answer repository.
    */
-  private final ExecutionPlanAnswerRepository executionPlanAnswerRepository;
+  @Autowired
+  private ExecutionPlanAnswerRepository executionPlanAnswerRepository;
   /**
    * the execution plan question repository.
    */
-  private final ExecutionPlanQuestionRepository executionPlanQuestionRepository;
+  @Autowired
+  private ExecutionPlanQuestionRepository executionPlanQuestionRepository;
   /**
    * the execution plan repository.
    */
-  private final ExecutionPlanRepository executionPlanRepository;
+  @Autowired
+  private ExecutionPlanRepository executionPlanRepository;
   /**
    * the user repository.
    */
-  private final UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
   /**
    * the project user permission repository.
    */
@@ -101,10 +106,6 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   /**
    * the constructor of the class.
    * it's used to inject the dependencies
-   * @param executionPlanAnswerRepository the execution plan answer repository to inject
-   * @param executionPlanQuestionRepository the execution plan question repository to inject
-   * @param executionPlanRepository the execution plan repository to inject
-   * @param userRepository the user repository to inject
    * @param projectUserPermissionRepository the project user permission repository to inject
    * @param methodRepository the method repository to inject
    * @param executionPlanVoteRepo the execution plan vote repository to inject
@@ -113,21 +114,13 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    * @param multiCriteriaAnalysisRepository the multi criteria analysis repository to inject
    * @param predictibilityResultsRepository the predictibility results repository to inject
    */
-  public ExecutionPlanServiceImpl(final ExecutionPlanAnswerRepository executionPlanAnswerRepository,
-                                  final ExecutionPlanQuestionRepository executionPlanQuestionRepository,
-                                  final ExecutionPlanRepository executionPlanRepository,
-                                  final UserRepository userRepository,
-                                  final ProjectUserPermissionRepository projectUserPermissionRepository,
+  public ExecutionPlanServiceImpl(final ProjectUserPermissionRepository projectUserPermissionRepository,
                                   final MethodRepository methodRepository,
                                   final ExecutionPlanVoteRepo executionPlanVoteRepo,
                                   final ProjectRepository projectRepository,
                                   final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
                                   final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
                                   final PredictibilityResultsRepository predictibilityResultsRepository) {
-    this.executionPlanAnswerRepository = executionPlanAnswerRepository;
-    this.executionPlanQuestionRepository = executionPlanQuestionRepository;
-    this.executionPlanRepository = executionPlanRepository;
-    this.userRepository = userRepository;
     this.projectUserPermissionRepository = projectUserPermissionRepository;
     this.methodRepository = methodRepository;
     this.executionPlanVoteRepo = executionPlanVoteRepo;
@@ -167,7 +160,6 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     int nextIteration = 1;
 
     if (lastExecutionPlan != null) {
-      // "Une Analyse de prévisibilité est déjà en cours"
       if (Boolean.FALSE.equals(lastExecutionPlan.getIsFinished())) {
         return ResponseEntity.ok().body(lastExecutionPlan.getExecutionPlanId());
       }

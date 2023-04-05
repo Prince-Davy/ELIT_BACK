@@ -124,15 +124,13 @@ public class VoteServiceImpl implements VoteService {
   @Override
   public List<VoteModelResponse> getVote(final Long predictibilityAnalysisId)
     throws UserNotFoundException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     log.info("userEmail", userEmail);
     User user = userRepository.findByUserEmail(userEmail);
     log.info("user", user);
-    PredictibilityAnalysis predictibilityAnalysis =
-      predictibilityAnalysisRepository
-        .findById(predictibilityAnalysisId)
-        .orElseThrow(() -> new RuntimeException("Predictibility Analysis Id non trouvé."));
+    PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository
+      .findById(predictibilityAnalysisId)
+      .orElseThrow(() -> new RuntimeException("Predictibility Analysis Id non trouvé."));
 
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
 
@@ -141,76 +139,81 @@ public class VoteServiceImpl implements VoteService {
     if (Objects.isNull(projectUserPermission)) {
       throw new UserNotFoundException("Cet utilisateur n'existe pas dans le projet !");
     }
-    List<VoteModelResponse> result = new ArrayList<>();
+    List<VoteModelResponse> result;
 
-    List<String> userPermission =
-      checkPermissionByProjectIdAndUserId(project.getProjectId(), user.getUserId());
+    List<String> userPermission = checkPermissionByProjectIdAndUserId(project.getProjectId(), user.getUserId());
+
     if (userPermission.contains(ProjectPermession.CDP.name())) {
-      List<ProjectUserPermission> usersPermission =
-        projectUserPermissionRepository.findAllByProjectId(project.getProjectId());
-      for (ProjectUserPermission userP : usersPermission) {
-        if (userP.getPermission().equals(ProjectPermession.CONTRIBUTER.toString())
-          || userP.getPermission().equals(ProjectPermession.CDP.name())) {
-          Vote userVote =
-            voteRepository.findByPredictibilityAnalysisAndUserId(
-              predictibilityAnalysisId, userP.getUser().getUserId());
-          if (Objects.isNull(userVote)) {
-            result.add(
-              VoteModelResponse.builder()
-                .voteId(null)
-                .isConfirmed(null)
-                .predictibilityAnalysisId(predictibilityAnalysisId)
-                .justification(null)
-                .chosenPMM(null)
-                .predictibilityValue(null)
-                .userId(userP.getUser().getUserId())
-                .build());
-          } else {
-            result.add(
-              VoteModelResponse.builder()
-                .voteId(userVote.getVoteId())
-                .isConfirmed(userVote.getIsConfirmed())
-                .predictibilityAnalysisId(predictibilityAnalysisId)
-                .justification(userVote.getJustification())
-                .chosenPMM(userVote.getChosenPMM())
-                .predictibilityValue(userVote.getPredictibilityValue())
-                .userId(userP.getUser().getUserId())
-                .build());
-          }
-        }
-      }
+      result = getAllVotesForCDP(project, predictibilityAnalysisId);
     } else {
-      Vote vote =
-        voteRepository.findByPredictibilityAnalysisAndUserId(
-          predictibilityAnalysisId, user.getUserId());
-      if (Objects.isNull(vote)) {
-        VoteModelResponse voteUser =
-          VoteModelResponse.builder()
-            .voteId(null)
-            .isConfirmed(null)
-            .justification(null)
-            .chosenPMM(null)
-            .predictibilityValue(null)
-            .predictibilityAnalysisId(predictibilityAnalysisId)
-            .userId(user.getUserId())
-            .build();
+      result = getVoteForNonCDPUser(user, predictibilityAnalysisId);
+    }
 
-        result.add(voteUser);
-        return result;
-      } else {
-        result.add(
-          new VoteModelResponse(
-            vote.getVoteId(),
-            vote.getChosenPMM(),
-            vote.getJustification(),
-            vote.getPredictibilityValue(),
-            predictibilityAnalysisId,
-            vote.getIsConfirmed(),
-            vote.getUser().getUserId()));
+    return result;
+  }
+  /**
+   * Retrieves a list of vote model responses for a given predictibility analysis ID.
+   *
+   * @param predictibilityAnalysisId the ID of the predictibility analysis.
+   * @param project the project.
+   * @return a list of vote model responses.
+   */
+  private List<VoteModelResponse> getAllVotesForCDP(final Project project, final Long predictibilityAnalysisId) {
+    List<VoteModelResponse> result = new ArrayList<>();
+    List<ProjectUserPermission> usersPermission = projectUserPermissionRepository.findAllByProjectId(project.getProjectId());
+    for (ProjectUserPermission userP : usersPermission) {
+      if (userP.getPermission().equals(ProjectPermession.CONTRIBUTER.toString())
+        || userP.getPermission().equals(ProjectPermession.CDP.name())) {
+        Vote userVote = voteRepository.findByPredictibilityAnalysisAndUserId(predictibilityAnalysisId, userP.getUser().getUserId());
+        result.add(createVoteModelResponse(userVote, predictibilityAnalysisId, userP.getUser().getUserId()));
       }
     }
     return result;
   }
+  /**
+   * Retreives the vote of a non CDP user.
+   * @param user the user.
+   * @param predictibilityAnalysisId the predictibility analysis id.
+   * @return a list of vote model responses.
+   */
+  private List<VoteModelResponse> getVoteForNonCDPUser(final User user, final Long predictibilityAnalysisId) {
+    List<VoteModelResponse> result = new ArrayList<>();
+    Vote vote = voteRepository.findByPredictibilityAnalysisAndUserId(predictibilityAnalysisId, user.getUserId());
+    result.add(createVoteModelResponse(vote, predictibilityAnalysisId, user.getUserId()));
+    return result;
+  }
+  /**
+   * Creates a vote model response from a vote.
+   *
+   * @param vote the vote.
+   * @param predictibilityAnalysisId the predictibility analysis id.
+   * @param userId the user id.
+   * @return a vote model response.
+   */
+  private VoteModelResponse createVoteModelResponse(final Vote vote, final Long predictibilityAnalysisId, final Long userId) {
+    if (Objects.isNull(vote)) {
+      return VoteModelResponse.builder()
+        .voteId(null)
+        .isConfirmed(null)
+        .predictibilityAnalysisId(predictibilityAnalysisId)
+        .justification(null)
+        .chosenPMM(null)
+        .predictibilityValue(null)
+        .userId(userId)
+        .build();
+    } else {
+      return VoteModelResponse.builder()
+        .voteId(vote.getVoteId())
+        .isConfirmed(vote.getIsConfirmed())
+        .predictibilityAnalysisId(predictibilityAnalysisId)
+        .justification(vote.getJustification())
+        .chosenPMM(vote.getChosenPMM())
+        .predictibilityValue(vote.getPredictibilityValue())
+        .userId(userId)
+        .build();
+    }
+  }
+
 
   /**
    * Updates an existing vote with new details from the provided vote model request.

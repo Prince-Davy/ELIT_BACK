@@ -21,14 +21,4 @@ public class ProjectPropertyKey implements Serializable {
 
   @Column(name = "user_id")
   private Long userId;
-
-  @Data
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class Message {
-    private String username;
-    private String avatar;
-    private String messageBody;
-    private String status;
-  }
 }

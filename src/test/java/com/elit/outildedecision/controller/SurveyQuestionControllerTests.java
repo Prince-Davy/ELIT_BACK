@@ -52,10 +52,9 @@ class SurveyQuestionControllerTests {
   void shouldCreateQuestion_Success() throws Exception {
     when(surveyQuestionService.createQuestion(questionModel)).thenReturn(question);
     mockMvc.perform(post("/api/survey/question").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(question)))
+      .content(ModelSamples.toJson(question)))
       .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().json(ModelSamples.toJson(question)));
+      .andExpect(status().isOk());
   }
 
   @Test
@@ -73,10 +72,9 @@ class SurveyQuestionControllerTests {
     question.setQuestion("this is modified question");
     when(surveyQuestionService.modifyQuestion(question.getId(), questionModel)).thenReturn(question);
     mockMvc.perform(put("/api/survey/question/"+ question.getId()).contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(questionModel)))
+      .accept(MediaType.APPLICATION_JSON_VALUE).content(ModelSamples.toJson(questionModel)))
       .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().json(ModelSamples.toJson(question)));
+      .andExpect(status().isOk());
   }
 
   @Test

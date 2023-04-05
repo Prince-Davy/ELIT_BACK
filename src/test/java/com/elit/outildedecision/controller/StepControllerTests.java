@@ -3,6 +3,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.service.FormStepService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class StepControllerTests {
+class StepControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
@@ -41,10 +42,12 @@ public class StepControllerTests {
   private  Long formId;
 
   private FormStep formStep;
+  private MultiCriteriaStepModel formStepMultiCreteria;
 
   @BeforeEach
   public void setUp() {
     formStep = ModelSamples.FormStepSamples.getFormStep();
+    formStepMultiCreteria = ModelSamples.FormStepSamples.getFormStepMultiCreteria();
     formId = 1l;
   }
 
@@ -72,8 +75,8 @@ public class StepControllerTests {
   @Test
   @WithMockUser(authorities = "USER")
   void shouldUpdateFormStep_Success() throws Exception {
-    when(formStepService.updateFormStep(formStep)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Vos Modifications ont été enregistrées !"));
-    mockMvc.perform(MockMvcRequestBuilders.put("/steps").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(formStep)))
+    when(formStepService.updateFormStep(formStepMultiCreteria)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Vos Modifications ont été enregistrées !"));
+    mockMvc.perform(MockMvcRequestBuilders.put("/steps").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(formStepMultiCreteria)))
       .andDo(print())
       .andExpect(status().isOk());
   }
