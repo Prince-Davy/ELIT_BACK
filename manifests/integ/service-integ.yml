@@ -7,6 +7,6 @@ metadata:
   namespace: lge-elit
 spec:
   ports:
-    - port: 8082
+    - port: 8080
   selector:
     app: lge-elit-back

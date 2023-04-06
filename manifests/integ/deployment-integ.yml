@@ -15,6 +15,7 @@ spec:
       labels:
         app: lge-elit-back
     spec:
+      serviceAccountName: lge-elit-integ-sa
       containers:
         - name: lge-elit-back
           imagePullPolicy: Always
