@@ -80,5 +80,4 @@ class StepControllerTests {
       .andDo(print())
       .andExpect(status().isOk());
   }
-
 }

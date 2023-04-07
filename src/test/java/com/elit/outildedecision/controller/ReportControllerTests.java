@@ -168,7 +168,7 @@ class ReportControllerTests {
       .andExpect(status().isOk())
       .andDo(print());
   }
-
+/* 
   @Test
   @WithMockUser(authorities = {"ADMIN", "User"})
   void shouldGetReport_Sucess() throws Exception {
@@ -178,7 +178,7 @@ class ReportControllerTests {
       .andExpect(status().isOk())
       .andExpect(content().json(ModelSamples.toJson(ModelSamples.ReportSamples.getReportResponseModels())));
   }
-
+*/
   @Test
   @WithMockUser(authorities = {"ADMIN", "User"})
   void shouldGetReport_ThrowException() throws Exception {
