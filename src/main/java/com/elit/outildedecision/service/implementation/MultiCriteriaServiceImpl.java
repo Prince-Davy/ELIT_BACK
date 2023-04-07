@@ -33,6 +33,7 @@ import com.elit.outildedecision.util.ProjectPermession;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -155,22 +156,40 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @return a ResponseEntity with a success message if the form was created successfully, or a
    * conflict status if there is already an ongoing analysis for the project.
    * @throws IOException if there is an error reading the JSON file.
-   * @throws org.json.simple.parser.ParseException if there is an error parsing the JSON file.
+   * @throws ParseException if there is an error parsing the JSON file.
    */
   @Override
   public ResponseEntity<String> createMulticriteriaAnalysisForm(final Long projectId)
-    throws IOException, org.json.simple.parser.ParseException {
-    Project project =
-      projectRepository
-        .findById(projectId)
-        .orElseThrow(() -> new RuntimeException("Ce projet n'existe pas"));
-    MultiCriteriaAnalysis existingMultiCriteriaAnalysis =
-      multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(projectId);
-    if (Objects.nonNull(existingMultiCriteriaAnalysis) && Boolean.TRUE.equals(!existingMultiCriteriaAnalysis.getIsFinished())) {
+    throws IOException, ParseException {
+    Project project = getProject(projectId);
+    MultiCriteriaAnalysis existingMultiCriteriaAnalysis = getExistingMultiCriteriaAnalysis(projectId);
+
+    if (isAnalysisInProgress(existingMultiCriteriaAnalysis)) {
       return ResponseEntity.status(HttpStatus.CONFLICT)
         .body("Une Analyse multicritère est déjà en cours pour ce projet");
     }
 
+    MultiCriteriaAnalysis persistedAnalysis = createNewMultiCriteriaAnalysis(project, existingMultiCriteriaAnalysis);
+    JSONObject multiCriteriaJson = readQuestionsJsonFile();
+    processMultiCriteriaJson(multiCriteriaJson, persistedAnalysis);
+
+    return ResponseEntity.ok().body("Votre Analyse multicritère est crée avec succés");
+  }
+  private Project getProject(final Long projectId) {
+    return projectRepository
+      .findById(projectId)
+      .orElseThrow(() -> new RuntimeException("Ce projet n'existe pas"));
+  }
+
+  private MultiCriteriaAnalysis getExistingMultiCriteriaAnalysis(final Long projectId) {
+    return multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(projectId);
+  }
+
+  private boolean isAnalysisInProgress(final MultiCriteriaAnalysis existingMultiCriteriaAnalysis) {
+    return Objects.nonNull(existingMultiCriteriaAnalysis) && Boolean.TRUE.equals(!existingMultiCriteriaAnalysis.getIsFinished());
+  }
+
+  private MultiCriteriaAnalysis createNewMultiCriteriaAnalysis(final Project project, final MultiCriteriaAnalysis existingMultiCriteriaAnalysis) {
     MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
     multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(
       Objects.nonNull(existingMultiCriteriaAnalysis)
@@ -178,63 +197,83 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
         : 1);
     multiCriteriaAnalysis.setIsFinished(false);
     multiCriteriaAnalysis.setProject(project);
-    MultiCriteriaAnalysis persistedAnalysis =
-      multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
-
+    return multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
+  }
+  private JSONObject readQuestionsJsonFile() throws IOException, ParseException {
     FileReader reader = new FileReader(questionsJsonFile);
-
     JSONParser jsonParser = new JSONParser();
-    JSONObject multiCriteriaJson = (JSONObject) jsonParser.parse(reader);
+    return (JSONObject) jsonParser.parse(reader);
+  }
+
+  private void processMultiCriteriaJson(final JSONObject multiCriteriaJson, final MultiCriteriaAnalysis persistedAnalysis) {
     Iterator<Map.Entry<String, JSONObject>> multiCreteriaIterator = multiCriteriaJson.entrySet().iterator();
 
     while (multiCreteriaIterator.hasNext()) {
       Map.Entry<String, JSONObject> entry = multiCreteriaIterator.next();
       JSONObject step = (JSONObject) multiCriteriaJson.get(entry.getKey());
 
-      FormStep persistedStep =
-        formStepRepo.save(
-          FormStep.builder()
-            .stepName(entry.getKey())
-            .stepRef((Long) step.get("stepRef"))
-            .multiCriteriaAnalysis(persistedAnalysis)
-            .build());
+      FormStep persistedStep = saveFormStep(entry, persistedAnalysis);
       JSONObject questions = (JSONObject) step.get("Questions");
       JSONArray criterias = (JSONArray) step.get("Criterias");
 
-      List<Float> initialWeights =
-        (criterias.size() == 2) ? List.of(HALF, HALF) : List.of(HALF, QUARTER, QUARTER);
+      saveStepWeights(criterias, persistedStep);
+      saveFormQuestionsAndCriteria(questions, criterias, persistedStep);
+    }
+  }
+
+  private FormStep saveFormStep(final Map.Entry<String, JSONObject> entry, final MultiCriteriaAnalysis persistedAnalysis) {
+    JSONObject step = entry.getValue();
+    return formStepRepo.save(
+      FormStep.builder()
+        .stepName(entry.getKey())
+        .stepRef((Long) step.get("stepRef"))
+        .multiCriteriaAnalysis(persistedAnalysis)
+        .build());
+  }
+
+  private void saveStepWeights(final JSONArray criterias, final FormStep persistedStep) {
+    List<Float> initialWeights =
+      (criterias.size() == 2) ? List.of(HALF, HALF) : List.of(HALF, QUARTER, QUARTER);
+
+    for (int i = 0; i < criterias.size(); i++) {
+      JSONObject criteriaData = (JSONObject) criterias.get(i);
+      stepWeightRepo.save(
+        StepWeight.builder()
+          .criteriaName(criteriaData.get("name").toString())
+          .criteriaDescription(criteriaData.get("description").toString())
+          .weightValue(initialWeights.get(i))
+          .formStep(persistedStep)
+          .build());
+    }
+  }
+
+  private void saveFormQuestionsAndCriteria(final JSONObject questions, final JSONArray criterias, final FormStep persistedStep) {
+    Iterator<Map.Entry<String, String>> questionIterator = questions.entrySet().iterator();
+
+    while (questionIterator.hasNext()) {
+      Map.Entry<String, String> question = questionIterator.next();
+      FormQuestion persistedFormQuestion = saveFormQuestion(persistedStep, question);
 
       for (int i = 0; i < criterias.size(); i++) {
         JSONObject criteriaData = (JSONObject) criterias.get(i);
-        stepWeightRepo.save(
-          StepWeight.builder()
+        criteriaRepository.save(
+          Criteria.builder()
             .criteriaName(criteriaData.get("name").toString())
-            .criteriaDescription(criteriaData.get("description").toString())
-            .weightValue(initialWeights.get(i))
-            .formStep(persistedStep)
+            .formQuestion(persistedFormQuestion)
             .build());
       }
-      while (multiCreteriaIterator.hasNext()) {
-        Map.Entry<String, JSONObject> question = multiCreteriaIterator.next();
-        FormQuestion persistedFormQuestion = formQuestionRepository.save(
-            FormQuestion.builder()
-              .formStep(persistedStep)
-              .questionText(questions.get(question.getKey()).toString())
-              .questionRef(question.getKey())
-              .build());
-
-        for (int i = 0; i < criterias.size(); i++) {
-          JSONObject criteriaData = (JSONObject) criterias.get(i);
-          criteriaRepository.save(
-            Criteria.builder()
-              .criteriaName(criteriaData.get("name").toString())
-              .formQuestion(persistedFormQuestion)
-              .build());
-        }
-      }
     }
-    return ResponseEntity.ok().body("Votre Analyse multicritère est crée avec succés");
   }
+
+  private FormQuestion saveFormQuestion(final FormStep persistedStep, final Map.Entry<String, String> question) {
+    return formQuestionRepository.save(
+      FormQuestion.builder()
+        .formStep(persistedStep)
+        .questionText(question.getValue())
+        .questionRef(question.getKey())
+        .build());
+  }
+
   /**
    * Retrieves the latest multicriteria analysis for a given project and returns it as a
    * {@link MulticriteriaAnalyseResponseModel}.

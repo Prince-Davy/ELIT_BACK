@@ -17,7 +17,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "predictibility_result")
+@Table(name = "predictibility_results")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

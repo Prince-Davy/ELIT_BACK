@@ -62,7 +62,7 @@ class AuthentificationControllerTest {
   void register_whenUserModel_isConform() throws Exception {
     UserModel userModel = ModelSamples.UserSamples.getUserModel();
     when(userService.saveUser(userModel)).thenReturn(ResponseEntity.ok().body("Votre compte a été créé avec succès"));
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/register").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/register").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(userModel))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -71,7 +71,7 @@ class AuthentificationControllerTest {
     UserModel userModel = ModelSamples.UserSamples.getUserModel();
     User user = ModelSamples.UserSamples.getUser();
     when(userService.saveUser(userModel)).thenThrow(new UserAlreadyExistsException("Utilisateur déjà existant"));
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/register").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/register").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(user))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }

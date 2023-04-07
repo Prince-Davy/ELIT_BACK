@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -75,8 +76,12 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
     http.headers().frameOptions().disable();
     http.cors().configurationSource(corsConfigurationSource());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    http.authorizeRequests().anyRequest().permitAll();
-    http.addFilter(new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean()));
+    http.authorizeRequests()
+      .antMatchers("/api/login", "/api/refreshToken").permitAll()
+      .anyRequest().permitAll();
+    JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean());
+    jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
+    http.addFilter(jwtAuthenticationFilter);
     http.addFilterBefore(new JwtAuthorizationFilter(jwtProperties), UsernamePasswordAuthenticationFilter.class);
   }
 

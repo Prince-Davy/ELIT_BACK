@@ -27,6 +27,7 @@ import com.elit.outildedecision.service.PredictibilityAnalysisService;
 import com.elit.outildedecision.util.MethodologyTypes;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,27 +90,27 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
   /**
    * A logger for logging application events and errors.
    */
-  private Logger logger;
+  private final Logger logger;
   /**
    * Constructs a PredictibilityAnalysisServiceImpl object.
    * uses the constructor-based dependency injection to inject the repositories.
    *
-   * @param multiCriteriaAnalysisRepository A repository for Multi-Criteria Analysis.
+   * @param multiCriteriaAnalysisRepository  A repository for Multi-Criteria Analysis.
    * @param predictibilityAnalysisRepository A repository for Predictibility Analysis.
-   * @param voteRepository A repository for Votes.
-   * @param userRepository A repository for Users.
-   * @param projectUserPermissionRepository A repository for Project User Permissions.
-   * @param methodologyRepository A repository for Methodologies.
-   * @param predictibilityResultsRepository A repository for Predictibility Results.
+   * @param voteRepository                   A repository for Votes.
+   * @param userRepository                   A repository for Users.
+   * @param projectUserPermissionRepository  A repository for Project User Permissions.
+   * @param methodologyRepository            A repository for Methodologies.
+   * @param predictibilityResultsRepository  A repository for Predictibility Results.
    */
   public PredictibilityAnalysisServiceImpl(
-      final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
-      final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
-      final VoteRepository voteRepository,
-      final UserRepository userRepository,
-      final ProjectUserPermissionRepository projectUserPermissionRepository,
-      final MethodologyRepository methodologyRepository,
-      final PredictibilityResultsRepository predictibilityResultsRepository) {
+    final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
+    final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
+    final VoteRepository voteRepository,
+    final UserRepository userRepository,
+    final ProjectUserPermissionRepository projectUserPermissionRepository,
+    final MethodologyRepository methodologyRepository,
+    final PredictibilityResultsRepository predictibilityResultsRepository) {
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
     this.voteRepository = voteRepository;
@@ -117,6 +118,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     this.projectUserPermissionRepository = projectUserPermissionRepository;
     this.methodologyRepository = methodologyRepository;
     this.predictibilityResultsRepository = predictibilityResultsRepository;
+    this.logger = LoggerFactory.getLogger(PredictibilityAnalysisServiceImpl.class);
   }
 
   /**

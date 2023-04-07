@@ -19,6 +19,7 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ import java.util.Map;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
+@RequestMapping("/api")
 public class AuthentificationController {
   /**
    * The Constant EXPIRATION_TIME.

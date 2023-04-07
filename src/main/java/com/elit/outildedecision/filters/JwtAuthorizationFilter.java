@@ -23,6 +23,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
    * The jwt properties used to get the key.
    */
   private final JwtProperties jwtProperties;
+
   /**
    * Constructor of JwtAuthorizationFilter.
    *
@@ -36,47 +37,55 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
    * This method is called by the servlet container each time a request/response pair is passed
    * through the chain due to a client request for a resource at the end of the chain.
    *
-   * @param request  The request to process
-   * @param response The response associated with the request
+   * @param request     The request to process
+   * @param response    The response associated with the request
    * @param filterChain The filter chain
    * @throws ServletException if the processing fails for any other reason
-   * @throws IOException if an I/O error occurs during this filter's processing of the request
+   * @throws IOException      if an I/O error occurs during this filter's processing of the request
    */
   @Override
   protected void doFilterInternal(final HttpServletRequest request,
                                   final HttpServletResponse response,
                                   final FilterChain filterChain)
-      throws ServletException, IOException {
-    if ("/refreshToken".equals(request.getServletPath())) {
+    throws ServletException, IOException {
+    if (shouldAllowRequestWithoutAuthentication(request)) {
       filterChain.doFilter(request, response);
-    } else {
-      String jwtAuthorizationToken = request.getHeader("Authorization");
-      if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
-        try {
-          String jwt = jwtAuthorizationToken.substring(7);
-          Algorithm algorithm =
-              Algorithm.HMAC256(jwtProperties.getSecret().getBytes());
-          JWTVerifier verifier =
-              JWT.require(algorithm).build(); // Require an algorithm and a secret:
-          DecodedJWT decodedJWT = verifier.verify(jwt);
-          String username = decodedJWT.getSubject();
-          String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-          Collection<GrantedAuthority> authorities = new ArrayList<>();
-          for (String r : roles) {
-            authorities.add(new SimpleGrantedAuthority(r));
-          }
-          UsernamePasswordAuthenticationToken authentificationToken =
-              new UsernamePasswordAuthenticationToken(username, null, authorities);
-          SecurityContextHolder.getContext().setAuthentication(authentificationToken);
-          filterChain.doFilter(request, response);
-        } catch (Exception e) {
-          response.setHeader("error", "Invalid token");
-          response.sendError(403);
+      return;
+    }
+    String jwtAuthorizationToken = request.getHeader("Authorization");
+    if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
+      try {
+        String jwt = jwtAuthorizationToken.substring(7);
+        Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret().getBytes());
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = verifier.verify(jwt);
+        String username = decodedJWT.getSubject();
+        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        for (String r : roles) {
+          authorities.add(new SimpleGrantedAuthority(r));
         }
-
-      } else {
-        filterChain.doFilter(request, response);
+        UsernamePasswordAuthenticationToken authentificationToken =
+          new UsernamePasswordAuthenticationToken(username, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentificationToken);
+      } catch (Exception e) {
+        response.setHeader("error", "Invalid token");
+        response.sendError(403);
+        return;
       }
     }
+    filterChain.doFilter(request, response);
+  }
+
+  /**
+   * This method is called by the servlet container each time a request/response pair is passed
+   * to check if the request should be allowed without authentication.
+   *
+   * @param request The request to process
+   * @return true if the request should be allowed without authentication, false otherwise
+   */
+  private boolean shouldAllowRequestWithoutAuthentication(final HttpServletRequest request) {
+    String requestURI = request.getRequestURI();
+    return requestURI.equals("/api/login") || requestURI.equals("/api/refreshToken");
   }
 }
