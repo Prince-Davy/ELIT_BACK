@@ -33,7 +33,7 @@ variables:
   - name: kubernetesNamespace
     value: "lge-elit"
   - name: kubernetesIntegNamespace
-    value: "lge-elit-production"
+    value: "lge-elit"
   - name: kubernetesSecret
     value: "lge-elit-config"
   - name: kubernetesIntegSecret
