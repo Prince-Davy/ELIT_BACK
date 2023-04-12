@@ -4,6 +4,7 @@ import com.elit.outildedecision.entity.SurveyQuestion;
 import com.elit.outildedecision.exception.QuestionFormatNotValidException;
 import com.elit.outildedecision.model.SurveyQuestionModel;
 import com.elit.outildedecision.service.SurveyQuestionService;
+import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

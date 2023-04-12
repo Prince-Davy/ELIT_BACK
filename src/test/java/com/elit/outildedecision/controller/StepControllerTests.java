@@ -5,6 +5,7 @@ import com.elit.outildedecision.entity.FormStep;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.service.FormStepService;
+import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

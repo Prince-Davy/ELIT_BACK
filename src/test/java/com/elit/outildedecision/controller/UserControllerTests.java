@@ -4,6 +4,7 @@ import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import com.elit.outildedecision.controller.ModelSamples.UserSamples;
+import com.elit.outildedecision.util.ModelSamples.UserSamples;
 import java.util.Arrays;
 import java.util.List;
 

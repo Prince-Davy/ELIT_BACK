@@ -16,12 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import com.elit.outildedecision.controller.ModelSamples.VoteSamples;
+import com.elit.outildedecision.util.ModelSamples.VoteSamples;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
-import static com.elit.outildedecision.controller.ModelSamples.toJson;
+import static com.elit.outildedecision.util.ModelSamples.toJson;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

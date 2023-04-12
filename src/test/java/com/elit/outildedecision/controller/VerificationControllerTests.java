@@ -2,6 +2,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.model.PasswordChangeModel;
 import com.elit.outildedecision.service.VerificationTokenService;
+import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;

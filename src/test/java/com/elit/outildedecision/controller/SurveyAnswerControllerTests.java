@@ -4,6 +4,7 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.SurveyAnswerRequestModel;
 import com.elit.outildedecision.model.SurveyAnswerResponseModel;
 import com.elit.outildedecision.service.SurveyAnswerService;
+import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,8 +28,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.elit.outildedecision.controller.ModelSamples.UserSamples;
-import com.elit.outildedecision.controller.ModelSamples.SurveyAnswerSamples;
+import com.elit.outildedecision.util.ModelSamples.UserSamples;
+import com.elit.outildedecision.util.ModelSamples.SurveyAnswerSamples;
 
 @SpringBootTest
 @AutoConfigureMockMvc

@@ -6,6 +6,7 @@ import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 
+import com.elit.outildedecision.util.ModelSamples;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
