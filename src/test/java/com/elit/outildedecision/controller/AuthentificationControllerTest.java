@@ -1,6 +1,7 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.repository.UserRepository;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -77,6 +79,14 @@ class AuthentificationControllerTest {
     Assertions.assertEquals(200, response.getStatus());
   }
 
+  @Test
+  void register_couldnotSaveUserException() throws Exception {
+    User user = ModelSamples.UserSamples.getUser();
+    when(userService.saveUser(any())).thenThrow(new CouldNotSaveUserException("Une erreur est survenue lors de la création de votre compte."));
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/register").contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON).content(asJsonString(user))).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(400, response.getStatus());
+  }
 }
 
 

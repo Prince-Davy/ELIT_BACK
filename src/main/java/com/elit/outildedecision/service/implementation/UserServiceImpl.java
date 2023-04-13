@@ -143,24 +143,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * @throws UserAlreadyExistsException if user already exists in the database.
    */
   @Override
-  public ResponseEntity<String> saveUser(final UserModel user) throws UserAlreadyExistsException {
+  public ResponseEntity<String> saveUser(final UserModel user) throws UserAlreadyExistsException, CouldNotSaveUserException {
     if (userRepository.existsByUserEmailOrUsername(user.getUserEmail(), user.getUsername())) {
-      throw new UserAlreadyExistsException("Utilisateur déjà existant");
+      throw new UserAlreadyExistsException("Une erreur est survenue, le compte associé à cet e-mail existe déjà");
     }
-    User userToSave =
-      User.builder()
-        .userEmail(user.getUserEmail())
-        .isUserActive(false)
-        .isEmailVerified(false)
-        .username(user.getUsername())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .userPassword(passwordEncoder.encode(user.getUserPassword()))
-        .userJob(user.getUserJob())
-        .isAdmin(false)
-        .build();
-    sendRegistrationConfirmationEmail(userRepository.save(userToSave));
-    return ResponseEntity.status(HttpStatus.CREATED).body("Votre compte a été créé avec succès");
+
+    try {
+      User userToSave =
+        User.builder()
+          .userEmail(user.getUserEmail())
+          .isUserActive(false)
+          .isEmailVerified(false)
+          .username(user.getUsername())
+          .userFirstName(user.getUserFirstName())
+          .userLastName(user.getUserLastName())
+          .userPassword(passwordEncoder.encode(user.getUserPassword()))
+          .userJob(user.getUserJob())
+          .isAdmin(false)
+          .build();
+      sendRegistrationConfirmationEmail(userRepository.save(userToSave));
+      return ResponseEntity.status(HttpStatus.CREATED).body("Votre compte a été créé avec succès");
+
+    } catch (Exception e) {
+      throw new CouldNotSaveUserException("Une erreur est survenue lors de la création de votre compte.");
+    }
   }
 
   /**
