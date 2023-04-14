@@ -54,8 +54,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
    * Checks if a user with the specified email address or username exists.
    *
    * @param userEmail the email address to check for
-   * @param username the username to check for
    * @return true if a user with the specified email address or username exists, false otherwise
    */
-  boolean existsByUserEmailOrUsername(String userEmail, String username);
+  boolean existsByUserEmail(String userEmail);
 }
