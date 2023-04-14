@@ -8,7 +8,9 @@ import com.elit.outildedecision.repository.OpinionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.OpinionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -49,14 +51,23 @@ public class OpinionServiceImpl implements OpinionService {
   @Override
   public ResponseEntity<String> createOpinion(final OpinionModel opinionModel)
     throws OpinionAlreadyExistException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    String userEmail;
 
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null && auth.getPrincipal() instanceof UserDetails) {
+      UserDetails userDetails = (UserDetails) auth.getPrincipal();
+      userEmail =  userDetails.getUsername();
+    } else {
+      userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    User user = userRepository.findByUserEmail(userEmail);
     Opinion opinionFromDB = opinionRepository.findByUserId(user.getUserId());
+
     if (Objects.nonNull(opinionFromDB)) {
       throw new OpinionAlreadyExistException("Cet utilisateur à déjà renseigné un avis.");
     }
+
     Opinion opinion = new Opinion();
     opinion.setDescription(opinionModel.getDescription());
     opinion.setRating(opinionModel.getRating());
@@ -73,10 +84,16 @@ public class OpinionServiceImpl implements OpinionService {
    */
   @Override
   public Boolean getOpinionIsAlreadyExist() {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    String userEmail;
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null && auth.getPrincipal() instanceof UserDetails) {
+      UserDetails userDetails = (UserDetails) auth.getPrincipal();
+      userEmail =  userDetails.getUsername();
+    } else {
+      userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
+    User user = userRepository.findByUserEmail(userEmail);
     Opinion opinionFromDB = opinionRepository.findByUserId(user.getUserId());
     return Objects.nonNull(opinionFromDB);
   }

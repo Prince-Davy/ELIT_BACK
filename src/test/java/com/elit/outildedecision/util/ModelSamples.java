@@ -55,7 +55,7 @@ public class ModelSamples {
     }
     public static User getUser2() {
       return createUser(1L, "user", "Doe", "John",
-        "user@user.com", "Développeur front", null, "user", true, true, false,
+        "user2@user.com", "Développeur front", null, "user", true, true, false,
         null, null);
     }
 
@@ -183,6 +183,23 @@ public class ModelSamples {
 
     public static MultiCriteriaStepModel getFormStepMultiCreteria() {
       return new MultiCriteriaStepModel(1l, "step2", 2f, null, null);
+    }
+  }
+
+  public static class OpinionSamples {
+    public static Opinion getOpinion() {
+      Opinion opinion = new Opinion();
+      opinion.setOpinionId(1L);
+      opinion.setRating(1);
+      opinion.setDescription("opinion1");
+      opinion.setUser(ModelSamples.UserSamples.getUser());
+
+      return opinion;
+    }
+
+    public static OpinionModel getOpinionModel() {
+      OpinionModel opinionModel = new OpinionModel(1, "opinion1");
+      return opinionModel;
     }
   }
 }
