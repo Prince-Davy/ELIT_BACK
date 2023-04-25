@@ -2,7 +2,6 @@ package com.elit.outildedecision.util;
 
 import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.model.*;
-import com.elit.outildedecision.util.AnswerType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
@@ -162,6 +161,14 @@ public class ModelSamples {
     public static SurveyQuestion getSurveyQuestion() {
       return new SurveyQuestion(1L, "is this a question", "yes/no question");
     }
+
+    public static SurveyQuestion getSurveyQuestion2() {
+      SurveyQuestion question = new SurveyQuestion();
+      question.setQuestion("is this a question");
+      question.setType("yes/no question");
+      return question;
+    }
+
     public static SurveyQuestionModel getSurveyQuestionRequestModel() {
       return new SurveyQuestionModel("is this a question", "yes/no question");
     }
@@ -170,6 +177,16 @@ public class ModelSamples {
   public static class ReportSamples {
     public static List<ReportResponseModel> getReportResponseModels() {
       return List.of(new ReportResponseModel(1L, "title", "type1", 1, null ));
+    }
+
+    public static Report getReport() {
+      Report report = new Report();
+      report.setReportId(1L);
+      report.setType("type1");
+      report.setIteration(1);
+      report.setAnalyseId(1L);
+      report.setReportPath("pathtoreport");
+      return report;
     }
   }
 

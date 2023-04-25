@@ -25,7 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
 @ActiveProfiles("test")
-class OpinionServiceImpTest {
+class OpinionServiceImpTests {
     @Mock
     private UserRepository userRepository;
 

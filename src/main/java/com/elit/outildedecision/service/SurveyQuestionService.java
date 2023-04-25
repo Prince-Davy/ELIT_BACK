@@ -33,7 +33,7 @@ public interface SurveyQuestionService {
    * @throws QuestionFormatNotValidException if the specified question format is not valid
    */
   SurveyQuestion modifyQuestion(Long questionId, SurveyQuestionModel question)
-    throws QuestionFormatNotValidException;
+    throws QuestionFormatNotValidException, QuestionsNotFoundException;
 
   /**
    * Deletes the survey question with the specified ID.

@@ -131,7 +131,7 @@ class SuperAdminServiceImplTests {
   }
 
   @Test
-  void shouldDeleteProject_ThrowProjectNotFoundException() throws ProjectNotFoundException {
+  void shouldDeleteProject_ThrowProjectNotFoundException() {
     when(projectRepository.findById(any())).thenReturn(Optional.empty());
     Assertions.assertThrows(ProjectNotFoundException.class, () -> superAdminService.deleteProject(project.getProjectId()));
   }

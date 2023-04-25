@@ -67,12 +67,12 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
   @Transactional
   public SurveyQuestion modifyQuestion(final Long questionId,
                                        final SurveyQuestionModel question)
-    throws QuestionFormatNotValidException {
+    throws QuestionFormatNotValidException, QuestionsNotFoundException {
     if (Objects.isNull(question)) {
       throw new QuestionFormatNotValidException("le format de la question n'est pas valide");
     }
-    if (questionRepo.existsById(questionId)) {
-      throw new QuestionFormatNotValidException("la question que vous voulez modifier n'existe pas");
+    if (!questionRepo.existsById(questionId)) {
+      throw new QuestionsNotFoundException("la question que vous voulez modifier n'existe pas");
     }
     // update the field question
     SurveyQuestion questionToUpdate = questionRepo.getById(questionId);

@@ -60,7 +60,7 @@ public class SurveyQuestionController {
   @PutMapping("/{questionId}")
   public SurveyQuestion modifyQuestion(
       @PathVariable final Long questionId, @RequestBody(required = false) final SurveyQuestionModel question)
-      throws QuestionFormatNotValidException {
+    throws QuestionFormatNotValidException, QuestionsNotFoundException {
     return questionService.modifyQuestion(questionId, question);
   }
   /**
