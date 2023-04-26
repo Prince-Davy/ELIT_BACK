@@ -53,6 +53,7 @@ public class ProjectController {
   public ProjectController(final ProjectService projectService) {
     this.projectService = projectService;
   }
+
   /**
    * Create a new project.
    * @param project ProjectModel
@@ -66,7 +67,7 @@ public class ProjectController {
    *
    */
   @PostMapping(value = "/user/projects", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+  @PreAuthorize("hasAnyAuthority('USER')")
   public ProjectResponseModel createProject(@ModelAttribute final ProjectModel project) throws ProjectFolderAlreadyExistsException,
     UserNotFoundException,
     ProjectNotFoundException,
@@ -75,6 +76,7 @@ public class ProjectController {
     org.json.simple.parser.ParseException, FileCouldNotBeSaved {
     return projectService.persistProject(project);
   }
+
   /**
    * get the project data by id.
    * @param projectId the id of the project
@@ -90,29 +92,23 @@ public class ProjectController {
         @ApiResponse(responseCode = "404", description = "Not found - The product was not found")
       })
   @GetMapping("/user/projects/getdata/{projectId}")
-  @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN') or  isContributer(#projectId)")
   public ProjectResponseModel getProjectData(@PathVariable final Long projectId)
     throws ProjectNotFoundException, UserNotAuthorizedException, ExecutionPlanNotFoundException {
     return projectService.getProjectData(projectId);
   }
+
   /** get the project data by id.
    * @param keyword the keyword to search for
    * @return ProjectResponseModel
+   * ToDO Delete the endPoint is not used
    */
   @GetMapping("/user/projects")
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
   public List<Project> getProjects(@RequestParam(required = false) final String keyword) {
     return projectService.getUserProjects(keyword);
   }
-  /**
-   * get all projects for admin.
-   * @return List<Project> list of projects
-   */
-  @GetMapping("/admin/projects")
-  @PreAuthorize("hasAnyAuthority('ADMIN')")
-  public List<Project> getAllProjects() {
-    return projectService.getAllProjects();
-  }
+
   /**
    * get all projects of a user.
    * @param keyword the keyword to search for
@@ -123,6 +119,52 @@ public class ProjectController {
   public List<ProjectResponseModel> getProjectList(@RequestParam(required = false) final String keyword) {
     return projectService.getUserProjectList(keyword);
   }
+
+  /**
+   * update a project.
+   * @param id the id of the project
+   * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found
+   * @throws IOException IOException if an I/O error occurs while deleting the project data
+   * @return ResponseEntity<String> the response
+   */
+  @DeleteMapping("/user/projects/{id}")
+  @PreAuthorize("hasAnyAuthority('USER') and isProjectOwner(#id)")
+  public ResponseEntity<String> deleteProject(@PathVariable final Long id) throws ProjectNotFoundException, IOException {
+    return projectService.deleteProject(id);
+  }
+
+  /**
+   * add a contributor to a project.
+   * @param contributor the contributor to add
+   * @param projectId the id of the project
+   * @throws ProjectNotFoundException if the specified project does not exist
+   * @throws UserNotFoundException if the specified user does not exist
+   * @return ResponseEntity<String>
+   */
+
+  @PostMapping("/user/projects/{projectId}/add-contributor")
+  @PreAuthorize("hasAnyAuthority('USER') and isProjectOwner(#projectId)")
+  public ResponseEntity<String> addProjectContributor(
+      @PathVariable final Long projectId, @ModelAttribute final ContributerModel contributor) throws ProjectNotFoundException, UserNotFoundException {
+    return projectService.addProjectContributor(projectId, contributor);
+  }
+
+  /**
+   * delete a contributor from a project.
+   * @param projectId the id of the project
+   * @param contributorID the id of the contributor
+   * @return ResponseEntity<String>
+   * @throws ProjectNotFoundException if the project with the given ID does not exist
+   * @throws UserNotFoundException if the user with the given ID does not exist in the project
+   * @throws ProjectOwnerException if the contributor to be removed is the owner of the project
+   */
+  @DeleteMapping("/user/projects/{projectId}/delete-contributor/{contributorID}")
+  @PreAuthorize("hasAnyAuthority('USER') and isProjectOwner(#projectId)")
+  public ResponseEntity<String> deleteProjectContributor(
+      @PathVariable final Long projectId, @PathVariable final Long contributorID) throws ProjectOwnerException, UserNotFoundException, ProjectNotFoundException {
+    return projectService.deleteProjectContributor(projectId, contributorID);
+  }
+
   /**
    * validate or reject a project.
    * @param id the id of the project
@@ -139,10 +181,21 @@ public class ProjectController {
   @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<String> validateOrRejectProject(@PathVariable final Long id,
                                                         final HttpEntity<String> isConfirmed)
-                                                        throws ProjectNotFoundException,
-                                                        IOException {
+    throws ProjectNotFoundException,
+    IOException {
     return projectService.validateOrRejectProject(id, isConfirmed);
   }
+
+  /**
+   * get all projects for admin.
+   * @return List<Project> list of projects
+   */
+  @GetMapping("/admin/projects")
+  @PreAuthorize("hasAnyAuthority('ADMIN')")
+  public List<Project> getAllProjects() {
+    return projectService.getAllProjects();
+  }
+
   /**
    * delete a project.
    * @param id the id of the project
@@ -154,46 +207,5 @@ public class ProjectController {
   @PreAuthorize("hasAnyAuthority('ADMIN')")
   public ResponseEntity<String> deleteProjectAdmin(@PathVariable final Long id) throws ProjectNotFoundException, IOException {
     return projectService.deleteProject(id);
-  }
-  /**
-   * update a project.
-   * @param id the id of the project
-   * @throws ProjectNotFoundException ProjectNotFoundException if the project is not found
-   * @throws IOException IOException if an I/O error occurs while deleting the project data
-   * @return ResponseEntity<String> the response
-   */
-  @DeleteMapping("/user/projects/{id}")
-  @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and isProjectOwner(#id)")
-  public ResponseEntity<String> deleteProject(@PathVariable final Long id) throws ProjectNotFoundException, IOException {
-    return projectService.deleteProject(id);
-  }
-  /**
-   * add a contributor to a project.
-   * @param contributor the contributor to add
-   * @param projectId the id of the project
-   * @throws ProjectNotFoundException if the specified project does not exist
-   * @throws UserNotFoundException if the specified user does not exist
-   * @return ResponseEntity<String>
-   */
-  @PostMapping("/user/projects/{projectId}/add-contributor")
-  @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and isProjectOwner(#projectId)")
-  public ResponseEntity<String> addProjectContributor(
-      @PathVariable final Long projectId, @ModelAttribute final ContributerModel contributor) throws ProjectNotFoundException, UserNotFoundException {
-    return projectService.addProjectContributor(projectId, contributor);
-  }
-  /**
-   * delete a contributor from a project.
-   * @param projectId the id of the project
-   * @param contributorID the id of the contributor
-   * @return ResponseEntity<String>
-   * @throws ProjectNotFoundException if the project with the given ID does not exist
-   * @throws UserNotFoundException if the user with the given ID does not exist in the project
-   * @throws ProjectOwnerException if the contributor to be removed is the owner of the project
-   */
-  @DeleteMapping("/user/projects/{projectId}/delete-contributor/{contributorID}")
-  @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and isProjectOwner(#projectId)")
-  public ResponseEntity<String> deleteProjectContributor(
-      @PathVariable final Long projectId, @PathVariable final Long contributorID) throws ProjectOwnerException, UserNotFoundException, ProjectNotFoundException {
-    return projectService.deleteProjectContributor(projectId, contributorID);
   }
 }

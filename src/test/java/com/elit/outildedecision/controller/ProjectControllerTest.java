@@ -51,6 +51,7 @@ class ProjectControllerTest {
   ProjectService projectService;
   @MockBean
   CustomMethodSecurityExpressionRoot customMethodSecurity;
+
   @InjectMocks
   private ProjectController ProjectController;
 
@@ -67,7 +68,8 @@ class ProjectControllerTest {
     files = new ArrayList<>();
     files.add(fileMultipart);
   }
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+
+  @WithMockUser(authorities = {"USER"})
   @Test
   void createProject() throws Exception {
     ProjectModel project = new ProjectModel();
@@ -76,7 +78,8 @@ class ProjectControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.multipart("/api/user/projects")
       .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(200));
   }
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+
+  @WithMockUser(authorities = {"USER"})
   @Test
   void createProject_whenProjectFolderAlreadyExists() throws Exception {
     ProjectModel project = new ProjectModel();
@@ -88,15 +91,18 @@ class ProjectControllerTest {
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
   }
+
   @WithMockUser(authorities = {"ADMIN", "USER"})
   @Test
   void getProjectData() throws Exception {
     Long projectId = 1L;
+    when(customMethodSecurity.isContributer(projectId)).thenReturn(true);
     ProjectResponseModel projectResponseModel = new ProjectResponseModel();
     when(projectService.getProjectData(projectId)).thenReturn(projectResponseModel);
     MockHttpServletResponse response = mockMvc.perform(get("/api/user/projects/getdata/"+projectId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
+
   @WithMockUser(authorities = {"ADMIN", "USER"})
   @Test
   void getProjectData_whenProjectNotFound() throws Exception {
@@ -105,6 +111,7 @@ class ProjectControllerTest {
     MockHttpServletResponse response = mockMvc.perform(get("/api/user/projects/getdata/"+projectId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
+
   @WithMockUser(authorities = {"ADMIN", "USER"})
   @Test
   void getProjects() throws Exception {
@@ -156,6 +163,7 @@ class ProjectControllerTest {
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
   }
+
   @WithMockUser(authorities = {"ADMIN"})
   @Test
   void deleteProjectAdmin() throws Exception {
@@ -173,7 +181,8 @@ class ProjectControllerTest {
     MockHttpServletResponse response = mockMvc.perform(delete("/api/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
-  @WithMockUser(authorities = {"ADMIN","USER"})
+
+  @WithMockUser(authorities = {"USER"})
   @Test
   void deleteProject() throws Exception {
     Long id = 1L;
@@ -181,7 +190,8 @@ class ProjectControllerTest {
     when(projectService.deleteProject(id)).thenReturn(ResponseEntity.ok().body("Le projet a été bien supprimé"));
     Assertions.assertEquals("Le projet a été bien supprimé", projectService.deleteProject(id).getBody());
   }
-  @WithMockUser(authorities = {"ADMIN","USER"})
+
+  @WithMockUser(authorities = {"ADMIN"})
   @Test
   void deleteProject_whenProjectNotFound() throws Exception {
     Long id = 1L;
@@ -191,15 +201,17 @@ class ProjectControllerTest {
     Assertions.assertEquals(404, response.getStatus());
   }
 
-  @WithMockUser(authorities = {"ADMIN","USER"})
+  @WithMockUser(authorities = {"USER"})
   @Test
   void addProjectContributor() throws Exception {
     Long projectId = 1L;
     ContributerModel contributor = new ContributerModel();
+    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
     when(projectService.addProjectContributor(projectId, contributor)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien enregistré"));
     Assertions.assertEquals("Le collaborateur a été bien enregistré", projectService.addProjectContributor(projectId, contributor).getBody());
   }
-  @WithMockUser(authorities = {"ADMIN","USER"})
+
+  @WithMockUser(authorities = {"USER"})
   @Test
   void addProjectContributor_whenProjectNotFound() throws Exception {
     Long projectId = 1L;
@@ -212,15 +224,18 @@ class ProjectControllerTest {
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
   }
-  @WithMockUser(authorities = {"ADMIN","USER"})
+
+  @WithMockUser(authorities = {"USER"})
   @Test
   void deleteProjectContributor() throws Exception {
     Long projectId = 1L;
     Long contributorID =2L;
+    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
     when(projectService.deleteProjectContributor(projectId, contributorID)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet"));
     Assertions.assertEquals("Le collaborateur a été bien retiré du projet", projectService.deleteProjectContributor(projectId, contributorID).getBody());
   }
-  @WithMockUser(authorities = {"ADMIN","USER"})
+
+  @WithMockUser(authorities = {"USER"})
   @Test
   void deleteProjectContributor_whenProjectNotFound() throws Exception {
     Long projectId = 1L;
@@ -233,11 +248,13 @@ class ProjectControllerTest {
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
   }
-  @WithMockUser(authorities = {"ADMIN","USER"})
+
+  @WithMockUser(authorities = {"USER"})
   @Test
   void deleteProjectContributor_whenUserNotFound() throws Exception {
     Long projectId = 1L;
     Long contributorID =2L;
+    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
     when(projectService.deleteProjectContributor(projectId, contributorID)).thenThrow(new ProjectNotFoundException("Cet utilisateur n'existe pas dans le projet !"));
     Exception exception = assertThrows(ProjectNotFoundException.class, () -> {
       projectService.deleteProjectContributor(projectId, contributorID);

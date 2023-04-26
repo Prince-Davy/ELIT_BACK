@@ -103,12 +103,12 @@ public class ProjectServiceImpl implements ProjectService {
    * of the projects.
    */
   public ProjectServiceImpl(
-      final ProjectRepository projectRepository,
-      final UserRepository userRepository,
-      final ExecutionPlanService executionPlanService,
-      final AttachmentService attachmentService,
-      final ProjectUserPermissionRepository projectUserPermissionRepository,
-      final MultiCriteriaAnalysisService multiCriteriaService) {
+    final ProjectRepository projectRepository,
+    final UserRepository userRepository,
+    final ExecutionPlanService executionPlanService,
+    final AttachmentService attachmentService,
+    final ProjectUserPermissionRepository projectUserPermissionRepository,
+    final MultiCriteriaAnalysisService multiCriteriaService) {
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
     this.attachmentService = attachmentService;
@@ -140,12 +140,12 @@ public class ProjectServiceImpl implements ProjectService {
     Project projectToSave = new Project();
     // getting the connected user
     String chefEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User chef = userRepository.findByUserEmail(chefEmail);
     Date dateOfCreation = new Date();
     String folderName = dateOfCreation.getTime() + "_" + project.getName();
     File projectDirectory =
-        new File(storingDirectory + folderName.replace(" ", "_").toLowerCase());
+      new File(storingDirectory + folderName.replace(" ", "_").toLowerCase());
     if (projectDirectory.exists()) {
       throw new ProjectFolderAlreadyExistsException("Dossier du projet dupliqué, réessayer plus tard.");
     }
@@ -157,20 +157,26 @@ public class ProjectServiceImpl implements ProjectService {
     projectToSave.setConfirmationState(ProjectConfirmationState.WAITING.name());
     projectToSave.setIsArchived(false);
     Long projectId = projectRepository.save(projectToSave).getProjectId();
-    // adding permissions to project
+
+    // adding permissions to project chef and contributers
+    ProjectUserPermission projectChefPermission = new ProjectUserPermission();
+    projectChefPermission.setUser(chef);
+    projectChefPermission.setProject(projectRepository.getById(projectId));
+    projectChefPermission.setPermission(
+      ProjectPermession.CDP.name());
+    projectChefPermission.setId(new ProjectPropertyKey(projectId, chef.getUserId()));
+    projectUserPermissionRepository.save(projectChefPermission);
+
     if (Objects.nonNull(project.getContributers())) {
       for (ContributerModel contributer : project.getContributers()) {
         User user =
-            userRepository
-                .findById(contributer.getContributerId())
-                .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas."));
+          userRepository
+            .findById(contributer.getContributerId())
+            .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas."));
         ProjectUserPermission projectUserPermission = new ProjectUserPermission();
         projectUserPermission.setUser(user);
         projectUserPermission.setProject(projectRepository.getById(projectId));
-        projectUserPermission.setPermission(
-            user.getUserId().equals(chef.getUserId())
-                ? ProjectPermession.CDP.name()
-                : contributer.getRole());
+        projectUserPermission.setPermission(contributer.getRole());
         projectUserPermission.setId(new ProjectPropertyKey(projectId, user.getUserId()));
         projectUserPermissionRepository.save(projectUserPermission);
       }
@@ -210,27 +216,27 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public List<Project> getUserProjects(final String keyword) {
     String principal =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     List<Project> projects = new ArrayList<>();
     List<ProjectUserPermission> projectUserPermissions =
-        projectUserPermissionRepository.findAll().stream()
-            .filter(
-                projectUserPermission ->
-                    projectUserPermission.getUser().getUserEmail().equals(principal))
-            .collect(Collectors.toList());
+      projectUserPermissionRepository.findAll().stream()
+        .filter(
+          projectUserPermission ->
+            projectUserPermission.getUser().getUserEmail().equals(principal))
+        .collect(Collectors.toList());
     if (!projectUserPermissions.isEmpty()) {
       for (ProjectUserPermission projectUserPermission : projectUserPermissions) {
         projects.add(projectUserPermission.getProject());
       }
     }
     if (keyword != null && !keyword.isEmpty()) {
-        return projects.stream()
-            .filter(
-                project ->
-                    Objects.nonNull(project.getDescription())
-                            && project.getDescription().contains(keyword)
-                        || project.getName().contains(keyword))
-            .collect(Collectors.toList());
+      return projects.stream()
+        .filter(
+          project ->
+            Objects.nonNull(project.getDescription())
+              && project.getDescription().contains(keyword)
+              || project.getName().contains(keyword))
+        .collect(Collectors.toList());
     }
     return projects;
   }
@@ -242,54 +248,54 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public List<ProjectResponseModel> getUserProjectList(final String keyword) {
     String principal =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     List<ProjectResponseModel> projects = new ArrayList<>();
     List<ProjectUserPermission> projectUserPermissions =
-        projectUserPermissionRepository.findAll().stream()
-            .filter(
-                projectUserPermission ->
-                    projectUserPermission.getUser().getUserEmail().equals(principal))
-            .collect(Collectors.toList());
+      projectUserPermissionRepository.findAll().stream()
+        .filter(
+          projectUserPermission ->
+            projectUserPermission.getUser().getUserEmail().equals(principal))
+        .collect(Collectors.toList());
 
     if (!projectUserPermissions.isEmpty()) {
       for (ProjectUserPermission projectUserPermission : projectUserPermissions) {
         Project project = projectUserPermission.getProject();
 
         List<ProjectUserPermission> userPermissionList =
-            projectUserPermissionRepository.findAll().stream()
-                .filter(
-                    permission ->
-                        permission.getProject().getProjectId().equals(project.getProjectId()))
-                .collect(Collectors.toList());
+          projectUserPermissionRepository.findAll().stream()
+            .filter(
+              permission ->
+                permission.getProject().getProjectId().equals(project.getProjectId()))
+            .collect(Collectors.toList());
 
         ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
         for (ProjectUserPermission userPermission : userPermissionList) {
           User user = userPermission.getUser();
           contributorModelList.add(
-              new ContributerModel(
-                  user.getUserId(),
-                  user.getUserFirstName(),
-                  user.getUserLastName(),
-                  null,
-                  null,
-                  null,
-                  userPermission.getPermission()));
+            new ContributerModel(
+              user.getUserId(),
+              user.getUserFirstName(),
+              user.getUserLastName(),
+              null,
+              null,
+              null,
+              userPermission.getPermission()));
         }
 
         projects.add(
-            new ProjectResponseModel(
-                project.getProjectId(),
-                project.getName(),
-                project.getDescription(),
-                project.getCreatedAt(),
-                project.getUpdatedAt(),
-                project.getConfirmationState(),
-                null,
-                null,
-                contributorModelList,
-                null,
-                null));
+          new ProjectResponseModel(
+            project.getProjectId(),
+            project.getName(),
+            project.getDescription(),
+            project.getCreatedAt(),
+            project.getUpdatedAt(),
+            project.getConfirmationState(),
+            null,
+            null,
+            contributorModelList,
+            null,
+            null));
       }
     }
     if (keyword != null && !keyword.isEmpty()) {
@@ -316,17 +322,17 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public ResponseEntity<String> validateOrRejectProject(final Long id,
                                                         final HttpEntity<String> isConfirmed)
-      throws ProjectNotFoundException, IOException {
+    throws ProjectNotFoundException, IOException {
     Project projectToConfirm =
-        projectRepository
-            .findById(id)
-            .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
+      projectRepository
+        .findById(id)
+        .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
 
     ProjectConfirmationState projectConfirmationState =
-        ProjectConfirmationState.valueOf(projectToConfirm.getConfirmationState());
+      ProjectConfirmationState.valueOf(projectToConfirm.getConfirmationState());
 
     Map<String, Boolean> result =
-        new ObjectMapper().readValue(isConfirmed.getBody(), HashMap.class);
+      new ObjectMapper().readValue(isConfirmed.getBody(), HashMap.class);
     if (Boolean.TRUE.equals(result.get("isConfirmed"))) {
       if (projectConfirmationState == ProjectConfirmationState.CONFIRMED) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ce projet est déjà validé");
@@ -358,14 +364,14 @@ public class ProjectServiceImpl implements ProjectService {
                                                       final ContributerModel contributor)
     throws ProjectNotFoundException, UserNotFoundException {
     Project project =
-        projectRepository
-            .findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas! "));
+      projectRepository
+        .findById(projectId)
+        .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas! "));
 
     User user =
-        userRepository
-            .findById(contributor.getContributerId())
-            .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas !"));
+      userRepository
+        .findById(contributor.getContributerId())
+        .orElseThrow(() -> new UserNotFoundException("Cet utilisateur n'existe pas !"));
 
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setUser(user);
@@ -396,7 +402,7 @@ public class ProjectServiceImpl implements ProjectService {
       throw new ProjectNotFoundException(PROJECT_NOT_FOUND);
     }
     ProjectUserPermission projectUserPermission =
-        projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID);
+      projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID);
 
     if (Objects.isNull(projectUserPermission)) {
       throw new UserNotFoundException("Cet utilisateur n'existe pas dans le projet !");
@@ -404,7 +410,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     if (projectUserPermission.getPermission().contains(ProjectPermession.CDP.name())) {
       throw new ProjectOwnerException(
-          "Cet utilisateur ne peut pas etre elimine car c'est le chef du projet!");
+        "Cet utilisateur ne peut pas etre elimine car c'est le chef du projet!");
     }
 
     projectUserPermissionRepository.deleteByProjectUser(projectId, contributorID);
@@ -423,9 +429,9 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public ProjectResponseModel getProjectData(final Long projectId) throws ProjectNotFoundException, UserNotAuthorizedException, ExecutionPlanNotFoundException {
     Project project =
-        projectRepository
-            .findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
+      projectRepository
+        .findById(projectId)
+        .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
 
     List<ProjectUserPermission> userPermissionList = project.getProjectUserPermissions();
 
@@ -433,68 +439,68 @@ public class ProjectServiceImpl implements ProjectService {
     for (ProjectUserPermission userPermission : userPermissionList) {
       User user = userPermission.getUser();
       contributorModelList.add(
-          new ContributerModel(
-              user.getUserId(),
-              user.getUserFirstName(),
-              user.getUserLastName(),
-              user.getUserEmail(),
-              user.getUserJob(),
-              user.getIsAdmin(),
-              userPermission.getPermission()));
+        new ContributerModel(
+          user.getUserId(),
+          user.getUserFirstName(),
+          user.getUserLastName(),
+          user.getUserEmail(),
+          user.getUserJob(),
+          user.getIsAdmin(),
+          userPermission.getPermission()));
     }
 
     ArrayList<AttachmentResponseModel> attachmentList = new ArrayList<>();
     for (Attachment attachment : project.getAttachments()) {
       attachmentList.add(
-          new AttachmentResponseModel(
-              attachment.getAttachmentId(),
-              attachment.getFileName(),
-              attachment.getFilePath(),
-              attachment.getContentType()));
+        new AttachmentResponseModel(
+          attachment.getAttachmentId(),
+          attachment.getFileName(),
+          attachment.getFilePath(),
+          attachment.getContentType()));
     }
 
     ArrayList<MulticriteriaAnalyseResponseModel> multicriteriaAnaliseList = new ArrayList<>();
     for (MultiCriteriaAnalysis multicriteriaAnalise : project.getMultiCriteriaAnalysisList()) {
       PredictibilityAnalyseResponseModel predictibilityAnalyse = null;
       PredictibilityAnalysis predictibilityAnalysis =
-          multicriteriaAnalise.getPredictibilityAnalysis();
+        multicriteriaAnalise.getPredictibilityAnalysis();
       if (predictibilityAnalysis != null) {
         ExecutionPlanScoreResponseModel executionPlanScore = null;
         if (predictibilityAnalysis.getExecutionPlan() != null) {
           executionPlanScore =
-              executionPlanService.getExecutionPlanScore(
-                  predictibilityAnalysis.getExecutionPlan().getExecutionPlanId());
+            executionPlanService.getExecutionPlanScore(
+              predictibilityAnalysis.getExecutionPlan().getExecutionPlanId());
         }
         predictibilityAnalyse =
-            new PredictibilityAnalyseResponseModel(
-                predictibilityAnalysis.getPredictibilityAnalysisId(),
-                predictibilityAnalysis.getIsFinished(),
-                predictibilityAnalysis.getPredictibilityAnalysisIteration(),
-                executionPlanScore);
+          new PredictibilityAnalyseResponseModel(
+            predictibilityAnalysis.getPredictibilityAnalysisId(),
+            predictibilityAnalysis.getIsFinished(),
+            predictibilityAnalysis.getPredictibilityAnalysisIteration(),
+            executionPlanScore);
       }
       multicriteriaAnaliseList.add(
-          new MulticriteriaAnalyseResponseModel(
-              multicriteriaAnalise.getMultiCriteriaAnalysisId(),
-              multicriteriaAnalise.getCreatedAt(),
-              multicriteriaAnalise.getUpdatedAt(),
-              multicriteriaAnalise.getMultiCriteriaAnalysisIteration(),
-              multicriteriaAnalise.getIsFinished(),
-              new ArrayList<>(multicriteriaAnalise.getFormSteps()),
-              predictibilityAnalyse));
+        new MulticriteriaAnalyseResponseModel(
+          multicriteriaAnalise.getMultiCriteriaAnalysisId(),
+          multicriteriaAnalise.getCreatedAt(),
+          multicriteriaAnalise.getUpdatedAt(),
+          multicriteriaAnalise.getMultiCriteriaAnalysisIteration(),
+          multicriteriaAnalise.getIsFinished(),
+          new ArrayList<>(multicriteriaAnalise.getFormSteps()),
+          predictibilityAnalyse));
     }
 
     return new ProjectResponseModel(
-        project.getProjectId(),
-        project.getName(),
-        project.getDescription(),
-        project.getCreatedAt(),
-        project.getUpdatedAt(),
-        project.getConfirmationState(),
-        project.getChefId(),
-        project.getIsArchived(),
-        contributorModelList,
-        attachmentList,
-        multicriteriaAnaliseList);
+      project.getProjectId(),
+      project.getName(),
+      project.getDescription(),
+      project.getCreatedAt(),
+      project.getUpdatedAt(),
+      project.getConfirmationState(),
+      project.getChefId(),
+      project.getIsArchived(),
+      contributorModelList,
+      attachmentList,
+      multicriteriaAnaliseList);
   }
   /**
    * Deletes a project and all its related data from the system.
@@ -506,14 +512,14 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   @Transactional
   public ResponseEntity<String> deleteProject(final Long projectId)
-      throws ProjectNotFoundException {
+    throws ProjectNotFoundException {
     Project projectToDelete =
-        projectRepository
-            .findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce project n'existe pas !"));
+      projectRepository
+        .findById(projectId)
+        .orElseThrow(() -> new ProjectNotFoundException("Ce project n'existe pas !"));
 
     List<ProjectUserPermission> projectUserPermissionList =
-        projectToDelete.getProjectUserPermissions();
+      projectToDelete.getProjectUserPermissions();
 
     for (ProjectUserPermission pup : projectUserPermissionList) {
       pup.getUser().detachPermission(pup);
