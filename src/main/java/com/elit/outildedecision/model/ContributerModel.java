@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -50,5 +51,6 @@ public class ContributerModel implements Serializable {
     /**
      * The role of the contributor within the project.
      */
+    @Pattern(regexp = "^(CONTRIBUTER|OBSERVER|CDP)$", message = "Le role doit étre CONTRIBUTER, OBSERVER, ou CDP.")
     private String role;
 }

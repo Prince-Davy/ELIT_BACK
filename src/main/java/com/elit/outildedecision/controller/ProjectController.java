@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -145,7 +147,7 @@ public class ProjectController {
   @PostMapping("/user/projects/{projectId}/add-contributor")
   @PreAuthorize("hasAnyAuthority('USER') and isProjectOwner(#projectId)")
   public ResponseEntity<String> addProjectContributor(
-      @PathVariable final Long projectId, @ModelAttribute final ContributerModel contributor) throws ProjectNotFoundException, UserNotFoundException {
+      @PathVariable final Long projectId, @Valid @ModelAttribute final ContributerModel contributor) throws ProjectNotFoundException, UserNotFoundException {
     return projectService.addProjectContributor(projectId, contributor);
   }
 

@@ -323,7 +323,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
             project.getProjectId(), user.getUserId());
 
     if (projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
-        || projectUserPermission.getPermission().equals(ProjectPermession.CONTRIBUTER.toString())) {
+        || projectUserPermission.getPermission().equals(ProjectPermession.CONTRIBUTER.name())) {
       ExecutionPlanVote executionPlanVoteFromDB =
           executionPlanVoteRepo.findVoteByUserIdAndExecutionPlanId(
               user.getUserId(), executionVoteRequestModel.getExecutionPlanId());
