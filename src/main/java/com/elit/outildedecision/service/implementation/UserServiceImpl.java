@@ -191,7 +191,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       user.setUserPassword(passwordEncoder.encode(newPass));
     }
     userRepository.save(user);
-    return ResponseEntity.status(HttpStatus.OK).body("Successful Update");
+    return ResponseEntity.status(HttpStatus.OK).body("Votre mot de passe a bien été modifié");
   }
 
   /**
@@ -227,31 +227,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * @throws UserNotFoundException     If the specified user cannot be found.
    */
   @Override
+  @Transactional
   public ResponseEntity<String> updateInfosByIdUser(final Long userId,
                                                     final String userFirstName,
                                                     final String userLastName) throws CouldNotSaveUserException, UserNotFoundException {
     User user = userRepository.findById(userId)
       .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
-
-    if (!Objects.isNull(userFirstName)) {
-      try {
-        user.setUserFirstName(userFirstName);
-      } catch (Exception e) {
-        throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de userFisrtName");
-      }
+    user.setUserFirstName(userFirstName);
+    user.setUserLastName(userLastName);
+    try {
+      userRepository.save(user);
+    } catch (Exception e) {
+      throw new CouldNotSaveUserException("Erreur lors de l'enregistrement");
     }
 
-    if (!Objects.isNull(userLastName)) {
-      try {
-        user.setUserLastName(userLastName);
-      } catch (Exception e) {
-        throw new CouldNotSaveUserException("Erreur lors de l'enregistrement de userLastName");
-      }
-    }
-
-    userRepository.save(user);
-
-    return ResponseEntity.status(HttpStatus.OK).body("Successful Update");
+    return ResponseEntity.status(HttpStatus.OK).body("Vos modifications ont bien été enregistrées");
   }
 
   /**

@@ -45,6 +45,7 @@ class UserControllerTests {
   private UserResponseModel userResponseModel;
   private User user;
   private String newPassword = "newPass";
+  private String userJob= "userJob";
   private String userFirstName = "userFirstName";
   private String userLastName = "userLastName";
 
@@ -101,9 +102,9 @@ class UserControllerTests {
 
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
-  void shouldUupdateInfosByUserId_Success() throws Exception {
+  void shouldUpdateInfosByUserId_Success() throws Exception {
     when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Successful Update"));
-    mockMvc.perform(put("/api/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userFirstName", userFirstName).param("userLastName", userLastName))
+    mockMvc.perform(put("/api/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userJob",userJob).param("userFirstName", userFirstName).param("userLastName", userLastName))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Successful Update")));
@@ -111,9 +112,9 @@ class UserControllerTests {
 
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
-  void shouldUupdateInfosByUserId_ThrowCouldNotSaveUserException() throws Exception {
+  void shouldUpdateInfosByUserId_ThrowCouldNotSaveUserException() throws Exception {
     when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName)).thenThrow(new CouldNotSaveUserException("Erreur lors de l'enregistrement de userFisrtName"));
-      mockMvc.perform(put("/api/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userFirstName", userFirstName).param("userLastName", userLastName))
+      mockMvc.perform(put("/api/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userJob",userJob).param("userFirstName", userFirstName).param("userLastName", userLastName))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(content().string(containsString("Erreur lors de l'enregistrement")));

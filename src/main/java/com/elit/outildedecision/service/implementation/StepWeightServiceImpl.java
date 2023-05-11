@@ -78,7 +78,7 @@ public class StepWeightServiceImpl implements StepWeightService {
   public StepWeight updateWeights(final StepWeight stepWeight) throws StepWeightNotFoundException {
     Optional<StepWeight> stepWeightFromDB = stepWeightRepo.findById(stepWeight.getWeightId());
     if (!stepWeightFromDB.isPresent()) {
-      throw new StepWeightNotFoundException("Le poid du critère " + stepWeight.getCriteriaName() + "n'existe pas !");
+      throw new StepWeightNotFoundException("Le poid du critère " + stepWeight.getCriteriaName() + " n'existe pas !");
     }
     StepWeight existingStepWeight = stepWeightFromDB.get();
     if (Objects.nonNull(stepWeight.getWeightValue())) {

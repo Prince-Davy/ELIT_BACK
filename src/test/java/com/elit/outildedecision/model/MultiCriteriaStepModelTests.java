@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MultiCriteriaStepModelTests {
+class MultiCriteriaStepModelTests {
 
   @Test
-  public void toStringTest() {
+  void toStringTest() {
     MultiCriteriaStepModel mcsm = new MultiCriteriaStepModel();
     mcsm.setStepId(1L);
     mcsm.setStepName("stepName");

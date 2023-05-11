@@ -2,76 +2,87 @@ package com.elit.outildedecision.service;
 import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormQuestion;
 import com.elit.outildedecision.repository.CriteriaRepository;
-import com.elit.outildedecision.service.CriteriaService;
 import com.elit.outildedecision.service.implementation.CriteriaServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CriteriaServiceImplTests {
 
   @Mock
   private CriteriaRepository criteriaRepository;
-  @Mock
-  private CriteriaService criteriaService;
+  @InjectMocks
+  private CriteriaServiceImpl criteriaService;
+  Set<Criteria> criterias= new HashSet<>();
+  FormQuestion formQuestion;
+  Criteria criteriaOne;
+  Criteria criteriaTwo;
+
 
   @BeforeEach
   void setUp() {
-    MockitoAnnotations.openMocks(this);
-    this.criteriaRepository = criteriaRepository;
+    formQuestion = new FormQuestion();
+    criteriaOne = new Criteria();
+    criteriaOne.setCriteriaId(1L);
+    criteriaOne.setCriteriaName("criteriaOne");
+    criteriaOne.setFormQuestion(formQuestion);
+    criteriaOne.setCriteriaValue(0);
+
+    criteriaTwo = new Criteria();
+    criteriaTwo.setCriteriaId(1L);
+    criteriaTwo.setCriteriaName("criteriaTwo");
+    criteriaTwo.setFormQuestion(formQuestion);
+    criteriaTwo.setCriteriaValue(0);
   }
 
   @Test
   void testCreateCriterias() {
-    FormQuestion formQuestion = FormQuestion.builder().questionId(1L).build();
-
-    Set<Criteria> criterias = new HashSet<>();
-    criterias.add(Criteria.builder().criteriaName("criteria1").build());
-    criterias.add(Criteria.builder().criteriaName("criteria2").build());
-    criterias.add(Criteria.builder().criteriaName("criteria3").build());
-
     Set<Criteria> persistedCriterias = new HashSet<>();
-    persistedCriterias.add(Criteria.builder().criteriaId(1L).criteriaName("criteria1").formQuestion(formQuestion).criteriaValue(0).build());
-    persistedCriterias.add(Criteria.builder().criteriaId(2L).criteriaName("criteria2").formQuestion(formQuestion).criteriaValue(0).build());
-    persistedCriterias.add(Criteria.builder().criteriaId(3L).criteriaName("criteria3").formQuestion(formQuestion).criteriaValue(0).build());
+    assertEquals(persistedCriterias,criteriaService.createCriterias(criterias,formQuestion));
+  }
 
-    when(criteriaRepository.save(any(Criteria.class))).thenReturn(criterias.iterator().next(),criterias.iterator().next(),criterias.iterator().next());
-
-
-    Set<Criteria> result = criteriaService.createCriterias(criterias, formQuestion);
-
-    assertEquals(3, persistedCriterias.size());
-
-    //TODO: fix H2 bd to test persistence
-    //verify(criteriaRepository, times(3)).save(any(Criteria.class));
+  @Test
+  void testCreateCriteriasNotEmpty() {
+    criterias.add(criteriaOne);
+    Set<Criteria> persistedCriterias = new HashSet<>();
+    criterias.add(criteriaOne);
+    Criteria criteriaToPersist =
+      Criteria.builder()
+        .criteriaName(criteriaOne.getCriteriaName())
+        .formQuestion(formQuestion)
+        .criteriaValue(0)
+        .build();
+    when(criteriaRepository.save(criteriaToPersist)).thenReturn(criteriaToPersist);
+    persistedCriterias.add(criteriaToPersist);
+    assertEquals(persistedCriterias,criteriaService.createCriterias(criterias,formQuestion));
   }
 
 
   @Test
-  void testUpdateCriteria() {
-    Criteria criteria = Criteria.builder().criteriaId(1L).criteriaName("criteria1").criteriaValue(0).build();
-    Criteria expected = Criteria.builder().criteriaId(1L).criteriaName("criteria1").criteriaValue(1).build();
+  void testUpdateCriteria_Success() {
+    when(criteriaRepository.findById(anyLong())).thenReturn(Optional.of(criteriaOne));
+    when(criteriaRepository.save(criteriaOne)).thenReturn(criteriaOne);
+    assertEquals(criteriaOne,criteriaService.updateCriteria(criteriaOne));
+  }
 
-    when(this.criteriaRepository.findById(1L)).thenReturn(Optional.of(criteria));
-    when(this.criteriaRepository.save(any(Criteria.class))).thenReturn(expected);
-    //TODO: remove next line when test db ok
-    when(this.criteriaService.updateCriteria(any(Criteria.class))).thenReturn(expected);
-
-    Criteria result = this.criteriaService.updateCriteria(Criteria.builder().criteriaId(1L).criteriaValue(1).build());
-
-    assertEquals(expected, result);
-    //verify(criteriaRepository, times(1)).findById(1L);
-    //verify(criteriaRepository, times(1)).save(any(Criteria.class));
+  @Test
+  void testUpdateCriteria_throwNoSuchElement() {
+    when(criteriaRepository.findById(anyLong())).thenReturn(Optional.empty());
+    NoSuchElementException p = Assertions.assertThrows(NoSuchElementException.class, ()-> criteriaService.updateCriteria(criteriaOne));
+    Assertions.assertEquals("Criteria not found with ID: {}1", p.getMessage());
   }
 
 

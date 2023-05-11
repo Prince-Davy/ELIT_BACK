@@ -8,11 +8,12 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.StepWeight;
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.exception.EscoreException;
+import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.CriteriaScoreModel;
 import com.elit.outildedecision.model.FormQuestionModel;
@@ -37,7 +38,6 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -323,13 +323,13 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @throws RuntimeException if the project or the step do not exist
    */
   @Override
-  @PreAuthorize("isProjectOwner(#projectId)")
+ // @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<String> updateMultiCriteriaAnalysis(
-    final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) {
+    final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException {
     FormStep formStepToUpdate =
       formStepRepo
         .findById(multiCriteriaAnalysisStep.getStepId())
-        .orElseThrow(() -> new RuntimeException("cette étape n'existe pas"));
+        .orElseThrow(() -> new StepFormNotFoundException("cette étape n'existe pas"));
     Set<FormQuestion> formQuestionListToUpdate = formStepToUpdate.getFormQuestions();
     Set<StepWeight> stepWeightsToUpdate = formStepToUpdate.getStepWeights();
     Set<FormQuestion> formQuestions = multiCriteriaAnalysisStep.getFormQuestions();
@@ -393,6 +393,43 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
     }
     return ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés");
   }
+
+  /**
+   * Updates a multi-criteria question's answer text and criteria values based on the provided {@link FormQuestionModel}.
+   *
+   * @param projectId the id of the project
+   * @param formQuestionModel the {@link FormQuestionModel} containing the updated answer text and criteria values
+   * @return a {@link ResponseEntity} containing a success message
+   * @throws MulticriteriaNotFoundException if the multi-criteria question with the provided ID is not found
+   */
+    @Override
+    public ResponseEntity<String> updateMultiCriteriaQuestion(final Long projectId, final FormQuestionModel formQuestionModel)
+      throws MulticriteriaNotFoundException, StepFormNotFoundException {
+      ResponseEntity<String> result;
+      FormQuestion formQuestion =
+        formQuestionRepository
+          .findById(formQuestionModel.getQuestionId())
+          .orElseThrow(() -> new MulticriteriaNotFoundException("Ce fichier n'existe pas !"));
+
+      FormStep formStep = formStepRepo
+        .findById(formQuestionModel.getStepId())
+        .orElseThrow(() -> new StepFormNotFoundException("l'étape associé a cette question n'existe pas "));
+
+      if (Objects.equals(formStep.getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
+        formQuestion.setAnswerText(formQuestionModel.getAnswerText());
+        formQuestionRepository.save(formQuestion);
+        for (CriteriaModel criteriaModel : formQuestionModel.getCriterias()) {
+          Criteria criteria = criteriaRepository.getById(criteriaModel.getCriteriaId());
+          criteria.setCriteriaValue(criteriaModel.getCriteriaValue());
+          criteriaRepository.save(criteria);
+        }
+        result = ResponseEntity.ok().body("La questions a été bien modifié.");
+      } else {
+        result = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La question n'a pas pu étre modifié");
+      }
+      return result;
+    }
+
   /**
    * Calculates the multi-criteria analysis score for the specified project.
    *
@@ -403,7 +440,6 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    */
   @Override
   @Transactional
-  @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<MultiCriteriaAnalysisScoreModel> calculateMultiCriteriaAnalysisScore(final Long projectId)
     throws QuestionsNotFoundException, EscoreException {
     MultiCriteriaAnalysis multiCriteriaAnalysis =
@@ -462,6 +498,37 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
     }
 
     return ResponseEntity.ok().body("L'analyse multicritères a bien changé d'itération.");
+  }
+
+  /**
+   * Increases the iteration number of a MultiCriteriaAnalysis.
+   *
+   * @param projectId the ID of project
+   * @param analyseId the ID of the MultiCriteriaAnalysis to update
+   * @return a ResponseEntity with a success message if the update was successful
+   * @throws MulticriteriaNotFoundException if the MultiCriteriaAnalysis with the given ID does not exist
+   * @throws ProjectNotFoundException if the specified project does not exist
+   */
+  @Override
+  public ResponseEntity<String> increaseMulticriteriaIteration(final Long projectId, final Long analyseId)
+    throws MulticriteriaNotFoundException {
+    ResponseEntity<String> result;
+      MultiCriteriaAnalysis multiCriteriaAnalysis =
+        multiCriteriaAnalysisRepository
+          .findById(analyseId)
+          .orElseThrow(
+            () ->
+              new MulticriteriaNotFoundException(
+                "Cette analyse multicritères n'existe pas."));
+      if (Objects.equals(multiCriteriaAnalysis.getProject().getProjectId(), projectId)) {
+        multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(
+          multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
+        multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
+        result = ResponseEntity.ok().body("L'analyse multicritères a bien changé d'itération.");
+      } else {
+        result = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'analyse multicritères n'a pas été trouvé");
+      }
+    return result;
   }
 
   /**
