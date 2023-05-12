@@ -8,6 +8,7 @@ import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import com.elit.outildedecision.util.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +33,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTests {
@@ -278,4 +284,57 @@ class UserServiceImplTests {
     foundUsers.add(userResponseModel);
     assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
   }
+
+  @Test
+  void updateUser_USERNOTFOUND() throws CouldNotSaveUserException {
+    UserModel usermodel = new UserModel();
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(null);
+    Map<String, String> errorMap = new HashMap<>();
+    errorMap.put("NOT_FOUND", Constants.USER_NOT_FOUND);
+    assertEquals(errorMap.entrySet(),userServiceImpl.updateUser(usermodel).getBody().entrySet());
+  }
+
+  @Test
+  void updateUser_EmailNotTheSame() throws CouldNotSaveUserException {
+    UserModel usermodel = new UserModel();
+    usermodel.setUsername(USER_EMAIL);
+    usermodel.setUserPassword("");
+    usermodel.setUserPasswordConfirmation("");
+    usermodel.setUserEmail(USER_EMAIL);
+    user.setUserPassword("");
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(USER_EMAIL);
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    Map<String, String> errorMap = new HashMap<>();
+    errorMap.put(Constants.CONFLICT, "Les emails doivent être identiques");
+    assertEquals(errorMap.entrySet(),userServiceImpl.updateUser(usermodel).getBody().entrySet());
+  }
+
+  @Test
+  void updateUser_Success() throws CouldNotSaveUserException {
+    UserModel usermodel = new UserModel();
+    usermodel.setUsername(USER_EMAIL);
+    usermodel.setUserEmailConfirmation(USER_EMAIL);
+    usermodel.setUserPassword("");
+    usermodel.setUserPasswordConfirmation("");
+    usermodel.setUserEmail(USER_EMAIL);
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(USER_EMAIL);
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    Map<String, String> errorMap = new HashMap<>();
+    errorMap.put("SUCCESS", "Utilisateur mis à jour");
+    assertEquals(errorMap.entrySet(),userServiceImpl.updateUser(usermodel).getBody().entrySet());
+  }
+
 }
