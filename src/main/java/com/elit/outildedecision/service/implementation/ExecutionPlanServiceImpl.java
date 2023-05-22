@@ -59,22 +59,22 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    * the execution plan answer repository.
    */
   @Autowired
-  private ExecutionPlanAnswerRepository executionPlanAnswerRepository;
+  private final ExecutionPlanAnswerRepository executionPlanAnswerRepository;
   /**
    * the execution plan question repository.
    */
   @Autowired
-  private ExecutionPlanQuestionRepository executionPlanQuestionRepository;
+  private final ExecutionPlanQuestionRepository executionPlanQuestionRepository;
   /**
    * the execution plan repository.
    */
   @Autowired
-  private ExecutionPlanRepository executionPlanRepository;
+  private final ExecutionPlanRepository executionPlanRepository;
   /**
    * the user repository.
    */
   @Autowired
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
   /**
    * the project user permission repository.
    */
@@ -111,6 +111,10 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    * @param executionPlanVoteRepo the execution plan vote repository to inject
    * @param projectRepository the project repository to inject
    * @param predictibilityAnalysisRepository the predictibility analysis repository to inject
+   * @param executionPlanRepository the execution plan repository to inject
+   * @param executionPlanQuestionRepository the execution plan question repository to inject
+   * @param executionPlanAnswerRepository the execution plan answer repository to inject
+   * @param userRepository the user repository to inject
    * @param multiCriteriaAnalysisRepository the multi criteria analysis repository to inject
    * @param predictibilityResultsRepository the predictibility results repository to inject
    */
@@ -120,7 +124,11 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
                                   final ProjectRepository projectRepository,
                                   final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
                                   final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
-                                  final PredictibilityResultsRepository predictibilityResultsRepository) {
+                                  final PredictibilityResultsRepository predictibilityResultsRepository,
+                                  final UserRepository userRepository,
+                                  final ExecutionPlanRepository executionPlanRepository,
+                                  final ExecutionPlanQuestionRepository executionPlanQuestionRepository,
+                                  final ExecutionPlanAnswerRepository executionPlanAnswerRepository) {
     this.projectUserPermissionRepository = projectUserPermissionRepository;
     this.methodRepository = methodRepository;
     this.executionPlanVoteRepo = executionPlanVoteRepo;
@@ -128,6 +136,10 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.predictibilityResultsRepository = predictibilityResultsRepository;
+    this.userRepository = userRepository;
+    this.executionPlanRepository = executionPlanRepository;
+    this.executionPlanQuestionRepository = executionPlanQuestionRepository;
+    this.executionPlanAnswerRepository = executionPlanAnswerRepository;
   }
 
   private final Logger log = LoggerFactory.getLogger(ExecutionPlanServiceImpl.class);
