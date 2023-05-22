@@ -265,7 +265,6 @@ public class ReportServiceImpl implements ReportService {
         .orElseThrow(() -> new ReportNotFoundException(String.format(REPORT_NOT_FOUND, reportId)));
 
     File fileReport = new File(report.getReportPath());
-
     if (fileReport.exists()) {
       String mimeType = URLConnection.guessContentTypeFromName(fileReport.getName());
       if (mimeType == null) {
