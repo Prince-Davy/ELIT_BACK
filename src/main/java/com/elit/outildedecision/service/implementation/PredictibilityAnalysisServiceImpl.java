@@ -46,7 +46,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
    * A repository for Projects.
    */
   @Autowired
-  private ProjectRepository projectRepository;
+  private final ProjectRepository projectRepository;
 
   /**
    * A repository for Multi-Criteria Analysis.
@@ -102,6 +102,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
    * @param projectUserPermissionRepository  A repository for Project User Permissions.
    * @param methodologyRepository            A repository for Methodologies.
    * @param predictibilityResultsRepository  A repository for Predictibility Results.
+   * @param projectRepository                A repository for Project
    */
   public PredictibilityAnalysisServiceImpl(
     final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
@@ -110,7 +111,8 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     final UserRepository userRepository,
     final ProjectUserPermissionRepository projectUserPermissionRepository,
     final MethodologyRepository methodologyRepository,
-    final PredictibilityResultsRepository predictibilityResultsRepository) {
+    final PredictibilityResultsRepository predictibilityResultsRepository,
+    final ProjectRepository projectRepository) {
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
     this.voteRepository = voteRepository;
@@ -118,6 +120,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     this.projectUserPermissionRepository = projectUserPermissionRepository;
     this.methodologyRepository = methodologyRepository;
     this.predictibilityResultsRepository = predictibilityResultsRepository;
+    this.projectRepository = projectRepository;
     this.logger = LoggerFactory.getLogger(PredictibilityAnalysisServiceImpl.class);
   }
 
