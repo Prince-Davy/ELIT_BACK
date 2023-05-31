@@ -103,7 +103,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://lge-elit.innovation-factory.io"));
     configuration.setAllowedMethods(
       List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     // setAllowCredentials(true) is important, otherwise
