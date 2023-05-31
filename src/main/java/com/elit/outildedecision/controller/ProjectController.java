@@ -13,7 +13,6 @@ import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
 import com.elit.outildedecision.service.ProjectService;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.tomcat.util.json.ParseException;
@@ -87,7 +86,6 @@ public class ProjectController {
    * @throws UserNotAuthorizedException UserNotAuthorizedException if the user is not authorized
    * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException if the execution plan is not found
    */
-  @ApiOperation(value = "Get a product by id", notes = "Returns a product as per the id")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved"),

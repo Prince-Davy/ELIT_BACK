@@ -7,8 +7,6 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.PredictibilityScoreModel;
 import com.elit.outildedecision.service.PredictibilityAnalysisService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +44,6 @@ public class PredictibilityAnalysisController {
    * @return ResponseEntity<Long>
    */
   @PostMapping("/predictibility-analysis/{projectId}")
-  // @PreAuthorize("isProjectOwner(#projectId)")
   ResponseEntity<Long> createPredictibilityAnalysis(@PathVariable final Long projectId) {
     return predictibilityAnalysisService.createPredictibilityForm(projectId);
   }
@@ -82,7 +79,7 @@ public class PredictibilityAnalysisController {
    * @throws UserNotAuthorizedException UserNotAuthorizedException
    * @throws PredictibilityAnalysisNotFoundException PredictibilityAnaliseNotFoundException
    */
-  @ApiOperation(value = "Increase the iteration number of the predictibility analyse")
+  // @ApiOperation(value = "Increase the iteration number of the predictibility analyse")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -92,7 +89,7 @@ public class PredictibilityAnalysisController {
       })
   @PutMapping("predictibility/iteration/{analyseId}")
   public ResponseEntity<String> increasePredictibilityAnalyseIterationNumber(
-      @ApiParam(value = "Analyse Id.") @PathVariable final Long analyseId)
+       @PathVariable final Long analyseId)
       throws UserNotAuthorizedException, PredictibilityAnalysisNotFoundException {
     return predictibilityAnalysisService.increasePredictAnalysisIterationNum(analyseId);
   }
