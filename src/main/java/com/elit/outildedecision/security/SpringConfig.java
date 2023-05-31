@@ -77,7 +77,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
     http.cors().configurationSource(corsConfigurationSource());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     http.authorizeRequests()
-      .antMatchers("/api/login", "/api/refreshToken").permitAll()
+      .antMatchers("/api/login", "/api/refreshToken", "/api/test").permitAll()
       .anyRequest().permitAll();
     JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean());
     jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
@@ -103,7 +103,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://lge-elit.innovation-factory.io"));
+    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://lge-elit.innovation-factory.io", "*"));
     configuration.setAllowedMethods(
       List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     // setAllowCredentials(true) is important, otherwise
