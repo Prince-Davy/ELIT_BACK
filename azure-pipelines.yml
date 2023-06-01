@@ -29,7 +29,7 @@ variables:
   - name: deploymentName
     value: "elit-back"
   - name: deploymentIntegName
-    value: "elit-back-integ"
+    value: "elit-back"
   - name: kubernetesNamespace
     value: "lge-elit"
   - name: kubernetesIntegNamespace
@@ -37,7 +37,7 @@ variables:
   - name: kubernetesSecret
     value: "lge-elit-config"
   - name: kubernetesIntegSecret
-    value: "lge-elit-config-integ"
+    value: "lge-elit-config"
   # Include template variables
   - template: templates-general/variables.yml@templates
 
