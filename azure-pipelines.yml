@@ -35,9 +35,9 @@ variables:
   - name: kubernetesIntegNamespace
     value: "lge-elit"
   - name: kubernetesSecret
-    value: "lge-elit-config"
+    value: "lge-elit-integ-config"
   - name: kubernetesIntegSecret
-    value: "lge-elit-config"
+    value: "lge-elit-integ-config"
   # Include template variables
   - template: templates-general/variables.yml@templates
 
