@@ -55,6 +55,9 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   private static final Long TOKEN_EXPIRATION_TIME = 30 * 60 * 1000L;
   /** The logger for this class. */
   private final Logger logger;
+  /** Value of backend url. */
+  @Value("${backend.value-url}")
+  private String backEndUrl;
   /**
    * Constructs a new instance of the verification token service implementation.
    *
@@ -197,7 +200,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
     VerificationToken verificationToken = createToken(user, FORGOT_PASSWORD);
     String recoveryUrl =
-        "http://localhost:8080/reset-password?token=" + verificationToken.getToken();
+        backEndUrl + "/reset-password?token=" + verificationToken.getToken();
     String mailBody =
         "Bonjour "
             + " "

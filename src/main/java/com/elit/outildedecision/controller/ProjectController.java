@@ -39,7 +39,6 @@ import java.util.List;
  * ProjectController contains all the endpoints related to projects.
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api")
 public class ProjectController {
    /**

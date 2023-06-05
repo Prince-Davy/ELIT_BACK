@@ -20,6 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
 /**
@@ -41,6 +42,11 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
    * PasswordEncoder instance to encode and decode passwords.
    */
   private final PasswordEncoder passwordEncoder;
+  /**
+   * The value of Backend url
+   */
+  @Value("${frontend.value-url}")
+  private String frontEndUrl;
 
   /**
    * Constructor for SpringConfig.
@@ -77,7 +83,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
     http.cors().configurationSource(corsConfigurationSource());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     http.authorizeRequests()
-      .antMatchers("/api/login", "/api/refreshToken", "/api/test").permitAll()
+      .antMatchers("/", "/api", "/api/login", "/api/refreshToken", "/api/test", "/api/swagger-ui.html", "/api/v3/api-docs", "/api/v3/api-docs.yaml").permitAll()
       .anyRequest().permitAll();
     JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean());
     jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
@@ -103,7 +109,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://lge-elit.innovation-factory.io", "*"));
+    configuration.setAllowedOriginPatterns(List.of(frontEndUrl, "*"));
     configuration.setAllowedMethods(
       List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     // setAllowCredentials(true) is important, otherwise

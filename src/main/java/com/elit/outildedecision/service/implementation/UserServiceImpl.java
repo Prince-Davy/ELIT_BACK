@@ -89,7 +89,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    */
   @Value("${spring.mail.username}")
   private String senderEmail;
-
+  /**
+   * Value of backend url.
+   */
+  @Value("${backend.value-url}")
+  private String backEndUrl;
   /**
    * Constructor for UserServiceImpl.
    *
@@ -376,7 +380,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     VerificationToken verificationToken =
       verificationTokenService.createToken(user, "confirm-account");
     String confirmationUrl =
-      "http://localhost:8080/confirm-account?token=" + verificationToken.getToken();
+      backEndUrl + "/confirm-account?token=" + verificationToken.getToken();
     String mailBody =
       "Bonjour "
         + " "
