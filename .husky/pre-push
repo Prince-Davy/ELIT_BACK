@@ -2,3 +2,5 @@
 . "$(dirname "$0")/_/husky.sh"
 
 npx --no-install validate-branch-name
+
+mvn -ntp clean checkstyle:check pmd:check clean  || exit 1

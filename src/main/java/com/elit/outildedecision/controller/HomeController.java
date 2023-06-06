@@ -16,5 +16,7 @@ public class HomeController {
      * @return "Server is up"
      */
     @GetMapping("/")
-    public String index() {return "Server is up";}
+    public String index() {
+        return "Server is up";
+    }
 }

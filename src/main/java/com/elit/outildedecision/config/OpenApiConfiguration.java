@@ -10,7 +10,10 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
 public class OpenApiConfiguration {
-
+    /**
+     * Creates and returns a custom instance of OpenAPI with a security scheme based on the JWT token.
+     * @return An instance of OpenAPI with a configured security scheme.
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -18,6 +21,10 @@ public class OpenApiConfiguration {
                         new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
     }
 
+    /**
+     * Customize API operations with specific security requirements.
+     * @return An instance of OperationCustomizer that adds security requirements to operations.
+     */
     @Bean
     public OperationCustomizer customize() {
         return (operation, handlerMethod) -> {
@@ -25,6 +32,4 @@ public class OpenApiConfiguration {
             return operation;
         };
     }
-
-    
 }

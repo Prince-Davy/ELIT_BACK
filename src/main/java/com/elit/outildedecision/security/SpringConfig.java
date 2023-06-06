@@ -43,7 +43,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
    */
   private final PasswordEncoder passwordEncoder;
   /**
-   * The value of Backend url
+   * The value of Backend url.
    */
   @Value("${frontend.value-url}")
   private String frontEndUrl;
