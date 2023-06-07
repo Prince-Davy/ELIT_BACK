@@ -56,7 +56,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   /** The logger for this class. */
   private final Logger logger;
   /** Value of backend url. */
-  @Value("${backend.value-url}")
+  @Value("${REACT_APP_BACKEND_API}")
   private String backEndUrl;
   /**
    * Constructs a new instance of the verification token service implementation.
