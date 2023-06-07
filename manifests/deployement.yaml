@@ -108,7 +108,6 @@ spec:
                 secretKeyRef:
                   key: FRONTEND_URL
                   name: lge-elit-integ-config
-
       volumes:
         - name: secrets-store-inline
           csi:
