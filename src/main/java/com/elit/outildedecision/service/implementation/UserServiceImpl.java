@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   /**
    * Value of backend url.
    */
-  @Value("${REACT_APP_BACKEND_API}")
+  @Value("${backend.value-url}")
   private String backEndUrl;
   /**
    * Constructor for UserServiceImpl.

@@ -98,6 +98,16 @@ spec:
                 secretKeyRef:
                   key: SPRING_MAIL_PASSWORD
                   name: lge-elit-integ-config
+            - name: REACT_APP_BACKEND_API
+              valueFrom:
+                secretKeyRef:
+                  key: REACT_APP_BACKEND_API
+                  name: lge-elit-integ-config
+            - name: FRONTEND_URL
+              valueFrom:
+                secretKeyRef:
+                  key: FRONTEND_URL
+                  name: lge-elit-integ-config
 
       volumes:
         - name: secrets-store-inline
