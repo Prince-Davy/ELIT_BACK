@@ -22,7 +22,7 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class VoteController {
   /**
    * VoteService the service used to manage votes.

@@ -47,7 +47,7 @@ class OpinionControllerTest {
     opinionModel.setDescription("description");
     opinionModel.setRating(2);
     when(opinionService.createOpinion(opinionModel)).thenReturn(ResponseEntity.ok().body("L'avis a bien été enregistré."));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/opinion").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(post("/opinion").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(opinionModel) )).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200,response.getStatus());
   }
@@ -57,7 +57,7 @@ class OpinionControllerTest {
     opinionModel.setDescription("description");
     opinionModel.setRating(2);
     when(opinionService.createOpinion(opinionModel)).thenThrow(new OpinionAlreadyExistException("Cet utilisateur à déjà renseigné un avis."));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/opinion").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(post("/opinion").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(opinionModel) )).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(409,response.getStatus());
   }
@@ -65,13 +65,13 @@ class OpinionControllerTest {
   @Test
   void getOpinionIsAlreadyExist() throws Exception {
     when(opinionService.getOpinionIsAlreadyExist()).thenReturn(true);
-    MockHttpServletResponse response = mockMvc.perform(get("/api/opinion/user")).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/opinion/user")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200,response.getStatus());
   }
   @Test
   void getOpinion_whenOpinionDoseNotExist() throws Exception {
     when(opinionService.getOpinionIsAlreadyExist()).thenReturn(false);
-    MockHttpServletResponse response = mockMvc.perform(get("/api/opinion/user")).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/opinion/user")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200,response.getStatus());
   }
 }

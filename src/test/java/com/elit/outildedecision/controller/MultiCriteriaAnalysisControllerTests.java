@@ -107,7 +107,7 @@ class MultiCriteriaAnalysisControllerTests {
     //    when(multiCriteriaAnalysisService.updateMultiCriteriaAnalysis(
     //      project.getProjectId(), multiCriteriaAnalysisStep)).thenReturn(ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés"));
 
-    mockMvc.perform(put("/api/multi-criteria-analysis/" + project.getProjectId()).contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(put("/multi-criteria-analysis/" + project.getProjectId()).contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(ModelSamples.toJson(multiCriteriaAnalysisStep)))
       .andDo(print())
@@ -154,7 +154,7 @@ class MultiCriteriaAnalysisControllerTests {
   void updateQuestion_Success() throws Exception {
     FormQuestionModel formQuestion = new FormQuestionModel();
     // when(multiCriteriaAnalysisService.updateMultiCriteriaQuestion(formQuestion)).thenReturn(ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés"));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .content(ModelSamples.toJson(formQuestion))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
@@ -167,7 +167,7 @@ class MultiCriteriaAnalysisControllerTests {
     doThrow(new MulticriteriaNotFoundException("Ce fichier n'existe pas !")).when(multiCriteriaAnalysisService)
       .updateMultiCriteriaQuestion(formQuestion);
 
-    MockHttpServletResponse response = mockMvc.perform(put("/api/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .content(ModelSamples.toJson(formQuestion))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
@@ -182,7 +182,7 @@ class MultiCriteriaAnalysisControllerTests {
     when(multiCriteriaAnalysisService.updateMultiCriteriaQuestion(project.getProjectId(), formQuestion)).thenThrow(
       new MulticriteriaNotFoundException("Ce fichier n'existe pas !"));
 
-    mockMvc.perform(put("/api/" + project.getProjectId() + "/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(put("/" + project.getProjectId() + "/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(ModelSamples.toJson(formQuestion)))
       .andDo(print())
@@ -200,7 +200,7 @@ class MultiCriteriaAnalysisControllerTests {
 
     when(multiCriteriaAnalysisService.updateMultiCriteriaQuestion(project.getProjectId(), formQuestion)).thenReturn(true);
 
-    mockMvc.perform(put("/api/" + project.getProjectId() + "/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(put("/" + project.getProjectId() + "/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(ModelSamples.toJson(formQuestion)))
       .andDo(print())
@@ -222,7 +222,7 @@ class MultiCriteriaAnalysisControllerTests {
     when(multiCriteriaAnalysisService.increaseMulticriteriaIteration(project.getProjectId(), analyseId)).thenReturn(true);
 
     mockMvc.perform(
-        put("/api/" + project.getProjectId() + "/multi-criteria-analysis/iteration/" + analyseId).contentType(MediaType.APPLICATION_JSON)
+        put("/" + project.getProjectId() + "/multi-criteria-analysis/iteration/" + analyseId).contentType(MediaType.APPLICATION_JSON)
           .accept(MediaType.APPLICATION_JSON)
           .content(ModelSamples.toJson(multiCriteriaAnalysisStep)))
       .andDo(print())
@@ -247,7 +247,7 @@ class MultiCriteriaAnalysisControllerTests {
       .increaseMulticriteriaIteration(project.getProjectId(), analyseId);
 
     mockMvc.perform(
-        put("/api/" + project.getProjectId() + "/multi-criteria-analysis/iteration/" + analyseId).contentType(MediaType.APPLICATION_JSON)
+        put("/" + project.getProjectId() + "/multi-criteria-analysis/iteration/" + analyseId).contentType(MediaType.APPLICATION_JSON)
           .accept(MediaType.APPLICATION_JSON)
           .content(ModelSamples.toJson(multiCriteriaAnalysisStep)))
       .andDo(print())
@@ -264,7 +264,7 @@ class MultiCriteriaAnalysisControllerTests {
     Long analyseId = 1L;
     doThrow(new MulticriteriaNotFoundException("Cette analyse multicritères n'existe pas.")).when(multiCriteriaAnalysisService)
       .increaseMulticriteriaIteration(analyseId);
-    MockHttpServletResponse response = mockMvc.perform(put("/api/multi-criteria-analysis/iteration/" + analyseId))
+    MockHttpServletResponse response = mockMvc.perform(put("/multi-criteria-analysis/iteration/" + analyseId))
       .andDo(print())
       .andReturn()
       .getResponse();
@@ -279,7 +279,7 @@ class MultiCriteriaAnalysisControllerTests {
     MultiCriteriaStepModel multiCriteriaAnalysisStep = new MultiCriteriaStepModel();
 
     when(customMethodSecurity.isContributer(project.getProjectId())).thenReturn(true);
-    MockHttpServletResponse response = mockMvc.perform(get("/api/multi-criteria-analysis/" + project.getProjectId() + "/score"))
+    MockHttpServletResponse response = mockMvc.perform(get("/multi-criteria-analysis/" + project.getProjectId() + "/score"))
       .andDo(print())
       .andReturn()
       .getResponse();
@@ -294,7 +294,7 @@ class MultiCriteriaAnalysisControllerTests {
 
     when(multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(project.getProjectId())).thenThrow(
       new EscoreException("score n'existe pas"));
-    MockHttpServletResponse response = mockMvc.perform(get("/api/multi-criteria-analysis/" + project.getProjectId() + "/score"))
+    MockHttpServletResponse response = mockMvc.perform(get("/multi-criteria-analysis/" + project.getProjectId() + "/score"))
       .andDo(print())
       .andReturn()
       .getResponse();

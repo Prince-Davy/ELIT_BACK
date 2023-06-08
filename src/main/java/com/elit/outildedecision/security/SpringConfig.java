@@ -83,10 +83,10 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
     http.cors().configurationSource(corsConfigurationSource());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     http.authorizeRequests()
-      .antMatchers("/", "/api", "/api/login", "/api/refreshToken", "/api/test", "/api/swagger-ui.html", "/api/v3/api-docs", "/api/v3/api-docs.yaml").permitAll()
+      .antMatchers("/", "/toto", "/login", "/refreshToken", "/test", "/swagger-ui.html", "/v3/api-docs", "/v3/api-docs.yaml").permitAll()
       .anyRequest().permitAll();
     JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean());
-    jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
+    jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
     http.addFilter(jwtAuthenticationFilter);
     http.addFilterBefore(new JwtAuthorizationFilter(jwtProperties), UsernamePasswordAuthenticationFilter.class);
   }

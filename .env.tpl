@@ -14,7 +14,7 @@ FILE_QUESTIONS=.\\outildedecision\\src\\main\\java\\com\\elit\\outildedecision\\
 SPRING_MAIL_USERNAME=elit.sogeti@gmail.com
 SPRING_MAIL_PASSWORD=sxcwmyfhazuhtzic
 
-REACT_APP_BACKEND_API=http://localhost:8080
+REACT_APP_BACKEND_API=http://localhost:8080/api
 FRONTEND_URL=http://localhost:3000
 
 _ADMINER_DEFAULT_SERVER=db

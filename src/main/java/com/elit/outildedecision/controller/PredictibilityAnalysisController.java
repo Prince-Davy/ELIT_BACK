@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * PredictibilityAnalysisController.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class PredictibilityAnalysisController {
 
   /**

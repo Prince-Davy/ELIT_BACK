@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user/attachments")
+@RequestMapping("/user/attachments")
 public class AttachementController {
   /** The Attachment service. */
   private final AttachmentService attachmentService;

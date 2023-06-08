@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @Validated
-@RequestMapping("/api/survey/answer")
+@RequestMapping("/survey/answer")
 public class SurveyAnswerController {
   /**
    * SurveyAnswerService to manage survey answers.

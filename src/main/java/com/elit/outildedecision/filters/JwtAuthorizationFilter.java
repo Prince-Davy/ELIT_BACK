@@ -86,6 +86,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
    */
   private boolean shouldAllowRequestWithoutAuthentication(final HttpServletRequest request) {
     String requestURI = request.getRequestURI();
-    return requestURI.equals("/api/login") || requestURI.equals("/api/refreshToken");
+    return requestURI.equals("/login") || requestURI.equals("/refreshToken");
   }
 }

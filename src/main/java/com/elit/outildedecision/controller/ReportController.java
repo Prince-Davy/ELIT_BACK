@@ -30,7 +30,7 @@ import java.util.List;
  * Report controller.
  */
 @RestController
-@RequestMapping("/api/report/")
+@RequestMapping("/report/")
 public class ReportController {
   /**
    * Report service.

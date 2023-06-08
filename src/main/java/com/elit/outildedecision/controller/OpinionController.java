@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Opinion controller.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class OpinionController {
   /**
    * Opinion Service.

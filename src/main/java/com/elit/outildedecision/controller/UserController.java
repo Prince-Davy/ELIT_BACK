@@ -29,7 +29,7 @@ import java.util.Map;
  * delete or modify users.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class UserController {
   /**
    * UserService to inject.

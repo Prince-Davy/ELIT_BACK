@@ -75,7 +75,7 @@ class ProjectControllerTest {
     ProjectModel project = new ProjectModel();
     ProjectResponseModel projectToReturn = new ProjectResponseModel();
     when(projectService.persistProject(project)).thenReturn(projectToReturn);
-    mockMvc.perform(MockMvcRequestBuilders.multipart("/api/user/projects")
+    mockMvc.perform(MockMvcRequestBuilders.multipart("/user/projects")
       .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(200));
   }
 
@@ -99,7 +99,7 @@ class ProjectControllerTest {
     when(customMethodSecurity.isContributer(projectId)).thenReturn(true);
     ProjectResponseModel projectResponseModel = new ProjectResponseModel();
     when(projectService.getProjectData(projectId)).thenReturn(projectResponseModel);
-    MockHttpServletResponse response = mockMvc.perform(get("/api/user/projects/getdata/"+projectId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/user/projects/getdata/"+projectId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
 
@@ -108,7 +108,7 @@ class ProjectControllerTest {
   void getProjectData_whenProjectNotFound() throws Exception {
     Long projectId = 1L;
     when(projectService.getProjectData(projectId)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas!"));
-    MockHttpServletResponse response = mockMvc.perform(get("/api/user/projects/getdata/"+projectId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/user/projects/getdata/"+projectId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
 
@@ -118,7 +118,7 @@ class ProjectControllerTest {
     String keyword = "query";
     List<Project> projects = new ArrayList<>();
     when(projectService.getUserProjects(keyword)).thenReturn(projects);
-    MockHttpServletResponse response = mockMvc.perform(get("/api/user/projects").param("required","false")).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/user/projects").param("required","false")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
 
@@ -127,7 +127,7 @@ class ProjectControllerTest {
   void getAllProjects() throws Exception {
     List<Project> projects = new ArrayList<>();
     when(projectService.getAllProjects()).thenReturn(projects);
-    MockHttpServletResponse response = mockMvc.perform(get("/api/admin/projects")).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/admin/projects")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
   @WithMockUser(authorities = {"ADMIN", "USER"})
@@ -136,7 +136,7 @@ class ProjectControllerTest {
     String keyword = "query";
     List<ProjectResponseModel> projectList = new ArrayList<>();
     when(projectService.getUserProjectList(keyword)).thenReturn(projectList);
-    MockHttpServletResponse response = mockMvc.perform(get("/api/user/projectlist/").param("required","false")).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/user/projectlist/").param("required","false")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
   @WithMockUser(authorities = {"ADMIN"})
@@ -145,7 +145,7 @@ class ProjectControllerTest {
     Long id = 1L;
     HttpEntity<String> isConfirmed = new HttpEntity<>("confirme");
     when(projectService.validateOrRejectProject(id, isConfirmed)).thenReturn(ResponseEntity.ok().body("Le Projet a été refusé"));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/admin/projects/"+id).contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/admin/projects/"+id).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(String.valueOf(isConfirmed)) ).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -169,7 +169,7 @@ class ProjectControllerTest {
   void deleteProjectAdmin() throws Exception {
     Long id = 1L;
     when(projectService.deleteProject(id)).thenReturn(ResponseEntity.ok().body("Le projet a été bien supprimé"));
-    MockHttpServletResponse response = mockMvc.perform(delete("/api/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(delete("/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
 
@@ -178,7 +178,7 @@ class ProjectControllerTest {
   void deleteProjectAdmin_whenProjectDoseNotFound() throws Exception {
     Long id = 1L;
     when(projectService.deleteProject(id)).thenThrow(new ProjectNotFoundException("Ce project n'existe pas !"));
-    MockHttpServletResponse response = mockMvc.perform(delete("/api/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(delete("/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
 
@@ -197,7 +197,7 @@ class ProjectControllerTest {
     Long id = 1L;
     when(customMethodSecurity.isProjectOwner(id)).thenReturn(true);
     when(projectService.deleteProject(id)).thenThrow(new ProjectNotFoundException("Ce project n'existe pas !"));
-    MockHttpServletResponse response = mockMvc.perform(delete("/api/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(delete("/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
 

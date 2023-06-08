@@ -30,7 +30,7 @@ import java.util.Optional;
  * Multi-criteria analysis controller.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class MultiCriteriaAnalysisController {
   /**
    * MultiCriteriaAnalysis Service.

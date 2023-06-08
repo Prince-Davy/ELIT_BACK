@@ -38,7 +38,7 @@ import java.util.List;
  * ProjectController contains all the endpoints related to projects.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class ProjectController {
    /**
    * ProjectService.

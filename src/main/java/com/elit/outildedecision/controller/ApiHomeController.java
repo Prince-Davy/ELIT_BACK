@@ -15,7 +15,7 @@ public class ApiHomeController {
      *
      * @return "Server is up"
      */
-    @GetMapping("/api")
+    @GetMapping("/toto")
     public String index() {
         return "Api is up";
     }

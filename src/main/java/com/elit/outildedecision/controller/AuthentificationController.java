@@ -34,7 +34,7 @@ import java.util.Map;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class AuthentificationController {
   /**
    * The Constant EXPIRATION_TIME.

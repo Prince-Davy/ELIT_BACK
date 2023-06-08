@@ -24,7 +24,7 @@ import java.util.List;
  * the controller for execution plan.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class ExecutionPlanController {
   /**
    * the execution plan service.

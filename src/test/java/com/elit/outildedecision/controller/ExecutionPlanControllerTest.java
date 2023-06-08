@@ -59,7 +59,7 @@ class ExecutionPlanControllerTest {
   void createExecutionPlan() throws Exception {
    Long projectId = 1L;
     when(executionPlanService.createExecutionPlan(projectId)).thenReturn(ResponseEntity.ok().body(1L));
-    ResultActions response = mockMvc.perform(post("/api/executionPlan/create/"+ projectId));
+    ResultActions response = mockMvc.perform(post("/executionPlan/create/"+ projectId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -79,7 +79,7 @@ class ExecutionPlanControllerTest {
   void getQuestionsAndAnswers() throws Exception {
     Long executionPlanId = 1L;
     when(executionPlanService.getQuestionsAndAnswers(executionPlanId)).thenReturn(ResponseEntity.ok().body("List of executionPlanFormMode"));
-    ResultActions response = mockMvc.perform(get("/api//executionPlan/formConstraints/"+ executionPlanId));
+    ResultActions response = mockMvc.perform(get("/executionPlan/formConstraints/"+ executionPlanId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -102,7 +102,7 @@ class ExecutionPlanControllerTest {
     List<ExecutionPlanAnswerModel> executionPlanAnswerModels = new ArrayList<>();
     executionPlanAnswerModels.add(executionPlanAnswerModel);
     when(executionPlanService.updateAnswers(executionPlanAnswerModels, executionPlanId)).thenReturn(ResponseEntity.ok().body( "La réponse avec l'id "+executionPlanId+" a bien été modifié."));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/executionPlan/formConstraints/putAnswers/"+ executionPlanId).contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/executionPlan/formConstraints/putAnswers/"+ executionPlanId).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(executionPlanAnswerModels))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -111,7 +111,7 @@ class ExecutionPlanControllerTest {
   void getMethodologies() throws Exception {
     Long executionPlanId = 1L;
     when(executionPlanService.getMethodologies(executionPlanId)).thenReturn(ResponseEntity.ok().body("List of ExecutionVoteResponse"));
-    ResultActions response = mockMvc.perform(get("/api//executionPlan/methodologies/"+ executionPlanId));
+    ResultActions response = mockMvc.perform(get("/executionPlan/methodologies/"+ executionPlanId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -130,7 +130,7 @@ class ExecutionPlanControllerTest {
   void postMethodologiesVote() throws UserNotAuthorizedException, Exception {
     ExecutionVoteRequestModel executionVoteRequestModel = new ExecutionVoteRequestModel();
     when(executionPlanService.postMethodologiesVote(executionVoteRequestModel)).thenReturn(ResponseEntity.ok().body("Le vote a bien été enregistré."));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/executionPlan/methodologies/vote").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(post("/executionPlan/methodologies/vote").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(executionVoteRequestModel))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
 
@@ -158,7 +158,7 @@ class ExecutionPlanControllerTest {
     Long executionPlanId = 1L;
     ExecutionPlanScoreResponseModel executionPlanScoreResponseModel = new ExecutionPlanScoreResponseModel();
     when(executionPlanService.getExecutionPlanScore(executionPlanId)).thenReturn(executionPlanScoreResponseModel);
-    ResultActions response = mockMvc.perform(get("/api/executionPlan/"+ executionPlanId+"/score"));
+    ResultActions response = mockMvc.perform(get("/executionPlan/"+ executionPlanId+"/score"));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -177,7 +177,7 @@ class ExecutionPlanControllerTest {
   void putIsFinishedExecutionPlan() throws UserNotAuthorizedException, Exception {
     Long executionPlanId = 1L;
     when(executionPlanService.putIsFinishedExecutionPlan(executionPlanId)).thenReturn(ResponseEntity.ok().body(true));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/executionPlan/isFinished/"+executionPlanId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(post("/executionPlan/isFinished/"+executionPlanId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
 

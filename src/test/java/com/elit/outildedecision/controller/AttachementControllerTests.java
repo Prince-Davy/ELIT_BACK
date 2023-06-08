@@ -86,7 +86,7 @@ class AttachementControllerTests {
   void uploadAttachment_whenFile_isDownloaded_Successfully() throws Exception {
 
     when(attachmentService.uploadAttachment(files, projectId)).thenReturn(ResponseEntity.ok().body("Fichiers enregistrés avec succés"));
-    mockMvc.perform(MockMvcRequestBuilders.multipart("/api/user/attachments/upload/"+ projectId)
+    mockMvc.perform(MockMvcRequestBuilders.multipart("/user/attachments/upload/"+ projectId)
       .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(200));
   }
 
@@ -94,7 +94,7 @@ class AttachementControllerTests {
   @Test
   void uploadAttachment_whenFile_isNotDownloaded() throws Exception {
     when(attachmentService.uploadAttachment(files, projectId)).thenReturn(ResponseEntity.badRequest().body("Erreur lors de l'enregistrement du fichier : " + files.get(0).getOriginalFilename()));
-    mockMvc.perform(MockMvcRequestBuilders.multipart("/api/user/attachments/upload/"+ projectId)
+    mockMvc.perform(MockMvcRequestBuilders.multipart("/user/attachments/upload/"+ projectId)
       .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(400));
   }
 
@@ -103,7 +103,7 @@ class AttachementControllerTests {
   void editAttachment_whenRenameFile_isOk() throws Exception {
     HttpEntity<String> newAttachmentName = new HttpEntity<>("newName");
     when(attachmentService.renameAttachment(attachmentId , newAttachmentName)).thenReturn(ResponseEntity.ok().body("Votre fichier a été mis à jour"));
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.put("/api/user/attachments/edit/"+ attachmentId).contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.put("/user/attachments/edit/"+ attachmentId).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(newAttachmentName))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -114,7 +114,7 @@ class AttachementControllerTests {
     HttpEntity<String> newAttachmentName = new HttpEntity<>("");
     when(attachmentRepository.findById(2L)).thenReturn(Optional.empty());
     when(attachmentService.renameAttachment(2L , newAttachmentName)).thenReturn(ResponseEntity.badRequest().body("Ce fichier n'existe pas !"));
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.put("/api/user/attachments/edit/"+ 2L).contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.put("/user/attachments/edit/"+ 2L).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(newAttachmentName))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -125,7 +125,7 @@ class AttachementControllerTests {
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(attachmentId);
     when(attachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/user/attachments/download/"+projectId+"/"+ attachmentId)
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/user/attachments/download/"+projectId+"/"+ attachmentId)
       .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -136,7 +136,7 @@ class AttachementControllerTests {
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(3L);
  when(attachmentRepository.findById(attachment.getAttachmentId())).thenReturn(Optional.empty()).thenThrow();
-    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/user/attachments/download/"+projectId+"/"+3L)
+    MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/user/attachments/download/"+projectId+"/"+3L)
       .accept(MediaType.APPLICATION_JSON).content(String.valueOf(httpServletResponse))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -147,7 +147,7 @@ class AttachementControllerTests {
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(attachmentId);
     when(attachmentService.deleteAttachment(attachmentId)).thenReturn(ResponseEntity.ok().body("Fichier supprimé avec succès."));
-    ResultActions response = mockMvc.perform(delete("/api/user/attachments/"+ attachmentId));
+    ResultActions response = mockMvc.perform(delete("/user/attachments/"+ attachmentId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -158,7 +158,7 @@ class AttachementControllerTests {
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(attachmentId);
     when(attachmentService.deleteAttachment(attachmentId)).thenReturn(ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier."));
-    ResultActions response = mockMvc.perform(delete("/api/user/attachments/"+ attachmentId));
+    ResultActions response = mockMvc.perform(delete("/user/attachments/"+ attachmentId));
     response.andExpect(status().isBadRequest())
       .andDo(print());
     Assertions.assertEquals(400, response.andReturn().getResponse().getStatus());
@@ -168,7 +168,7 @@ class AttachementControllerTests {
   void previewAttachmentWithoutDownload_whenAttachment_exists() throws Exception {
     HttpServletResponse httpServletResponse = new MockHttpServletResponse();
     willDoNothing().given(attachmentService).openAttachment(attachmentId,httpServletResponse);
-    ResultActions response = mockMvc.perform(get("/api/user/attachments/preview/"+ projectId + "/"+ attachmentId));
+    ResultActions response = mockMvc.perform(get("/user/attachments/preview/"+ projectId + "/"+ attachmentId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -177,7 +177,7 @@ class AttachementControllerTests {
   @Test
   void previewAttachmentWithoutDownload_whenAttachment_doseNotexists() throws Exception {
     when(attachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
-    ResultActions response = mockMvc.perform(get("/api/user/attachments/preview/"+ projectId + "/"+ attachmentId));
+    ResultActions response = mockMvc.perform(get("/user/attachments/preview/"+ projectId + "/"+ attachmentId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());

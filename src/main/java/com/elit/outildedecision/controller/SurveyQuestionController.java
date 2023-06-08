@@ -22,7 +22,7 @@ import java.util.Optional;
  * display, create, delete or modify survey questions.
  */
 @RestController
-@RequestMapping("/api/survey/question")
+@RequestMapping("/survey/question")
 public class SurveyQuestionController {
   /**
    * SurveyQuestionServiceImpl.

@@ -63,7 +63,7 @@ class BrainstormingControllerTest {
     predictibilityAnalysis.setPredictibilityAnalysisId(predictibilityAnalysisId);
    when(predictibilityAnalysisRepository.findById(predictibilityAnalysisId)).thenReturn(Optional.of(predictibilityAnalysis));
     when(brainstormingService.getBrainstorming(1L)).thenReturn(ResponseEntity.ok().body("Liste de FormStepModelForBrainstorming"));
-    ResultActions response = mockMvc.perform(get("/api/brainstorming/"+ predictibilityAnalysisId));
+    ResultActions response = mockMvc.perform(get("/brainstorming/"+ predictibilityAnalysisId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -73,7 +73,7 @@ class BrainstormingControllerTest {
   void getBrainstorming_whenPredictibilityAnalysis_isNotFound() throws Exception {
     Long predictibilityAnalysisId = 1L;
     when( brainstormingService.getBrainstorming(predictibilityAnalysisId)).thenThrow(new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
-    ResultActions response = mockMvc.perform(get("/api/brainstorming/"+ predictibilityAnalysisId));
+    ResultActions response = mockMvc.perform(get("/brainstorming/"+ predictibilityAnalysisId));
     response.andExpect(status().isNotFound())
       .andDo(print());
     Assertions.assertEquals(404, response.andReturn().getResponse().getStatus());
@@ -86,7 +86,7 @@ class BrainstormingControllerTest {
     predictibilityAnalysis.setPredictibilityAnalysisId(predictibilityAnalysisId);
     when(predictibilityAnalysisRepository.findById(predictibilityAnalysisId)).thenReturn(Optional.of(predictibilityAnalysis));
     when(brainstormingService.getBrainstormingAbstract(predictibilityAnalysisId)).thenReturn(ResponseEntity.ok().body("Liste de FormStepModelForBrainstorming"));
-    ResultActions response = mockMvc.perform(get("/api/brainstorming/abstract/"+ predictibilityAnalysisId));
+    ResultActions response = mockMvc.perform(get("/brainstorming/abstract/"+ predictibilityAnalysisId));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
@@ -96,7 +96,7 @@ class BrainstormingControllerTest {
   void getBrainstormingAbstract_whenPredictibilityAnalysis_isNotFound() throws Exception {
     Long predictibilityAnalysisId = 1L;
     when( brainstormingService.getBrainstormingAbstract(predictibilityAnalysisId)).thenThrow(new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
-    ResultActions response = mockMvc.perform(get("/api/brainstorming/abstract/"+ predictibilityAnalysisId));
+    ResultActions response = mockMvc.perform(get("/brainstorming/abstract/"+ predictibilityAnalysisId));
     response.andExpect(status().isNotFound())
       .andDo(print());
     Assertions.assertEquals(404, response.andReturn().getResponse().getStatus());
@@ -108,7 +108,7 @@ class BrainstormingControllerTest {
     brainstormingModel.setBrainstormingId(1L);
     brainstormingModel.setBrainstormingText("text text");
     when(brainstormingService.createBrainstorming(brainstormingModel)).thenReturn(ResponseEntity.ok().body("Le commentaire du brainstorming a bien été enregistré."));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/brainstorming").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(post("/brainstorming").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(brainstormingModel))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -118,7 +118,7 @@ class BrainstormingControllerTest {
     brainstormingModel.setBrainstormingId(1L);
     brainstormingModel.setBrainstormingText("text text");
     when(brainstormingService.createBrainstorming(brainstormingModel)).thenThrow(new PredictibilityAnalysisNotFoundException("Ce analysis n'existe pas"));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/brainstorming").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(post("/brainstorming").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(brainstormingModel))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
@@ -129,7 +129,7 @@ class BrainstormingControllerTest {
     brainstormingModel.setBrainstormingId(1L);
     brainstormingModel.setBrainstormingText("text text");
     when(brainstormingService.updateBrainstorming(brainstormingModel)).thenReturn(ResponseEntity.ok().body("Le commentaire du brainstorming a bien été enregistré."));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/brainstorming").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/brainstorming").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(brainstormingModel))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
 
@@ -141,7 +141,7 @@ class BrainstormingControllerTest {
     brainstormingModel.setBrainstormingId(1L);
     brainstormingModel.setBrainstormingText("text text");
     when(brainstormingService.updateBrainstorming(brainstormingModel)).thenThrow(new BrainstormingNotFoundException("Cet brainstorming n'existe pas"));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/brainstorming").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/brainstorming").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(brainstormingModel))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
 
@@ -154,7 +154,7 @@ class BrainstormingControllerTest {
     brainstormingModel.setBrainstormingText("text text");
     when(brainstormingService.updateBrainstorming(brainstormingModel)).thenReturn(ResponseEntity.status(HttpStatus.FORBIDDEN)
       .body("L'utilisateur enregistré ne correspond pas à l'utilisateur du brainstorming"));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/brainstorming").contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/brainstorming").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(brainstormingModel))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(403, response.getStatus());
 
@@ -164,7 +164,7 @@ class BrainstormingControllerTest {
   void removeBrainstorming() throws Exception {
     Long brainstormingId = 1L;
     when(brainstormingService.deleteBrainstorming(brainstormingId)).thenReturn(ResponseEntity.ok().body("Le commentaire du brainstorming a bien été supprimé."));
-    MockHttpServletResponse response = mockMvc.perform(delete("/api/brainstorming/"+brainstormingId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(delete("/brainstorming/"+brainstormingId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
 
@@ -172,7 +172,7 @@ class BrainstormingControllerTest {
   void removeBrainstorming_whenBrainstormingDoseNotExists() throws Exception {
     Long brainstormingId = 1L;
     when(brainstormingService.deleteBrainstorming(brainstormingId)).thenThrow(new BrainstormingNotFoundException("Cet brainstorming n'existe pas"));
-    MockHttpServletResponse response = mockMvc.perform(delete("/api/brainstorming/"+brainstormingId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(delete("/brainstorming/"+brainstormingId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
 
@@ -181,7 +181,7 @@ class BrainstormingControllerTest {
     Long brainstormingId = 1L;
     HttpEntity<String> isChecked = new HttpEntity<>("true");
     when(brainstormingService.validateOrRejectBrainstorming(brainstormingId, isChecked)).thenReturn(ResponseEntity.ok().body("Le commentaire a bien été enregistré."));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/brainstorming/validate/"+brainstormingId).contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/brainstorming/validate/"+brainstormingId).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(isChecked))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
@@ -191,7 +191,7 @@ class BrainstormingControllerTest {
     Long brainstormingId = 1L;
     HttpEntity<String> isChecked = new HttpEntity<>("false");
     when(brainstormingService.validateOrRejectBrainstorming(brainstormingId, isChecked)).thenThrow(new BrainstormingNotFoundException("Cet brainstorming n'existe pas"));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/brainstorming/validate/"+brainstormingId).contentType(MediaType.APPLICATION_JSON)
+    MockHttpServletResponse response = mockMvc.perform(put("/brainstorming/validate/"+brainstormingId).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(isChecked))).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }

@@ -42,7 +42,7 @@ class PredictibilityAnalysisControllerTest {
   void createPredictibilityAnalysis() throws Exception {
     Long projectId = 1L;
     when(predictibilityAnalysisService.createPredictibilityForm(projectId)).thenReturn(ResponseEntity.ok().body(1L));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/predictibility-analysis/"+projectId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(post("/predictibility-analysis/"+projectId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
 
@@ -62,7 +62,7 @@ class PredictibilityAnalysisControllerTest {
   void createPredictibilityAnalysis_whenPredictibilityAnalysisIsNotFinished() throws Exception {
     Long projectId = 1L;
     when(predictibilityAnalysisService.createPredictibilityForm(projectId)).thenReturn(ResponseEntity.status(HttpStatus.FORBIDDEN).body(-1L));
-    MockHttpServletResponse response = mockMvc.perform(post("/api/predictibility-analysis/"+projectId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(post("/predictibility-analysis/"+projectId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(403, response.getStatus());
   }
 
@@ -71,14 +71,14 @@ class PredictibilityAnalysisControllerTest {
     Long analyseId = 2L;
     PredictibilityScoreModel predictibilityResult = new PredictibilityScoreModel();
     when(predictibilityAnalysisService.calculatePredictibilityAnalysisScore(analyseId)).thenReturn(ResponseEntity.ok().body(predictibilityResult));
-    MockHttpServletResponse response = mockMvc.perform(get("/api/predictibility/"+analyseId+"/score")).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/predictibility/"+analyseId+"/score")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
   @Test
   void getPredictabilityAnalysisScore_whenAnalysisDoseNotExist() throws Exception {
     Long analyseId = 2L;
     when(predictibilityAnalysisService.calculatePredictibilityAnalysisScore(analyseId)).thenThrow(new PredictibilityAnalysisNotFoundException("Cet analyse n'existe pas"));
-    MockHttpServletResponse response = mockMvc.perform(get("/api/predictibility/"+analyseId+"/score")).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(get("/predictibility/"+analyseId+"/score")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
 
@@ -87,7 +87,7 @@ class PredictibilityAnalysisControllerTest {
     Long analyseId = 1L;
     when( predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(analyseId)).thenReturn(ResponseEntity.ok()
       .body("L'analyse de prévisibilité a bien été enregistré comme terminée."));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/predictibility/isFinished/"+analyseId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(put("/predictibility/isFinished/"+analyseId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
 
@@ -96,7 +96,7 @@ class PredictibilityAnalysisControllerTest {
     Long analyseId = 1L;
     when( predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(analyseId)).thenThrow(new PredictibilityAnalysisNotFoundException(
       "Cette analyse de prévisibilité n'existe pas."));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/predictibility/isFinished/"+analyseId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(put("/predictibility/isFinished/"+analyseId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
 
@@ -105,7 +105,7 @@ class PredictibilityAnalysisControllerTest {
     Long analyseId = 1L;
     when(predictibilityAnalysisService.increasePredictAnalysisIterationNum(analyseId)).thenReturn(ResponseEntity.ok()
       .body("L'analyse de prévisibilité a rentre dans une nouvelle iteration."));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/predictibility/iteration/"+analyseId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(put("/predictibility/iteration/"+analyseId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }
   @Test
@@ -113,7 +113,7 @@ class PredictibilityAnalysisControllerTest {
     Long analyseId = 1L;
     when(predictibilityAnalysisService.increasePredictAnalysisIterationNum(analyseId)).thenThrow( new PredictibilityAnalysisNotFoundException(
       "Cette analyse de prévisibilité n'existe pas."));
-    MockHttpServletResponse response = mockMvc.perform(put("/api/predictibility/iteration/"+analyseId)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(put("/predictibility/iteration/"+analyseId)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
   }
 

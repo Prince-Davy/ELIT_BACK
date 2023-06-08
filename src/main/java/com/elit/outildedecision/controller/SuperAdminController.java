@@ -22,7 +22,7 @@ import java.util.List;
  * SuperAdminController.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class SuperAdminController {
   /**
    * SuperAdminService.

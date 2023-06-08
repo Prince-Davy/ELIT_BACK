@@ -52,7 +52,7 @@ class SurveyQuestionControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldCreateQuestion_Success() throws Exception {
     when(surveyQuestionService.createQuestion(questionModel)).thenReturn(question);
-    mockMvc.perform(post("/api/survey/question").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/survey/question").contentType(MediaType.APPLICATION_JSON)
       .content(ModelSamples.toJson(question)))
       .andDo(print())
       .andExpect(status().isOk());
@@ -62,7 +62,7 @@ class SurveyQuestionControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shoudCreateQuestion_ThrowQuestionFormatNotValidException() throws Exception {
   when(surveyQuestionService.createQuestion(null)).thenThrow(new QuestionFormatNotValidException("question format not valid"));
-  mockMvc.perform(post("/api/survey/question").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+  mockMvc.perform(post("/survey/question").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
     .andDo(print())
     .andExpect(status().isBadRequest());
   }
@@ -72,7 +72,7 @@ class SurveyQuestionControllerTests {
   void shouldModifyQuestion_Success() throws Exception {
     question.setQuestion("this is modified question");
     when(surveyQuestionService.modifyQuestion(question.getId(), questionModel)).thenReturn(question);
-    mockMvc.perform(put("/api/survey/question/"+ question.getId()).contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(put("/survey/question/"+ question.getId()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON_VALUE).content(ModelSamples.toJson(questionModel)))
       .andDo(print())
       .andExpect(status().isOk());
@@ -82,7 +82,7 @@ class SurveyQuestionControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shoudModifyQuestion_ThrowQuestionFormatNotValidException() throws Exception {
     when(surveyQuestionService.modifyQuestion(question.getId(),null)).thenThrow(new QuestionFormatNotValidException("question format not valid"));
-    mockMvc.perform(put("/api/survey/question/"+ question.getId()).contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(put("/survey/question/"+ question.getId()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON))
       .andDo(print())
       .andExpect(status().isBadRequest());
@@ -92,7 +92,7 @@ class SurveyQuestionControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldDeleteQuestion_Success() throws Exception {
     when(surveyQuestionService.deleteQuestion(question.getId())).thenReturn(Optional.of(question));
-    mockMvc.perform(delete("/api/survey/question/"+ question.getId()))
+    mockMvc.perform(delete("/survey/question/"+ question.getId()))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().json(ModelSamples.toJson(question)));
@@ -102,7 +102,7 @@ class SurveyQuestionControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldDeleteQuestion_ThrowQuestionNotFound() throws Exception {
     when(surveyQuestionService.deleteQuestion(question.getId())).thenReturn(Optional.empty());
-    mockMvc.perform(delete("/api/survey/question/"+ question.getId()))
+    mockMvc.perform(delete("/survey/question/"+ question.getId()))
       .andDo(print())
       .andExpect(status().isOk());
   }
@@ -111,7 +111,7 @@ class SurveyQuestionControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shoudGetQuestionList_Success() throws Exception {
     when(surveyQuestionService.getQuestionsList()).thenReturn(Arrays.asList(question));
-    mockMvc.perform(get("/api/survey/question"))
+    mockMvc.perform(get("/survey/question"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().json(ModelSamples.toJson(Arrays.asList(question))));
@@ -121,7 +121,7 @@ class SurveyQuestionControllerTests {
   @WithMockUser
   void shouldSelectQuestion_Success() throws Exception {
     when(surveyQuestionService.selectQuestion(question.getId())).thenReturn(question);
-    mockMvc.perform(get("/api/survey/question/"+question.getId()))
+    mockMvc.perform(get("/survey/question/"+question.getId()))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().json(ModelSamples.toJson(question)));

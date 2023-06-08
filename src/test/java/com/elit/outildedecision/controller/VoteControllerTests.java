@@ -56,7 +56,7 @@ class VoteControllerTests {
   void shouldCreateVote_Success() throws Exception {
     voteModelRequest = VoteSamples.getVoteModelRequest();
     when(voteService.createVote(voteModelRequest)).thenReturn(ResponseEntity.ok().body("Le vote a bien été enregistré."));
-    mockMvc.perform(post("/api/vote").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/vote").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(toJson((voteModelRequest))))
       .andDo(print())
       .andExpect(status().isOk())
@@ -68,7 +68,7 @@ class VoteControllerTests {
   void shouldCreateVote_ThrowVoteExists() throws Exception {
     voteModelRequest = VoteSamples.getVoteModelRequest();
     when(voteService.createVote(voteModelRequest)).thenReturn(ResponseEntity.badRequest().body("Cet utilisateur à déjà soumis un vote."));
-    mockMvc.perform(post("/api/vote").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/vote").contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(toJson((voteModelRequest))))
       .andDo(print())
       .andExpect(status().isBadRequest());
@@ -79,7 +79,7 @@ class VoteControllerTests {
   void shouldGetVote_Success() throws Exception {
     List<VoteModelResponse> listVoteModelResponse = VoteSamples.getVotes();
     when(voteService.getVote(listVoteModelResponse.get(0).getPredictibilityAnalysisId())).thenReturn(listVoteModelResponse);
-    mockMvc.perform(get("/api/vote/"+ listVoteModelResponse.get(0).getPredictibilityAnalysisId()))
+    mockMvc.perform(get("/vote/"+ listVoteModelResponse.get(0).getPredictibilityAnalysisId()))
       .andDo(print())
       .andExpect(status().isOk());
   }
@@ -90,7 +90,7 @@ class VoteControllerTests {
     voteModelRequest = VoteSamples.getVoteModelRequest();
     voteModelRequest.setChosenPMM("modified chosenPMM");
     when(voteService.updateVote(voteModelRequest.getVoteId(), voteModelRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Vote mis à jour."));
-    mockMvc.perform(MockMvcRequestBuilders.put("/api/vote/"+ voteModelRequest.getVoteId()).contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(MockMvcRequestBuilders.put("/vote/"+ voteModelRequest.getVoteId()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(toJson(voteModelRequest)))
       .andDo(print())
       .andExpect(status().isOk())
@@ -102,7 +102,7 @@ class VoteControllerTests {
   void shouldUpdateVote_ThrowConflictException() throws Exception {
     voteModelRequest = VoteSamples.getVoteModelRequest();
     when(voteService.updateVote(voteModelRequest.getVoteId(), voteModelRequest)).thenReturn(ResponseEntity.status(HttpStatus.CONFLICT).body("Vous n'êtes pas autorisé à modifier ce vote."));
-    mockMvc.perform(MockMvcRequestBuilders.put("/api/vote/"+ voteModelRequest.getVoteId()).contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(MockMvcRequestBuilders.put("/vote/"+ voteModelRequest.getVoteId()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON).content(toJson(voteModelRequest)))
       .andDo(print()).andExpect(status().isConflict());
   }

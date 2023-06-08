@@ -61,14 +61,14 @@ class UserControllerTests {
    void findUserByIdExists() throws Exception {
     userResponseModel = UserSamples.getUserResponseModel();
     when(userService.getAllInfosUserById(userResponseModel.getUserId())).thenReturn(userResponseModel);
-    mockMvc.perform(get("/api/user/"+userResponseModel.getUserId())).andDo(print()).andExpect(status().isOk());
+    mockMvc.perform(get("/user/"+userResponseModel.getUserId())).andDo(print()).andExpect(status().isOk());
   }
 
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
    void findUserByIdNotExists() throws Exception {
     when(userService.getAllInfosUserById(UserSamples.notExistUserId)).thenReturn(null);
-    mockMvc.perform(get("/api/user/"+UserSamples.notExistUserId)).andDo(print()).andExpect(status().isOk());
+    mockMvc.perform(get("/user/"+UserSamples.notExistUserId)).andDo(print()).andExpect(status().isOk());
   }
 
   @Test
@@ -76,14 +76,14 @@ class UserControllerTests {
   void findUserByKeyWord_Success() throws Exception {
     userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponseModel());
     when(userService.findUsersByKeyword("username")).thenReturn(userResponseModelList);
-    mockMvc.perform(get("/api/user/users")).andDo(print()).andExpect(status().isOk());
+    mockMvc.perform(get("/user/users")).andDo(print()).andExpect(status().isOk());
   }
 
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUpdatePasswordById_Success() throws Exception {
     when(userService.updatePasswordUserById(user.getUserId(), user.getUserPassword(), newPassword)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Successful Update"));
-    mockMvc.perform(put("/api/user/password/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("oldPass", user.getUserPassword()).param("newPass", newPassword))
+    mockMvc.perform(put("/user/password/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("oldPass", user.getUserPassword()).param("newPass", newPassword))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Successful Update")));
@@ -94,7 +94,7 @@ class UserControllerTests {
   void shouldUpdateAvatar_Success() throws Exception {
     MultipartFile file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_JPEG_VALUE,  "<<avatar data>>".getBytes());
     when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Votre Photo de profil a été modifiée avec succès"));
-    mockMvc.perform(MockMvcRequestBuilders.multipart("/api/user/avatar/"+user.getUserId()).file((MockMultipartFile) file).accept(MediaType.MULTIPART_FORM_DATA).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+    mockMvc.perform(MockMvcRequestBuilders.multipart("/user/avatar/"+user.getUserId()).file((MockMultipartFile) file).accept(MediaType.MULTIPART_FORM_DATA).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
       .andDo(print())
       .andExpect(status().isOk());
   }*/
@@ -104,7 +104,7 @@ class UserControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUpdateInfosByUserId_Success() throws Exception {
     when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Successful Update"));
-    mockMvc.perform(put("/api/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userJob",userJob).param("userFirstName", userFirstName).param("userLastName", userLastName))
+    mockMvc.perform(put("/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userJob",userJob).param("userFirstName", userFirstName).param("userLastName", userLastName))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Successful Update")));
@@ -114,7 +114,7 @@ class UserControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUpdateInfosByUserId_ThrowCouldNotSaveUserException() throws Exception {
     when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName)).thenThrow(new CouldNotSaveUserException("Erreur lors de l'enregistrement de userFisrtName"));
-      mockMvc.perform(put("/api/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userJob",userJob).param("userFirstName", userFirstName).param("userLastName", userLastName))
+      mockMvc.perform(put("/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userJob",userJob).param("userFirstName", userFirstName).param("userLastName", userLastName))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(content().string(containsString("Erreur lors de l'enregistrement")));
