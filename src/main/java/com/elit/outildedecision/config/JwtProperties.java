@@ -1,9 +1,13 @@
 package com.elit.outildedecision.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
   /**
@@ -12,17 +16,9 @@ public class JwtProperties {
    */
   private String secret;
   /**
-   * Gets secret.
-   * @return the secret key used to sign the JWT token.
+   * The Expitation time.
+   * The expiration duration for JWT token.
    */
-  public String getSecret() {
-        return secret;
-    }
-    /**
-     * Sets secret.
-     * @param jwtSecret the secret key used to sign the JWT token.
-     */
-    public void setSecret(final String jwtSecret) {
-        this.secret = jwtSecret;
-    }
+  private Long expirationTime;
+
 }

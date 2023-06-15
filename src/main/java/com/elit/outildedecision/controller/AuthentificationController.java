@@ -36,11 +36,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RestController
 @RequestMapping("/")
 public class AuthentificationController {
-  /**
-   * The Constant EXPIRATION_TIME.
-   * The expiration time of the JWT token.
-   */
-  private static final long EXPIRATION_TIME = 5L * 60L * 1000L;
 
   /**
    * The Jwt Properties.
@@ -104,7 +99,7 @@ public class AuthentificationController {
         String accessToken =
           JWT.create()
             .withSubject(user.getUserEmail())
-            .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+            .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
             .withIssuer(request.getRequestURL().toString())
             .withClaim("roles", roles)
             .withClaim("firstname", user.getUserFirstName())

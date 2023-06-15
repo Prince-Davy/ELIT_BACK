@@ -52,7 +52,7 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
    * Constructor for SpringConfig.
    *
    * @param customUserDetailsService the custom user details service used for authentication.
-   * @param passwordEncoder
+   * @param passwordEncoder the encoder password
    */
   public SpringConfig(final UserServiceImpl customUserDetailsService, final PasswordEncoder passwordEncoder) {
     this.customUserDetailsService = customUserDetailsService;

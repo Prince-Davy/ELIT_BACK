@@ -22,13 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-  private static final long EXPIRATION_TIME = 5L * 60L * 1000L;
   private final JwtProperties jwtProperties;
   private final AuthenticationManager authenticationManager;
   /**
    * Constructor of JwtAuthenticationFilter.
-   *
    * @param jwtProperties
    * @param authenticationManager the authentication manager
    */
@@ -86,7 +85,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .withSubject(user.getUsername()) // the (email) of the authenticated user
             .withExpiresAt(
                 new Date(
-                    System.currentTimeMillis() + EXPIRATION_TIME)) // the token will expire in 5min
+                    System.currentTimeMillis() + jwtProperties.getExpirationTime())) // the token will expire in 15min
             .withIssuer(
                 request
                     .getRequestURL()
@@ -112,7 +111,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .withSubject(user.getUsername()) // the username of the authenticated user
             .withExpiresAt(
                 new Date(
-                    System.currentTimeMillis() + 8640 * EXPIRATION_TIME)) // the token will expire
+                    System.currentTimeMillis() + 2880L * jwtProperties.getExpirationTime())) // the token will expire
             // in 30 days
             .withIssuer(
                 request
