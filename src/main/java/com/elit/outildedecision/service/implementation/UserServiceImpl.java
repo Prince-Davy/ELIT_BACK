@@ -94,6 +94,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    */
   @Value("${backend.value-url}")
   private String backEndUrl;
+
   /**
    * Constructor for UserServiceImpl.
    *
@@ -172,7 +173,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       throw new CouldNotSaveUserException("Une erreur est survenue lors de la création de votre compte.");
     }
   }
-
   /**
    * Updates a user's password given their ID and old and new passwords.
    *
@@ -189,15 +189,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     String currentPass = user.getUserPassword();
     boolean checkPassword = passwordEncoder.matches(oldPass, currentPass);
     if (!checkPassword) {
-      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-        .body("Votre ancien mot de passe n'est pas correct");
-    } else {
-      user.setUserPassword(passwordEncoder.encode(newPass));
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        .body("L'ancien mot de passe renseigné n'est pas correct.");
     }
-    userRepository.save(user);
-    return ResponseEntity.status(HttpStatus.OK).body("Votre mot de passe a bien été modifié");
+    if (oldPass.equals(newPass)) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        .body("Le nouveau mot de passe renseigné ne doit pas être identique au précédent.");
+    }
+       user.setUserPassword(passwordEncoder.encode(newPass));
+       userRepository.save(user);
+    return ResponseEntity.status(HttpStatus.OK).body("Votre nouveau mot de passe a bien été enregistré.");
   }
-
   /**
    * Updates a user's avatar given their ID and a new avatar file.
    *
@@ -219,7 +221,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     userRepository.save(user);
     return ResponseEntity.status(HttpStatus.OK).body("Votre Photo de profil a été modifiée avec succès");
   }
-
   /**
    * Updates a user's first name and/or last name given their ID.
    *
@@ -309,10 +310,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     errorMap.put("SUCCESS", "Utilisateur mis à jour");
     return ResponseEntity.status(HttpStatus.OK).body(errorMap);
   }
+
   /**
    * Validates a user details against the user details in the database.
    *
-   * @param user The UserModel object containing the updated user information.
+   * @param user       The UserModel object containing the updated user information.
    * @param userFromDB The user to update.
    * @return A Map containing the errors.
    */
@@ -334,10 +336,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
     return errorMap;
   }
+
   /**
    * Updates a user's fields.
    *
-   * @param user The UserModel object containing the updated user information.
+   * @param user       The UserModel object containing the updated user information.
    * @param userFromDB The user to update.
    * @throws CouldNotSaveUserException If there is an error saving the updated user to the database.
    */
@@ -415,14 +418,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public UserResponseModel getAllInfosUserById(final Long userId) {
     User user = userRepository.getById(userId);
-      return UserResponseModel.builder()
-        .userId(user.getUserId())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .userJob(user.getUserJob())
-        .build();
+    return UserResponseModel.builder()
+      .userId(user.getUserId())
+      .userFirstName(user.getUserFirstName())
+      .userLastName(user.getUserLastName())
+      .username(user.getUsername())
+      .userEmail(user.getUserEmail())
+      .userJob(user.getUserJob())
+      .build();
   }
 
   /**

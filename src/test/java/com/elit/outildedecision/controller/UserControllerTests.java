@@ -88,6 +88,24 @@ class UserControllerTests {
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Successful Update")));
   }
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void shouldUpdatePasswordById_LastPwdNotCorrect () throws Exception {
+    when(userService.updatePasswordUserById(user.getUserId(), "user", newPassword)).thenReturn(ResponseEntity.badRequest().body("L'ancien mot de passe renseigné n'est pas correct."));
+    mockMvc.perform(put("/user/password/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("oldPass", "user").param("newPass", newPassword))
+      .andDo(print())
+      .andExpect(status().isBadRequest())
+      .andExpect(content().string(containsString("L'ancien mot de passe renseigné n'est pas correct.")));
+  }
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void shouldUpdatePasswordById_PwdOldAndNewAreSame () throws Exception {
+    when(userService.updatePasswordUserById(user.getUserId(), user.getUserPassword(), user.getUserPassword())).thenReturn(ResponseEntity.badRequest().body("Le nouveau mot de passe renseigné ne doit pas être identique au précédent."));
+    mockMvc.perform(put("/user/password/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("oldPass", user.getUserPassword()).param("newPass", user.getUserPassword()))
+      .andDo(print())
+      .andExpect(status().isBadRequest())
+      .andExpect(content().string(containsString("Le nouveau mot de passe renseigné ne doit pas être identique au précédent.")));
+  }
 
  /*@Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
