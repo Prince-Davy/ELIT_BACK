@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -160,7 +159,6 @@ class UserServiceImplTests {
       .userLastName(user.getUserLastName())
       .username(user.getUsername())
       .userEmail(user.getUserEmail())
-      .userJob(user.getUserJob())
       .build(), userServiceImpl.getAllInfosUserById(USER_ID));
   }
 
@@ -192,7 +190,6 @@ class UserServiceImplTests {
         .userLastName(user.getUserLastName())
         .username(user.getUsername())
         .userEmail(user.getUserEmail())
-        .userJob(user.getUserJob())
         .userAvatar(Files.readAllBytes(file.toPath()))
         .build();
     foundUsers.add(userResponseModel);
@@ -214,7 +211,6 @@ class UserServiceImplTests {
         .userLastName(user.getUserLastName())
         .username(user.getUsername())
         .userEmail(user.getUserEmail())
-        .userJob(user.getUserJob())
         .build();
     foundUsers.add(userResponseModel);
     assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
@@ -236,7 +232,6 @@ class UserServiceImplTests {
         .userLastName(user.getUserLastName())
         .username(user.getUsername())
         .userEmail(user.getUserEmail())
-        .userJob(user.getUserJob())
         .userAvatar(Files.readAllBytes(file.toPath()))
         .build();
     foundUsers.add(userResponseModel);
@@ -258,7 +253,6 @@ class UserServiceImplTests {
         .userLastName(user.getUserLastName())
         .username(user.getUsername())
         .userEmail(user.getUserEmail())
-        .userJob(user.getUserJob())
         .build();
     foundUsers.add(userResponseModel);
     assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
@@ -278,7 +272,6 @@ class UserServiceImplTests {
         .userLastName(user.getUserLastName())
         .username(user.getUsername())
         .userEmail(user.getUserEmail())
-        .userJob(user.getUserJob())
         .userAvatar(Files.readAllBytes(Paths.get(user.getUserAvatarPath())))
         .build();
     foundUsers.add(userResponseModel);

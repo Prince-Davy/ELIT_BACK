@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserTests {
     @Test
     void testToString(){
-        User user = new User(null, 1L, "username", "userLastName", "userFirstName", "userEmail", null, "/", null, null, null, null, null, null);
+        User user = new User(null, 1L, "username", "userLastName", "userFirstName", "userEmail", "/", null, null, null, null, null, null);
         final String useString="User{"
         + "userId="
         + "1"
@@ -34,7 +34,7 @@ class UserTests {
 
     @Test
     void testdetachPermission(){
-        User user = new User(null, 1L, "username", "userLastName", "userFirstName", "userEmail", null, "/", null, null, null, null, null, null);
+        User user = new User(null, 1L, "username", "userLastName", "userFirstName", "userEmail", "/", null, null, null, null, null, null);
         Project p = new Project();
         ProjectUserPermission pup = new ProjectUserPermission();
         pup.setId(new ProjectPropertyKey());

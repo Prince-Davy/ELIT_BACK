@@ -27,12 +27,12 @@ public class ModelSamples {
 
     public static UserResponseModel getUserResponseModel() {
       return new UserResponseModel(1L, "username", "lastname",
-        "firstname", "user@user.com", "developer",
+        "firstname", "user@user.com",
         null);
     }
 
     public static UserModel createUserModel(String username, String userLastName,
-                                            String userFirstName, String userEmail, String userJob,
+                                            String userFirstName, String userEmail,
                                             String userPassword) {
       UserModel userModel = new UserModel();
       userModel.setUserFirstName(userFirstName);
@@ -40,7 +40,6 @@ public class ModelSamples {
       userModel.setUsername(username);
       userModel.setUserPassword(userPassword);
       userModel.setUserEmail(userEmail);
-      userModel.setUserJob(userJob);
       userModel.setUserEmailConfirmation(userEmail);
       userModel.setUserPasswordConfirmation(userPassword);
 
@@ -49,32 +48,32 @@ public class ModelSamples {
 
     public static User getUser() {
       return createUser(1L, "username", "userLastName", "userFirstName",
-        "user@user.com", "developper", "useravatarPath", "userPassword", true, true, true,
+        "user@user.com", "useravatarPath", "userPassword", true, true, true,
         new ArrayList<VerificationToken>(), new ArrayList<Brainstorming>());
     }
     public static User getUser2() {
       return createUser(1L, "user", "Doe", "John",
-        "user2@user.com", "Développeur front", null, "user", true, true, false,
+        "user2@user.com", null, "user", true, true, false,
         null, null);
     }
 
     public static UserModel getUserModel() {
       return createUserModel("username", "lastname",
-        "firstname", "user@user.com", "developer", "Azerty!123");
+        "firstname", "user@user.com", "Azerty!123");
     }
 
 
     public static UserResponseModel createResponseModel(Long userId, String username,
                                                         String userLastName, String userFirstName, String userEmail,
-                                                        String userJob, byte[] userAvatar) {
+                                                        byte[] userAvatar) {
       return new UserResponseModel(userId, username, userLastName,
-        userFirstName, userEmail, userJob,
+        userFirstName, userEmail,
         userAvatar);
 
     }
 
     public static User createUser(Long userId, String username, String userLastName,
-                                  String userFirstName, String userEmail, String userJob,
+                                  String userFirstName, String userEmail,
                                   String userAvatarPath, String userPassword, Boolean isEmailVerified,
                                   Boolean isUserActive, Boolean isAdmin, List<VerificationToken> verificationTokens,
                                   List<Brainstorming> brainstormings) {
@@ -86,7 +85,6 @@ public class ModelSamples {
         user.setUsername(username);
         user.setUserPassword(userPassword);
         user.setUserEmail(userEmail);
-        user.setUserJob(userJob);
         user.setUserAvatarPath(userAvatarPath);
         user.setIsUserActive(isUserActive);
         user.setIsAdmin(isAdmin);

@@ -94,7 +94,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    */
   @Value("${backend.value-url}")
   private String backEndUrl;
-
   /**
    * Constructor for UserServiceImpl.
    *
@@ -163,7 +162,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
           .userFirstName(user.getUserFirstName())
           .userLastName(user.getUserLastName())
           .userPassword(passwordEncoder.encode(user.getUserPassword()))
-          .userJob(user.getUserJob())
           .isAdmin(false)
           .build();
       sendRegistrationConfirmationEmail(userRepository.save(userToSave));
@@ -189,17 +187,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     String currentPass = user.getUserPassword();
     boolean checkPassword = passwordEncoder.matches(oldPass, currentPass);
     if (!checkPassword) {
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-        .body("L'ancien mot de passe renseigné n'est pas correct.");
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        .body("Votre ancien mot de passe n'est pas correct");
+    } else {
+      user.setUserPassword(passwordEncoder.encode(newPass));
     }
-    if (oldPass.equals(newPass)) {
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-        .body("Le nouveau mot de passe renseigné ne doit pas être identique au précédent.");
-    }
-       user.setUserPassword(passwordEncoder.encode(newPass));
-       userRepository.save(user);
-    return ResponseEntity.status(HttpStatus.OK).body("Votre nouveau mot de passe a bien été enregistré.");
+    userRepository.save(user);
+    return ResponseEntity.status(HttpStatus.OK).body("Votre mot de passe a bien été modifié");
   }
+
   /**
    * Updates a user's avatar given their ID and a new avatar file.
    *
@@ -221,6 +217,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     userRepository.save(user);
     return ResponseEntity.status(HttpStatus.OK).body("Votre Photo de profil a été modifiée avec succès");
   }
+
   /**
    * Updates a user's first name and/or last name given their ID.
    *
@@ -310,11 +307,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     errorMap.put("SUCCESS", "Utilisateur mis à jour");
     return ResponseEntity.status(HttpStatus.OK).body(errorMap);
   }
-
   /**
    * Validates a user details against the user details in the database.
    *
-   * @param user       The UserModel object containing the updated user information.
+   * @param user The UserModel object containing the updated user information.
    * @param userFromDB The user to update.
    * @return A Map containing the errors.
    */
@@ -336,11 +332,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
     return errorMap;
   }
-
   /**
    * Updates a user's fields.
    *
-   * @param user       The UserModel object containing the updated user information.
+   * @param user The UserModel object containing the updated user information.
    * @param userFromDB The user to update.
    * @throws CouldNotSaveUserException If there is an error saving the updated user to the database.
    */
@@ -359,9 +354,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
     if (!Objects.isNull(user.getUserEmail())) {
       userFromDB.setUserEmail(user.getUserEmail());
-    }
-    if (!Objects.isNull(user.getUserJob())) {
-      userFromDB.setUserJob(user.getUserJob());
     }
     if (!Objects.isNull(user.getUserAvatar())) {
       try {
@@ -418,14 +410,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public UserResponseModel getAllInfosUserById(final Long userId) {
     User user = userRepository.getById(userId);
-    return UserResponseModel.builder()
-      .userId(user.getUserId())
-      .userFirstName(user.getUserFirstName())
-      .userLastName(user.getUserLastName())
-      .username(user.getUsername())
-      .userEmail(user.getUserEmail())
-      .userJob(user.getUserJob())
-      .build();
+      return UserResponseModel.builder()
+        .userId(user.getUserId())
+        .userFirstName(user.getUserFirstName())
+        .userLastName(user.getUserLastName())
+        .username(user.getUsername())
+        .userEmail(user.getUserEmail())
+        .build();
   }
 
   /**
@@ -449,7 +440,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
               .userLastName(user.getUserLastName())
               .username(user.getUsername())
               .userEmail(user.getUserEmail())
-              .userJob(user.getUserJob())
               .userAvatar(Files.readAllBytes(file.toPath()))
               .build();
           foundUsers.add(userResponseModel);
@@ -462,7 +452,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
               .userLastName(user.getUserLastName())
               .username(user.getUsername())
               .userEmail(user.getUserEmail())
-              .userJob(user.getUserJob())
               .build();
           foundUsers.add(userResponseModel);
         }
@@ -476,7 +465,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
           .userLastName(user.getUserLastName())
           .username(user.getUsername())
           .userEmail(user.getUserEmail())
-          .userJob(user.getUserJob())
           .userAvatar(Files.readAllBytes(Paths.get(user.getUserAvatarPath())))
           .build();
       foundUsers.add(userResponseModel);

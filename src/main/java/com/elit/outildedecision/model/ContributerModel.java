@@ -39,11 +39,6 @@ public class ContributerModel implements Serializable {
     private String email;
 
     /**
-     * The job or occupation of the contributor.
-     */
-    private String job;
-
-    /**
      * A boolean flag indicating whether the contributor has administrative privileges.
      */
     private Boolean isAdmin;

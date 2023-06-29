@@ -38,7 +38,6 @@ public class User implements Serializable {
   private String userLastName;
   private String userFirstName;
   private String userEmail;
-  private String userJob;
   private String userAvatarPath;
 
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

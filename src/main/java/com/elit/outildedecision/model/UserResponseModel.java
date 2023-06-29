@@ -40,11 +40,6 @@ public class UserResponseModel {
   private String userEmail;
 
   /**
-   * The job title of the user.
-   */
-  private String userJob;
-
-  /**
    * The avatar image of the user, represented as a byte array.
    */
   private byte[] userAvatar;

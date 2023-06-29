@@ -297,7 +297,6 @@
             <column name="user_avatar_path" type="VARCHAR(255)"/>
             <column name="user_email" type="VARCHAR(255)"/>
             <column name="user_first_name" type="VARCHAR(255)"/>
-            <column name="user_job" type="VARCHAR(255)"/>
             <column name="user_last_name" type="VARCHAR(255)"/>
             <column name="user_password" type="VARCHAR(255)"/>
             <column name="username" type="VARCHAR(255)"/>

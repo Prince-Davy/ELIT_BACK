@@ -46,12 +46,6 @@ public class UserModel {
   private String userEmail;
 
   /**
-   * The job title of the user.
-   */
-  @NotBlank(message = "metier est obligatoire")
-  private String userJob;
-
-  /**
    * The password of the user.
    */
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
