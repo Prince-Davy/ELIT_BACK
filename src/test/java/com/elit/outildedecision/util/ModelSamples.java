@@ -33,7 +33,7 @@ public class ModelSamples {
 
     public static UserModel createUserModel(String username, String userLastName,
                                             String userFirstName, String userEmail,
-                                            String userPassword) {
+                                            String userPassword, String userPasswordConfirmation) {
       UserModel userModel = new UserModel();
       userModel.setUserFirstName(userFirstName);
       userModel.setUserLastName(userLastName);
@@ -48,18 +48,18 @@ public class ModelSamples {
 
     public static User getUser() {
       return createUser(1L, "username", "userLastName", "userFirstName",
-        "user@user.com", "useravatarPath", "userPassword", true, true, true,
+        "user@user.com", "developper", "useravatarPath", "userPassword", true, true, true,
         new ArrayList<VerificationToken>(), new ArrayList<Brainstorming>());
     }
     public static User getUser2() {
       return createUser(1L, "user", "Doe", "John",
-        "user2@user.com", null, "user", true, true, false,
+        "user2@user.com", "Développeur front", null, "user", true, true, false,
         null, null);
     }
 
     public static UserModel getUserModel() {
       return createUserModel("username", "lastname",
-        "firstname", "user@user.com", "Azerty!123");
+        "firstname", "user@user.com", "developer", "Azerty!123");
     }
 
 
@@ -67,13 +67,12 @@ public class ModelSamples {
                                                         String userLastName, String userFirstName, String userEmail,
                                                         byte[] userAvatar) {
       return new UserResponseModel(userId, username, userLastName,
-        userFirstName, userEmail,
-        userAvatar);
+        userFirstName, userEmail, userAvatar);
 
     }
 
     public static User createUser(Long userId, String username, String userLastName,
-                                  String userFirstName, String userEmail,
+                                  String userFirstName, String userEmail, String userJob,
                                   String userAvatarPath, String userPassword, Boolean isEmailVerified,
                                   Boolean isUserActive, Boolean isAdmin, List<VerificationToken> verificationTokens,
                                   List<Brainstorming> brainstormings) {

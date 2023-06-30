@@ -50,9 +50,9 @@ public class UserModel {
    */
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   @Pattern(
-    regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+    regexp = "^(?=.*[~!@#$%^&*()_+`\\-=\\[\\].;':,/<>?])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])\\S{12,32}$",
     message =
-      "le mot de passe doit contenir au moins 8 caractères,"
+      "le mot de passe doit contenir au moins 12 caractères,"
         + " une lettre majuscule, une lettre minuscule,"
         + " un chiffre et un caractère spécial")
   private String userPassword;
@@ -65,6 +65,7 @@ public class UserModel {
   /**
    * The password confirmation of the user.
    */
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String userPasswordConfirmation;
 
   /**

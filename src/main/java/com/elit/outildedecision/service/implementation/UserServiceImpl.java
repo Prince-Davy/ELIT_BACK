@@ -148,10 +148,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    */
   @Override
   public ResponseEntity<String> saveUser(final UserModel user) throws UserAlreadyExistsException, CouldNotSaveUserException {
+    if (!user.getUserPassword().equals(user.getUserPasswordConfirmation())) {
+      throw new CouldNotSaveUserException("Les mots de passes ne sont pas identiques.");
+    }
     if (userRepository.existsByUserEmail(user.getUserEmail())) {
       throw new UserAlreadyExistsException("Une erreur est survenue, le compte associé à cet e-mail existe déjà");
     }
-
     try {
       User userToSave =
         User.builder()
@@ -168,7 +170,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       return ResponseEntity.status(HttpStatus.CREATED).body("Votre compte a été créé avec succès");
     } catch (Exception e) {
 
-      throw new CouldNotSaveUserException("Une erreur est survenue lors de la création de votre compte.");
+      throw new CouldNotSaveUserException("Une erreur est survenue lors de votre inscription. Veuillez réessayer plus tard");
     }
   }
   /**

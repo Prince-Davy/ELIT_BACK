@@ -37,7 +37,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTests {
-
   @Mock
   private UserRepository userRepository;
   @Mock
@@ -82,6 +81,8 @@ class UserServiceImplTests {
     when(userRepository.existsByUserEmail(USER_EMAIL)).thenReturn(true);
     UserModel usermodel = new UserModel();
     usermodel.setUserEmail(USER_EMAIL);
+    usermodel.setUserPassword("");
+    usermodel.setUserPasswordConfirmation("");
     assertThrows(UserAlreadyExistsException.class, () -> userServiceImpl.saveUser(usermodel));
   }
 
@@ -89,10 +90,19 @@ class UserServiceImplTests {
   void saveUser_ThrowsCouldNotSaveUserException() {
     UserModel usermodel = new UserModel();
     usermodel.setUserEmail(USER_EMAIL);
+    usermodel.setUserPassword("");
+    usermodel.setUserPasswordConfirmation("");
     when(userRepository.save(user)).thenReturn(user);
     assertThrows(CouldNotSaveUserException.class, () -> userServiceImpl.saveUser(usermodel));
   }
-
+  @Test
+  void updatePasswordDifferent() throws Exception {
+    UserModel usermodel = new UserModel();
+    usermodel.setUserEmail(USER_EMAIL);
+    usermodel.setUserPassword("123456789");
+    usermodel.setUserPasswordConfirmation("987654321");
+     assertThrows(CouldNotSaveUserException.class, () -> userServiceImpl.saveUser(usermodel));
+  }
   @Test
   void updatePasswordUserById_httpNotAcceptable() throws Exception {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
