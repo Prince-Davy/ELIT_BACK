@@ -85,7 +85,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .withSubject(user.getUsername()) // the (email) of the authenticated user
             .withExpiresAt(
                 new Date(
-                    System.currentTimeMillis() + jwtProperties.getExpirationTime())) // the token will expire in 15min
+                    System.currentTimeMillis() + jwtProperties.getAccessTokenExpirationTime())) // the token will expire in 15min
             .withIssuer(
                 request
                     .getRequestURL()
@@ -111,7 +111,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .withSubject(user.getUsername()) // the username of the authenticated user
             .withExpiresAt(
                 new Date(
-                    System.currentTimeMillis() + 2880L * jwtProperties.getExpirationTime())) // the token will expire
+                    System.currentTimeMillis() + jwtProperties.getRefreshTokenExpirationTime())) // the token will expire
             // in 30 days
             .withIssuer(
                 request

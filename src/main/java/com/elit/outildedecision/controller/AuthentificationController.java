@@ -99,7 +99,7 @@ public class AuthentificationController {
         String accessToken =
           JWT.create()
             .withSubject(user.getUserEmail())
-            .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
+            .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getAccessTokenExpirationTime()))
             .withIssuer(request.getRequestURL().toString())
             .withClaim("roles", roles)
             .withClaim("firstname", user.getUserFirstName())
