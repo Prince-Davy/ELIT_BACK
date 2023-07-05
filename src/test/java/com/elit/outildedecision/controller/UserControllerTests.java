@@ -1,9 +1,12 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.AvatarNotFoundException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
+import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,14 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import com.elit.outildedecision.util.ModelSamples.UserSamples;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
@@ -54,6 +63,7 @@ class UserControllerTests {
     userResponseModel = UserSamples.getUserResponseModel();
     user =  UserSamples.getUser();
   }
+
   @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
   void findUserByIdExists() throws Exception {
@@ -115,6 +125,65 @@ class UserControllerTests {
       .andExpect(status().isOk());
   }*/
 
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void updateAvatarByIdUser_Success() throws Exception {
+
+    HashMap<String, String> contentTypeParams = new HashMap<String, String>();
+    MediaType mediaType = new MediaType("multipart", "form-data", contentTypeParams);
+    contentTypeParams.put("boundary", "265001916915724");
+    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",  "<<avatar data>>".getBytes());
+
+    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart("/user/avatar/1").with(request -> {
+      request.setMethod(String.valueOf(HttpMethod.PUT));
+      return request;
+    });
+
+    when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("Votre photo a bien été modifiée."));
+    mockMvc.perform(multipartPut.file((MockMultipartFile) file).contentType(mediaType))
+      .andDo(print())
+      .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void updateAvatarByIdUser_ThrowUserNotFoundException() throws Exception {
+
+    HashMap<String, String> contentTypeParams = new HashMap<String, String>();
+    MediaType mediaType = new MediaType("multipart", "form-data", contentTypeParams);
+    contentTypeParams.put("boundary", "265001916915724");
+    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",  "<<avatar data>>".getBytes());
+
+    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart("/api/user/avatar/1").with(request -> {
+      request.setMethod(String.valueOf(HttpMethod.PUT));
+      return request;
+    });
+
+    when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenThrow(new UserNotFoundException("Cet utilisateur n'existe pas!"));
+    mockMvc.perform(multipartPut.file((MockMultipartFile) file).contentType(mediaType))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void updateAvatarByIdUser_ThrowCouldNotSaveUserException() throws Exception {
+
+    HashMap<String, String> contentTypeParams = new HashMap<String, String>();
+    MediaType mediaType = new MediaType("multipart", "form-data", contentTypeParams);
+    contentTypeParams.put("boundary", "265001916915724");
+    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",  "<<avatar data>>".getBytes());
+
+    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart("/user/avatar/1").with(request -> {
+      request.setMethod(String.valueOf(HttpMethod.PUT));
+      return request;
+    });
+
+    when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenThrow(new CouldNotSaveUserException("Une erreur est survenue lors de l'enregistrement de votre photo."));
+    mockMvc.perform(multipartPut.file((MockMultipartFile) file).contentType(mediaType))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
 
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"})
@@ -136,4 +205,39 @@ class UserControllerTests {
       .andExpect(content().string(containsString("Erreur lors de l'enregistrement")));
   }
 
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void deleteAvatarByIdUser_Success() throws Exception {
+    when(userService.deleteAvatarByIdUser(user.getUserId())).thenReturn(ResponseEntity.ok().body("Photo de profil supprimé avec succès"));
+    mockMvc.perform(delete("/user/avatar/1"))
+      .andDo(print())
+      .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void deleteAvatarByIdUser_ErrorDelete() throws Exception {
+    when(userService.deleteAvatarByIdUser(user.getUserId())).thenReturn(ResponseEntity.badRequest().body("Erreur lors de la suppression de la photo de profil."));
+    mockMvc.perform(delete("/user/avatar/1"))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void deleteAvatarByIdUser_UserNotFound() throws Exception {
+    when(userService.deleteAvatarByIdUser(user.getUserId())).thenThrow(new UserNotFoundException(Constants.USER_NOT_FOUND));
+    mockMvc.perform(delete("/user/avatar/1"))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void deleteAvatarByIdUser_AvatarNotFound() throws Exception {
+    when(userService.deleteAvatarByIdUser(user.getUserId())).thenThrow(new AvatarNotFoundException(Constants.AVATAR_NOT_FOUND));
+    mockMvc.perform(delete("/user/avatar/1"))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+  }
 }

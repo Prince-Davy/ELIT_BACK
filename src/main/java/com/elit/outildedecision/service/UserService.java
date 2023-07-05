@@ -2,6 +2,7 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.AvatarNotFoundException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
@@ -66,12 +67,11 @@ public interface UserService {
    * @param userId     the ID of the user to update the avatar for
    * @param userAvatar a MultipartFile object representing the user's new avatar
    * @return a ResponseEntity indicating the success or failure of the avatar update operation
-   * @throws IOException               if an I/O error occurs while updating the user account data
    * @throws CouldNotSaveUserException if the specified user account could not be updated
    * @throws UserNotFoundException     if the specified user account does not exist
    */
   ResponseEntity<String> updateAvatarByIdUser(Long userId, MultipartFile userAvatar)
-    throws IOException, CouldNotSaveUserException, UserNotFoundException;
+    throws CouldNotSaveUserException, UserNotFoundException;
 
   /**
    * Updates the information (first name, last name) for the user with the specified ID.
@@ -93,9 +93,10 @@ public interface UserService {
    * @param userId   the ID of the user
    *                 to retrieve the avatar for
    * @param response the HttpServletResponse object to write the avatar to
+   * @return A ResponseEntity with a message when avatar not found
    * @throws IOException if an I/O error occurs while retrieving the avatar
    */
-  void viewAvatarByUserId(Long userId, HttpServletResponse response) throws IOException;
+  ResponseEntity<String> viewAvatarByUserId(Long userId, HttpServletResponse response) throws IOException, AvatarNotFoundException;
 
   /**
    * Sends a registration confirmation email to the specified user.
@@ -131,4 +132,16 @@ public interface UserService {
    * @throws IOException           if an I/O error occurs while saving the avatar
    */
   String saveAvatar(MultipartFile avatar) throws UserNotFoundException, IOException;
+
+  /**
+   * Deletes the avatar for the user with the specified ID.
+   *
+   * @param userId     the ID of the user to update the avatar for
+   * @return a ResponseEntity indicating the success or failure of the avatar update operation
+   * @throws IOException               if an I/O error occurs while updating the user account data
+   * @throws UserNotFoundException     if the specified user account does not exist
+   * @throws AvatarNotFoundException     if the specified avatar  does not exist
+   */
+  ResponseEntity<String> deleteAvatarByIdUser(Long userId) throws AvatarNotFoundException, UserNotFoundException;
+
 }

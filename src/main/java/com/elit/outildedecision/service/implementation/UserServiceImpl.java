@@ -3,6 +3,7 @@ package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
+import com.elit.outildedecision.exception.AvatarNotFoundException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
@@ -29,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -205,19 +207,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * @param userAvatar The new avatar file.
    * @return A ResponseEntity with a status code and message indicating the outcome of the update.
    * @throws UserNotFoundException If the specified user cannot be found.
-   * @throws IOException           If there is an error reading or writing the avatar file.
    */
   @Override
   public ResponseEntity<String> updateAvatarByIdUser(final Long userId,
                                                      final MultipartFile userAvatar)
-    throws UserNotFoundException,
-    IOException {
+    throws UserNotFoundException, CouldNotSaveUserException {
     User user = userRepository.findById(userId)
       .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
-    String avatarPath = saveAvatar(userAvatar);
-    user.setUserAvatarPath(avatarPath);
-    userRepository.save(user);
-    return ResponseEntity.status(HttpStatus.OK).body("Votre Photo de profil a été modifiée avec succès");
+    try {
+        String avatarPath = saveAvatar(userAvatar);
+        user.setUserAvatarPath(avatarPath);
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.OK).body("Votre photo a bien été modifiée.");
+  } catch (Exception e) {
+
+        throw new CouldNotSaveUserException("Une erreur est survenue lors de l'enregistrement de votre photo.");
+    }
   }
 
   /**
@@ -248,16 +253,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     return ResponseEntity.status(HttpStatus.OK).body("Vos modifications ont bien été enregistrées");
   }
 
+
   /**
    * Sends a user's avatar file to the client in the response body.
    *
    * @param userId   The ID of the user whose avatar should be sent.
    * @param response The response to write the avatar file to.
-   * @throws IOException If there is an error reading or writing the avatar file.
+   * @return A ResponseEntity with a message avatar not found
+   * @throws IOException             If there is an error reading or writing the avatar file.
    */
   @Override
-  public void viewAvatarByUserId(final Long userId,
-                                 final HttpServletResponse response) throws IOException {
+  public ResponseEntity<String> viewAvatarByUserId(final Long userId,
+                                                   final HttpServletResponse response) throws IOException {
     User user = userRepository.getById(userId);
     String pathAvatar = user.getUserAvatarPath();
     if (!Objects.isNull(pathAvatar)) {
@@ -275,11 +282,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
         FileCopyUtils.copy(inputStream, response.getOutputStream());
       }
-    } else {
-      logger.error("L'avatar n'existe pas.");
     }
-  }
+      logger.error(Constants.AVATAR_NOT_FOUND);
+      return ResponseEntity.status(200).body(Constants.AVATAR_NOT_FOUND);
 
+  }
   /**
    * Updates a user's information given a UserModel object containing the updated information.
    *
@@ -476,7 +483,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
   /**
    * Saves the avatar file uploaded by the user to the specified directory.
-   *
    * @param avatar the avatar file uploaded by the user
    * @return the file path where the avatar file was saved
    * @throws IOException if an I/O error occurs while saving the file
@@ -489,4 +495,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     Files.copy(avatar.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
     return filePath;
   }
+
+  /**
+   * Deletes the avatar for the user with the specified ID.
+   * @param userId     the ID of the user to update the avatar for
+   * @return a ResponseEntity indicating the success or failure of the avatar update operation
+   * @throws UserNotFoundException     if the specified user account does not exist
+   * @throws AvatarNotFoundException     if the specified avatar  does not exist
+   */
+  @Override
+  public ResponseEntity<String> deleteAvatarByIdUser(final Long userId) throws AvatarNotFoundException, UserNotFoundException {
+    User user = userRepository.findById(userId)
+      .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
+
+    String pathAvatar = user.getUserAvatarPath();
+    if (Objects.isNull(pathAvatar)) {
+      throw new AvatarNotFoundException(Constants.AVATAR_NOT_FOUND);
+    }
+
+    File avatarToDelete = new File(pathAvatar);
+    if (FileSystemUtils.deleteRecursively(avatarToDelete)) {
+      user.setUserAvatarPath(null);
+      return ResponseEntity.ok().body("Photo de profil supprimé avec succès");
+    } else {
+      return ResponseEntity.badRequest().body("Erreur lors de la suppression de la photo de profil.");
+    }
+  }
+
 }

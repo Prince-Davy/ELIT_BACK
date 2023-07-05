@@ -145,6 +145,7 @@ class UserServiceImplTests {
     );
     assertEquals(HttpStatus.OK, userServiceImpl.updateAvatarByIdUser(USER_ID, file).getStatusCode());
   }
+
   @Test
   void updateInfosByIdUser_UserNotFoundException() {
     UserModel usermodel = new UserModel();

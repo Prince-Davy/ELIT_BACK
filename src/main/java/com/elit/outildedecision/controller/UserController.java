@@ -1,6 +1,7 @@
 
 package com.elit.outildedecision.controller;
 
+import com.elit.outildedecision.exception.AvatarNotFoundException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.UserModel;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -107,16 +109,15 @@ public class UserController {
    * @param userId id of the user
    * @param userAvatar the new avatar of the user
    * @return UserResponseModel that contains the user's information
-   * @throws IOException IOException
    * @throws CouldNotSaveUserException when the user could not be saved in database
    * @throws UserNotFoundException when the user could not be found in database
    */
   @PutMapping(
       value = "/user/avatar/{userId}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<String> updateAvatarByIdUser(
+  public ResponseEntity<String> uploadAvatarByIdUser(
       @PathVariable final Long userId, @RequestParam final MultipartFile userAvatar)
-    throws IOException, CouldNotSaveUserException, UserNotFoundException {
+    throws CouldNotSaveUserException, UserNotFoundException {
     return userService.updateAvatarByIdUser(userId, userAvatar);
   }
   /**
@@ -143,13 +144,30 @@ public class UserController {
   /**
    * Method to call to get user's avatar by id.
    *
-   * @param userId id of the user
+   * @param userId   id of the user
    * @param response HttpServletResponse to send the avatar to the client
-   * @throws IOException IOException
+   * @return A ResponseEntity with a message when avatar not found
+   * @throws IOException             IOException
+   * @throws AvatarNotFoundException AvatarNotFoundException
    */
   @GetMapping("/user/avatar/{userId}")
-  public void viewAvatarByUserId(final HttpServletResponse response, @PathVariable final Long userId)
-      throws IOException {
-    userService.viewAvatarByUserId(userId, response);
+  public ResponseEntity<String> viewAvatarByUserId(final HttpServletResponse response, @PathVariable final Long userId)
+      throws IOException, AvatarNotFoundException {
+    return userService.viewAvatarByUserId(userId, response);
+  }
+
+  /**
+   * Deletes the avatar for the user with the specified ID.
+   *
+   * @param userId     the ID of the user to update the avatar for
+   * @return a ResponseEntity indicating the success or failure of the avatar update operation
+   * @throws IOException               if an I/O error occurs while updating the user account data
+   * @throws UserNotFoundException     if the specified user account does not exist
+   * @throws AvatarNotFoundException     if the specified avatar  does not exist
+   */
+  @DeleteMapping("/user/avatar/{userId}")
+  public ResponseEntity<String> deleteAvatarByIdUser(
+    @PathVariable final Long userId) throws UserNotFoundException, AvatarNotFoundException {
+    return userService.deleteAvatarByIdUser(userId);
   }
 }

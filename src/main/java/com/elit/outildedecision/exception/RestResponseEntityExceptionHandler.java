@@ -113,6 +113,20 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     ErrorMessage errorMessage = new ErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
   }
+
+  /**
+   * Handles AvatarNotFoundException and returns a response with an error message and HTTP status code 404 (NOT FOUND).
+   *
+   * @param e         The UserNotFoundException to handle.
+   * @param webRequest The WebRequest of the request.
+   * @return A ResponseEntity with an error message and HTTP status code 404 (NOT FOUND).
+   */
+  @ExceptionHandler(AvatarNotFoundException.class)
+  public ResponseEntity<ErrorMessage> avatarNotFoundException(final AvatarNotFoundException e,
+                                                            final WebRequest webRequest) {
+    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+  }
   /**
    * Handles ProjectOwnerException by returning an error response with HTTP status code 404.
    *
