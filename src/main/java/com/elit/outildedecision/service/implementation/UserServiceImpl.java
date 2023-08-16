@@ -216,14 +216,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
     try {
         String avatarPath = saveAvatar(userAvatar);
-        logger.info("avatarPath: {}" + avatarPath);
         user.setUserAvatarPath(avatarPath);
-        logger.info("TOTO 1");
         userRepository.save(user);
-        logger.info("TOTO 2");
         return ResponseEntity.status(HttpStatus.OK).body("Votre photo a bien été modifiée.");
   } catch (Exception e) {
-        logger.error("Une erreur est: ", e);
         throw new CouldNotSaveUserException("Une erreur est survenue lors de l'enregistrement de votre photo.");
     }
   }
@@ -494,7 +490,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public String saveAvatar(final MultipartFile avatar) throws IOException {
     String filePath;
     String folderPath = StringUtils.cleanPath(avatarUploadDir);
-    logger.info("avatarUploadDir: {} ", folderPath);
     filePath = StringUtils.cleanPath(folderPath + avatar.getOriginalFilename());
     Files.copy(avatar.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
     return filePath;

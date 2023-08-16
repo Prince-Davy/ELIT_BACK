@@ -37,8 +37,11 @@ RUN apt-get autoremove -y \
 WORKDIR /app
 COPY --from=BUILDER /app/db ./db
 COPY --from=BUILDER /app/log4j.xml ./log4j.xml
+COPY --from=BUILDER /app/src/main/java/com/elit/outildedecision/util/MultiCriteriaAnalysisFormSchema.Json ./util/MultiCriteriaAnalysisFormSchema.Json
 RUN mkdir -p /app/template
 RUN mkdir -p /app/logs
+RUN mkdir -p /app/avatars
+RUN mkdir -p /app/projects
 COPY --from=BUILDER /app/target/*-SNAPSHOT.jar .
 
 ADD ./filebeat/filebeat.yml /usr/share/filebeat/config/filebeat.yml
