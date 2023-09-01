@@ -152,7 +152,7 @@ public class MultiCriteriaAnalysisController {
 
   /**
    * update the multi-criteria analysis question.
-   * ToDo Delete this EndPoint and tell the FrontEnd
+   * Delete this EndPoint and tell the FrontEnd
    *
    * @param formQuestion the new multi-criteria analysis question
    * @return ResponseEntity<Object>

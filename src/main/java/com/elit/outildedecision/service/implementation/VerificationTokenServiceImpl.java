@@ -129,6 +129,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
    * @param token The token string to validate.
    * @return A response entity indicating the result of the operation.
    */
+
   @Override
   public ResponseEntity<String> confirmUser(final String token) {
     VerificationToken verificationToken = findByToken(token);
@@ -147,7 +148,6 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     userRepository.save(user);
     return ResponseEntity.ok("Account confirmed");
   }
-
   /**
    * This method is used to reinstate a forgotten password. It checks whether the token is valid and
    * not expired. It also checks whether the new password and confirm password match, and if they do,

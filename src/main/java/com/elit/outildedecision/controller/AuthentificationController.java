@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.elit.outildedecision.config.JwtProperties;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.CouldNotMailUserException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.RefreshTokenException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
@@ -123,5 +124,18 @@ public class AuthentificationController {
     } else {
       throw new RefreshTokenException("Refresh token is missing");
     }
+  }
+  /**
+   * Send a new mail for user.
+   *
+   * @param user the user to register
+   * @return ResponseEntity<String>
+   * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
+   * @throws UserAlreadyExistsException the exception thrown when the user already exist
+   */
+  @PostMapping("/sendRegistrationConfirmationEmailAgain")
+  public ResponseEntity<String> sendRegistrationConfirmationEmailAgain(@RequestBody @Valid final UserModel user)
+    throws CouldNotMailUserException, UserAlreadyExistsException {
+    return userService.sendRegistrationConfirmationEmailAgain(user);
   }
 }

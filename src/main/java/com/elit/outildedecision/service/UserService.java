@@ -3,6 +3,7 @@ package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.AvatarNotFoundException;
+import com.elit.outildedecision.exception.CouldNotMailUserException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
@@ -144,4 +145,13 @@ public interface UserService {
    */
   ResponseEntity<String> deleteAvatarByIdUser(Long userId) throws AvatarNotFoundException, UserNotFoundException;
 
+  /**
+   * Sends a registration confirmation email to the specified user again.
+   *
+   * @param user
+   * @return A ResponseEntity with a status code and message indicating the outcome of the update.
+   * @throws UserAlreadyExistsException
+   * @throws CouldNotSaveUserException
+   */
+  ResponseEntity<String> sendRegistrationConfirmationEmailAgain(UserModel user) throws UserAlreadyExistsException, CouldNotMailUserException;
 }

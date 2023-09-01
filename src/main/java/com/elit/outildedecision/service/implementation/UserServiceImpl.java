@@ -4,6 +4,7 @@ package com.elit.outildedecision.service.implementation;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
 import com.elit.outildedecision.exception.AvatarNotFoundException;
+import com.elit.outildedecision.exception.CouldNotMailUserException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
@@ -168,12 +169,29 @@ public class UserServiceImpl implements UserService, UserDetailsService {
           .userPassword(passwordEncoder.encode(user.getUserPassword()))
           .isAdmin(false)
           .build();
-      sendRegistrationConfirmationEmail(userRepository.save(userToSave));
+     sendRegistrationConfirmationEmail(userRepository.save(userToSave));
       return ResponseEntity.status(HttpStatus.CREATED).body("Votre compte a été créé avec succès");
     } catch (Exception e) {
 
       throw new CouldNotSaveUserException("Une erreur est survenue lors de votre inscription. Veuillez réessayer plus tard");
     }
+  }
+  /**
+   * Method to send mail to user to the database.
+   *
+   * @param user
+   * @return A ResponseEntity with a status code and message indicating the outcome of the update.
+   * @throws UserAlreadyExistsException
+   * @throws CouldNotSaveUserException
+   */
+  public ResponseEntity<String> sendRegistrationConfirmationEmailAgain(final UserModel user) throws UserAlreadyExistsException, CouldNotMailUserException {
+     try {
+          User userToMail = userRepository.findByUserEmail(user.getUserEmail());
+          sendRegistrationConfirmationEmail(userToMail);
+          return ResponseEntity.status(HttpStatus.CREATED).body("Le mail à correctement été envoyé");
+      } catch (Exception e) {
+          throw new CouldNotMailUserException("Une erreur est survenue lors de l'envoi du mail. Veuillez réessayer plus tard");
+      }
   }
   /**
    * Updates a user's password given their ID and old and new passwords.
@@ -372,7 +390,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
   }
 
-
   /**
    * Sends a registration confirmation email to a user containing a verification token.
    *
@@ -386,16 +403,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       backEndUrl + "/confirm-account?token=" + verificationToken.getToken();
     String mailBody =
       "Bonjour "
-        + " "
         + user.getUserFirstName()
-        + " "
-        + user.getUserLastName()
         + ",\n\n"
-        + "Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :\n"
+        + "Vous y êtes presque ! Veuillez cliquer sur le lien ci-dessous afin de finaliser la création de votre compte :\n"
         + confirmationUrl
         + "\n\n"
+        + "Attention, le lien a une durée de validité de 48 heures."
         + "Cordialement,\n"
-        + "L'équipe Outil de décision ELIT";
+        + "L'équipe ELIT";
     String mailSubject = "ELIT : Confirmation de votre compte";
     try {
       SimpleMailMessage mailMessage = new SimpleMailMessage();
