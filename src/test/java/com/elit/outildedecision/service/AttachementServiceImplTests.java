@@ -2,7 +2,6 @@ package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
-import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.util.*;
 
 import static org.junit.Assert.assertThrows;

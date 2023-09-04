@@ -10,16 +10,16 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AppUserPrincipalTests {
+ class AppUserPrincipalTests {
 
   @Test
-  void appUserPrincipalTest(){
+   void appUserPrincipalTest(){
     AppUserPrincipal appUserPrincipal = new AppUserPrincipal(new User());
     assertNotNull(appUserPrincipal);
   }
 
   @Test
-   void gettersTest(){
+    void gettersTest(){
     User user = new User();
     user.setUserEmail("user@user.com");
     user.setUserFirstName("firstName");
@@ -33,7 +33,7 @@ class AppUserPrincipalTests {
   }
 
   @Test
-  void booleanTests(){
+   void booleanTests(){
     AppUserPrincipal appUserPrincipal = new AppUserPrincipal(new User());
     assertTrue(appUserPrincipal.isEnabled());
     assertTrue(appUserPrincipal.isAccountNonLocked());
@@ -42,7 +42,7 @@ class AppUserPrincipalTests {
   }
 
   @Test
-  void getAuthoritiesTest(){
+   void getAuthoritiesTest(){
     User userAdmin = new User();
     userAdmin.setIsAdmin(true);
     User userUser = new User();

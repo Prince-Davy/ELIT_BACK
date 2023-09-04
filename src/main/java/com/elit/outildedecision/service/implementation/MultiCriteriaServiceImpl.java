@@ -9,12 +9,12 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.StepWeight;
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
-import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.exception.EscoreException;
+import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.CriteriaScoreModel;
 import com.elit.outildedecision.model.FormQuestionModel;
@@ -162,9 +162,10 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
     return ResponseEntity.ok().body("Votre Analyse multicritère est crée avec succés");
   }
-
   private Project getProject(final Long projectId) throws ProjectNotFoundException {
-    return projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas"));
+    return projectRepository
+      .findById(projectId)
+      .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas"));
   }
 
   private MultiCriteriaAnalysis getExistingMultiCriteriaAnalysis(final Long projectId) {
@@ -285,11 +286,13 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @throws RuntimeException if the project or the step do not exist
    */
   @Override
-  // @PreAuthorize("isProjectOwner(#projectId)")
-  public void updateMultiCriteriaAnalysis(final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep)
-    throws StepFormNotFoundException {
-    FormStep formStepToUpdate = formStepRepo.findById(multiCriteriaAnalysisStep.getStepId())
-      .orElseThrow(() -> new StepFormNotFoundException("cette étape n'existe pas"));
+ // @PreAuthorize("isProjectOwner(#projectId)")
+  public void updateMultiCriteriaAnalysis(
+    final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException {
+    FormStep formStepToUpdate =
+      formStepRepo
+        .findById(multiCriteriaAnalysisStep.getStepId())
+        .orElseThrow(() -> new StepFormNotFoundException("cette étape n'existe pas"));
     Set<FormQuestion> formQuestionListToUpdate = formStepToUpdate.getFormQuestions();
     Set<StepWeight> stepWeightsToUpdate = formStepToUpdate.getStepWeights();
     Set<FormQuestion> formQuestions = multiCriteriaAnalysisStep.getFormQuestions();
@@ -421,15 +424,23 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @throws UserNotAuthorizedException if the user does not have the necessary permissions to update the iteration number
    */
   @Override
-  public void increaseMulticriteriaIteration(final Long analyseId) throws MulticriteriaNotFoundException, UserNotAuthorizedException {
-    MultiCriteriaAnalysis multiCriteriaAnalysis = multiCriteriaAnalysisRepository.findById(analyseId)
-      .orElseThrow(() -> new MulticriteriaNotFoundException("Cette analyse multicritères n'existe pas."));
+  public void increaseMulticriteriaIteration(final Long analyseId)
+    throws MulticriteriaNotFoundException, UserNotAuthorizedException {
+    MultiCriteriaAnalysis multiCriteriaAnalysis =
+      multiCriteriaAnalysisRepository
+        .findById(analyseId)
+        .orElseThrow(
+          () ->
+            new MulticriteriaNotFoundException(
+              "Cette analyse multicritères n'existe pas."));
     Project project = multiCriteriaAnalysis.getProject();
     if (checkPermissions(project.getProjectId(), ProjectPermession.CDP.name())) {
-      multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
+      multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(
+        multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
       multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
     } else {
-      throw new UserNotAuthorizedException("Vous n'êtes pas autorisé à changer l'itération de cette analyse multicritères.");
+      throw new UserNotAuthorizedException(
+        "Vous n'êtes pas autorisé à changer l'itération de cette analyse multicritères.");
     }
   }
 
@@ -444,13 +455,12 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    */
   @Override
   public boolean increaseMulticriteriaIteration(final Long projectId, final Long analyseId) throws MulticriteriaNotFoundException {
-
     MultiCriteriaAnalysis multiCriteriaAnalysis = multiCriteriaAnalysisRepository.findById(analyseId)
-      .orElseThrow(() -> new MulticriteriaNotFoundException("Cette analyse multicritères n'existe pas."));
+    .orElseThrow(() -> new MulticriteriaNotFoundException("Cette analyse multicritères n'existe pas."));
     if (Objects.equals(multiCriteriaAnalysis.getProject().getProjectId(), projectId)) {
-      multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
-      multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
-      return true;
+        multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
+        multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
+        return true;
     }
     return false;
   }

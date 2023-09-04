@@ -57,7 +57,7 @@ class SurveyAnswerControllerTests {
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"USER"})
   void shouldReplyToQuestion_Success() throws Exception {
     List<SurveyAnswerRequestModel> SurveyAnswerRequestModelList = Arrays.asList(surveyAnswerRequestModel);
     when(surveyAnswerService.replyToQuestion(SurveyAnswerRequestModelList)).thenReturn(ResponseEntity.ok().body("reponses enregistrées avec succès"));
@@ -70,7 +70,7 @@ class SurveyAnswerControllerTests {
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"USER"})
   void shouldGetUserAnswer_Success() throws Exception {
       when(surveyAnswerService.getUserAnswer(UserSamples.getUser().getUserId())).thenReturn(Arrays.asList(surveyAnswerResponseModel));
       mockMvc.perform(get("/survey/answer/" + UserSamples.getUser().getUserId()))
@@ -80,7 +80,7 @@ class SurveyAnswerControllerTests {
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"USER"})
   void shouldGetUserAnswer_ThrowUserNotFoundException() throws Exception {
     when(surveyAnswerService.getUserAnswer(UserSamples.getUser().getUserId())).thenThrow(new UserNotFoundException("UserNotFoundException"));
     mockMvc.perform(get("/survey/answer/" + UserSamples.getUser().getUserId()))
@@ -88,16 +88,5 @@ class SurveyAnswerControllerTests {
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.status").value("NOT_FOUND"))
       .andExpect(jsonPath("$.message").value("UserNotFoundException"));
-  }
-
-  @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
-  void shouldGetSurveyReport_Success() throws Exception {
-    when(surveyAnswerService.getSurveyReport(pageNumber)).thenReturn(Arrays.asList(surveyAnswerResponseModel));
-    mockMvc.perform(get("/survey/answer/page/" + pageNumber))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().json(ModelSamples.toJson(Arrays.asList(surveyAnswerResponseModel))));
-
   }
 }

@@ -194,14 +194,6 @@ public class MultiCriteriaServiceImplTests {
   }
 
   @Test
-  public void getMulticriteriaAnalysisTest() throws ProjectNotFoundException {
-    when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
-
-    Optional<MulticriteriaAnalyseResponseModel> response = multiCriteriaServiceImpl.getMulticriteriaAnalysis(1L);
-    assertTrue(response.isPresent());
-  }
-
-  @Test
   public void updateMultiCriteriaAnalysisTest() throws StepFormNotFoundException {
 
     when(formStepRepo.findById(1l)).thenReturn(Optional.of(formStep));

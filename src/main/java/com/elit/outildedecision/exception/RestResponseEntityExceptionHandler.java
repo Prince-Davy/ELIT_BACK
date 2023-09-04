@@ -61,6 +61,35 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
   }
+
+  /**
+   * Handles VoteAlreadyExistsException by returning an error response with HTTP status code 409.
+   *
+   * @param ex      the FormStepAlreadyExistsException instance containing the error message
+   * @param request the web request
+   * @return the ResponseEntity containing the error message and HTTP status code 409
+   */
+  @ExceptionHandler(VoteAlreadyExistException.class)
+  public ResponseEntity<ErrorMessage> voteAlreadyExistsException(final VoteAlreadyExistException ex,
+                                                                 final WebRequest request) {
+    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
+  }
+
+  /**
+   * Handles VoteNotFoundException and returns a response with an error message and HTTP status code 404 (NOT FOUND).
+   *
+   * @param e          The VoteNotFoundException to handle.
+   * @param webRequest The WebRequest of the request.
+   * @return A ResponseEntity with an error message and HTTP status code 404 (NOT FOUND).
+   */
+  @ExceptionHandler(VoteNotFoundException.class)
+  public ResponseEntity<ErrorMessage> voteNotFoundException(final VoteNotFoundException e,
+                                                            final WebRequest webRequest) {
+    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+  }
+
   /**
    * Handles CouldNotSaveUserException and returns a response with an error message and HTTP status code 400 (BAD REQUEST).
    *
@@ -215,8 +244,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   @ExceptionHandler(ExistingBrainstormingException.class)
   public ResponseEntity<ErrorMessage> existingBrainstormingException(final ExistingBrainstormingException e,
                                                                      final WebRequest webRequest) {
-    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+    ErrorMessage errorMessage = new ErrorMessage(HttpStatus.CONFLICT, e.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
   }
   /**
    * Handles QuestionsNotFoundException by returning an error response with HTTP status code 302.

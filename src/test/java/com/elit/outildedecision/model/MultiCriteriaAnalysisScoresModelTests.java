@@ -6,11 +6,11 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MultiCriteriaAnalysisScoresModelTests {
+ class MultiCriteriaAnalysisScoresModelTests {
   @Test
-  void getMultiCriteriaStepScoresTest(){
+   void getMultiCriteriaStepScoresTest(){
     MultiCriteriaStepScoreModel multiCriteriaStepScoreModel = new MultiCriteriaStepScoreModel();
-    List<MultiCriteriaStepScoreModel> mcsList = new ArrayList<>();
+    List<MultiCriteriaStepScoreModel> mcsList = new ArrayList<MultiCriteriaStepScoreModel>();
     mcsList.add(multiCriteriaStepScoreModel);
     MultiCriteriaAnalysisScoreModel mcasm = new MultiCriteriaAnalysisScoreModel();
     mcasm.setMultiCriteriaStepScores(mcsList);

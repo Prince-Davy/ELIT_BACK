@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ChatMessageTests {
+ class ChatMessageTests {
 
   @Test
-  void getAndSetTests(){
+   void getAndSetTests(){
     final String username = "username";
     final String avatar = "";
     final String messageBody ="messageBody";

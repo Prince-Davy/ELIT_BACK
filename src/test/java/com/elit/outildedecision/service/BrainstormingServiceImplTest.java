@@ -4,6 +4,7 @@ import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.exception.BrainstormingNotFoundException;
 import com.elit.outildedecision.exception.ExistingBrainstormingException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.repository.*;
 import com.elit.outildedecision.service.implementation.BrainstormingServiceImpl;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -92,21 +92,29 @@ class BrainstormingServiceImplTest {
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
     when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.empty());
-    BrainstormingNotFoundException p = Assertions.assertThrows(BrainstormingNotFoundException.class, ()-> brainstormingService.validateOrRejectBrainstorming(1L,entity));
+    BrainstormingNotFoundException p = Assertions.assertThrows(BrainstormingNotFoundException.class, ()-> brainstormingService.validateOrRejectBrainstorming(1L, 1L, entity));
     Assertions.assertEquals(BRAINSTORMING_DOESNT_EXIST, p.getMessage());
   }
 
   @Test
   void testValidateOrRejectBrainstorming() throws Exception {
+    Project project = new Project();
+    project.setProjectId(10L);
 
+    MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+    multiCriteriaAnalysis.setProject(project);
+
+    PredictibilityAnalysis predictibilityAnalysis = new PredictibilityAnalysis();
+    predictibilityAnalysis.setMultiCriteriaAnalysis(multiCriteriaAnalysis);
     // Create a Brainstorming object
     Brainstorming brainstorming = new Brainstorming();
     brainstorming.setBrainstormingId(1L);
     brainstorming.setIsChecked(false);
-
+    brainstorming.setPredictibilityAnalysis(predictibilityAnalysis);
+    
+   
     // Set up the repository to return the Brainstorming object when findById is called
     when(brainstormingRepository.findById(1L)).thenReturn(Optional.of(brainstorming));
-
     // Create an HttpEntity containing a JSON object with a "isConfirmed" field set to true
     String json = "{\"isConfirmed\": true}";
     HttpHeaders headers = new HttpHeaders();
@@ -114,7 +122,7 @@ class BrainstormingServiceImplTest {
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
 
     // Call the method under test
-    ResponseEntity<String> response = brainstormingService.validateOrRejectBrainstorming(1L, entity);
+    ResponseEntity<String> response = brainstormingService.validateOrRejectBrainstorming(10L, 1L,  entity);
 
     // Assert that the Brainstorming object was updated correctly
     assertEquals(true, brainstorming.getIsChecked());
@@ -127,33 +135,45 @@ class BrainstormingServiceImplTest {
   @Test
   void getBrainstorming_throwPredictibilityAnalysisNotFoundException() {
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.empty());
-    PredictibilityAnalysisNotFoundException p = Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, ()-> brainstormingService.getBrainstorming(1L));
+    PredictibilityAnalysisNotFoundException p = Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, ()-> brainstormingService.getBrainstorming(1L, 1L));
     Assertions.assertEquals(ANALYSIS_DOESNT_EXIST, p.getMessage());
   }
 
   @Test
-  void getBrainstorming_Success() throws PredictibilityAnalysisNotFoundException {
+  void getBrainstorming_Success() throws PredictibilityAnalysisNotFoundException, ProjectNotFoundException {
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(predictibilityAnalysis));
-    assertEquals(HttpStatus.OK,brainstormingService.getBrainstorming(1L).getStatusCode());
+    assertEquals(HttpStatus.OK,brainstormingService.getBrainstorming(1L, 1L).getStatusCode());
   }
 
   @Test
-  void getBrainstormingAbstract_Success() throws PredictibilityAnalysisNotFoundException {
+  void getBrainstormingAbstract_Success() throws PredictibilityAnalysisNotFoundException, ProjectNotFoundException {
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(predictibilityAnalysis));
-    assertEquals(HttpStatus.OK,brainstormingService.getBrainstormingAbstract(1L).getStatusCode());
+    assertEquals(HttpStatus.OK,brainstormingService.getBrainstormingAbstract(1L, 1L).getStatusCode());
   }
 
   @Test
   void deleteBrainstorming_BrainstormingNotFoundException() {
     when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.empty());
-    BrainstormingNotFoundException p = Assertions.assertThrows(BrainstormingNotFoundException.class, ()-> brainstormingService.deleteBrainstorming(1L));
+    BrainstormingNotFoundException p = Assertions.assertThrows(BrainstormingNotFoundException.class, ()-> brainstormingService.deleteBrainstorming(1L,1L));
     Assertions.assertEquals(BRAINSTORMING_DOESNT_EXIST, p.getMessage());
   }
 
   @Test
   void deleteBrainstorming_Success() throws Exception {
-    when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.of(brainstorming));
-    assertEquals(HttpStatus.OK,brainstormingService.deleteBrainstorming(1L).getStatusCode());
+    Project project = new Project();
+    project.setProjectId(10L);
+
+    MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+    multiCriteriaAnalysis.setProject(project);
+
+    PredictibilityAnalysis predictibilityAnalysis = new PredictibilityAnalysis();
+    predictibilityAnalysis.setMultiCriteriaAnalysis(multiCriteriaAnalysis);
+    // Create a Brainstorming object
+    Brainstorming brainstorming = new Brainstorming();
+    brainstorming.setBrainstormingId(1L);
+    brainstorming.setPredictibilityAnalysis(predictibilityAnalysis);
+    when(brainstormingRepository.findById(1L)).thenReturn(Optional.of(brainstorming));
+    assertEquals(HttpStatus.OK,brainstormingService.deleteBrainstorming(10L, 1L).getStatusCode());
   }
 
   @Test
@@ -168,7 +188,7 @@ class BrainstormingServiceImplTest {
     SecurityContextHolder.setContext(securityContext);
     when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.empty());
-    Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, ()-> brainstormingService.createBrainstorming(brainstormingModel));
+    Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, ()-> brainstormingService.createBrainstorming(1L, brainstormingModel));
   }
 
   @Test
@@ -186,11 +206,11 @@ class BrainstormingServiceImplTest {
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(predictibilityAnalysis));
     when(brainstormingRepository.findByUserQuestionPredictibilityId(anyLong(),anyLong(),anyLong()))
       .thenReturn(brainstorming);
-    Assertions.assertThrows(ExistingBrainstormingException.class, ()-> brainstormingService.createBrainstorming(brainstormingModel));
+    Assertions.assertThrows(ExistingBrainstormingException.class, ()-> brainstormingService.createBrainstorming(1L, brainstormingModel));
   }
 
   @Test
-  void createBrainstorming_Success() throws ExistingBrainstormingException, PredictibilityAnalysisNotFoundException {
+  void createBrainstorming_Success() throws ExistingBrainstormingException, PredictibilityAnalysisNotFoundException, ProjectNotFoundException {
     Authentication authentication = mock(Authentication.class);
     when(authentication.getPrincipal()).thenReturn("test@test.com");
     BrainstormingModel brainstormingModel = new BrainstormingModel();
@@ -204,7 +224,7 @@ class BrainstormingServiceImplTest {
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(predictibilityAnalysis));
     when(brainstormingRepository.findByUserQuestionPredictibilityId(1L,0L,1L))
       .thenReturn(null);
-    assertEquals(HttpStatus.OK,brainstormingService.createBrainstorming(brainstormingModel).getStatusCode());
+    assertEquals(HttpStatus.OK,brainstormingService.createBrainstorming(1L, brainstormingModel).getStatusCode());
   }
 
   @Test
@@ -214,11 +234,11 @@ class BrainstormingServiceImplTest {
     brainstormingModel.setPredictibilityAnalysisId(0L);
     brainstormingModel.setQuestionId(0L);
     when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.empty());
-    assertThrows(BrainstormingNotFoundException.class,() -> brainstormingService.updateBrainstorming(brainstormingModel));
+    assertThrows(BrainstormingNotFoundException.class,() -> brainstormingService.updateBrainstorming(1L, brainstormingModel));
   }
 
   @Test
-  void updateBrainstorming_Success() throws BrainstormingNotFoundException {
+  void updateBrainstorming_Success() throws BrainstormingNotFoundException, ProjectNotFoundException {
     when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.of(brainstorming));
     Authentication authentication = mock(Authentication.class);
     when(authentication.getPrincipal()).thenReturn("test@test.com");
@@ -227,15 +247,25 @@ class BrainstormingServiceImplTest {
     SecurityContextHolder.setContext(securityContext);
     when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     BrainstormingModel brainstormingModel = new BrainstormingModel();
+    Project project = new Project();
+    project.setProjectId(10L);
+
+    MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+    multiCriteriaAnalysis.setProject(project);
+
+    PredictibilityAnalysis predictibilityAnalysis = new PredictibilityAnalysis();
+    predictibilityAnalysis.setMultiCriteriaAnalysis(multiCriteriaAnalysis);
+
     brainstormingModel.setBrainstormingId(0L);
     brainstormingModel.setPredictibilityAnalysisId(0L);
     brainstormingModel.setQuestionId(0L);
     brainstorming.setUser(user);
-    assertEquals(HttpStatus.OK,brainstormingService.updateBrainstorming(brainstormingModel).getStatusCode());
+    brainstorming.setPredictibilityAnalysis(predictibilityAnalysis);
+    assertEquals(HttpStatus.OK,brainstormingService.updateBrainstorming(10L, brainstormingModel).getStatusCode());
   }
 
   @Test
-  void updateBrainstorming_Forbidden() throws BrainstormingNotFoundException {
+  void updateBrainstorming_Forbidden() throws BrainstormingNotFoundException, ProjectNotFoundException {
     when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.of(brainstorming));
     User userNotTheSame = new User();
     userNotTheSame.setUserId(10L);
@@ -245,11 +275,20 @@ class BrainstormingServiceImplTest {
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
     when(userRepository.findByUserEmail("test@test.com")).thenReturn(userNotTheSame);
+    Project project = new Project();
+    project.setProjectId(10L);
+
+    MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+    multiCriteriaAnalysis.setProject(project);
+
+    PredictibilityAnalysis predictibilityAnalysis = new PredictibilityAnalysis();
+    predictibilityAnalysis.setMultiCriteriaAnalysis(multiCriteriaAnalysis);
     BrainstormingModel brainstormingModel = new BrainstormingModel();
     brainstormingModel.setBrainstormingId(0L);
     brainstormingModel.setPredictibilityAnalysisId(0L);
     brainstormingModel.setQuestionId(0L);
     brainstorming.setUser(user);
-    assertEquals(HttpStatus.FORBIDDEN,brainstormingService.updateBrainstorming(brainstormingModel).getStatusCode());
+    brainstorming.setPredictibilityAnalysis(predictibilityAnalysis);
+    assertEquals(HttpStatus.FORBIDDEN,brainstormingService.updateBrainstorming(10L, brainstormingModel).getStatusCode());
   }
 }

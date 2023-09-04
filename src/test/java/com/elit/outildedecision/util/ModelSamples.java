@@ -192,6 +192,7 @@ public class ModelSamples {
       FormStep formStep = new FormStep();
       formStep.setStepName("step1");
       formStep.setStepId(1l);
+      formStep.setMultiCriteriaAnalysis(ModelSamples.MultiCriteriaAnalysisModel.getMultiCriteriaAnalysis());
       return formStep;
     }
 
@@ -200,6 +201,15 @@ public class ModelSamples {
     }
   }
 
+  public static class MultiCriteriaAnalysisModel {
+    public static MultiCriteriaAnalysis getMultiCriteriaAnalysis() {
+     MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+     multiCriteriaAnalysis.setMultiCriteriaAnalysisId(1L);
+
+     return multiCriteriaAnalysis;
+    }
+
+  }
   public static class OpinionSamples {
     public static Opinion getOpinion() {
       Opinion opinion = new Opinion();

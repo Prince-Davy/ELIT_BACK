@@ -1,11 +1,12 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
+
 import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
-import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.exception.EscoreException;
+import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
@@ -38,8 +39,9 @@ public class MultiCriteriaAnalysisController {
   private final MultiCriteriaAnalysisService multiCriteriaAnalysisService;
 
   /**
-   * Constructor for MultiCriteriaAnalysisController. dependency injection for MultiCriteriaAnalysisService
    *
+   * Constructor for MultiCriteriaAnalysisController.
+   * dependency injection for MultiCriteriaAnalysisService
    * @param multiCriteriaAnalysisService MultiCriteriaAnalysisService
    */
   public MultiCriteriaAnalysisController(final MultiCriteriaAnalysisService multiCriteriaAnalysisService) {
@@ -55,8 +57,10 @@ public class MultiCriteriaAnalysisController {
    */
   @PostMapping("/multi-criteria-analysis/{projectId}")
   @PreAuthorize("isProjectOwner(#projectId)")
-  public ResponseEntity<String> createMultiCriteriaAnalysis(@PathVariable("projectId") final Long projectId)
-    throws IOException, ParseException, org.json.simple.parser.ParseException, ProjectNotFoundException {
+  public ResponseEntity<String> createMultiCriteriaAnalysis(
+      @PathVariable("projectId") final Long projectId)
+    throws IOException, ParseException,
+    org.json.simple.parser.ParseException, ProjectNotFoundException {
     return multiCriteriaAnalysisService.createMulticriteriaAnalysisForm(projectId);
   }
 
@@ -83,10 +87,10 @@ public class MultiCriteriaAnalysisController {
    *
    * @param projectId the project id
    * @param analyseId the multi-criteria analysis id
-   * @return ResponseEntity<Object>
    * @throws MulticriteriaNotFoundException when the multi-criteria analysis is not found in the database
    * @throws UserNotAuthorizedException when the user is not authorized to perform this action
    * @throws ProjectNotFoundException if the specified project does not exist
+   * @return ResponseEntity<Object>
    */
   @PutMapping("/{projectId}/multi-criteria-analysis/iteration/{analyseId}")
   @PreAuthorize("isProjectOwner(#projectId)")
@@ -150,34 +154,4 @@ public class MultiCriteriaAnalysisController {
     return ResponseEntity.ok().body(multiCriteriaAnalysisService.calculateMultiCriteriaAnalysisScore(projectId));
   }
 
-  /**
-   * update the multi-criteria analysis question.
-   * Delete this EndPoint and tell the FrontEnd
-   *
-   * @param formQuestion the new multi-criteria analysis question
-   * @return ResponseEntity<Object>
-   * @throws MulticriteriaNotFoundException when the multi-criteria analysis is not found in the database
-   */
-  @PutMapping("/multi-criteria-analysis/question")
-  public ResponseEntity<String> updateQuestion(@RequestBody final FormQuestionModel formQuestion) throws MulticriteriaNotFoundException {
-    multiCriteriaAnalysisService.updateMultiCriteriaQuestion(formQuestion);
-    return ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés");
-
-  }
-
-  /**
-   * increase the iteration of the multi-criteria analysis.
-   * ToDo delite this API ; it was replaced by increaseMulticriteriaIteration
-   *
-   * @param analyseId the multi-criteria analysis id
-   * @return ResponseEntity<Object>
-   * @throws MulticriteriaNotFoundException when the multi-criteria analysis is not found in the database
-   * @throws UserNotAuthorizedException when the user is not authorized to perform this action
-   */
-  @PutMapping("/multi-criteria-analysis/iteration/{analyseId}")
-  public ResponseEntity<String> increaseMulticriteriaIterationV1(@PathVariable final Long analyseId)
-    throws MulticriteriaNotFoundException, UserNotAuthorizedException {
-    multiCriteriaAnalysisService.increaseMulticriteriaIteration(analyseId);
-    return ResponseEntity.ok().body("L'analyse multicritères a bien changé d'itération.");
-  }
 }

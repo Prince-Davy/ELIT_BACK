@@ -1,21 +1,25 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.ProjectUserPermission;
+import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.ProjectService;
+import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,31 +35,37 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 /**
  * Unit test for ProjectController
  */
-@SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
+@RunWith(MockitoJUnitRunner.class)
 class ProjectControllerTest {
-  @Autowired
+
   private MockMvc mockMvc;
 
-  @MockBean
+  @Mock
   ProjectService projectService;
-  @MockBean
+  @Mock
   CustomMethodSecurityExpressionRoot customMethodSecurity;
 
   @InjectMocks
-  private ProjectController ProjectController;
+  private ProjectController projectController;
 
   private List<MultipartFile> files;
+
+  private User user;
+  private Project project;
+  private ProjectUserPermission permission;
 
   @BeforeEach
   public void setup() {
@@ -67,6 +77,19 @@ class ProjectControllerTest {
         "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
     files = new ArrayList<>();
     files.add(fileMultipart);
+
+    MockitoAnnotations.initMocks(this);
+    mockMvc = standaloneSetup(projectController).setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
+
+    user = new User();
+    user.setUserEmail("user@user.com");
+    project = new Project();
+    project.setProjectId(1L);
+    permission = new ProjectUserPermission();
+    permission.setProject(project);
+    permission.setUser(user);
+    permission.setPermission(ProjectPermession.CONTRIBUTER.name());
+    user.setUserProjectPermissions(List.of(permission));
   }
 
   @WithMockUser(authorities = {"USER"})
@@ -150,33 +173,28 @@ class ProjectControllerTest {
     Assertions.assertEquals(200, response.getStatus());
   }
 
+
   @WithMockUser(authorities = {"ADMIN"})
   @Test
-  void validateOrRejectProjec_ProjectNotFound() throws Exception {
-    Long id = 1L;
-    HttpEntity<String> isConfirmed = new HttpEntity<>("confirme");
-    when(projectService.validateOrRejectProject(id, isConfirmed)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas!"));
-    Exception exception = assertThrows(ProjectNotFoundException.class, () -> {
-      projectService.validateOrRejectProject(id, isConfirmed);
-    });
-    String expectedMessage ="Ce Projet n'existe pas!";
-    String actualMessage = exception.getMessage();
-    assertTrue(actualMessage.contains(expectedMessage));
+  void deleteProjectADMIN_Success() throws Exception {
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.deleteProject(project.getProjectId())).thenReturn(ResponseEntity.ok().body("Le projet a été bien supprimé"));
+
+    mockMvc.perform(delete("/admin/projects/"+project.getProjectId()))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Le projet a été bien supprim")));
+
+    verify(projectService, times(1)).deleteProject(project.getProjectId());
+
   }
 
   @WithMockUser(authorities = {"ADMIN"})
   @Test
-  void deleteProjectAdmin() throws Exception {
+  void deleteProjectAdmin_whenProjectNotFound() throws Exception {
     Long id = 1L;
-    when(projectService.deleteProject(id)).thenReturn(ResponseEntity.ok().body("Le projet a été bien supprimé"));
-    MockHttpServletResponse response = mockMvc.perform(delete("/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
-    Assertions.assertEquals(200, response.getStatus());
-  }
-
-  @WithMockUser(authorities = {"ADMIN"})
-  @Test
-  void deleteProjectAdmin_whenProjectDoseNotFound() throws Exception {
-    Long id = 1L;
+    when(customMethodSecurity.isProjectOwner(id)).thenReturn(true);
     when(projectService.deleteProject(id)).thenThrow(new ProjectNotFoundException("Ce project n'existe pas !"));
     MockHttpServletResponse response = mockMvc.perform(delete("/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
@@ -184,31 +202,71 @@ class ProjectControllerTest {
 
   @WithMockUser(authorities = {"USER"})
   @Test
-  void deleteProject() throws Exception {
-    Long id = 1L;
-    when(customMethodSecurity.isProjectOwner(id)).thenReturn(true);
-    when(projectService.deleteProject(id)).thenReturn(ResponseEntity.ok().body("Le projet a été bien supprimé"));
-    Assertions.assertEquals("Le projet a été bien supprimé", projectService.deleteProject(id).getBody());
+  void deleteProject_Success() throws Exception {
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.deleteProject(project.getProjectId())).thenReturn(ResponseEntity.ok().body("Le projet a été bien supprimé"));
+
+    mockMvc.perform(delete("/user/projects/"+project.getProjectId()))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Le projet a été bien supprim")));
+
+    verify(projectService, times(1)).deleteProject(project.getProjectId());
+
   }
 
-  @WithMockUser(authorities = {"ADMIN"})
+  @WithMockUser(authorities = {"USER"})
   @Test
   void deleteProject_whenProjectNotFound() throws Exception {
     Long id = 1L;
     when(customMethodSecurity.isProjectOwner(id)).thenReturn(true);
     when(projectService.deleteProject(id)).thenThrow(new ProjectNotFoundException("Ce project n'existe pas !"));
-    MockHttpServletResponse response = mockMvc.perform(delete("/admin/projects/"+id)).andDo(print()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(delete("/user/projects/"+id)).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(404, response.getStatus());
+  }
+  @WithMockUser(authorities = {"USER"})
+  @Test
+  void addProjectContributor_Success() throws Exception {
+    ContributerModel contributor = new ContributerModel();
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.addProjectContributor(project.getProjectId(), contributor)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien enregistré"));
+
+    mockMvc.perform(post("/user/projects/"+project.getProjectId()+"/add-contributor"))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Le collaborateur a")));
+
+    verify(projectService, times(1)).addProjectContributor(project.getProjectId(), contributor);
   }
 
   @WithMockUser(authorities = {"USER"})
   @Test
-  void addProjectContributor() throws Exception {
-    Long projectId = 1L;
+  void addProjectContributor_ThrowProjectNOtFound() throws Exception {
     ContributerModel contributor = new ContributerModel();
-    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
-    when(projectService.addProjectContributor(projectId, contributor)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien enregistré"));
-    Assertions.assertEquals("Le collaborateur a été bien enregistré", projectService.addProjectContributor(projectId, contributor).getBody());
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.addProjectContributor(project.getProjectId(), contributor)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas! "));
+
+    mockMvc.perform(post("/user/projects/"+project.getProjectId()+"/add-contributor"))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+    verify(projectService, times(1)).addProjectContributor(project.getProjectId(), contributor);
+  }
+
+  @WithMockUser(authorities = {"USER"})
+  @Test
+  void addProjectContributor_ThrowUserNotFound() throws Exception {
+    ContributerModel contributor = new ContributerModel();
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.addProjectContributor(project.getProjectId(), contributor)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas! "));
+
+    mockMvc.perform(post("/user/projects/"+project.getProjectId()+"/add-contributor"))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+    verify(projectService, times(1)).addProjectContributor(project.getProjectId(), contributor);
   }
 
   @WithMockUser(authorities = {"USER"})
@@ -227,40 +285,43 @@ class ProjectControllerTest {
 
   @WithMockUser(authorities = {"USER"})
   @Test
-  void deleteProjectContributor() throws Exception {
-    Long projectId = 1L;
-    Long contributorID =2L;
-    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
-    when(projectService.deleteProjectContributor(projectId, contributorID)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet"));
-    Assertions.assertEquals("Le collaborateur a été bien retiré du projet", projectService.deleteProjectContributor(projectId, contributorID).getBody());
+  void DeleteProjectContributor_Success() throws Exception {
+    Long contributorId =2L;
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.deleteProjectContributor(project.getProjectId(), contributorId)).thenReturn(ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet"));
+
+    mockMvc.perform(delete("/user/projects/"+project.getProjectId()+"/delete-contributor/"+contributorId))
+      .andDo(print())
+      .andExpect(status().isOk());
+    verify(projectService, times(1)).deleteProjectContributor(project.getProjectId(), contributorId);
   }
 
   @WithMockUser(authorities = {"USER"})
   @Test
-  void deleteProjectContributor_whenProjectNotFound() throws Exception {
-    Long projectId = 1L;
-    Long contributorID =2L;
-    when(projectService.deleteProjectContributor(projectId, contributorID)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas!"));
-    Exception exception = assertThrows(ProjectNotFoundException.class, () -> {
-      projectService.deleteProjectContributor(projectId, contributorID);
-    });
-    String expectedMessage ="Ce Projet n'existe pas!";
-    String actualMessage = exception.getMessage();
-    assertTrue(actualMessage.contains(expectedMessage));
+  void DeleteProjectContributor_ThrowProjectNotFound() throws Exception {
+    Long contributorId =2L;
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.deleteProjectContributor(project.getProjectId(), contributorId)).thenThrow(new ProjectNotFoundException("Ce Projet n'existe pas!"));
+
+    mockMvc.perform(delete("/user/projects/"+project.getProjectId()+"/delete-contributor/"+contributorId))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+    verify(projectService, times(1)).deleteProjectContributor(project.getProjectId(), contributorId);
   }
 
   @WithMockUser(authorities = {"USER"})
   @Test
-  void deleteProjectContributor_whenUserNotFound() throws Exception {
-    Long projectId = 1L;
-    Long contributorID =2L;
-    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
-    when(projectService.deleteProjectContributor(projectId, contributorID)).thenThrow(new ProjectNotFoundException("Cet utilisateur n'existe pas dans le projet !"));
-    Exception exception = assertThrows(ProjectNotFoundException.class, () -> {
-      projectService.deleteProjectContributor(projectId, contributorID);
-    });
-    String expectedMessage ="Cet utilisateur n'existe pas dans le projet !";
-    String actualMessage = exception.getMessage();
-    assertTrue(actualMessage.contains(expectedMessage));
+  void DeleteProjectContributor_ThrowUserNotFound() throws Exception {
+    Long contributorId =2L;
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.deleteProjectContributor(project.getProjectId(), contributorId)).thenThrow(new ProjectNotFoundException("Cet utilisateur n'existe pas dans le projet !"));
+
+    mockMvc.perform(delete("/user/projects/"+project.getProjectId()+"/delete-contributor/"+contributorId))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+    verify(projectService, times(1)).deleteProjectContributor(project.getProjectId(), contributorId);
   }
 }

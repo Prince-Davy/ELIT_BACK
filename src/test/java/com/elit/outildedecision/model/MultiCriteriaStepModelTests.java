@@ -3,11 +3,10 @@ package com.elit.outildedecision.model;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-class MultiCriteriaStepModelTests {
+ class MultiCriteriaStepModelTests {
 
   @Test
-  void toStringTest() {
+   void toStringTest() {
     MultiCriteriaStepModel mcsm = new MultiCriteriaStepModel();
     mcsm.setStepId(1L);
     mcsm.setStepName("stepName");

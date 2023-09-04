@@ -3,6 +3,7 @@ package com.elit.outildedecision.service;
 import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.exception.PredictibilityAnalysisAlreadyUpdated;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.repository.*;
 import com.elit.outildedecision.service.implementation.PredictibilityAnalysisServiceImpl;
@@ -44,22 +45,22 @@ class PredictibilityAnalysisServiceImplTests {
   FormStep formStep;
   List<FormStep> formSteps = new ArrayList<>();
   User user;
-  Long LONG_ID = 1L;
+  Long LongId = 1L;
   @BeforeEach
   void setUp(){
     user = new User();
     user.setUserId(1L);
     user.setUserEmail("test@test.com");
     formStep = new FormStep();
-    formStep.setStepId(LONG_ID);
+    formStep.setStepId(LongId);
     formStep.setEScore(1F);
     project = new Project();
-    project.setProjectId(LONG_ID);
+    project.setProjectId(LongId);
     multiCriteriaAnalysis = new MultiCriteriaAnalysis();
-    multiCriteriaAnalysis.setMultiCriteriaAnalysisId(LONG_ID);
+    multiCriteriaAnalysis.setMultiCriteriaAnalysisId(LongId);
     multiCriteriaAnalysis.setProject(project);
     predictibilityAnalysis = new PredictibilityAnalysis();
-    predictibilityAnalysis.setPredictibilityAnalysisId(LONG_ID);
+    predictibilityAnalysis.setPredictibilityAnalysisId(LongId);
     predictibilityAnalysis.setMultiCriteriaAnalysis(multiCriteriaAnalysis);
     formStep.setMultiCriteriaAnalysis(multiCriteriaAnalysis);
     formSteps.add(formStep);
@@ -68,36 +69,36 @@ class PredictibilityAnalysisServiceImplTests {
 
   @Test
   void createPredictibilityForm_RuntimeException() {
-    assertThrows(RuntimeException.class, () -> predictibilityAnalysisService.createPredictibilityForm(LONG_ID));
+    assertThrows(ProjectNotFoundException.class, () -> predictibilityAnalysisService.createPredictibilityForm(LongId));
   }
 
   @Test
-  void createPredictibilityForm_FORBIDDEN() {
+  void createPredictibilityForm_FORBIDDEN() throws ProjectNotFoundException {
     multiCriteriaAnalysis.setIsFinished(false);
-    when(projectRepository.findById(LONG_ID)).thenReturn(Optional.of(project));
-    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(LONG_ID))
+    when(projectRepository.findById(LongId)).thenReturn(Optional.of(project));
+    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(LongId))
       .thenReturn(multiCriteriaAnalysis);
-    assertEquals(HttpStatus.FORBIDDEN,predictibilityAnalysisService.createPredictibilityForm(LONG_ID).getStatusCode());
+    assertEquals(HttpStatus.FORBIDDEN,predictibilityAnalysisService.createPredictibilityForm(LongId).getStatusCode());
   }
 
   @Test
-  void createPredictibilityForm_Success() {
+  void createPredictibilityForm_Success() throws ProjectNotFoundException {
     multiCriteriaAnalysis.setIsFinished(true);
-    when(projectRepository.findById(LONG_ID)).thenReturn(Optional.of(project));
-    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(LONG_ID))
+    when(projectRepository.findById(LongId)).thenReturn(Optional.of(project));
+    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(LongId))
       .thenReturn(multiCriteriaAnalysis);
-    when(predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(LONG_ID))
+    when(predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(LongId))
       .thenReturn(predictibilityAnalysis);
-    assertEquals(HttpStatus.OK,predictibilityAnalysisService.createPredictibilityForm(LONG_ID).getStatusCode());
+    assertEquals(HttpStatus.OK,predictibilityAnalysisService.createPredictibilityForm(LongId).getStatusCode());
   }
 
   @Test
-  void createPredictibilityForm_SuccessNull() {
+  void createPredictibilityForm_SuccessNull() throws ProjectNotFoundException {
     multiCriteriaAnalysis.setIsFinished(true);
-    when(projectRepository.findById(LONG_ID)).thenReturn(Optional.of(project));
-    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(LONG_ID))
+    when(projectRepository.findById(LongId)).thenReturn(Optional.of(project));
+    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(LongId))
       .thenReturn(multiCriteriaAnalysis);
-    when(predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(LONG_ID))
+    when(predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(LongId))
       .thenReturn(null);
     when(predictibilityAnalysisRepository.save(            PredictibilityAnalysis.builder()
       .multiCriteriaAnalysis(multiCriteriaAnalysis)
@@ -108,23 +109,12 @@ class PredictibilityAnalysisServiceImplTests {
       .isFinished(false)
       .predictibilityAnalysisIteration(1)
       .build());
-    assertEquals(HttpStatus.OK,predictibilityAnalysisService.createPredictibilityForm(LONG_ID).getStatusCode());
-  }
-
-  @Test
-  void calculatePredictibilityAnalysisScore_PredictibilityAnalysisNotFoundException() {
-    assertThrows(PredictibilityAnalysisNotFoundException.class, () -> predictibilityAnalysisService.calculatePredictibilityAnalysisScore(LONG_ID));
-  }
-
-  @Test
-  void calculatePredictibilityAnalysisScore_Success() throws Exception {
-    when(predictibilityAnalysisRepository.findById(LONG_ID)).thenReturn(Optional.ofNullable(predictibilityAnalysis));
-    assertEquals(HttpStatus.OK,predictibilityAnalysisService.calculatePredictibilityAnalysisScore(LONG_ID).getStatusCode());
+    assertEquals(HttpStatus.OK,predictibilityAnalysisService.createPredictibilityForm(LongId).getStatusCode());
   }
 
   @Test
   void putIsFinishedPredictibilityAnalysis_PredictibilityAnalysisNotFoundException() {
-    assertThrows(PredictibilityAnalysisNotFoundException.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LONG_ID));
+    assertThrows(PredictibilityAnalysisNotFoundException.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LongId));
   }
 
   @Test
@@ -142,10 +132,10 @@ class PredictibilityAnalysisServiceImplTests {
     projectUserPermissionList.add(projectUserPermission);
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
-    when(predictibilityAnalysisRepository.findById(LONG_ID)).thenReturn(Optional.of(predictibilityAnalysis));
+    when(predictibilityAnalysisRepository.findById(LongId)).thenReturn(Optional.of(predictibilityAnalysis));
     when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(projectUserPermissionRepository.findByProjectIdUserID(LONG_ID,LONG_ID)).thenReturn(projectUserPermission);
-    assertThrows(PredictibilityAnalysisAlreadyUpdated.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LONG_ID));
+    when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
+    assertThrows(PredictibilityAnalysisAlreadyUpdated.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LongId));
   }
 
   @Test
@@ -164,10 +154,10 @@ class PredictibilityAnalysisServiceImplTests {
     projectUserPermissionList.add(projectUserPermission);
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
-    when(predictibilityAnalysisRepository.findById(LONG_ID)).thenReturn(Optional.of(predictibilityAnalysis));
+    when(predictibilityAnalysisRepository.findById(LongId)).thenReturn(Optional.of(predictibilityAnalysis));
     when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(projectUserPermissionRepository.findByProjectIdUserID(LONG_ID,LONG_ID)).thenReturn(projectUserPermission);
-    assertThrows(UserNotAuthorizedException.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LONG_ID));
+    when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
+    assertThrows(UserNotAuthorizedException.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LongId));
   }
 
   @Test
@@ -186,59 +176,11 @@ class PredictibilityAnalysisServiceImplTests {
     projectUserPermissionList.add(projectUserPermission);
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
-    when(predictibilityAnalysisRepository.findById(LONG_ID)).thenReturn(Optional.of(predictibilityAnalysis));
+    when(predictibilityAnalysisRepository.findById(LongId)).thenReturn(Optional.of(predictibilityAnalysis));
     when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(projectUserPermissionRepository.findByProjectIdUserID(LONG_ID,LONG_ID)).thenReturn(projectUserPermission);
-    assertEquals(HttpStatus.OK, predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LONG_ID).getStatusCode());
+    when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
+    assertEquals(HttpStatus.OK, predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LongId).getStatusCode());
   }
 
-  @Test
-  void increasePredictAnalysisIterationNum_PredictibilityAnalysisNotFoundException() {
-    assertThrows(PredictibilityAnalysisNotFoundException.class, () -> predictibilityAnalysisService.increasePredictAnalysisIterationNum(LONG_ID));
-  }
 
-  @Test
-  void increasePredictAnalysisIterationNum_UserNotAuthorizedException() {
-    predictibilityAnalysis.setIsFinished(false);
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
-    ProjectUserPermission projectUserPermission = new ProjectUserPermission();
-    projectUserPermission.setUser(user);
-    projectUserPermission.setProject(project);
-    projectUserPermission.setPermission("");
-    projectUserPermissionList.add(projectUserPermission);
-    user.setUserProjectPermissions(projectUserPermissionList);
-    project.setProjectUserPermissions(projectUserPermissionList);
-    when(predictibilityAnalysisRepository.findById(LONG_ID)).thenReturn(Optional.of(predictibilityAnalysis));
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(projectUserPermissionRepository.findByProjectIdUserID(LONG_ID,LONG_ID)).thenReturn(null);
-    assertThrows(UserNotAuthorizedException.class, () -> predictibilityAnalysisService.increasePredictAnalysisIterationNum(LONG_ID));
-  }
-
-  @Test
-  void increasePredictAnalysisIterationNum_Success() throws Exception {
-    predictibilityAnalysis.setIsFinished(false);
-    predictibilityAnalysis.setPredictibilityAnalysisIteration(0);
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
-    ProjectUserPermission projectUserPermission = new ProjectUserPermission();
-    projectUserPermission.setUser(user);
-    projectUserPermission.setProject(project);
-    projectUserPermission.setPermission("CDP");
-    projectUserPermissionList.add(projectUserPermission);
-    user.setUserProjectPermissions(projectUserPermissionList);
-    project.setProjectUserPermissions(projectUserPermissionList);
-    when(predictibilityAnalysisRepository.findById(LONG_ID)).thenReturn(Optional.of(predictibilityAnalysis));
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(projectUserPermissionRepository.findByProjectIdUserID(LONG_ID,LONG_ID)).thenReturn(projectUserPermission);
-    assertEquals(HttpStatus.OK, predictibilityAnalysisService.increasePredictAnalysisIterationNum(LONG_ID).getStatusCode());
-  }
 }

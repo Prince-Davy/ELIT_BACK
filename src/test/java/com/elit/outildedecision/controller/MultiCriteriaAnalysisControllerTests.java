@@ -7,6 +7,7 @@ import com.elit.outildedecision.exception.EscoreException;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
+import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
@@ -38,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -96,6 +98,36 @@ class MultiCriteriaAnalysisControllerTests {
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
   }
+  @Test
+  void shouldCreateMultiCriteriaAnalysis_Success() throws Exception {
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isContributer(project.getProjectId())).thenReturn(true);
+
+    when(multiCriteriaAnalysisService.createMulticriteriaAnalysisForm(project.getProjectId())).thenReturn(ResponseEntity.ok().body("Votre Analyse multicritère est crée avec succés"));
+
+
+    mockMvc.perform(post("/multi-criteria-analysis/"+project.getProjectId()))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Votre Analyse mult")));
+
+    verify(multiCriteriaAnalysisService, times(1)).createMulticriteriaAnalysisForm(project.getProjectId());
+  }
+
+  @Test
+  void shouldCreateMultiCriteriaAnalysis_whenProjectDoseNotExists() throws Exception {
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isContributer(project.getProjectId())).thenReturn(true);
+
+    when(multiCriteriaAnalysisService.createMulticriteriaAnalysisForm(project.getProjectId())).thenThrow( new ProjectNotFoundException("Ce projet n'existe pas"));
+
+    mockMvc.perform(post("/multi-criteria-analysis/"+project.getProjectId()))
+      .andDo(print())
+      .andExpect(status().isNotFound())
+      .andExpect(content().string(containsString("Ce projet n'existe pas")));
+
+    verify(multiCriteriaAnalysisService, times(1)).createMulticriteriaAnalysisForm(project.getProjectId());
+  }
 
   @Test
   void shouldUpdateMultiCriteriaAnalysis_Success() throws Exception {
@@ -118,6 +150,25 @@ class MultiCriteriaAnalysisControllerTests {
   }
 
   @Test
+  void shouldUpdateMultiCriteriaAnalysis_ThrowException() throws Exception {
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isContributer(project.getProjectId())).thenReturn(true);
+
+    MultiCriteriaStepModel multiCriteriaAnalysisStep = new MultiCriteriaStepModel();
+
+    doThrow(new StepFormNotFoundException("cette étape n'existe pas"))
+    .when(multiCriteriaAnalysisService)
+    .updateMultiCriteriaAnalysis(project.getProjectId(), multiCriteriaAnalysisStep);
+
+    mockMvc.perform(put("/multi-criteria-analysis/"+project.getProjectId()).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(ModelSamples.toJson(multiCriteriaAnalysisStep)))
+      .andDo(print())
+      .andExpect(status().isNotFound())
+      .andExpect(content().string(containsString("cette")));
+
+    verify(multiCriteriaAnalysisService, times(1)).updateMultiCriteriaAnalysis(project.getProjectId(), multiCriteriaAnalysisStep);
+  }
+
+  @Test
   @ExtendWith(SpringExtension.class)
   void updateMultiCriteriaAnalysis_whenStepDoseNotExist() throws Exception {
     Long projectId = 1L;
@@ -128,6 +179,38 @@ class MultiCriteriaAnalysisControllerTests {
     String expectedMessage = "Ce projet n'existe pas";
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
+  }
+
+  @Test
+  void shouldGetMultiCriteriaAnalysis_ThrowProjectNotFound() throws Exception {
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isContributer(project.getProjectId())).thenReturn(true);
+
+
+    when(multiCriteriaAnalysisService.getMulticriteriaAnalysis(
+      project.getProjectId())).thenThrow( new ProjectNotFoundException("Ce projet n'existe pas"));
+
+    mockMvc.perform(get("/multi-criteria-analysis/"+project.getProjectId()))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+
+    verify(multiCriteriaAnalysisService, times(1)).getMulticriteriaAnalysis(project.getProjectId());
+  }
+
+  @Test
+  void shouldGetMultiCriteriaAnalysis_Success() throws Exception {
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(customMethodSecurity.isContributer(project.getProjectId())).thenReturn(true);
+
+    MulticriteriaAnalyseResponseModel responseModel = new MulticriteriaAnalyseResponseModel();
+    responseModel.setMultiCriteriaAnalysisId(1L);
+    when(multiCriteriaAnalysisService.getMulticriteriaAnalysis(project.getProjectId())).thenReturn(Optional.of(responseModel));
+
+    mockMvc.perform(get("/multi-criteria-analysis/"+project.getProjectId()))
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    verify(multiCriteriaAnalysisService, times(1)).getMulticriteriaAnalysis(project.getProjectId());
   }
 
   @Test
@@ -150,28 +233,6 @@ class MultiCriteriaAnalysisControllerTests {
     assertTrue(actualMessage.contains(expectedMessage));
   }
 
-  @Test
-  void updateQuestion_Success() throws Exception {
-    FormQuestionModel formQuestion = new FormQuestionModel();
-    // when(multiCriteriaAnalysisService.updateMultiCriteriaQuestion(formQuestion)).thenReturn(ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés"));
-    MockHttpServletResponse response = mockMvc.perform(put("/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .content(ModelSamples.toJson(formQuestion))).andDo(print()).andReturn().getResponse();
-    Assertions.assertEquals(200, response.getStatus());
-  }
-
-  @Test
-  void updateQuestion_whenQuestionDoseNotExists() throws Exception {
-    FormQuestionModel formQuestion = new FormQuestionModel();
-
-    doThrow(new MulticriteriaNotFoundException("Ce fichier n'existe pas !")).when(multiCriteriaAnalysisService)
-      .updateMultiCriteriaQuestion(formQuestion);
-
-    MockHttpServletResponse response = mockMvc.perform(put("/multi-criteria-analysis/question").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .content(ModelSamples.toJson(formQuestion))).andDo(print()).andReturn().getResponse();
-    Assertions.assertEquals(404, response.getStatus());
-  }
 
   @Test
   void updateQuestion_v2_Success() throws Exception {

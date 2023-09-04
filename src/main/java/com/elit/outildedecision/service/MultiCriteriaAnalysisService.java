@@ -1,11 +1,11 @@
 package com.elit.outildedecision.service;
 
-import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.EscoreException;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
@@ -49,7 +49,8 @@ public interface MultiCriteriaAnalysisService {
    * @param projectId the ID of the project for which to update the form
    * @param multiCriteriaAnalysis a FormStep object representing the updated form
    */
-  void updateMultiCriteriaAnalysis(Long projectId, MultiCriteriaStepModel multiCriteriaAnalysis) throws StepFormNotFoundException;
+  void updateMultiCriteriaAnalysis(
+    Long projectId, MultiCriteriaStepModel multiCriteriaAnalysis) throws StepFormNotFoundException;
 
   /**
    * Updates an existing multi-criteria analysis question.
@@ -58,6 +59,7 @@ public interface MultiCriteriaAnalysisService {
    * @throws MulticriteriaNotFoundException if the specified multi-criteria analysis does not exist
    */
   void updateMultiCriteriaQuestion(FormQuestionModel formQuestion) throws MulticriteriaNotFoundException;
+
 
   /**
    * Updates an existing multi-criteria analysis question.
@@ -89,11 +91,11 @@ public interface MultiCriteriaAnalysisService {
    * @throws MulticriteriaNotFoundException if the specified multi-criteria analysis does not exist
    * @throws UserNotAuthorizedException if the user is not authorized to update the specified multi-criteria analysis
    */
-  void increaseMulticriteriaIteration(Long analyseId) throws MulticriteriaNotFoundException, UserNotAuthorizedException;
+  void increaseMulticriteriaIteration(Long analyseId)
+    throws MulticriteriaNotFoundException, UserNotAuthorizedException;
 
   /**
    * Increases the iteration count for the specified multi-criteria analysis.
-   *
    * @param projectId the Id of the project
    * @param analyseId the ID of the multi-criteria analysis for which to increase the iteration count
    * @return a ResponseEntity indicating the success or failure of the operation

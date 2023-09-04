@@ -1,12 +1,16 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.exception.VoteAlreadyExistException;
+import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.repository.*;
 import com.elit.outildedecision.service.implementation.VoteServiceImpl;
+import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +25,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +54,8 @@ class VoteServiceImplTests {
   private VoteServiceImpl voteService;
   @Mock
   private Authentication authentication;
+  @Mock
+  private ProjectRepository projectRepository;
 
 
   private static final String USER_EMAIL = "test@example.com";
@@ -61,6 +69,7 @@ class VoteServiceImplTests {
   private Project testProject;
   private ProjectUserPermission testPermission;
   private Vote testVote;
+  private   MultiCriteriaAnalysis testMultiCriteriaAnalysis;
 
 
   @BeforeEach
@@ -78,6 +87,11 @@ class VoteServiceImplTests {
     // create a test project
     testProject = new Project();
     testProject.setProjectId(PROJECT_ID);
+
+    // create a test multicriteria analysis
+    testMultiCriteriaAnalysis = new MultiCriteriaAnalysis();
+    testMultiCriteriaAnalysis.setProject(testProject);
+    testPredictabilityAnalysis.setMultiCriteriaAnalysis(testMultiCriteriaAnalysis);
 
 
     // create a test project permission
@@ -102,10 +116,6 @@ class VoteServiceImplTests {
     voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
     voteModelRequest.setIsConfirmed(true);
 
-    User user = new User();
-    user.setUserId(1L);
-    user.setUserEmail("test@test.com");
-
     Authentication authentication = mock(Authentication.class);
     when(authentication.getPrincipal()).thenReturn("test@test.com");
 
@@ -113,7 +123,7 @@ class VoteServiceImplTests {
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
 
-    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(testUser);
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(new PredictibilityAnalysis()));
 
     // Act
@@ -125,6 +135,37 @@ class VoteServiceImplTests {
     verify(voteRepository, times(1)).save(any(Vote.class));
   }
 
+  @Test
+  void testCreateVote_success() throws Exception {
+    // Arrange
+    VoteModelRequest voteModelRequest = new VoteModelRequest();
+    voteModelRequest.setPredictibilityAnalysisId(PREDICTIBILITY_ANALYSIS_ID);
+    voteModelRequest.setChosenPMM(CHOSEN_PMM);
+    voteModelRequest.setJustification("Test justification");
+    voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
+    voteModelRequest.setIsConfirmed(true);
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+
+    testPredictabilityAnalysis.getMultiCriteriaAnalysis().getProject().setProjectId(testProject.getProjectId());
+
+    when(userRepository.findByUserEmail(anyString())).thenReturn(testUser);
+    when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(testPredictabilityAnalysis));
+
+    // Act
+    ResponseEntity<String> response = voteService.createVote(testProject.getProjectId(),voteModelRequest);
+
+    // Assert
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Le vote a bien été enregistré.", response.getBody());
+    verify(voteRepository, times(1)).save(any(Vote.class));
+  }
   @Test
   void testCreateVote_whenVoteAlreadyExistInUser()  {
     // Arrange
@@ -156,6 +197,36 @@ class VoteServiceImplTests {
   }
 
   @Test
+  void testCreateVote_ThrowsVoteAlreadyExist()  {
+    // Arrange
+    VoteModelRequest voteModelRequest = new VoteModelRequest();
+    voteModelRequest.setPredictibilityAnalysisId(PREDICTIBILITY_ANALYSIS_ID);
+    voteModelRequest.setChosenPMM(CHOSEN_PMM);
+    voteModelRequest.setJustification("Test justification");
+    voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
+    voteModelRequest.setIsConfirmed(true);
+
+    User user = new User();
+    user.setUserId(1L);
+    user.setUserEmail("test@test.com");
+
+    Vote voteFromDB = new Vote();
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    testPredictabilityAnalysis.getMultiCriteriaAnalysis().getProject().setProjectId(testProject.getProjectId());
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    when(voteRepository.findByPredictibilityAnalysisAndUserId(1L, user.getUserId())).thenReturn(voteFromDB);
+    VoteAlreadyExistException p = Assertions.assertThrows(VoteAlreadyExistException.class, ()-> voteService.createVote(testProject.getProjectId(),voteModelRequest));
+
+    Assertions.assertEquals("Cet utilisateur a déjà soumis un vote.", p.getMessage());
+  }
+
+  @Test
   void testCreateVote_whenPredictibilityAnalysisDoseNotExists()  {
     // Arrange
     VoteModelRequest voteModelRequest = new VoteModelRequest();
@@ -181,7 +252,60 @@ class VoteServiceImplTests {
 
     Assertions.assertEquals("Cet analyse n'existe pas", p.getMessage());
   }
+  @Test
+  void testCreateVote_ThrowsPredictibilityAnalysisNotExists()  {
+    // Arrange
+    VoteModelRequest voteModelRequest = new VoteModelRequest();
+    voteModelRequest.setPredictibilityAnalysisId(PREDICTIBILITY_ANALYSIS_ID);
+    voteModelRequest.setChosenPMM(CHOSEN_PMM);
+    voteModelRequest.setJustification("Test justification");
+    voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
+    voteModelRequest.setIsConfirmed(true);
 
+    User user = new User();
+    user.setUserId(1L);
+    user.setUserEmail("test@test.com");
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    testPredictabilityAnalysis.getMultiCriteriaAnalysis().getProject().setProjectId(testProject.getProjectId());
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    PredictibilityAnalysisNotFoundException p = Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, ()-> voteService.createVote(testProject.getProjectId(),voteModelRequest));
+
+    Assertions.assertEquals("Analyse de Predictibilité n'existe pas ", p.getMessage());
+  }
+  @Test
+  void testCreateVote_ThrowsProjectNotExists()  {
+    // Arrange
+    VoteModelRequest voteModelRequest = new VoteModelRequest();
+    voteModelRequest.setPredictibilityAnalysisId(PREDICTIBILITY_ANALYSIS_ID);
+    voteModelRequest.setChosenPMM(CHOSEN_PMM);
+    voteModelRequest.setJustification("Test justification");
+    voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
+    testVote.setPredictibilityAnalysis(testPredictabilityAnalysis);
+    voteModelRequest.setIsConfirmed(true);
+
+    User user = new User();
+    user.setUserId(1L);
+    user.setUserEmail("test@test.com");
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    testPredictabilityAnalysis.getMultiCriteriaAnalysis().getProject().setProjectId(testProject.getProjectId());
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(testPredictabilityAnalysis));
+    ProjectNotFoundException p = Assertions.assertThrows(ProjectNotFoundException.class, ()-> voteService.createVote(5L,voteModelRequest));
+
+    Assertions.assertEquals(Constants.PROJECT_DOESNT_EXIST, p.getMessage());
+  }
 
   @Test
   void testCheckPermissionByProjectIdAndUserId_withValidProjectAndUser_shouldReturnPermissionList()
@@ -244,6 +368,74 @@ class VoteServiceImplTests {
     Assertions.assertEquals(result, voteService.getVote(1L));
 
   }
+  @Test
+  void testGetVote_success() throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    List< VoteModelResponse > result = new ArrayList<>();
+    VoteModelResponse vMp = new VoteModelResponse(null,null,null,null,1L,null,1L);
+    result.add(vMp);
+    List<ProjectUserPermission> p = new ArrayList<>();
+    MultiCriteriaAnalysis m = new MultiCriteriaAnalysis();
+    m.setProject(testProject);
+    testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
+    testProject.setProjectUserPermissions(p);
+    testVote.setPredictibilityAnalysis(testPredictabilityAnalysis);
+
+    User user = new User();
+    user.setUserEmail(userEmail);
+    user.setUserId(1L);
+    user.setUserProjectPermissions(p);
+
+
+    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
+    Assertions.assertEquals(result, voteService.getVote(testProject.getProjectId(),testPredictabilityAnalysis.getPredictibilityAnalysisId()));
+
+  }
+
+  @Test
+  void testGetVote_shouldReturn_VoteModelList_whenUserIsCDPOrContributer() throws UserNotFoundException {
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    List< VoteModelResponse > result = new ArrayList<>();
+    VoteModelResponse vMp = new VoteModelResponse(1L,null,null,null,1L,null,1L);
+    result.add(vMp);
+    List<ProjectUserPermission> p = new ArrayList<>();
+    MultiCriteriaAnalysis m = new MultiCriteriaAnalysis();
+    m.setProject(testProject);
+    testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
+    testProject.setProjectUserPermissions(p);
+
+    User user = new User();
+    user.setUserEmail(userEmail);
+    user.setUserId(1L);
+    user.setUserProjectPermissions(p);
+
+    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+    when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
+    when(voteRepository.findByPredictibilityAnalysisAndUserId(testPredictabilityAnalysis.getPredictibilityAnalysisId(), user.getUserId())).thenReturn(testVote);
+    Assertions.assertEquals(result, voteService.getVote(1L));
+
+  }
+
 
   @Test
   void testGetVote_whenPredectibilityDoseNotExists() {
@@ -260,6 +452,33 @@ class VoteServiceImplTests {
     RuntimeException exception = Assertions.assertThrows(RuntimeException.class, ()-> voteService.getVote(1L));
 
     Assertions.assertEquals("Predictibility Analysis Id non trouvé.", exception.getMessage());
+
+  }
+
+  @Test
+  void testGetVote_whenProjectAssociateDoseNotExists() {
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn("test@test.com");
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    List< VoteModelResponse > result = new ArrayList<>();
+    VoteModelResponse vMp = new VoteModelResponse(null,null,null,null,1L,null,1L);
+    result.add(vMp);
+    List<ProjectUserPermission> p = new ArrayList<>();
+    MultiCriteriaAnalysis m = new MultiCriteriaAnalysis();
+    m.setProject(testProject);
+    testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
+    testProject.setProjectUserPermissions(p);
+
+    when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
+
+    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, ()-> voteService.getVote(10L,testPredictabilityAnalysis.getPredictibilityAnalysisId()));
+
+    Assertions.assertEquals("Le projet lié a cet analyse n'existe pas", exception.getMessage());
 
   }
 
@@ -376,6 +595,47 @@ class VoteServiceImplTests {
 
     RuntimeException p = Assertions.assertThrows(RuntimeException.class, ()-> voteService.updateVote(3L,voteModelRequest));
     Assertions.assertEquals("Ce vote n'existe pas!", p.getMessage());
+  }
+
+  @Test
+  void updateVote_whenProjectAssociateNotFound()  {
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    // Arrange
+    VoteModelRequest voteModelRequest = new VoteModelRequest();
+    voteModelRequest.setPredictibilityAnalysisId(PREDICTIBILITY_ANALYSIS_ID);
+    voteModelRequest.setChosenPMM(CHOSEN_PMM);
+    voteModelRequest.setJustification("Test justification");
+    voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
+    voteModelRequest.setIsConfirmed(true);
+
+    MultiCriteriaAnalysis m = new MultiCriteriaAnalysis();
+    m.setProject(testProject);
+    testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
+    testVote.setPredictibilityAnalysis(testPredictabilityAnalysis);
+
+    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = new User();
+    user.setUserEmail(userEmail);
+    user.setUserId(1L);
+
+    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(voteRepository.findById(testVote.getVoteId())).thenReturn(Optional.ofNullable(testVote));
+    ProjectNotFoundException p = Assertions.assertThrows(ProjectNotFoundException.class, ()-> voteService.updateVote(10L,1L, voteModelRequest));
+    Assertions.assertEquals("Ce projet n'existe pas", p.getMessage());
+  }
+
+  @Test
+  void shoudGetAllVotesForCDP_whenNotFoundProjectAssociateUserPermission() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    //use reflection to test private methods
+    Method method = voteService.getClass().getDeclaredMethod("getAllVotesForCDP", testProject.getClass(), Long.class);
+    method.setAccessible(true);
+    List<VoteModelResponse> result = (List<VoteModelResponse>) method.invoke(voteService, testProject, 1L);
+
+    List< VoteModelResponse > response = new ArrayList<>();
+    Assertions.assertEquals(response,result);
   }
 
 }

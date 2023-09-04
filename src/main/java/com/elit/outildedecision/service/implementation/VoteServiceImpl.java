@@ -1,19 +1,23 @@
 package com.elit.outildedecision.service.implementation;
 
+import com.elit.outildedecision.entity.Vote;
 import com.elit.outildedecision.entity.PredictibilityAnalysis;
+import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.entity.Vote;
-import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.exception.VoteAlreadyExistException;
+import com.elit.outildedecision.exception.VoteNotFoundException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.UserNotFoundException;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
-import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
+import com.elit.outildedecision.repository.VoteRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
-import com.elit.outildedecision.repository.VoteRepository;
+import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.service.VoteService;
+import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ProjectPermession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,10 +36,27 @@ import java.util.Objects;
 @Slf4j
 public class VoteServiceImpl implements VoteService {
 
+  /**
+   * Repository for accessing vote data.
+   */
   private final VoteRepository voteRepository;
+
+  /**
+   * Repository for accessing user data.
+   */
+
   private final UserRepository userRepository;
+
+  /**
+   * Repository for accessing predictibility Analysis data.
+   */
   private final PredictibilityAnalysisRepository predictibilityAnalysisRepository;
+
+  /**
+   * Repository for accessing project user permission data.
+   */
   private final ProjectUserPermissionRepository projectUserPermissionRepository;
+
 
   /**
    * Constructor for the VoteServiceImpl class.
@@ -93,6 +114,52 @@ public class VoteServiceImpl implements VoteService {
   }
 
   /**
+   * Creates a new vote for a predictibility analysis.
+   *
+   * @param projectId project id.
+   * @param voteModelRequest the vote model request containing the details of the vote to be created.
+   * @return a ResponseEntity with a message indicating whether the vote has been successfully created.
+   * @throws VoteAlreadyExistException if a vote for the given predictibility analysis and user already exists.
+   */
+  @Override
+  public ResponseEntity<String> createVote(final Long projectId, final VoteModelRequest voteModelRequest)
+    throws VoteAlreadyExistException, ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
+    String userEmail =
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userEmail);
+
+    Vote voteFromDB =
+      voteRepository.findByPredictibilityAnalysisAndUserId(
+        voteModelRequest.getPredictibilityAnalysisId(), user.getUserId());
+
+    if (Objects.nonNull(voteFromDB)) {
+      throw new VoteAlreadyExistException("Cet utilisateur a déjà soumis un vote.");
+    }
+
+    PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository.findById(voteModelRequest.getPredictibilityAnalysisId())
+      .orElseThrow(() -> new PredictibilityAnalysisNotFoundException("Analyse de Predictibilité n'existe pas "));
+
+    if (!Objects.equals(predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
+      throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
+    }
+
+    Vote vote = new Vote();
+    vote.setChosenPMM(voteModelRequest.getChosenPMM());
+    vote.setJustification(voteModelRequest.getJustification());
+    vote.setPredictibilityValue(voteModelRequest.getPredictibilityValue());
+    PredictibilityAnalysis analysis =
+      predictibilityAnalysisRepository
+        .findById(voteModelRequest.getPredictibilityAnalysisId())
+        .orElseThrow(() -> new RuntimeException("Cet analyse n'existe pas"));
+    vote.setPredictibilityAnalysis(analysis);
+    vote.setIsConfirmed(voteModelRequest.getIsConfirmed());
+    vote.setUser(user);
+    voteRepository.save(vote);
+
+    return ResponseEntity.ok().body("Le vote a bien été enregistré.");
+  }
+
+  /**
    * Checks the permissions of a user for a given project.
    *
    * @param projectId the id of the project to check the permissions for.
@@ -125,9 +192,8 @@ public class VoteServiceImpl implements VoteService {
   public List<VoteModelResponse> getVote(final Long predictibilityAnalysisId)
     throws UserNotFoundException {
     String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    log.info("userEmail", userEmail);
     User user = userRepository.findByUserEmail(userEmail);
-    log.info("user", user);
+
     PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository
       .findById(predictibilityAnalysisId)
       .orElseThrow(() -> new RuntimeException("Predictibility Analysis Id non trouvé."));
@@ -148,6 +214,36 @@ public class VoteServiceImpl implements VoteService {
     } else {
       result = getVoteForNonCDPUser(user, predictibilityAnalysisId);
     }
+
+    return result;
+  }
+
+  /**
+   * Retrieves a list of vote model responses for a given predictibility analysis ID.
+   *
+   * @param projectId project id.
+   * @param predictibilityAnalysisId the ID of the predictibility analysis.
+   * @return a list of vote model responses.
+   * @throws UserNotFoundException if the user is not found.
+   */
+  @Override
+  public List<VoteModelResponse> getVote(final Long projectId, final Long predictibilityAnalysisId)
+    throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
+
+    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userEmail);
+
+    PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository
+      .findById(predictibilityAnalysisId)
+      .orElseThrow(() -> new PredictibilityAnalysisNotFoundException("Analyse de predictibilité n'existe pas"));
+
+    if (!Objects.equals(projectId, predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId())) {
+      throw new ProjectNotFoundException("Le projet lié a cet analyse n'existe pas");
+    }
+
+    List<VoteModelResponse> result = new ArrayList<>();
+    Vote vote = voteRepository.findByPredictibilityAnalysisAndUserId(predictibilityAnalysisId, user.getUserId());
+    result.add(createVoteModelResponse(vote, predictibilityAnalysisId, user.getUserId()));
 
     return result;
   }
@@ -241,6 +337,41 @@ public class VoteServiceImpl implements VoteService {
 
     if (user.getUserId().equals(voteFromDB.getUser().getUserId())
       || projectUserPermission.getPermission().contains(ProjectPermession.CDP.name())) {
+      voteFromDB.setPredictibilityValue(voteModelRequest.getPredictibilityValue());
+      voteFromDB.setChosenPMM(voteModelRequest.getChosenPMM());
+      voteFromDB.setJustification(voteModelRequest.getJustification());
+      voteRepository.save(voteFromDB);
+      return ResponseEntity.status(HttpStatus.OK).body("Vote mis à jour.");
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body("Vous n'êtes pas autorisé à modifier ce vote.");
+    }
+  }
+
+  /**
+   * Updates an existing vote with new details from the provided vote model request.
+   *
+   * @param projectId project id.
+   * @param voteId           the ID of the vote to update.
+   * @param voteModelRequest the vote model request containing the new details of the vote.
+   * @return a ResponseEntity with a message indicating whether the vote has been successfully updated.
+   */
+  @Override
+  public ResponseEntity<String> updateVote(final Long projectId, final Long voteId, final VoteModelRequest voteModelRequest) throws ProjectNotFoundException, VoteNotFoundException {
+    String userEmail =
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userEmail);
+
+    Vote voteFromDB =
+      voteRepository
+        .findById(voteId)
+        .orElseThrow(() -> new VoteNotFoundException("Ce vote n'existe pas!"));
+
+    if (!Objects.equals(voteFromDB.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
+      throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
+    }
+
+    if (user.getUserId().equals(voteFromDB.getUser().getUserId())) {
       voteFromDB.setPredictibilityValue(voteModelRequest.getPredictibilityValue());
       voteFromDB.setChosenPMM(voteModelRequest.getChosenPMM());
       voteFromDB.setJustification(voteModelRequest.getJustification());

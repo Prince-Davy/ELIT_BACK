@@ -13,10 +13,11 @@ import com.elit.outildedecision.entity.PredictibilityResults;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.ExecutionPlanException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.VoteAlreadyExistException;
+import com.elit.outildedecision.exception.ExecutionPlanException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionPlanFormModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
@@ -103,6 +104,10 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    * the predictibility results repository.
    */
   private final PredictibilityResultsRepository predictibilityResultsRepository;
+  /**
+   * statique message for plan execution.
+   */
+  private static final String PLAN_EXECUTION_NOT_FOUND_MESSAGE = "Plan d'exécution introuvable.";
   /**
    * the constructor of the class.
    * it's used to inject the dependencies
@@ -223,6 +228,34 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     return ResponseEntity.ok().body(executionPlanFormModelList);
   }
+
+  /**
+   * this method is used to get the execution plan questions and answers.
+   * @param projectId the project id
+   * @param executionPlanId the ID of the execution plan for which to retrieve the questions and answers
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException when the execution plan is not found in the database
+   * @return the list of the execution plan questions
+   */
+  @Override
+  public ResponseEntity<Object> getQuestionsAndAnswers(final Long projectId, final Long executionPlanId)
+    throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+
+    ExecutionPlan executionPlan = checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
+
+    List<ExecutionPlanFormModel> executionPlanFormModelList = new ArrayList<>();
+
+    for (ExecutionPlanAnswer executionPlanAnswer : executionPlan.getExecutionPlanAnswers()) {
+      executionPlanFormModelList.add(
+        new ExecutionPlanFormModel(
+          executionPlanAnswer.getAnswer(),
+          executionPlanAnswer.getExecutionPlanQuestion().getTitle(),
+          executionPlanAnswer.getExecutionPlanQuestion().getQuestion(),
+          executionPlanAnswer.getExecutionPlanQuestion().getExecutionPlanQuestionId()));
+    }
+
+    return ResponseEntity.ok().body(executionPlanFormModelList);
+  }
   /**
    * this method is used to update the execution plan answers.
    *
@@ -238,7 +271,6 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
       ExecutionPlanAnswer executionPlanAnswerFromDB =
           executionPlanAnswerRepository.findByExecutionPlanIdAndExecutionPlanQuestionId(
               executionPlanId, executionPlanAnswerUnit.getExecutionPlanQuestionId());
-
       if (Objects.nonNull(executionPlanAnswerFromDB)) {
         executionPlanAnswerFromDB.setAnswer(executionPlanAnswerUnit.getAnswer());
         executionPlanAnswerRepository.save(executionPlanAnswerFromDB);
@@ -246,6 +278,38 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
             "La réponse avec l'id "
                 + executionPlanAnswerFromDB.getExecutionPlanAnswerId()
                 + " a bien été modifié.");
+      }
+    }
+    return ResponseEntity.ok().body(result);
+  }
+
+  /**
+   * this method is used to update the execution plan answers.
+   * @param projectId the project id
+   * @param executionPlanId the ID of the execution plan for which to update the answers
+   * @param executionPlanAnswerModel a list of ExecutionPlanAnswerModel objects containing the updated answers
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException when the execution plan is not found in the database
+   * @return response entity
+   */
+  @Override
+  public ResponseEntity<Object> updateAnswers(final Long projectId,
+                                              final Long executionPlanId,
+                                              final List<ExecutionPlanAnswerModel> executionPlanAnswerModel)
+    throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+    checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
+    List<Object> result = new ArrayList<>();
+    for (ExecutionPlanAnswerModel executionPlanAnswerUnit : executionPlanAnswerModel) {
+      ExecutionPlanAnswer executionPlanAnswerFromDB =
+        executionPlanAnswerRepository.findByExecutionPlanIdAndExecutionPlanQuestionId(
+          executionPlanId, executionPlanAnswerUnit.getExecutionPlanQuestionId());
+      if (Objects.nonNull(executionPlanAnswerFromDB)) {
+        executionPlanAnswerFromDB.setAnswer(executionPlanAnswerUnit.getAnswer());
+        executionPlanAnswerRepository.save(executionPlanAnswerFromDB);
+        result.add(
+          "La réponse avec l'id "
+            + executionPlanAnswerFromDB.getExecutionPlanAnswerId()
+            + " a bien été modifié.");
       }
     }
     return ResponseEntity.ok().body(result);
@@ -264,7 +328,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
-            .orElseThrow(() -> new RuntimeException("Plan d'exécution introuvable."));
+            .orElseThrow(() -> new RuntimeException(PLAN_EXECUTION_NOT_FOUND_MESSAGE));
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
     this.log.info("project = {}", project);
@@ -283,12 +347,14 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     List<ExecutionVoteResponseModel> result = new ArrayList<>();
     for (Method method : methodList) {
       ExecutionVoteResponseModel model = new ExecutionVoteResponseModel();
+
       model.setId(method.getId());
       model.setAdvantages(method.getAdvantages());
       model.setDisadvantages(method.getDisadvantages());
       model.setMethodologyName(method.getMethodology().getName());
       model.setMethodName(method.getName());
       model.setMethodDescription(method.getDescription());
+
       List<ExecutionPlanVote> votesModelList =
           projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
               ? executionPlanVoteRepo.findAllVotesByMethodIdAndExecutionPlanId(
@@ -311,6 +377,69 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     return ResponseEntity.ok().body(result);
   }
+
+  /**
+   * this method is used to get the execution plan answers.
+   * @param projectId the project id
+   * @param executionPlanId the id of the execution plan
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @return response entity
+   */
+  @Override
+  public ResponseEntity<Object> getMethodologies(final Long projectId, final Long executionPlanId) throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+    String userEmail =
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userEmail);
+    ExecutionPlan executionPlan = checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
+    PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
+    Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
+    this.log.info("project = {}", project);
+    ProjectUserPermission projectUserPermission =
+      projectUserPermissionRepository.findByProjectIdUserID(
+        project.getProjectId(), user.getUserId());
+
+    Methodology methodology = predictibilityAnalysis.getMethodology();
+    List<Method> methodList;
+    if (methodology.getName().equals("Hybride")) {
+      methodList = methodRepository.findAll();
+    } else {
+      methodList = methodology.getMethods();
+    }
+
+    List<ExecutionVoteResponseModel> result = new ArrayList<>();
+    for (Method method : methodList) {
+      ExecutionVoteResponseModel model = new ExecutionVoteResponseModel();
+
+      model.setId(method.getId());
+      model.setAdvantages(method.getAdvantages());
+      model.setDisadvantages(method.getDisadvantages());
+      model.setMethodologyName(method.getMethodology().getName());
+      model.setMethodName(method.getName());
+      model.setMethodDescription(method.getDescription());
+
+      List<ExecutionPlanVote> votesModelList =
+        projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
+          ? executionPlanVoteRepo.findAllVotesByMethodIdAndExecutionPlanId(
+          method.getId(), executionPlanId)
+          : executionPlanVoteRepo.findVoteByMethodIdUserIdAndExecutionPlanId(
+          method.getId(), user.getUserId(), executionPlanId);
+      List<ExecutionVoteModel> votesList = new ArrayList<>();
+      for (ExecutionPlanVote vote : votesModelList) {
+        ExecutionVoteModel voteModel = new ExecutionVoteModel();
+        voteModel.setId(vote.getId());
+        voteModel.setUserId(
+          projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
+            ? vote.getUser().getUserId()
+            : null);
+        votesList.add(voteModel);
+      }
+      model.setVotes(votesList);
+      result.add(model);
+    }
+
+    return ResponseEntity.ok().body(result);
+  }
+
   /**
    * this method is used to vote for a method.
    *
@@ -364,6 +493,53 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     return ResponseEntity.ok().body("Le vote a bien été enregistré.");
   }
+
+  /**
+   * this method is used to vote for a method.
+   * @param projectId the project id
+   * @param executionVoteRequestModel an ExecutionVoteRequestModel object containing the vote to be posted
+   * @throws VoteAlreadyExistException when a vote already exist by the user
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException if the execution plan is not found
+   * @return response entity
+   */
+  @Override
+  public ResponseEntity<String> postMethodologiesVote(
+    final Long projectId,
+    final ExecutionVoteRequestModel executionVoteRequestModel) throws VoteAlreadyExistException, ProjectNotFoundException, ExecutionPlanNotFoundException {
+    String userEmail =
+      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userEmail);
+    checkAssociationProjectAndExecutionPlan(projectId, executionVoteRequestModel.getExecutionPlanId());
+    ExecutionPlanVote executionPlanVoteFromDB =
+      executionPlanVoteRepo.findVoteByUserIdAndExecutionPlanId(
+        user.getUserId(), executionVoteRequestModel.getExecutionPlanId());
+    if (Objects.nonNull(executionPlanVoteFromDB)) {
+      throw new VoteAlreadyExistException(
+        "Cet utilisateur a déjà soumis un vote sur ce plan d'exécution.");
+    }
+    ExecutionPlanVote executionPlanVote = new ExecutionPlanVote();
+    executionPlanVote.setUser(user);
+    executionPlanVote.setMethod(
+      methodRepository.getById(executionVoteRequestModel.getMethodId()));
+    executionPlanVote.setExecutionPlan(
+      executionPlanRepository.getById(executionVoteRequestModel.getExecutionPlanId()));
+    executionPlanVoteRepo.save(executionPlanVote);
+
+    if (executionVoteRequestModel.getMethodId2ForHybrid() != null) {
+      ExecutionPlanVote executionPlanVote2 = new ExecutionPlanVote();
+      executionPlanVote2.setUser(user);
+      executionPlanVote2.setMethod(
+        methodRepository.getById(executionVoteRequestModel.getMethodId2ForHybrid()));
+      executionPlanVote2.setExecutionPlan(
+        executionPlanRepository.getById(executionVoteRequestModel.getExecutionPlanId()));
+      executionPlanVoteRepo.save(executionPlanVote2);
+
+    }
+
+    return ResponseEntity.ok().body("Le vote a bien été enregistré.");
+  }
+
   /**
    * this method is used to get the execution plan score.
    *
@@ -380,7 +556,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
-            .orElseThrow(() -> new ExecutionPlanNotFoundException("Plan d'exécution introuvable."));
+            .orElseThrow(() -> new ExecutionPlanNotFoundException(PLAN_EXECUTION_NOT_FOUND_MESSAGE));
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
     ProjectUserPermission projectUserPermission =
@@ -454,6 +630,88 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     result.setIsFinished(executionPlan.getIsFinished());
     return result;
   }
+
+  /**
+   * this method is used to get the execution plan score.
+   *
+   * @param projectId the project id
+   * @param executionPlanId the id of the execution plan
+   * @return response entity
+   * @throws ExecutionPlanNotFoundException the execution plan not found exception if the execution plan is not found
+   * @throws ProjectNotFoundException when the project is not found in the database
+   */
+  @Override
+  public ExecutionPlanScoreResponseModel getExecutionPlanScore(final Long projectId, final Long executionPlanId)
+    throws ExecutionPlanNotFoundException, ProjectNotFoundException {
+
+    ExecutionPlan executionPlan = checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
+
+    PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
+
+    List<ExecutionPlanVote> votesList =
+      executionPlanVoteRepo.findAllVotesByExecutionPlanId(executionPlanId);
+
+    List<Method> allMethods;
+    if (predictibilityAnalysis.getMethodology().getName().equals("Classique")
+      || predictibilityAnalysis.getMethodology().getName().equals("Agile")) {
+      allMethods =
+        methodRepository.findAllMethodsByMethodologyId(
+          predictibilityAnalysis.getMethodology().getMethodologyId());
+    } else {
+      allMethods = methodRepository.findAll();
+    }
+    List<MethodModel> allMethodsModel = new ArrayList<>();
+
+    Integer countVotes = 0;
+    for (Method method : allMethods) {
+      MethodModel methodModel = new MethodModel();
+      methodModel.setVotes(0);
+      methodModel.setName(method.getName());
+      for (ExecutionPlanVote vote : votesList) {
+        if (methodModel.getName().equals(vote.getMethod().getName())) {
+          methodModel.setVotes(methodModel.getVotes() + 1);
+          countVotes++;
+        }
+      }
+      allMethodsModel.add(methodModel);
+    }
+
+    int maxVoteValue =
+      allMethodsModel.stream()
+        .map(MethodModel::getVotes)
+        .mapToInt(v -> v)
+        .max()
+        .orElseThrow(() -> new RuntimeException("Pas de valeur max trouvée pour les votes."));
+
+    List<String> chooseMethod =
+      allMethodsModel.stream()
+        .filter(m -> m.getVotes() == maxVoteValue)
+        .map(MethodModel::getName)
+        .collect(Collectors.toList());
+
+    List<PredictibilityResults> predictibilityResultsList =
+      predictibilityResultsRepository.findAllPredictibilityResultsByPreAnalysisId(
+        predictibilityAnalysis.getPredictibilityAnalysisId());
+    List<PredictibilityResultsResponseModel> predictibilityResults = new ArrayList<>();
+    for (PredictibilityResults predictibilityResult : predictibilityResultsList) {
+      PredictibilityResultsResponseModel predictibilityResultNew =
+        new PredictibilityResultsResponseModel();
+      predictibilityResultNew.setName(predictibilityResult.getName());
+      predictibilityResultNew.setValue(predictibilityResult.getValue());
+      predictibilityResults.add(predictibilityResultNew);
+    }
+
+    ExecutionPlanScoreResponseModel result = new ExecutionPlanScoreResponseModel();
+    result.setExecutionPlanId(executionPlan.getExecutionPlanId());
+    result.setAllMethods(allMethodsModel);
+    result.setCountVotes(countVotes);
+    result.setExecutionPlanIteration(executionPlan.getExecutionIteration());
+    result.setChooseMethod(chooseMethod);
+    result.setPredictibilityResults(predictibilityResults);
+    result.setIsFinished(executionPlan.getIsFinished());
+    return result;
+  }
+
   /**
    * this method is used to get the execution plan score.
    *
@@ -485,6 +743,32 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     }
     return ResponseEntity.ok().body(true);
   }
+
+  /**
+   * this method is used to get the execution plan score.
+   *
+   * @param projectId the project id
+   * @param executionPlanId the id of the execution plan
+   * @return response entity
+   * @throws ExecutionPlanNotFoundException the execution plan not found exception if the execution plan is not found
+   * @throws ExecutionPlanException the execution plan exception if the execution plan is already finished
+   * @throws ProjectNotFoundException when the project is not found in the database
+   */
+  @Override
+  public ResponseEntity<Boolean> putIsFinishedExecutionPlan(final Long projectId, final Long executionPlanId)
+    throws ExecutionPlanNotFoundException, ExecutionPlanException, ProjectNotFoundException {
+
+    ExecutionPlan executionPlan = checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
+
+    if (Boolean.FALSE.equals(executionPlan.getIsFinished())) {
+      executionPlan.setIsFinished(true);
+      executionPlanRepository.save(executionPlan);
+    } else {
+      throw new ExecutionPlanException("Le plan d'exécution est déjà terminé.");
+    }
+
+    return ResponseEntity.ok().body(true);
+  }
   /**
    * this method is used to get the execution plan score.
    *
@@ -502,5 +786,25 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
         projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
     return Objects.nonNull(projectUserPermission)
         && permissionName.equals(projectUserPermission.getPermission());
+  }
+
+  /**
+   * this method is used to get the execution plan score.
+   *
+   * @param projectId the id of the project
+   * @param executionPlanId the id of the execution plan
+   * @return boolean true if the user has the permission
+   */
+  private ExecutionPlan checkAssociationProjectAndExecutionPlan(final Long projectId, final Long executionPlanId)
+    throws ExecutionPlanNotFoundException, ProjectNotFoundException {
+    ExecutionPlan executionPlan =
+      executionPlanRepository
+        .findById(executionPlanId)
+        .orElseThrow(
+          () -> new ExecutionPlanNotFoundException(PLAN_EXECUTION_NOT_FOUND_MESSAGE));
+    if (!executionPlan.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId().equals(projectId)) {
+      throw new ProjectNotFoundException("Le project dans le path et celui de Plan d'exécution ne correspondent pas");
+    }
+    return executionPlan;
   }
 }

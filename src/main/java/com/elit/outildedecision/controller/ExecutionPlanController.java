@@ -1,15 +1,16 @@
 
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.exception.ExecutionPlanException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.VoteAlreadyExistException;
+import com.elit.outildedecision.exception.ExecutionPlanException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
 import com.elit.outildedecision.model.ExecutionVoteRequestModel;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,75 +46,103 @@ public class ExecutionPlanController {
    * @return ResponseEntity<Long>
    */
   @PostMapping("/executionPlan/create/{projectId}")
+  @PreAuthorize("isProjectOwner(#projectId)")
   ResponseEntity<Long> createExecutionPlan(@PathVariable final Long projectId) {
     return executionPlanService.createExecutionPlan(projectId);
   }
+
   /**
    * Get questions and answers for of an execution plan.
+   * @param projectId the project id
    * @param executionPlanId the execution plan id
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException when the execution plan is not found in the database
    * @return ResponseEntity<Long>
    */
-  @GetMapping("/executionPlan/formConstraints/{executionPlanId}")
-  // @PreAuthorize("isContributer(#projectId)")
-  public ResponseEntity<Object> getQuestionsAndAnswers(@PathVariable final Long executionPlanId) {
-    return executionPlanService.getQuestionsAndAnswers(executionPlanId);
+  @GetMapping("/{projectId}/executionPlan/formConstraints/{executionPlanId}")
+  @PreAuthorize("hasAnyAuthority('ADMIN') or isContributer(#projectId)")
+  public ResponseEntity<Object> getQuestionsAndAnswers(@PathVariable final Long projectId, @PathVariable final Long executionPlanId)
+    throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+    return executionPlanService.getQuestionsAndAnswers(projectId, executionPlanId);
   }
+
   /**
    * Update answers of an execution plan.
-   * @param executionPlanAnswerModel the execution plan answer model
+   * @param projectId the project id
    * @param executionPlanId the execution plan id
+   * @param executionPlanAnswerModel the execution plan answer model
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException when the execution plan is not found in the database
    * @return ResponseEntity<Long>
    */
-  @PutMapping(value = "/executionPlan/formConstraints/putAnswers/{executionPlanId}")
-  // @PreAuthorize("isProjectOwner(#projectId)")
+  @PutMapping(value = "/{projectId}/executionPlan/formConstraints/putAnswers/{executionPlanId}")
+  @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<Object> updateAnswers(
-      @RequestBody final List<ExecutionPlanAnswerModel> executionPlanAnswerModel,
-      @PathVariable final Long executionPlanId) {
-    return executionPlanService.updateAnswers(executionPlanAnswerModel, executionPlanId);
+    @PathVariable final Long projectId,
+    @PathVariable final Long executionPlanId,
+    @RequestBody final List<ExecutionPlanAnswerModel> executionPlanAnswerModel) throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+    return executionPlanService.updateAnswers(projectId, executionPlanId, executionPlanAnswerModel);
   }
+
   /**
    * Get methodologies for an execution plan.
+   * @param projectId the project id
    * @param executionPlanId the execution plan id
+   * @throws ProjectNotFoundException when a vote already exist by the user
    * @return ResponseEntity<Long>
    */
-  @GetMapping("/executionPlan/methodologies/{executionPlanId}")
-  public ResponseEntity<Object> getMethodologies(@PathVariable final Long executionPlanId) {
-    return executionPlanService.getMethodologies(executionPlanId);
+  @GetMapping("/{projectId}/executionPlan/methodologies/{executionPlanId}")
+  @PreAuthorize("isContributer(#projectId)")
+  public ResponseEntity<Object> getMethodologies(@PathVariable final Long projectId, @PathVariable final Long executionPlanId) throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+    return executionPlanService.getMethodologies(projectId, executionPlanId);
   }
+
   /**
    * Vote for a methodology.
+   * @param projectId the project id
    * @param executionVoteRequestModel the execution vote request model
    * @throws VoteAlreadyExistException when a vote already exist by the user
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException if the execution plan is not found
    * @return ResponseEntity<Long>
    */
-  @PostMapping("/executionPlan/methodologies/vote")
+  @PostMapping("/{projectId}/executionPlan/methodologies/vote")
+  @PreAuthorize("isContributer(#projectId)")
   public ResponseEntity<String> postMethodologiesVote(
-      @RequestBody final ExecutionVoteRequestModel executionVoteRequestModel)
-    throws VoteAlreadyExistException {
-    return executionPlanService.postMethodologiesVote(executionVoteRequestModel);
+    @PathVariable final Long projectId,
+    @RequestBody final ExecutionVoteRequestModel executionVoteRequestModel)
+    throws VoteAlreadyExistException, ProjectNotFoundException, ExecutionPlanNotFoundException {
+    return executionPlanService.postMethodologiesVote(projectId, executionVoteRequestModel);
   }
+
   /**
    * Get execution plan score.
+   * @param projectId the project id
    * @param executionPlanId the execution plan id
    * @return ExecutionPlanScoreResponseModel
-   * @throws UserNotAuthorizedException if the user is not authorized to vote in the specified execution plan
    * @throws ExecutionPlanNotFoundException if the execution plan is not found
+   * @throws ProjectNotFoundException when the project is not found in the database
    */
-  @GetMapping("/executionPlan/{executionPlanId}/score")
-  public ExecutionPlanScoreResponseModel getExecutionPlanScore(@PathVariable final Long executionPlanId) throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
-    return executionPlanService.getExecutionPlanScore(executionPlanId);
+  @GetMapping("/{projectId}/executionPlan/{executionPlanId}/score")
+  @PreAuthorize("hasAnyAuthority('ADMIN') or isContributer(#projectId) or isObserver(#projectId)")
+  public ExecutionPlanScoreResponseModel getExecutionPlanScore(@PathVariable final Long projectId, @PathVariable final Long executionPlanId)
+    throws ExecutionPlanNotFoundException, ProjectNotFoundException {
+    return executionPlanService.getExecutionPlanScore(projectId, executionPlanId);
   }
+
   /**
    * Get execution plan score.
+   * @param projectId the project id
    * @param executionPlanId the execution plan id
-   * @throws UserNotAuthorizedException when a user is not authorized
    * @throws ExecutionPlanNotFoundException when an execution plan is not found
    * @throws ExecutionPlanException when an execution plan is already finished
+   * @throws ProjectNotFoundException when the project is not found in the database
    * @return ExecutionPlanScoreResponseModel
    */
-  @PostMapping("/executionPlan/isFinished/{executionPlanId}")
-  public ResponseEntity<Boolean> putIsFinishedExecutionPlan(@PathVariable final Long executionPlanId)
-    throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException {
-    return executionPlanService.putIsFinishedExecutionPlan(executionPlanId);
+  @PostMapping("/{projectId}/executionPlan/isFinished/{executionPlanId}")
+  @PreAuthorize("isProjectOwner(#projectId)")
+  public ResponseEntity<Boolean> putIsFinishedExecutionPlan(@PathVariable final Long projectId, @PathVariable final Long executionPlanId)
+    throws ExecutionPlanNotFoundException, ExecutionPlanException, ProjectNotFoundException {
+    return executionPlanService.putIsFinishedExecutionPlan(projectId, executionPlanId);
   }
 }

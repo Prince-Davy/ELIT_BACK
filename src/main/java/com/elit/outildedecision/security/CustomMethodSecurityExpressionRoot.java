@@ -83,8 +83,26 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
       return false;
     }
     return permissions.contains(ProjectPermession.CDP.name())
-      || permissions.contains(ProjectPermession.CONTRIBUTER.name())
-      || permissions.contains(ProjectPermession.OBSERVER.name());
+      || permissions.contains(ProjectPermession.CONTRIBUTER.name());
+  }
+
+  /**
+   * Checks if the authenticated user has Observer permissions for the project with the given ID.
+   *
+   * @param projectId the ID of the project to check permissions for
+   * @return true if the authenticated user has Observer permissions for the project, false otherwise
+   */
+  public boolean isObserver(final Long projectId) {
+    List<String> permissions = new ArrayList<>();
+    try {
+      User user = userService.findByEmail((String) this.getPrincipal());
+      user.getUserProjectPermissions().stream()
+        .filter(p -> p.getProject().getProjectId().equals(projectId))
+        .forEach(p -> permissions.add(p.getPermission()));
+    } catch (Exception e) {
+      return false;
+    }
+    return permissions.contains(ProjectPermession.OBSERVER.name());
   }
   /**
    * Returns the object that was the filter object being processed when the method was invoked.

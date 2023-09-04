@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -46,7 +45,9 @@ public class Project implements Serializable {
   @Size(max = 20, message = "Le nom du projet ne doit pas dépasser 20 caractères")
   private String name;
 
-  @Nullable private String description;
+  @Size(min = 3, message = "La description du projet doit contenir au moins 3 caractères")
+  @Size(max = 255, message = "La description du projet ne doit pas dépasser 255 caractères")
+  private String description;
   private String folderPath;
   private Long chefId;
   private String confirmationState;

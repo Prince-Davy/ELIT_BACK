@@ -9,6 +9,7 @@ import com.elit.outildedecision.model.SurveyAnswerRequestModel;
 import com.elit.outildedecision.model.SurveyAnswerResponseModel;
 import com.elit.outildedecision.service.SurveyAnswerService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +52,7 @@ public class SurveyAnswerController {
    * @return a list of questions with their answers.
    */
   @PostMapping
+  @PreAuthorize("hasAnyAuthority('USER')")
   public ResponseEntity<String> replyToQuestion(@RequestBody final List<@Valid SurveyAnswerRequestModel> userAnswerList) throws UserNotFoundException,
     QuestionsNotFoundException,
     ResponseNotFoundException,
@@ -67,18 +69,9 @@ public class SurveyAnswerController {
    * @return a list of user answers
    */
   @GetMapping("/{userId}")
+  @PreAuthorize("hasAnyAuthority('USER')")
   public List<SurveyAnswerResponseModel> userAnswer(@PathVariable final Long userId)
       throws UserNotFoundException, ResponseNotFoundException {
     return answerService.getUserAnswer(userId);
-  }
-  /**
-   * method called to display all result of survey.
-   *
-   * @param pageNumber represents the page number to display
-   * @return a list of survey result
-   */
-  @GetMapping("/page/{pageNumber}")
-  public List<SurveyAnswerResponseModel> getSurveyReport(@PathVariable final int pageNumber) {
-    return answerService.getSurveyReport(pageNumber);
   }
 }

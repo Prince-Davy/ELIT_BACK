@@ -9,7 +9,6 @@ import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionVoteRequestModel;
 import com.elit.outildedecision.repository.*;
 import com.elit.outildedecision.service.implementation.ExecutionPlanServiceImpl;
-import liquibase.pro.packaged.E;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

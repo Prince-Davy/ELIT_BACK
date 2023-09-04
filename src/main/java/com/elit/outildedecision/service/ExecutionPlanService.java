@@ -1,10 +1,11 @@
 
 package com.elit.outildedecision.service;
 
-import com.elit.outildedecision.exception.ExecutionPlanException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.VoteAlreadyExistException;
+import com.elit.outildedecision.exception.ExecutionPlanException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
 import com.elit.outildedecision.model.ExecutionVoteRequestModel;
@@ -33,6 +34,17 @@ public interface ExecutionPlanService {
   ResponseEntity<Object> getQuestionsAndAnswers(Long executionPlanId);
 
   /**
+   * Retrieves the questions and answers for the specified execution plan.
+   *
+   * @param projectId the project id
+   * @param executionPlanId the ID of the execution plan for which to retrieve the questions and answers
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException when the execution plan is not found in the database
+   * @return a ResponseEntity containing the questions and answers for the specified execution plan
+   */
+  ResponseEntity<Object> getQuestionsAndAnswers(Long projectId, Long executionPlanId) throws ProjectNotFoundException, ExecutionPlanNotFoundException;
+
+  /**
    * Updates the answers for the specified execution plan.
    *
    * @param executionPlanAnswerModel a list of ExecutionPlanAnswerModel objects containing the updated answers
@@ -43,12 +55,35 @@ public interface ExecutionPlanService {
     List<ExecutionPlanAnswerModel> executionPlanAnswerModel, Long executionPlanId);
 
   /**
+   * Updates the answers for the specified execution plan.
+   *
+   * @param projectId the project id
+   * @param executionPlanId the ID of the execution plan for which to update the answers
+   * @param executionPlanAnswerModel a list of ExecutionPlanAnswerModel objects containing the updated answers
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException when the execution plan is not found in the database
+   * @return a ResponseEntity indicating the success or failure of the update operation
+   */
+  ResponseEntity<Object> updateAnswers(
+    Long projectId, Long executionPlanId, List<ExecutionPlanAnswerModel> executionPlanAnswerModel) throws ProjectNotFoundException, ExecutionPlanNotFoundException;
+
+  /**
    * Retrieves the methodologies for the specified execution plan.
    *
    * @param executionPlanId the ID of the execution plan for which to retrieve the methodologies
    * @return a ResponseEntity containing the methodologies for the specified execution plan
    */
   ResponseEntity<Object> getMethodologies(Long executionPlanId);
+
+  /**
+   * Retrieves the methodologies for the specified execution plan.
+   *
+   * @param projectId the project id
+   * @param executionPlanId the ID of the execution plan for which to retrieve the methodologies
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @return a ResponseEntity containing the methodologies for the specified execution plan
+   */
+  ResponseEntity<Object> getMethodologies(Long projectId, Long executionPlanId) throws ProjectNotFoundException, ExecutionPlanNotFoundException;
 
   /**
    * Posts a vote for a methodology in the specified execution plan.
@@ -61,6 +96,20 @@ public interface ExecutionPlanService {
           throws VoteAlreadyExistException;
 
   /**
+   * Posts a vote for a methodology in the specified execution plan.
+   *
+   * @param projectId the project id
+   * @param executionVoteRequestModel an ExecutionVoteRequestModel object containing the vote to be posted
+   * @throws VoteAlreadyExistException when a vote already exist by the user
+   * @throws ProjectNotFoundException when the project is not found in the database
+   * @throws ExecutionPlanNotFoundException if the execution plan is not found
+   * @return a ResponseEntity indicating the success or failure of the vote operation
+   *
+   */
+  ResponseEntity<String> postMethodologiesVote(Long projectId, ExecutionVoteRequestModel executionVoteRequestModel)
+    throws VoteAlreadyExistException, ProjectNotFoundException, ExecutionPlanNotFoundException;
+
+  /**
    * Retrieves the score for the specified execution plan.
    *
    * @param executionPlanId the ID of the execution plan for which to retrieve the score
@@ -69,6 +118,16 @@ public interface ExecutionPlanService {
    * @throws ExecutionPlanNotFoundException if the specified execution plan does not exist
    */
   ExecutionPlanScoreResponseModel getExecutionPlanScore(Long executionPlanId) throws UserNotAuthorizedException, ExecutionPlanNotFoundException;
+
+  /**
+   * Retrieves the score for the specified execution plan.
+   *
+   * @param projectId the project id
+   * @param executionPlanId the ID of the execution plan for which to retrieve the score
+   * @return an ExecutionPlanScoreResponseModel object containing the score for the specified execution plan
+   * @throws ExecutionPlanNotFoundException if the specified execution plan does not exist
+   */
+  ExecutionPlanScoreResponseModel getExecutionPlanScore(Long projectId, Long executionPlanId) throws  ExecutionPlanNotFoundException, ProjectNotFoundException;
 
   /**
    * Sets the "isFinished" flag for the specified execution plan to true.
@@ -81,4 +140,17 @@ public interface ExecutionPlanService {
    */
   ResponseEntity<Boolean> putIsFinishedExecutionPlan(Long executionPlanId)
     throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException;
+
+  /**
+   * Sets the "isFinished" flag for the specified execution plan to true.
+   *
+   * @param projectId the project id
+   * @param executionPlanId the ID of the execution plan for which to set the flag
+   * @return a ResponseEntity indicating the success or failure of the operation
+   * @throws ExecutionPlanNotFoundException if the specified execution plan does not exist
+   * @throws ExecutionPlanException if the specified execution plan is already finished
+   * @throws ProjectNotFoundException when the project is not found in the database
+   */
+  ResponseEntity<Boolean> putIsFinishedExecutionPlan(Long projectId, Long executionPlanId)
+    throws ExecutionPlanNotFoundException, ExecutionPlanException, ProjectNotFoundException;
 }
