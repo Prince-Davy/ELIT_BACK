@@ -5,6 +5,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.elit.outildedecision.config.JwtProperties;
+import com.elit.outildedecision.security.AppUserPrincipal;
+import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,13 +26,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
    */
   private final JwtProperties jwtProperties;
 
+
+  private final UserServiceImpl customUserDetailsService;
   /**
    * Constructor of JwtAuthorizationFilter.
    *
    * @param jwtProperties the jwt properties used to get the secret key
+   * @param customUserDetailsService user custom service
    */
-  public JwtAuthorizationFilter(final JwtProperties jwtProperties) {
+  public JwtAuthorizationFilter(final JwtProperties jwtProperties, final UserServiceImpl customUserDetailsService) {
     this.jwtProperties = jwtProperties;
+    this.customUserDetailsService = customUserDetailsService;
   }
 
   /**
@@ -60,13 +66,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(jwt);
         String username = decodedJWT.getSubject();
+        AppUserPrincipal appUserPrincipal = new AppUserPrincipal(customUserDetailsService.findByEmail(username));
+
         String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         for (String r : roles) {
           authorities.add(new SimpleGrantedAuthority(r));
         }
         UsernamePasswordAuthenticationToken authentificationToken =
-          new UsernamePasswordAuthenticationToken(username, null, authorities);
+          new UsernamePasswordAuthenticationToken(appUserPrincipal, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentificationToken);
       } catch (Exception e) {
         response.setHeader("error", "Invalid token");

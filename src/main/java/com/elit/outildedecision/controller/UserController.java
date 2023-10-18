@@ -7,9 +7,13 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -101,7 +105,16 @@ public class UserController {
   public ResponseEntity<String> updatePasswordUserById(
       @PathVariable final Long userId, @RequestParam final String oldPass, @RequestParam final String newPass)
     throws IOException, CouldNotSaveUserException, UserNotFoundException {
-    return userService.updatePasswordUserById(userId, oldPass, newPass);
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails user = (UserDetails) auth.getPrincipal();
+    UserResponseModel userModel = userService.getAllInfosUserById(userId);
+    if (userModel.getUserEmail().equals(user.getUsername())) {
+      return userService.updatePasswordUserById(userId, oldPass, newPass);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        .body("Impossible de changer le mot de passe");
+    }
+
   }
   /**
    * Method to call to update user's avatar.

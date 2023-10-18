@@ -30,6 +30,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -106,9 +107,8 @@ public class BrainstormingServiceImpl implements BrainstormingService {
   @Override
   public ResponseEntity<String> createBrainstorming(final Long projectId, final BrainstormingModel brainstormingModel)
     throws PredictibilityAnalysisNotFoundException, ExistingBrainstormingException, ProjectNotFoundException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     PredictibilityAnalysis predictibilityAnalysis =
       predictibilityAnalysisRepository
@@ -163,9 +163,8 @@ public class BrainstormingServiceImpl implements BrainstormingService {
       throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
     }
 
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     if (!brainstorming.getUser().getUserId().equals(user.getUserId())) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN)

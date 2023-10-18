@@ -8,6 +8,7 @@ import com.elit.outildedecision.exception.VoteAlreadyExistException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionVoteRequestModel;
 import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.ExecutionPlanServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,11 +21,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,6 +87,7 @@ public class ExecutionPlanServiceImplTests {
     user = new User();
     user.setUserId(1L);
     user.setUserEmail("test@test.com");
+    user.setUsername("test@test.com");
   }
 
   @Test
@@ -145,10 +149,17 @@ public class ExecutionPlanServiceImplTests {
 
   @Test
   void getMethodologies_throwsRuntimeException() {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     SecurityContextHolder.setContext(securityContext);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.empty());
     Assertions.assertThrows(RuntimeException.class,() -> executionPlanService.getMethodologies(longId));
@@ -157,10 +168,17 @@ public class ExecutionPlanServiceImplTests {
   @Test
   void postMethodologiesVote_throwsRuntimeException() {
     ExecutionVoteRequestModel executionVoteRequestModel = new ExecutionVoteRequestModel();
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     SecurityContextHolder.setContext(securityContext);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.empty());
     Assertions.assertThrows(RuntimeException.class,() -> executionPlanService.postMethodologiesVote(executionVoteRequestModel));
@@ -181,12 +199,17 @@ public class ExecutionPlanServiceImplTests {
     executionPlanVote.setExecutionPlan(executionPlan);
     executionPlanVote.setId(1L);
     executionPlanVote.setUser(user);
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
     when(projectUserPermissionRepository.findByProjectIdUserID(longId,longId))
       .thenReturn(projectUserPermission);
@@ -198,6 +221,19 @@ public class ExecutionPlanServiceImplTests {
 
   @Test
   void postMethodologiesVote_Success() throws VoteAlreadyExistException {
+
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
     ExecutionVoteRequestModel executionVoteRequestModel = new ExecutionVoteRequestModel();
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
@@ -211,12 +247,6 @@ public class ExecutionPlanServiceImplTests {
     executionPlanVote.setExecutionPlan(executionPlan);
     executionPlanVote.setId(1L);
     executionPlanVote.setUser(user);
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
     when(projectUserPermissionRepository.findByProjectIdUserID(longId,longId))
       .thenReturn(projectUserPermission);
@@ -229,12 +259,17 @@ public class ExecutionPlanServiceImplTests {
 
   @Test
   void getExecutionPlanScore_throwsExecutionPlanNotFoundException() throws Exception {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.empty());
     ExecutionPlanNotFoundException e = Assertions.assertThrows(ExecutionPlanNotFoundException.class, () -> executionPlanService.getExecutionPlanScore(longId));
     Assertions.assertEquals("Plan d'exécution introuvable.", e.getMessage());
@@ -242,12 +277,18 @@ public class ExecutionPlanServiceImplTests {
 
   @Test
   void getExecutionPlanScore_throwsUserNotAuthorizedException() throws Exception {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
     when(projectUserPermissionRepository.findByProjectIdUserID(longId,longId)).thenReturn(null);
     Assertions.assertThrows(UserNotAuthorizedException.class, () -> executionPlanService.getExecutionPlanScore(longId));
@@ -261,11 +302,17 @@ public class ExecutionPlanServiceImplTests {
     List<Method> listMethods = new ArrayList<>();
     predictibilityAnalysis.setMethodology(methodology);
     methodology.setMethods(listMethods);
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setUser(user);
@@ -275,7 +322,6 @@ public class ExecutionPlanServiceImplTests {
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
     List<ExecutionPlanVote> votesList = new ArrayList<>();
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
     when(projectUserPermissionRepository.findByProjectIdUserID(longId,longId)).thenReturn(projectUserPermission);
     when(executionPlanVoteRepo.findAllVotesByExecutionPlanId(longId))
@@ -291,11 +337,17 @@ public class ExecutionPlanServiceImplTests {
     List<Method> listMethods = new ArrayList<>();
     methodology.setMethods(listMethods);
     predictibilityAnalysis.setMethodology(methodology);
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setUser(user);
@@ -304,7 +356,6 @@ public class ExecutionPlanServiceImplTests {
     projectUserPermissionList.add(projectUserPermission);
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
     when(projectUserPermissionRepository.findByProjectIdUserID(longId,longId))
       .thenReturn(projectUserPermission);
@@ -318,24 +369,40 @@ public class ExecutionPlanServiceImplTests {
   }
 
   @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void putIsFinishedExecutionPlan_throwsUserNotAuthorizedException() throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException {
-    when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
+
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
+    when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
+     SecurityContextHolder.setContext(securityContext);
     Assertions.assertThrows(UserNotAuthorizedException.class,()->executionPlanService.putIsFinishedExecutionPlan(longId));
   }
 
   @Test
   void putIsFinishedExecutionPlan_Success() throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException {
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     SecurityContextHolder.setContext(securityContext);
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
@@ -345,7 +412,6 @@ public class ExecutionPlanServiceImplTests {
     projectUserPermissionList.add(projectUserPermission);
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     when(projectUserPermissionRepository.findByProjectIdUserID(longId,longId))
       .thenReturn(projectUserPermission);
     Assertions.assertEquals(HttpStatus.OK,executionPlanService.putIsFinishedExecutionPlan(longId).getStatusCode());
@@ -355,11 +421,17 @@ public class ExecutionPlanServiceImplTests {
   void putIsFinishedExecutionPlan_ExecutionPlanException() throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ExecutionPlanException {
     executionPlan.setIsFinished(true);
     when(executionPlanRepository.findById(longId)).thenReturn(Optional.of(executionPlan));
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setUser(user);
@@ -368,7 +440,6 @@ public class ExecutionPlanServiceImplTests {
     projectUserPermissionList.add(projectUserPermission);
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     when(projectUserPermissionRepository.findByProjectIdUserID(longId,longId))
       .thenReturn(projectUserPermission);
     Assertions.assertThrows(ExecutionPlanException.class,() -> executionPlanService.putIsFinishedExecutionPlan(longId));

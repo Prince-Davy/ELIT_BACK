@@ -37,6 +37,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
@@ -139,9 +140,9 @@ public class ProjectServiceImpl implements ProjectService {
     org.json.simple.parser.ParseException, FileCouldNotBeSaved {
     Project projectToSave = new Project();
     // getting the connected user
-    String chefEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User chef = userRepository.findByUserEmail(chefEmail);
+    UserDetails principal =
+      (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User chef = userRepository.findByUserEmail(principal.getUsername());
     Date dateOfCreation = new Date();
     String folderName = dateOfCreation.getTime() + "_" + project.getName();
     File projectDirectory =
@@ -215,14 +216,13 @@ public class ProjectServiceImpl implements ProjectService {
    */
   @Override
   public List<Project> getUserProjects(final String keyword) {
-    String principal =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     List<Project> projects = new ArrayList<>();
     List<ProjectUserPermission> projectUserPermissions =
       projectUserPermissionRepository.findAll().stream()
         .filter(
           projectUserPermission ->
-            projectUserPermission.getUser().getUserEmail().equals(principal))
+            projectUserPermission.getUser().getUserEmail().equals(userDetails.getUsername()))
         .collect(Collectors.toList());
     if (!projectUserPermissions.isEmpty()) {
       for (ProjectUserPermission projectUserPermission : projectUserPermissions) {
@@ -247,15 +247,14 @@ public class ProjectServiceImpl implements ProjectService {
    */
   @Override
   public List<ProjectResponseModel> getUserProjectList(final String keyword) {
-    String principal =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     List<ProjectResponseModel> projects = new ArrayList<>();
     List<ProjectUserPermission> projectUserPermissions =
       projectUserPermissionRepository.findAll().stream()
         .filter(
           projectUserPermission ->
-            projectUserPermission.getUser().getUserEmail().equals(principal))
+            projectUserPermission.getUser().getUserEmail().equals(userDetails.getUsername()))
         .collect(Collectors.toList());
 
     if (!projectUserPermissions.isEmpty()) {

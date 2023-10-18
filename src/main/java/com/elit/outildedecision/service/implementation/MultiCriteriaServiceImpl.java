@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -409,8 +410,8 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @return true if the user has the specified permission, false otherwise
    */
   private boolean checkPermissions(final Long projectId, final String permissionName) {
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
     return Objects.nonNull(projectUserPermission) && permissionName.equals(projectUserPermission.getPermission());

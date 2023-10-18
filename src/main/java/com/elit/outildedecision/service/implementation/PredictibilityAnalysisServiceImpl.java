@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -373,9 +374,8 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
    * @return true if the user has the specified permission on the specified project, false otherwise
    */
   private boolean checkPermissions(final Long projectId, final String permissionName) {
-    String userEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     ProjectUserPermission projectUserPermission =
         projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());

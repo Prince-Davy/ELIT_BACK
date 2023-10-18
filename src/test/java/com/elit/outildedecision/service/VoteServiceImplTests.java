@@ -9,6 +9,7 @@ import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.VoteServiceImpl;
 import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ProjectPermession;
@@ -24,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,9 +56,6 @@ class VoteServiceImplTests {
   private VoteServiceImpl voteService;
   @Mock
   private Authentication authentication;
-  @Mock
-  private ProjectRepository projectRepository;
-
 
   private static final String USER_EMAIL = "test@example.com";
   private static final Long USER_ID = 1L;
@@ -69,7 +68,7 @@ class VoteServiceImplTests {
   private Project testProject;
   private ProjectUserPermission testPermission;
   private Vote testVote;
-  private   MultiCriteriaAnalysis testMultiCriteriaAnalysis;
+  private MultiCriteriaAnalysis testMultiCriteriaAnalysis;
 
 
   @BeforeEach
@@ -116,12 +115,18 @@ class VoteServiceImplTests {
     voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
     voteModelRequest.setIsConfirmed(true);
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
 
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
 
     when(userRepository.findByUserEmail(anyString())).thenReturn(testUser);
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(new PredictibilityAnalysis()));
@@ -145,12 +150,17 @@ class VoteServiceImplTests {
     voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
     voteModelRequest.setIsConfirmed(true);
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
 
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
 
     testPredictabilityAnalysis.getMultiCriteriaAnalysis().getProject().setProjectId(testProject.getProjectId());
@@ -183,7 +193,7 @@ class VoteServiceImplTests {
     Vote voteFromDB = new Vote();
 
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
 
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -213,7 +223,7 @@ class VoteServiceImplTests {
     Vote voteFromDB = new Vote();
 
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
 
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -237,15 +247,16 @@ class VoteServiceImplTests {
     voteModelRequest.setIsConfirmed(true);
 
     User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
     user.setUserId(1L);
-    user.setUserEmail("test@test.com");
 
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
-
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
     when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     RuntimeException p = Assertions.assertThrows(RuntimeException.class, ()-> voteService.createVote(voteModelRequest));
@@ -263,15 +274,17 @@ class VoteServiceImplTests {
     voteModelRequest.setIsConfirmed(true);
 
     User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
     user.setUserId(1L);
-    user.setUserEmail("test@test.com");
 
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
-
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
     testPredictabilityAnalysis.getMultiCriteriaAnalysis().getProject().setProjectId(testProject.getProjectId());
     when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     PredictibilityAnalysisNotFoundException p = Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, ()-> voteService.createVote(testProject.getProjectId(),voteModelRequest));
@@ -290,15 +303,17 @@ class VoteServiceImplTests {
     voteModelRequest.setIsConfirmed(true);
 
     User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
     user.setUserId(1L);
-    user.setUserEmail("test@test.com");
 
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
-
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
     testPredictabilityAnalysis.getMultiCriteriaAnalysis().getProject().setProjectId(testProject.getProjectId());
     when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(testPredictabilityAnalysis));
@@ -339,14 +354,28 @@ class VoteServiceImplTests {
   @Test
   void testGetVote_shouldReturn_VoteModelList() throws UserNotFoundException {
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+    user.setUserProjectPermissions(new ArrayList<>());
+     Project project = new Project();
+    ProjectUserPermission pup = new ProjectUserPermission();
+    pup.setId(new ProjectPropertyKey());
+    pup.setUser(user);
+    pup.setProject(project);
+    pup.setPermission("permission");
+    ArrayList<ProjectUserPermission> list = new ArrayList<ProjectUserPermission>();
+    list.add(pup);
+    user.setUserProjectPermissions(list);
+    user.detachPermission(pup);
 
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
     List< VoteModelResponse > result = new ArrayList<>();
     VoteModelResponse vMp = new VoteModelResponse(null,null,null,null,1L,null,1L);
@@ -357,12 +386,7 @@ class VoteServiceImplTests {
     testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
     testProject.setProjectUserPermissions(p);
 
-    User user = new User();
-    user.setUserEmail(userEmail);
-    user.setUserId(1L);
-    user.setUserProjectPermissions(p);
-
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(userRepository.findByUserEmail(user.getUsername())).thenReturn(user);
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
     when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
     Assertions.assertEquals(result, voteService.getVote(1L));
@@ -372,13 +396,13 @@ class VoteServiceImplTests {
   void testGetVote_success() throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
 
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(testUser));
 
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
 
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     List< VoteModelResponse > result = new ArrayList<>();
     VoteModelResponse vMp = new VoteModelResponse(null,null,null,null,1L,null,1L);
@@ -391,12 +415,12 @@ class VoteServiceImplTests {
     testVote.setPredictibilityAnalysis(testPredictabilityAnalysis);
 
     User user = new User();
-    user.setUserEmail(userEmail);
+    user.setUserEmail(userDetails.getUsername());
     user.setUserId(1L);
     user.setUserProjectPermissions(p);
 
 
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(userRepository.findByUserEmail(userDetails.getUsername())).thenReturn(user);
     when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
     Assertions.assertEquals(result, voteService.getVote(testProject.getProjectId(),testPredictabilityAnalysis.getPredictibilityAnalysisId()));
 
@@ -405,14 +429,19 @@ class VoteServiceImplTests {
   @Test
   void testGetVote_shouldReturn_VoteModelList_whenUserIsCDPOrContributer() throws UserNotFoundException {
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
 
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     List< VoteModelResponse > result = new ArrayList<>();
     VoteModelResponse vMp = new VoteModelResponse(1L,null,null,null,1L,null,1L);
@@ -423,12 +452,11 @@ class VoteServiceImplTests {
     testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
     testProject.setProjectUserPermissions(p);
 
-    User user = new User();
-    user.setUserEmail(userEmail);
+    user.setUserEmail(userDetails.getUsername());
     user.setUserId(1L);
     user.setUserProjectPermissions(p);
 
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(userRepository.findByUserEmail(userDetails.getUsername())).thenReturn(user);
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
     when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
     when(voteRepository.findByPredictibilityAnalysisAndUserId(testPredictabilityAnalysis.getPredictibilityAnalysisId(), user.getUserId())).thenReturn(testVote);
@@ -440,12 +468,17 @@ class VoteServiceImplTests {
   @Test
   void testGetVote_whenPredectibilityDoseNotExists() {
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
 
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
     when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.empty());
 
@@ -458,12 +491,17 @@ class VoteServiceImplTests {
   @Test
   void testGetVote_whenProjectAssociateDoseNotExists() {
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
 
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
     List< VoteModelResponse > result = new ArrayList<>();
     VoteModelResponse vMp = new VoteModelResponse(null,null,null,null,1L,null,1L);
@@ -485,24 +523,25 @@ class VoteServiceImplTests {
   @Test
   void testGetVote_whenUserDoseNotExisitsInProject() {
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
 
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     MultiCriteriaAnalysis m = new MultiCriteriaAnalysis();
     m.setProject(testProject);
     testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
     testProject.setProjectUserPermissions(null);
-    User user = new User();
-    user.setUserEmail(userEmail);
-    user.setUserId(1L);
 
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(userRepository.findByUserEmail(user.getUsername())).thenReturn(user);
     when(predictibilityAnalysisRepository.findById(1L)).thenReturn(Optional.of(testPredictabilityAnalysis));
     UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, ()-> voteService.getVote(1L));
 
@@ -512,9 +551,6 @@ class VoteServiceImplTests {
 
   @Test
    void updateVote()  {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
 
     // Arrange
     VoteModelRequest voteModelRequest = new VoteModelRequest();
@@ -529,21 +565,36 @@ class VoteServiceImplTests {
     testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
     testVote.setPredictibilityAnalysis(testPredictabilityAnalysis);
 
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = new User();
-    user.setUserEmail(userEmail);
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
     user.setUserId(1L);
 
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
+    when(userRepository.findByUserEmail(user.getUsername())).thenReturn(user);
     when(voteRepository.findById(testVote.getVoteId())).thenReturn(Optional.ofNullable(testVote));
     Assertions.assertEquals(ResponseEntity.ok().body("Vote mis à jour."), voteService.updateVote(testVote.getVoteId(),voteModelRequest));
   }
 
   @Test
   void updateVote_whenUserIsNotAutorised()  {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(3L);
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
 
     // Arrange
     VoteModelRequest voteModelRequest = new VoteModelRequest();
@@ -558,14 +609,12 @@ class VoteServiceImplTests {
     testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
     testVote.setPredictibilityAnalysis(testPredictabilityAnalysis);
     testVote.setUser(testUser);
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = new User();
-    user.setUserEmail(userEmail);
-    user.setUserId(3L);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
 
     testPermission.setPermission(ProjectPermession.CONTRIBUTER.toString());
 
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(userRepository.findByUserEmail(userDetails.getUsername())).thenReturn(user);
     when(voteRepository.findById(testVote.getVoteId())).thenReturn(Optional.ofNullable(testVote));
     when(projectUserPermissionRepository.findByProjectIdUserID(testProject.getProjectId(), user.getUserId())).thenReturn(testPermission);
     Assertions.assertEquals(ResponseEntity.status(HttpStatus.CONFLICT).body("Vous n'êtes pas autorisé à modifier ce vote."), voteService.updateVote(testVote.getVoteId(),voteModelRequest));
@@ -573,9 +622,18 @@ class VoteServiceImplTests {
 
   @Test
   void updateVote_whenVoteDoseNotExists()  {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
 
     // Arrange
     VoteModelRequest voteModelRequest = new VoteModelRequest();
@@ -585,12 +643,9 @@ class VoteServiceImplTests {
     voteModelRequest.setPredictibilityValue(PREDICTIBILITY_VALUE);
     voteModelRequest.setIsConfirmed(true);
 
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = new User();
-    user.setUserEmail(userEmail);
-    user.setUserId(1L);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    when(userRepository.findByUserEmail(userDetails.getUsername())).thenReturn(user);
     when(voteRepository.findById(3L)).thenReturn(Optional.empty());
 
     RuntimeException p = Assertions.assertThrows(RuntimeException.class, ()-> voteService.updateVote(3L,voteModelRequest));
@@ -599,9 +654,6 @@ class VoteServiceImplTests {
 
   @Test
   void updateVote_whenProjectAssociateNotFound()  {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
 
     // Arrange
     VoteModelRequest voteModelRequest = new VoteModelRequest();
@@ -616,12 +668,21 @@ class VoteServiceImplTests {
     testPredictabilityAnalysis.setMultiCriteriaAnalysis(m);
     testVote.setPredictibilityAnalysis(testPredictabilityAnalysis);
 
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
     User user = new User();
-    user.setUserEmail(userEmail);
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
     user.setUserId(1L);
 
-    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
+    when(userRepository.findByUserEmail(userDetails.getUsername())).thenReturn(user);
     when(voteRepository.findById(testVote.getVoteId())).thenReturn(Optional.ofNullable(testVote));
     ProjectNotFoundException p = Assertions.assertThrows(ProjectNotFoundException.class, ()-> voteService.updateVote(10L,1L, voteModelRequest));
     Assertions.assertEquals("Ce projet n'existe pas", p.getMessage());

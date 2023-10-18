@@ -2,11 +2,16 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.OpinionAlreadyExistException;
 import com.elit.outildedecision.model.OpinionModel;
+import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.OpinionService;
+import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import com.elit.outildedecision.util.ModelSamples;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +19,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,15 +38,22 @@ class OpinionControllerTest {
   private MockMvc mockMvc;
   @MockBean
   OpinionService opinionService;
+  @MockBean
+  private UserServiceImpl userService;
   @InjectMocks
   OpinionController OpinionController;
-
+  private UserResponseModel userResponseModel;
   public static String asJsonString(final Object obj) {
     try {
       return new ObjectMapper().writeValueAsString(obj);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @BeforeEach
+  public void setup() {
+    userResponseModel = ModelSamples.UserSamples.getUserResponseModel();
   }
 
   @Test
@@ -63,7 +78,10 @@ class OpinionControllerTest {
   }
 
   @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void getOpinionIsAlreadyExist() throws Exception {
+    when(userService.getAllInfosUserById(Mockito.any())).thenReturn(userResponseModel);
+
     when(opinionService.getOpinionIsAlreadyExist()).thenReturn(true);
     MockHttpServletResponse response = mockMvc.perform(get("/opinion/user")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200,response.getStatus());

@@ -5,8 +5,8 @@ import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
-import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.MultiCriteriaServiceImpl;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -229,7 +229,15 @@ public class MultiCriteriaServiceImplTests {
   }
 
   @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   public void increaseMulticriteriaIterationTest() throws MulticriteriaNotFoundException, UserNotAuthorizedException {
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     when(multiCriteriaAnalysisRepository.findById(1l)).thenReturn(Optional.ofNullable(multiCriteriaAnalysis));
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setPermission("CDP");
@@ -237,26 +245,11 @@ public class MultiCriteriaServiceImplTests {
     when(projectUserPermissionRepository.findByProjectIdUserID(any(), any())).
       thenReturn(projectUserPermission);
 
-    User user = new User();
-    user.setUserId(1l);
-    when(userRepository.findByUserEmail("email")).thenReturn(user);
 
-    mockAuthentication();
     multiCriteriaServiceImpl.increaseMulticriteriaIteration(1l);
     verify(multiCriteriaAnalysisRepository, times(1)).save(any());
 
   }
-
-  private void mockAuthentication() {
-    Authentication auth = mock(Authentication.class);
-
-    when(auth.getPrincipal()).thenReturn("email");
-
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(auth);
-    SecurityContextHolder.setContext(securityContext);
-  }
-
 
   @Test
   public void increaseMulticriteriaIterationAnalyseTest() throws MulticriteriaNotFoundException, UserNotAuthorizedException {
@@ -268,7 +261,7 @@ public class MultiCriteriaServiceImplTests {
     User user = new User();
     user.setUserId(1l);
 
-     multiCriteriaServiceImpl.increaseMulticriteriaIteration(1l,1l);
+    multiCriteriaServiceImpl.increaseMulticriteriaIteration(1l,1l);
     verify(multiCriteriaAnalysisRepository, times(1)).save(any());
 
   }

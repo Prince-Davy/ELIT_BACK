@@ -6,6 +6,7 @@ import com.elit.outildedecision.model.*;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
+import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.ProjectServiceImpl;
 import com.elit.outildedecision.util.ProjectConfirmationState;
 import com.elit.outildedecision.util.ProjectPermession;
@@ -64,7 +65,7 @@ class ProjectServiceImplTest {
   @Test
   void persistProject() throws UserNotFoundException, ProjectNotFoundException, ProjectFolderAlreadyExistsException, FileCouldNotBeSaved, IOException, ParseException, org.json.simple.parser.ParseException {
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
 
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -93,7 +94,7 @@ class ProjectServiceImplTest {
   @Test
   void persistProject_whenUserNotFound() {
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
 
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -124,7 +125,7 @@ class ProjectServiceImplTest {
   void getUserProjects() {
     String keyword = "test@test.com";
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
 
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -142,7 +143,7 @@ class ProjectServiceImplTest {
 
     String keyword = "test@test.com";
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
 
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);

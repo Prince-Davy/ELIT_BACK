@@ -7,22 +7,26 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.repository.UserRepository;
+import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.elit.outildedecision.util.Constants;
+import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -35,7 +39,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class UserServiceImplTests {
   @Mock
   private UserRepository userRepository;
@@ -53,6 +59,7 @@ class UserServiceImplTests {
   private static final String NEW_PASS = "new_pass";
   private User user;
 
+
   @BeforeEach
   public void setUp() {
     user = new User();
@@ -60,7 +67,8 @@ class UserServiceImplTests {
     user.setUserEmail(USER_EMAIL);
     user.setUserId(1L);
     user.setUserPassword(passwordEncoder.encode(OLD_PASS));
-  }
+    user.setUserPassword(passwordEncoder.encode(OLD_PASS));
+   }
 
   @Test
   void loadUserByUsername_Success(){
@@ -290,10 +298,12 @@ class UserServiceImplTests {
   }
 
   @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void updateUser_USERNOTFOUND() throws CouldNotSaveUserException {
-    UserModel usermodel = new UserModel();
+    UserModel usermodel = ModelSamples.UserSamples.getUserModel();
+    usermodel.setUserEmail("super@elite.com");
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
@@ -304,6 +314,7 @@ class UserServiceImplTests {
   }
 
   @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void updateUser_EmailNotTheSame() throws CouldNotSaveUserException {
     UserModel usermodel = new UserModel();
     usermodel.setUsername(USER_EMAIL);
@@ -312,7 +323,7 @@ class UserServiceImplTests {
     usermodel.setUserEmail(USER_EMAIL);
     user.setUserPassword("");
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn(USER_EMAIL);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
@@ -323,6 +334,7 @@ class UserServiceImplTests {
   }
 
   @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void updateUser_Success() throws CouldNotSaveUserException {
     UserModel usermodel = new UserModel();
     usermodel.setUsername(USER_EMAIL);
@@ -331,7 +343,7 @@ class UserServiceImplTests {
     usermodel.setUserPasswordConfirmation("");
     usermodel.setUserEmail(USER_EMAIL);
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn(USER_EMAIL);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);

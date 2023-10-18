@@ -6,6 +6,7 @@ import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundExceptio
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.PredictibilityAnalysisServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -119,11 +121,17 @@ class PredictibilityAnalysisServiceImplTests {
 
   @Test
   void putIsFinishedPredictibilityAnalysis_PredictibilityAnalysisAlreadyUpdated() {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setUser(user);
@@ -133,19 +141,24 @@ class PredictibilityAnalysisServiceImplTests {
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
     when(predictibilityAnalysisRepository.findById(LongId)).thenReturn(Optional.of(predictibilityAnalysis));
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
+     when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
     assertThrows(PredictibilityAnalysisAlreadyUpdated.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LongId));
   }
 
   @Test
   void putIsFinishedPredictibilityAnalysis_UserNotAuthorizedException() {
     predictibilityAnalysis.setIsFinished(false);
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setUser(user);
@@ -155,19 +168,24 @@ class PredictibilityAnalysisServiceImplTests {
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
     when(predictibilityAnalysisRepository.findById(LongId)).thenReturn(Optional.of(predictibilityAnalysis));
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
+     when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
     assertThrows(UserNotAuthorizedException.class, () -> predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LongId));
   }
 
   @Test
   void putIsFinishedPredictibilityAnalysis_Success() throws Exception {
     predictibilityAnalysis.setIsFinished(false);
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
     ProjectUserPermission projectUserPermission = new ProjectUserPermission();
     projectUserPermission.setUser(user);
@@ -177,7 +195,6 @@ class PredictibilityAnalysisServiceImplTests {
     user.setUserProjectPermissions(projectUserPermissionList);
     project.setProjectUserPermissions(projectUserPermissionList);
     when(predictibilityAnalysisRepository.findById(LongId)).thenReturn(Optional.of(predictibilityAnalysis));
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
     when(projectUserPermissionRepository.findByProjectIdUserID(LongId, LongId)).thenReturn(projectUserPermission);
     assertEquals(HttpStatus.OK, predictibilityAnalysisService.putIsFinishedPredictibilityAnalysis(LongId).getStatusCode());
   }

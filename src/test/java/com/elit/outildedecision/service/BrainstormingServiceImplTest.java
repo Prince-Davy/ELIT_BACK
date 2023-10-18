@@ -27,11 +27,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import static com.elit.outildedecision.util.Constants.BRAINSTORMING_DOESNT_EXIST;
 import static com.elit.outildedecision.util.Constants.ANALYSIS_DOESNT_EXIST;
+import com.elit.outildedecision.security.AppUserPrincipal;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -111,8 +113,8 @@ class BrainstormingServiceImplTest {
     brainstorming.setBrainstormingId(1L);
     brainstorming.setIsChecked(false);
     brainstorming.setPredictibilityAnalysis(predictibilityAnalysis);
-    
-   
+
+
     // Set up the repository to return the Brainstorming object when findById is called
     when(brainstormingRepository.findById(1L)).thenReturn(Optional.of(brainstorming));
     // Create an HttpEntity containing a JSON object with a "isConfirmed" field set to true
@@ -178,31 +180,42 @@ class BrainstormingServiceImplTest {
 
   @Test
   void createBrainstorming_PredictibilityError() throws ExistingBrainstormingException, PredictibilityAnalysisNotFoundException {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
-    BrainstormingModel brainstormingModel = new BrainstormingModel();
-    brainstormingModel.setBrainstormingId(1L);
-    brainstormingModel.setPredictibilityAnalysisId(1L);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+    BrainstormingModel brainstormingModel = new BrainstormingModel();
+    brainstormingModel.setBrainstormingId(1L);
+    brainstormingModel.setPredictibilityAnalysisId(1L);
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.empty());
     Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, ()-> brainstormingService.createBrainstorming(1L, brainstormingModel));
   }
 
   @Test
   void createBrainstorming_ExistingError() throws ExistingBrainstormingException, PredictibilityAnalysisNotFoundException {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     BrainstormingModel brainstormingModel = new BrainstormingModel();
     brainstormingModel.setBrainstormingId(0L);
     brainstormingModel.setPredictibilityAnalysisId(0L);
     brainstormingModel.setQuestionId(0L);
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
+     SecurityContextHolder.setContext(securityContext);
     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(predictibilityAnalysis));
     when(brainstormingRepository.findByUserQuestionPredictibilityId(anyLong(),anyLong(),anyLong()))
       .thenReturn(brainstorming);
@@ -211,17 +224,25 @@ class BrainstormingServiceImplTest {
 
   @Test
   void createBrainstorming_Success() throws ExistingBrainstormingException, PredictibilityAnalysisNotFoundException, ProjectNotFoundException {
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
+
     BrainstormingModel brainstormingModel = new BrainstormingModel();
     brainstormingModel.setBrainstormingId(0L);
     brainstormingModel.setPredictibilityAnalysisId(0L);
     brainstormingModel.setQuestionId(0L);
-    SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
-    when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(predictibilityAnalysis));
+     when(predictibilityAnalysisRepository.findById(anyLong())).thenReturn(Optional.of(predictibilityAnalysis));
     when(brainstormingRepository.findByUserQuestionPredictibilityId(1L,0L,1L))
       .thenReturn(null);
     assertEquals(HttpStatus.OK,brainstormingService.createBrainstorming(1L, brainstormingModel).getStatusCode());
@@ -240,12 +261,17 @@ class BrainstormingServiceImplTest {
   @Test
   void updateBrainstorming_Success() throws BrainstormingNotFoundException, ProjectNotFoundException {
     when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.of(brainstorming));
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(user);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     BrainstormingModel brainstormingModel = new BrainstormingModel();
     Project project = new Project();
     project.setProjectId(10L);
@@ -269,12 +295,22 @@ class BrainstormingServiceImplTest {
     when(brainstormingRepository.findById(anyLong())).thenReturn(Optional.of(brainstorming));
     User userNotTheSame = new User();
     userNotTheSame.setUserId(10L);
+    User user = new User();
+    user.setUserEmail("test@test.fr");
+    user.setUsername("test@test.fr");
+    user.setUserId(1L);
+
+    User user2 = new User();
+    user2.setUserEmail("test2@test.fr");
+    user2.setUsername("test2@test.fr");
+    user2.setUserId(2L);
+
     Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn("test@test.com");
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
-    when(userRepository.findByUserEmail("test@test.com")).thenReturn(userNotTheSame);
+    when(userRepository.findByUserEmail(anyString())).thenReturn(user2);
     Project project = new Project();
     project.setProjectId(10L);
 

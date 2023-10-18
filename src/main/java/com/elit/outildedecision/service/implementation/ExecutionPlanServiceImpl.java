@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -322,9 +323,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    */
   @Override
   public ResponseEntity<Object> getMethodologies(final Long executionPlanId) {
-    String userEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
@@ -387,9 +387,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    */
   @Override
   public ResponseEntity<Object> getMethodologies(final Long projectId, final Long executionPlanId) throws ProjectNotFoundException, ExecutionPlanNotFoundException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
     ExecutionPlan executionPlan = checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
@@ -449,9 +448,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   @Override
   public ResponseEntity<String> postMethodologiesVote(
       final ExecutionVoteRequestModel executionVoteRequestModel) throws VoteAlreadyExistException {
-    String userEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     ExecutionPlan executionPlan =
         executionPlanRepository
@@ -507,9 +505,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   public ResponseEntity<String> postMethodologiesVote(
     final Long projectId,
     final ExecutionVoteRequestModel executionVoteRequestModel) throws VoteAlreadyExistException, ProjectNotFoundException, ExecutionPlanNotFoundException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
     checkAssociationProjectAndExecutionPlan(projectId, executionVoteRequestModel.getExecutionPlanId());
     ExecutionPlanVote executionPlanVoteFromDB =
       executionPlanVoteRepo.findVoteByUserIdAndExecutionPlanId(
@@ -550,9 +547,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    */
   @Override
   public ExecutionPlanScoreResponseModel getExecutionPlanScore(final Long executionPlanId) throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
-    String userEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
     ExecutionPlan executionPlan =
         executionPlanRepository
             .findById(executionPlanId)
@@ -778,9 +774,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    */
   private boolean checkPermissions(final Long projectId,
                                    final String permissionName) {
-    String userEmail =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     ProjectUserPermission projectUserPermission =
         projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());

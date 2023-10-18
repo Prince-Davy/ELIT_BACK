@@ -314,8 +314,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public ResponseEntity<Map<String, String>> updateUser(final UserModel user)
     throws CouldNotSaveUserException {
-    String authenticatedUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User userFromDB = userRepository.findByUserEmail(authenticatedUserEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User userFromDB = userRepository.findByUserEmail(userDetails.getUsername());
     Map<String, String> errorMap = new HashMap<>();
     if (Objects.isNull(userFromDB)) {
       errorMap.put("NOT_FOUND", Constants.USER_NOT_FOUND);

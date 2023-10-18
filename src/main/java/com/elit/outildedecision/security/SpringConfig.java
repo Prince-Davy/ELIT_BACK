@@ -85,10 +85,10 @@ public class SpringConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests()
       .antMatchers("/", "/login", "/refreshToken", "/swagger-ui.html", "/v3/api-docs", "/v3/api-docs.yaml").permitAll()
       .anyRequest().permitAll();
-    JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean());
+    JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean(), customUserDetailsService);
     jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
     http.addFilter(jwtAuthenticationFilter);
-    http.addFilterBefore(new JwtAuthorizationFilter(jwtProperties), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(new JwtAuthorizationFilter(jwtProperties, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
   }
 
   /**

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.elit.outildedecision.config.JwtProperties;
 import com.elit.outildedecision.security.AppUserPrincipal;
+import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -26,14 +27,19 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
   private final JwtProperties jwtProperties;
   private final AuthenticationManager authenticationManager;
+
+  private final  UserServiceImpl customUserDetailsService;
   /**
    * Constructor of JwtAuthenticationFilter.
-   * @param jwtProperties
-   * @param authenticationManager the authentication manager
+   *
+   * @param jwtProperties properties
+   * @param authenticationManager    the authentication manager
+   * @param customUserDetailsService custom service
    */
-  public JwtAuthenticationFilter(final JwtProperties jwtProperties, final AuthenticationManager authenticationManager) {
+  public JwtAuthenticationFilter(final JwtProperties jwtProperties, final AuthenticationManager authenticationManager, final UserServiceImpl customUserDetailsService) {
     this.jwtProperties = jwtProperties;
     this.authenticationManager = authenticationManager;
+    this.customUserDetailsService = customUserDetailsService;
   }
 
   /**
@@ -55,8 +61,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
           new ObjectMapper().readValue(request.getInputStream(), Map.class);
       String username = requestMap.get("username");
       String password = requestMap.get("password");
+
+      AppUserPrincipal appUserPrincipal = new AppUserPrincipal(customUserDetailsService.findByEmail(username));
+
       UsernamePasswordAuthenticationToken authenticationToken =
-          new UsernamePasswordAuthenticationToken(username, password);
+          new UsernamePasswordAuthenticationToken(appUserPrincipal, password);
       return authenticationManager.authenticate(authenticationToken);
     } catch (IOException e) {
       throw new AuthenticationServiceException(e.getMessage(), e);

@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -87,9 +88,8 @@ public class VoteServiceImpl implements VoteService {
   @Override
   public ResponseEntity<String> createVote(final VoteModelRequest voteModelRequest)
     throws VoteAlreadyExistException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     Vote voteFromDB =
       voteRepository.findByPredictibilityAnalysisAndUserId(
@@ -124,9 +124,8 @@ public class VoteServiceImpl implements VoteService {
   @Override
   public ResponseEntity<String> createVote(final Long projectId, final VoteModelRequest voteModelRequest)
     throws VoteAlreadyExistException, ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     Vote voteFromDB =
       voteRepository.findByPredictibilityAnalysisAndUserId(
@@ -191,8 +190,8 @@ public class VoteServiceImpl implements VoteService {
   @Override
   public List<VoteModelResponse> getVote(final Long predictibilityAnalysisId)
     throws UserNotFoundException {
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository
       .findById(predictibilityAnalysisId)
@@ -230,8 +229,8 @@ public class VoteServiceImpl implements VoteService {
   public List<VoteModelResponse> getVote(final Long projectId, final Long predictibilityAnalysisId)
     throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
 
-    String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository
       .findById(predictibilityAnalysisId)
@@ -320,9 +319,8 @@ public class VoteServiceImpl implements VoteService {
    */
   @Override
   public ResponseEntity<String> updateVote(final Long voteId, final VoteModelRequest voteModelRequest) {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     Vote voteFromDB =
       voteRepository
@@ -358,9 +356,8 @@ public class VoteServiceImpl implements VoteService {
    */
   @Override
   public ResponseEntity<String> updateVote(final Long projectId, final Long voteId, final VoteModelRequest voteModelRequest) throws ProjectNotFoundException, VoteNotFoundException {
-    String userEmail =
-      (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findByUserEmail(userEmail);
+    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     Vote voteFromDB =
       voteRepository
