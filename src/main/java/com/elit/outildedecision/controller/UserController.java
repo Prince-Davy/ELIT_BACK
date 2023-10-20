@@ -112,7 +112,7 @@ public class UserController {
       return userService.updatePasswordUserById(userId, oldPass, newPass);
     } else {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-        .body("Impossible de changer le mot de passe");
+        .body("Une erreur est survenue, votre nouveau mot de passe n’a pas été enregistré.");
     }
 
   }

@@ -51,6 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Service implementation for managing user-related operations.
@@ -205,17 +207,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public ResponseEntity<String> updatePasswordUserById(final Long userId,
                                                        final String oldPass,
                                                        final String newPass) throws UserNotFoundException {
-    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
-    String currentPass = user.getUserPassword();
-    boolean checkPassword = passwordEncoder.matches(oldPass, currentPass);
-    if (!checkPassword) {
+    final User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
+
+    final Pattern pattern = Pattern.compile("^(?=.*[~!@#$%^&*()_+`\\-=\\[\\]\\{\\};':\\\",./<>?])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])\\S{12,32}$", Pattern.CASE_INSENSITIVE);
+    final Matcher matcher = pattern.matcher(newPass);
+     if (!matcher.find()) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-        .body("Votre ancien mot de passe n'est pas correct");
+        .body("Le mot de passe doit contenir 12 caractères minimum dont 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial (~!@#$%^&*()_+`\\-=\\[\\]\\{\\};':\\\",./<>?) et pas d’espace.");
+    } else if (!passwordEncoder.matches(oldPass, user.getUserPassword())) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        .body("L'ancien mot de passe renseigné n'est pas correct.");
+    } else if (oldPass.equals(newPass)) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        .body("Le nouveau mot de passe renseigné ne doit pas être identique au précédent.");
     } else {
       user.setUserPassword(passwordEncoder.encode(newPass));
     }
     userRepository.save(user);
-    return ResponseEntity.status(HttpStatus.OK).body("Votre mot de passe a bien été modifié");
+    return ResponseEntity.status(HttpStatus.OK).body("Votre nouveau mot de passe a bien été enregistré.");
   }
 
   /**

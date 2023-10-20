@@ -56,7 +56,7 @@ class UserServiceImplTests {
   private static final String USER_EMAIL = "test@example.com";
   private static final Long USER_ID = 1L;
   private static final String OLD_PASS = "old_pass";
-  private static final String NEW_PASS = "new_pass";
+  private static final String NEW_PASS = "Azertyuio12!";
   private User user;
 
 
