@@ -7,6 +7,7 @@ import com.elit.outildedecision.util.ProjectPermession;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,8 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
   public boolean isProjectOwner(final Long projectId) {
     List<String> permissions = new ArrayList<>();
     try {
-      User user = userService.findByEmail((String) this.getPrincipal());
+      final UserDetails userDetails = (UserDetails) this.getPrincipal();
+      User user = userService.findByEmail(userDetails.getUsername());
 
       user.getUserProjectPermissions().stream()
         .filter(p -> p.getProject().getProjectId().equals(projectId))
@@ -75,7 +77,8 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
   public boolean isContributer(final Long projectId) {
     List<String> permissions = new ArrayList<>();
     try {
-      User user = userService.findByEmail((String) this.getPrincipal());
+      final UserDetails userDetails = (UserDetails) this.getPrincipal();
+      User user = userService.findByEmail(userDetails.getUsername());
       user.getUserProjectPermissions().stream()
         .filter(p -> p.getProject().getProjectId().equals(projectId))
         .forEach(p -> permissions.add(p.getPermission()));
@@ -95,7 +98,8 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
   public boolean isObserver(final Long projectId) {
     List<String> permissions = new ArrayList<>();
     try {
-      User user = userService.findByEmail((String) this.getPrincipal());
+      final UserDetails userDetails = (UserDetails) this.getPrincipal();
+      User user = userService.findByEmail(userDetails.getUsername());
       user.getUserProjectPermissions().stream()
         .filter(p -> p.getProject().getProjectId().equals(projectId))
         .forEach(p -> permissions.add(p.getPermission()));
