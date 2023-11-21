@@ -16,6 +16,7 @@ import com.elit.outildedecision.service.UserService;
 import com.elit.outildedecision.service.VerificationTokenService;
 import com.elit.outildedecision.util.Constants;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -53,12 +55,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 /**
  * Service implementation for managing user-related operations.
  */
 @Service
 @Transactional
+@Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
 
   /**
@@ -99,6 +101,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    */
   @Value("${backend.value-url}")
   private String backEndUrl;
+
   /**
    * Constructor for UserServiceImpl.
    *
@@ -171,13 +174,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
           .userPassword(passwordEncoder.encode(user.getUserPassword()))
           .isAdmin(false)
           .build();
-     sendRegistrationConfirmationEmail(userRepository.save(userToSave));
+      sendRegistrationConfirmationEmail(userRepository.save(userToSave));
       return ResponseEntity.status(HttpStatus.CREATED).body("Votre compte a été créé avec succès");
     } catch (Exception e) {
 
       throw new CouldNotSaveUserException("Une erreur est survenue lors de votre inscription. Veuillez réessayer plus tard");
     }
   }
+
   /**
    * Method to send mail to user to the database.
    *
@@ -187,14 +191,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * @throws CouldNotSaveUserException
    */
   public ResponseEntity<String> sendRegistrationConfirmationEmailAgain(final UserModel user) throws UserAlreadyExistsException, CouldNotMailUserException {
-     try {
-          User userToMail = userRepository.findByUserEmail(user.getUserEmail());
-          sendRegistrationConfirmationEmail(userToMail);
-          return ResponseEntity.status(HttpStatus.CREATED).body("Le mail à correctement été envoyé");
-      } catch (Exception e) {
-          throw new CouldNotMailUserException("Une erreur est survenue lors de l'envoi du mail. Veuillez réessayer plus tard");
-      }
+    try {
+      User userToMail = userRepository.findByUserEmail(user.getUserEmail());
+      sendRegistrationConfirmationEmail(userToMail);
+      return ResponseEntity.status(HttpStatus.CREATED).body("Le mail à correctement été envoyé");
+    } catch (Exception e) {
+      throw new CouldNotMailUserException("Une erreur est survenue lors de l'envoi du mail. Veuillez réessayer plus tard");
+    }
   }
+
   /**
    * Updates a user's password given their ID and old and new passwords.
    *
@@ -211,7 +216,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     final Pattern pattern = Pattern.compile("^(?=.*[~!@#$%^&*()_+`\\-=\\[\\]\\{\\};':\\\",./<>?])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])\\S{12,32}$", Pattern.CASE_INSENSITIVE);
     final Matcher matcher = pattern.matcher(newPass);
-     if (!matcher.find()) {
+    if (!matcher.find()) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
         .body("Le mot de passe doit contenir 12 caractères minimum dont 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial (~!@#$%^&*()_+`\\-=\\[\\]\\{\\};':\\\",./<>?) et pas d’espace.");
     } else if (!passwordEncoder.matches(oldPass, user.getUserPassword())) {
@@ -242,12 +247,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     User user = userRepository.findById(userId)
       .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
     try {
-        String avatarPath = saveAvatar(userAvatar);
-        user.setUserAvatarPath(avatarPath);
-        userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.OK).body("Votre photo a bien été modifiée.");
-  } catch (Exception e) {
-        throw new CouldNotSaveUserException("Une erreur est survenue lors de l'enregistrement de votre photo.");
+      String avatarPath = saveAvatar(userAvatar);
+      user.setUserAvatarPath(avatarPath);
+      userRepository.save(user);
+      return ResponseEntity.status(HttpStatus.OK).body("Votre photo a bien été modifiée.");
+    } catch (Exception e) {
+      throw new CouldNotSaveUserException("Une erreur est survenue lors de l'enregistrement de votre photo.");
     }
   }
 
@@ -286,7 +291,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * @param userId   The ID of the user whose avatar should be sent.
    * @param response The response to write the avatar file to.
    * @return A ResponseEntity with a message avatar not found
-   * @throws IOException             If there is an error reading or writing the avatar file.
+   * @throws IOException If there is an error reading or writing the avatar file.
    */
   @Override
   public ResponseEntity<String> viewAvatarByUserId(final Long userId,
@@ -309,10 +314,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         FileCopyUtils.copy(inputStream, response.getOutputStream());
       }
     }
-      logger.error(Constants.AVATAR_NOT_FOUND);
-      return ResponseEntity.status(200).body(Constants.AVATAR_NOT_FOUND);
+    logger.error(Constants.AVATAR_NOT_FOUND);
+    return ResponseEntity.status(200).body(Constants.AVATAR_NOT_FOUND);
 
   }
+
   /**
    * Updates a user's information given a UserModel object containing the updated information.
    *
@@ -323,7 +329,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public ResponseEntity<Map<String, String>> updateUser(final UserModel user)
     throws CouldNotSaveUserException {
-    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User userFromDB = userRepository.findByUserEmail(userDetails.getUsername());
     Map<String, String> errorMap = new HashMap<>();
     if (Objects.isNull(userFromDB)) {
@@ -342,10 +348,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     errorMap.put("SUCCESS", "Utilisateur mis à jour");
     return ResponseEntity.status(HttpStatus.OK).body(errorMap);
   }
+
   /**
    * Validates a user details against the user details in the database.
    *
-   * @param user The UserModel object containing the updated user information.
+   * @param user       The UserModel object containing the updated user information.
    * @param userFromDB The user to update.
    * @return A Map containing the errors.
    */
@@ -367,10 +374,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
     return errorMap;
   }
+
   /**
    * Updates a user's fields.
    *
-   * @param user The UserModel object containing the updated user information.
+   * @param user       The UserModel object containing the updated user information.
    * @param userFromDB The user to update.
    * @throws CouldNotSaveUserException If there is an error saving the updated user to the database.
    */
@@ -442,13 +450,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public UserResponseModel getAllInfosUserById(final Long userId) {
     User user = userRepository.getById(userId);
-      return UserResponseModel.builder()
-        .userId(user.getUserId())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .build();
+    return UserResponseModel.builder()
+      .userId(user.getUserId())
+      .userFirstName(user.getUserFirstName())
+      .userLastName(user.getUserLastName())
+      .username(user.getUsername())
+      .userEmail(user.getUserEmail())
+      .build();
   }
 
   /**
@@ -463,49 +471,64 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     List<UserResponseModel> foundUsers = new ArrayList<>();
     if (keyword == null || "".equals(keyword)) {
       for (User user : userRepository.findAll()) {
-        if (user.getUserAvatarPath() != null) {
-          File file = new File(user.getUserAvatarPath());
-          UserResponseModel userResponseModel =
-            UserResponseModel.builder()
-              .userId(user.getUserId())
-              .userFirstName(user.getUserFirstName())
-              .userLastName(user.getUserLastName())
-              .username(user.getUsername())
-              .userEmail(user.getUserEmail())
-              .userAvatar(Files.readAllBytes(file.toPath()))
-              .build();
-          foundUsers.add(userResponseModel);
-
-        } else {
-          UserResponseModel userResponseModel =
-            UserResponseModel.builder()
-              .userId(user.getUserId())
-              .userFirstName(user.getUserFirstName())
-              .userLastName(user.getUserLastName())
-              .username(user.getUsername())
-              .userEmail(user.getUserEmail())
-              .build();
-          foundUsers.add(userResponseModel);
-        }
+        foundUsers.add(createUserResponseModel(user));
       }
-      return foundUsers;
+    } else {
+      for (User user : userRepository.findAllByUserEmailOrUsernameContaining(keyword)) {
+        foundUsers.add(createUserResponseModel(user));
+      }
     }
-    for (User user : userRepository.findAllByUserEmailOrUsernameContaining(keyword)) {
-      UserResponseModel userResponseModel =
-        UserResponseModel.builder()
-          .userFirstName(user.getUserFirstName())
-          .userLastName(user.getUserLastName())
-          .username(user.getUsername())
-          .userEmail(user.getUserEmail())
-          .userAvatar(Files.readAllBytes(Paths.get(user.getUserAvatarPath())))
-          .build();
-      foundUsers.add(userResponseModel);
-    }
+
     return foundUsers;
+  }
+
+
+  /**
+   * Finds all users whose email or username contains a given keyword.
+   *
+   * @param user The keyword to search for.
+   * @return A UserResponseModel object.
+   * @throws IOException If there is an error reading a user's avatar file.
+   */
+  private UserResponseModel createUserResponseModel(final User user) throws IOException {
+    UserResponseModel.UserResponseModelBuilder userModel = UserResponseModel.builder()
+      .userId(user.getUserId())
+      .userFirstName(user.getUserFirstName())
+      .userLastName(user.getUserLastName())
+      .username(user.getUsername())
+      .userEmail(user.getUserEmail());
+
+    if (user.getUserAvatarPath() != null) {
+      File file = new File(user.getUserAvatarPath());
+      byte[] userAvatar = readBytesFromFile(file.getPath());
+      userModel.userAvatar(userAvatar);
+    }
+
+    return userModel.build();
+  }
+
+
+  /**
+   * Finds all users whose email or username contains a given keyword.
+   *
+   * @param filePath The filePath of teh file.
+   * @return A[] of bytes if the avatar correctly found it   .
+   * @throws IOException If there is an error reading a user's avatar file.
+   */
+  private byte[] readBytesFromFile(final String filePath) throws IOException {
+    try {
+      if (filePath != null) {
+        return Files.readAllBytes(Paths.get(filePath));
+      }
+    } catch (NoSuchFileException e) {
+      log.error("File not found: " + e.getMessage());
+    }
+    return new byte[0];
   }
 
   /**
    * Saves the avatar file uploaded by the user to the specified directory.
+   *
    * @param avatar the avatar file uploaded by the user
    * @return the file path where the avatar file was saved
    * @throws IOException if an I/O error occurs while saving the file
@@ -521,10 +544,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
   /**
    * Deletes the avatar for the user with the specified ID.
-   * @param userId     the ID of the user to update the avatar for
+   *
+   * @param userId the ID of the user to update the avatar for
    * @return a ResponseEntity indicating the success or failure of the avatar update operation
-   * @throws UserNotFoundException     if the specified user account does not exist
-   * @throws AvatarNotFoundException     if the specified avatar  does not exist
+   * @throws UserNotFoundException   if the specified user account does not exist
+   * @throws AvatarNotFoundException if the specified avatar  does not exist
    */
   @Override
   public ResponseEntity<String> deleteAvatarByIdUser(final Long userId) throws AvatarNotFoundException, UserNotFoundException {

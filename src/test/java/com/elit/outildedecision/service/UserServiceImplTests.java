@@ -287,6 +287,7 @@ class UserServiceImplTests {
     when(userRepository.findAllByUserEmailOrUsernameContaining(keyworld)).thenReturn(users);
     UserResponseModel userResponseModel =
       UserResponseModel.builder()
+        .userId(1L)
         .userFirstName(user.getUserFirstName())
         .userLastName(user.getUserLastName())
         .username(user.getUsername())
