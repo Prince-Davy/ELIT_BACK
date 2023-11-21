@@ -28,11 +28,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   private final JwtProperties jwtProperties;
   private final AuthenticationManager authenticationManager;
 
-  private final  UserServiceImpl customUserDetailsService;
+  private final UserServiceImpl customUserDetailsService;
+
   /**
    * Constructor of JwtAuthenticationFilter.
    *
-   * @param jwtProperties properties
+   * @param jwtProperties            properties
    * @param authenticationManager    the authentication manager
    * @param customUserDetailsService custom service
    */
@@ -48,7 +49,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
    * and then we use the authentication manager to authenticate the user
    * If the authentication is successful, we will generate a JWT token
    * and send it back to the client.
-   * @param request the request
+   *
+   * @param request  the request
    * @param response the response
    * @return Authentication the authentication object that contains the authenticated user details
    * @throws AuthenticationException if the authentication fails for any reason.
@@ -58,25 +60,27 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                               final HttpServletResponse response) throws AuthenticationException {
     try {
       Map<String, String> requestMap =
-          new ObjectMapper().readValue(request.getInputStream(), Map.class);
+        new ObjectMapper().readValue(request.getInputStream(), Map.class);
       String username = requestMap.get("username");
       String password = requestMap.get("password");
 
       AppUserPrincipal appUserPrincipal = new AppUserPrincipal(customUserDetailsService.findByEmail(username));
 
       UsernamePasswordAuthenticationToken authenticationToken =
-          new UsernamePasswordAuthenticationToken(appUserPrincipal, password);
+        new UsernamePasswordAuthenticationToken(appUserPrincipal, password);
       return authenticationManager.authenticate(authenticationToken);
     } catch (IOException e) {
       throw new AuthenticationServiceException(e.getMessage(), e);
     }
   }
+
   /**
    * This method is called when the authentication is successful
    * We generate a JWT token and send it back to the client.
-   * @param request the request
-   * @param response the response
-   * @param chain the filter chain
+   *
+   * @param request    the request
+   * @param response   the response
+   * @param chain      the filter chain
    * @param authResult the authentication object that contains the authenticated user details
    * @throws IOException if there is an error while writing the token to the response body
    */
@@ -86,47 +90,47 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                           final FilterChain chain,
                                           final Authentication authResult) throws IOException {
     AppUserPrincipal user =
-        (AppUserPrincipal) authResult.getPrincipal(); // get the authenticated user
+      (AppUserPrincipal) authResult.getPrincipal(); // get the authenticated user
     Algorithm algorithm =
-        Algorithm.HMAC256(jwtProperties.getSecret().getBytes());
+      Algorithm.HMAC256(jwtProperties.getSecret().getBytes());
     String accessToken =
-        JWT.create()
-            .withSubject(user.getUsername()) // the (email) of the authenticated user
-            .withExpiresAt(
-                new Date(
-                    System.currentTimeMillis() + jwtProperties.getAccessTokenExpirationTime())) // the token will expire in 15min
-            .withIssuer(
-                request
-                    .getRequestURL()
-                    .toString()) // the issuer of the token is the URL of the server
-            .withClaim(
-                "roles",
-                user.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList())) // the
-            // roles
-            // of
-            // the
-            // authenticated
-            // user
-            .withClaim(
-                "firstname", user.getUserFirstName()) // the first name of the authenticated user
-            .withClaim(
-                "lastname", user.getUserLastName()) // the last name of the authenticated user
-            .withClaim("id", user.getUser().getUserId()) // the user id of the authenticated user
-            .sign(algorithm); // sign the token using our secret
+      JWT.create()
+        .withSubject(user.getUsername()) // the (email) of the authenticated user
+        .withExpiresAt(
+          new Date(
+            System.currentTimeMillis() + jwtProperties.getAccessTokenExpirationTime())) // the token will expire in 15min
+        .withIssuer(
+          request
+            .getRequestURL()
+            .toString()) // the issuer of the token is the URL of the server
+        .withClaim(
+          "roles",
+          user.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList())) // the
+        // roles
+        // of
+        // the
+        // authenticated
+        // user
+        .withClaim(
+          "firstname", user.getUserFirstName()) // the first name of the authenticated user
+        .withClaim(
+          "lastname", user.getUserLastName()) // the last name of the authenticated user
+        .withClaim("id", user.getUser().getUserId()) // the user id of the authenticated user
+        .sign(algorithm); // sign the token using our secret
     String refreshToken =
-        JWT.create()
-            .withSubject(user.getUsername()) // the username of the authenticated user
-            .withExpiresAt(
-                new Date(
-                    System.currentTimeMillis() + jwtProperties.getRefreshTokenExpirationTime())) // the token will expire
-            // in 30 days
-            .withIssuer(
-                request
-                    .getRequestURL()
-                    .toString()) // the issuer of the token is the URL of the server
-            .sign(algorithm); // sign the token using our secret
+      JWT.create()
+        .withSubject(user.getUsername()) // the username of the authenticated user
+        .withExpiresAt(
+          new Date(
+            System.currentTimeMillis() + jwtProperties.getRefreshTokenExpirationTime())) // the token will expire
+        // in 30 days
+        .withIssuer(
+          request
+            .getRequestURL()
+            .toString()) // the issuer of the token is the URL of the server
+        .sign(algorithm); // sign the token using our secret
     Map<String, String> tokens = new HashMap<>();
 
     tokens.put("access-token", accessToken);
@@ -134,16 +138,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // response.addHeader("Access-Control-Allow-Origin", "*"); // this one allows to
     // escape the CORS problem
     new ObjectMapper()
-        .writeValue(response.getOutputStream(), tokens); // send the token as JSON in the response
+      .writeValue(response.getOutputStream(), tokens); // send the token as JSON in the response
     // body
   }
 
   /**
    * This method is called when the authentication is unsuccessful.
    * We send an error message to the client.
-   * @param request the request
+   *
+   * @param request  the request
    * @param response the response
-   * @param failed the exception that caused the authentication to fail
+   * @param failed   the exception that caused the authentication to fail
    * @throws IOException if there is an error while writing the error message to the response body
    */
   @Override
@@ -152,11 +157,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             final AuthenticationException failed) throws IOException {
 
     Map<String, String> errors = new HashMap<>();
-    errors.put("access-token", "access_token");
-    errors.put("refresh-token", "refresh_token");
+    errors.put("error", "Email or password incorrect");
 
-    // escape the CORS problem
-    response.sendError(1, "error");
-    new ObjectMapper().writeValue(response.getOutputStream(), errors); // send the tok
+    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+    new ObjectMapper().writeValue(response.getOutputStream(), errors); // send the error message
   }
 }

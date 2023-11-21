@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,6 +33,9 @@ public class AppUserPrincipal implements UserDetails {
    */
   @Override
   public String getUsername() {
+    if (this.user == null) {
+      return null;
+    }
     return user.getUserEmail();
   }
 
@@ -100,6 +104,9 @@ public class AppUserPrincipal implements UserDetails {
    */
   @Override
   public String getPassword() {
+    if (this.user == null) {
+      return null;
+    }
     return user.getUserPassword();
   }
 
