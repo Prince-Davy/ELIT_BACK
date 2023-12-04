@@ -20,10 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -36,6 +37,8 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -55,6 +58,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 /**
  * Service implementation for managing user-related operations.
  */
@@ -418,25 +422,32 @@ public class UserServiceImpl implements UserService, UserDetailsService {
       verificationTokenService.createToken(user, "confirm-account");
     String confirmationUrl =
       backEndUrl + "/confirm-account?token=" + verificationToken.getToken();
-    String mailBody =
-      "Bonjour "
-        + user.getUserFirstName()
-        + ",\n\n"
-        + "Vous y êtes presque ! Veuillez cliquer sur le lien ci-dessous afin de finaliser la création de votre compte :\n"
-        + confirmationUrl
-        + "\n\n"
-        + "Attention, le lien a une durée de validité de 48 heures."
-        + "Cordialement,\n"
-        + "L'équipe ELIT";
     String mailSubject = "ELIT : Confirmation de votre compte";
+    String mailBody =
+      "<html><body> "
+        + "<div style='background-color: #E2F0F9; padding: 20px; text-align: center;'>"
+        + "<img src='cid:logoImage' style='display: block; margin: auto;' />"
+        + "</div>"
+        + "<p>Bonjour " + user.getUserFirstName() + ",</p>"
+        + "<p>Vous y êtes presque ! Veuillez cliquer sur le lien ci-dessous afin de finaliser la création de votre compte :</p>"
+        + "<div style='text-align: center;'>"
+        + "<a href='" + confirmationUrl + "' style='background-color: #116E9C; color: white; padding: 14px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;'>Confirmez votre compte</a>"
+        + "</div>"
+        + "<p>Attention, le lien a une durée de validité de 48 heures.</p>"
+        + "<p>Cordialement,</p>"
+        + "<p>L'équipe ELIT</p>"
+        + "</body></html>";
     try {
-      SimpleMailMessage mailMessage = new SimpleMailMessage();
-      mailMessage.setFrom(senderEmail);
-      mailMessage.setTo(user.getUserEmail());
-      mailMessage.setText(mailBody);
-      mailMessage.setSubject(mailSubject);
-      javaMailSender.send(mailMessage);
-    } catch (Exception e) {
+      MimeMessage message = javaMailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, true);
+      helper.setFrom(senderEmail);
+      helper.setTo(user.getUserEmail());
+      helper.setText(mailBody, true);
+      helper.setSubject(mailSubject);
+      ClassPathResource file = new ClassPathResource("avatars/logoImage.png");
+      helper.addInline("logoImage", file);
+      javaMailSender.send(message);
+    } catch (MessagingException e) {
       logger.error("Erreur lors de l'envoi du mail de confirmation d'inscription");
     }
   }
