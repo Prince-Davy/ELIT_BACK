@@ -172,7 +172,7 @@ class VerificationTokenServiceImplTest {
     String email = "{\"email\":\"" + user.getUserEmail() + "\"}";
     Map result = new ObjectMapper().readValue(email, Map.class);
     when(userRepository.findByUserEmail((String) result.get("email"))).thenReturn(user);
-     Assertions.assertEquals(ResponseEntity.ok("Email de récupération envoyé"),verificationTokenServiceImpl.forgotPassword(email));
+     Assertions.assertEquals(ResponseEntity.ok("Email de récupération envoyé"),verificationTokenServiceImpl.sendForgotPasswordEmail(email));
   }
 
   @Test
@@ -181,7 +181,7 @@ class VerificationTokenServiceImplTest {
     String email = "{\"email\":\"" + user.getUserEmail() + "\"}";
     Map result = new ObjectMapper().readValue(email, Map.class);
     when(userRepository.findByUserEmail((String) result.get("email"))).thenReturn(null);
-    Assertions.assertEquals(ResponseEntity.badRequest().body("Cet utilisateur n'existe pas !"),verificationTokenServiceImpl.forgotPassword(email));
+    Assertions.assertEquals(ResponseEntity.badRequest().body("Cet utilisateur n'existe pas !"),verificationTokenServiceImpl.sendForgotPasswordEmail(email));
   }
 
   @Test
@@ -190,7 +190,7 @@ class VerificationTokenServiceImplTest {
     String email = "{\"email\":\"" + "email@" + "\"}";
     Map result = new ObjectMapper().readValue(email, Map.class);
     when(userRepository.findByUserEmail((String) result.get("email"))).thenReturn(user);
-    UserNotVerifiedException e = Assertions.assertThrows(UserNotVerifiedException.class, () -> verificationTokenServiceImpl.forgotPassword(email));
+    UserNotVerifiedException e = Assertions.assertThrows(UserNotVerifiedException.class, () -> verificationTokenServiceImpl.sendForgotPasswordEmail(email));
     Assertions.assertEquals("Votre compte n'est pas vérifié", e.getMessage());
   }
 

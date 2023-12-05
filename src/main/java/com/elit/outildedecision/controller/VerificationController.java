@@ -64,6 +64,6 @@ public class VerificationController {
   @GetMapping(value = "/reset-password", consumes = "application/json")
   public ResponseEntity<String> forgotPassword(final HttpEntity<String> email)
       throws JsonProcessingException, UserNotVerifiedException {
-    return verificationTokenService.forgotPassword(email.getBody());
+    return verificationTokenService.sendForgotPasswordEmail(email.getBody());
   }
 }

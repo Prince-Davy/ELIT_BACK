@@ -188,7 +188,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
    * @throws UserNotVerifiedException If the user has not verified their email address
    */
   @Override
-  public ResponseEntity<String> forgotPassword(final String email)
+  public ResponseEntity<String> sendForgotPasswordEmail(final String email)
       throws JsonProcessingException, UserNotVerifiedException {
     Map result = new ObjectMapper().readValue(email, Map.class);
     User user = userRepository.findByUserEmail((String) result.get("email"));
@@ -202,18 +202,20 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     String recoveryUrl =
         backEndUrl + "/reset-password?token=" + verificationToken.getToken();
     String mailBody =
-        "Bonjour "
-            + " "
-            + user.getUserFirstName()
-            + " "
-            + user.getUserLastName()
-            + ",\n\n"
-            + "Veuillez cliquer sur le lien ci-dessous pour changer le mot de passe de votre compte :\n"
-            + recoveryUrl
-            + "\n\n"
-            + "Cordialement,\n"
-            + "L'équipe Outil de décision ELIT";
-    String mailSubject = "ELIT : Récupération de mot de passe";
+      "<html><body> "
+        + "<div style='background-color: #E2F0F9; padding: 20px; text-align: center;'>"
+        + "<img src='cid:logoImage' style='display: block; margin: auto;' />"
+        + "</div>"
+        + "<p>Bonjour " + user.getUserFirstName() + ",</p>"
+        + "<p>Vous y êtes presque ! Veuillez cliquer sur le lien ci-dessous afin de réinitialiser votre mot de passe :</p>"
+        + "<div style='text-align: center;'>"
+        + "<a href='" + recoveryUrl + "' style='background-color: #116E9C; color: white; padding: 14px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;'>Réinitialisation le mot de passe</a>"
+        + "</div>"
+        + "<p>Attention, le lien a une durée de validité de 48 heures.</p>"
+        + "<p>Cordialement,</p>"
+        + "<p>L'équipe ELIT</p>"
+        + "</body></html>";
+    String mailSubject = "ELIT : Réinitialiser votre mot de passe";
     try {
       SimpleMailMessage mailMessage = new SimpleMailMessage();
       mailMessage.setFrom(senderEmail);

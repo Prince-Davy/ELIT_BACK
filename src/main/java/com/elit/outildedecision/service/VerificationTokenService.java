@@ -62,7 +62,7 @@ public interface VerificationTokenService {
    * @throws JsonProcessingException if an error occurs while processing the JSON data for the email
    * @throws UserNotVerifiedException if the specified user account has not been verified
    */
-  ResponseEntity<String> forgotPassword(String email)
+  ResponseEntity<String> sendForgotPasswordEmail(String email)
     throws JsonProcessingException, UserNotVerifiedException;
 }
 
