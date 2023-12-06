@@ -100,11 +100,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    */
   @Value("${spring.mail.username}")
   private String senderEmail;
-  /**
+  /*
    * Value of backend url.
+   @Value("${backend.value-url}")
+  private String backEndUrl;*/
+  /**
+   * Value of frontend url.
    */
-  @Value("${backend.value-url}")
-  private String backEndUrl;
+  @Value("${frontend.value-url}")
+  private String frontEndUrl;
 
   /**
    * Constructor for UserServiceImpl.
@@ -421,7 +425,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     VerificationToken verificationToken =
       verificationTokenService.createToken(user, "confirm-account");
     String confirmationUrl =
-      backEndUrl + "/confirm-account?token=" + verificationToken.getToken();
+      frontEndUrl + "/confirm-account?token=" + verificationToken.getToken();
     String mailSubject = "ELIT : Confirmation de votre compte";
     String mailBody =
       "<html><body> "
