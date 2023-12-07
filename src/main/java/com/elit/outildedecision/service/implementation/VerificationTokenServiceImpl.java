@@ -13,12 +13,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -30,34 +33,53 @@ import java.util.Objects;
 @Transactional
 public class VerificationTokenServiceImpl implements VerificationTokenService {
 
-  /** The sender email address used for sending emails. */
+  /**
+   * The sender email address used for sending emails.
+   */
 
   private static final String FORGOT_PASSWORD = "";
   @Value("${spring.mail.username}")
   private static String senderEmail;
 
-  /** The password encoder used for encoding passwords. */
+  /**
+   * The password encoder used for encoding passwords.
+   */
   private final PasswordEncoder passwordEncoder;
 
-  /** The repository for managing verification tokens. */
+  /**
+   * The repository for managing verification tokens.
+   */
   private final VerificationTokenRepository verificationTokenRepository;
 
-  /** The repository for managing users. */
+  /**
+   * The repository for managing users.
+   */
   private final UserRepository userRepository;
 
-  /** The mail sender used for sending emails. */
+  /**
+   * The mail sender used for sending emails.
+   */
   private final JavaMailSender javaMailSender;
 
-  /** The expiration time for account confirmation tokens. */
+  /**
+   * The expiration time for account confirmation tokens.
+   */
   private static final Long EXPIRATION_TIME_CONFIRMATION = 2 * 24 * 60 * 60 * 1000L;
 
-  /** The expiration time for password recovery tokens. */
+  /**
+   * The expiration time for password recovery tokens.
+   */
   private static final Long TOKEN_EXPIRATION_TIME = 30 * 60 * 1000L;
-  /** The logger for this class. */
+  /**
+   * The logger for this class.
+   */
   private final Logger logger;
-  /** Value of backend url. */
+  /**
+   * Value of backend url.
+   */
   @Value("${backend.value-url}")
   private String backEndUrl;
+
   /**
    * Constructs a new instance of the verification token service implementation.
    *
@@ -133,7 +155,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   public ResponseEntity<String> confirmUser(final String token) {
     VerificationToken verificationToken = findByToken(token);
     if (verificationToken == null
-        || !Objects.equals(verificationToken.getType(), "confirm-account")) {
+      || !Objects.equals(verificationToken.getType(), "confirm-account")) {
       return ResponseEntity.badRequest().body("Invalid token");
     }
     if (verificationToken.getExpiryDate().before(new Date())) {
@@ -153,7 +175,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
    * not expired. It also checks whether the new password and confirm password match, and if they do,
    * it updates the user's password.
    *
-   * @param token              The token that is used to reinstate a forgotten password
+   * @param token               The token that is used to reinstate a forgotten password
    * @param changePasswordModel The model that contains the new password and the confirm password
    * @return A response entity with a message indicating whether the password update was successful or not
    */
@@ -162,7 +184,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
                                                         final PasswordChangeModel changePasswordModel) {
     VerificationToken verificationToken = findByToken(token);
     if (verificationToken == null
-        || !Objects.equals(verificationToken.getType(), FORGOT_PASSWORD)) {
+      || !Objects.equals(verificationToken.getType(), FORGOT_PASSWORD)) {
       return ResponseEntity.badRequest().body("le lien est invalide");
     }
     if (verificationToken.getExpiryDate().before(new Date())) {
@@ -170,13 +192,14 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
       return ResponseEntity.badRequest().body("le lien est expiré");
     }
     if (!Objects.equals(
-        changePasswordModel.getNewPassword(), changePasswordModel.getConfirmPassword())) {
+      changePasswordModel.getNewPassword(), changePasswordModel.getConfirmPassword())) {
       return ResponseEntity.badRequest().body("les mots de passes ne sont pas identiques");
     }
     User user = verificationToken.getUser();
     user.setUserPassword(passwordEncoder.encode(changePasswordModel.getNewPassword()));
     return ResponseEntity.ok("Le mot de passe est mis à jour");
   }
+
   /**
    * This method is used to initiate a forgot password request. It reads the user email from the JSON
    * string, retrieves the user from the database, and creates a verification token. It then sends an
@@ -184,12 +207,12 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
    *
    * @param email The JSON string containing the user email
    * @return A response entity with a message indicating whether the forgot password request was successful or not
-   * @throws JsonProcessingException If the JSON string cannot be processed
+   * @throws JsonProcessingException  If the JSON string cannot be processed
    * @throws UserNotVerifiedException If the user has not verified their email address
    */
   @Override
   public ResponseEntity<String> sendForgotPasswordEmail(final String email)
-      throws JsonProcessingException, UserNotVerifiedException {
+    throws JsonProcessingException, UserNotVerifiedException {
     Map result = new ObjectMapper().readValue(email, Map.class);
     User user = userRepository.findByUserEmail((String) result.get("email"));
     if (Objects.isNull(user)) {
@@ -200,7 +223,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
     VerificationToken verificationToken = createToken(user, FORGOT_PASSWORD);
     String recoveryUrl =
-        backEndUrl + "/reset-password?token=" + verificationToken.getToken();
+      backEndUrl + "/reset-password?token=" + verificationToken.getToken();
     String mailBody =
       "<html><body> "
         + "<div style='background-color: #E2F0F9; padding: 20px; text-align: center;'>"
@@ -217,12 +240,14 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         + "</body></html>";
     String mailSubject = "ELIT : Réinitialiser votre mot de passe";
     try {
-      SimpleMailMessage mailMessage = new SimpleMailMessage();
-      mailMessage.setFrom(senderEmail);
-      mailMessage.setTo(user.getUserEmail());
-      mailMessage.setText(mailBody);
-      mailMessage.setSubject(mailSubject);
-
+      MimeMessage mailMessage = javaMailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+      helper.setFrom(senderEmail);
+      helper.setTo(user.getUserEmail());
+      helper.setText(mailBody, true);
+      helper.setSubject(mailSubject);
+      ClassPathResource file = new ClassPathResource("avatars/logoImage.png");
+      helper.addInline("logoImage", file);
       javaMailSender.send(mailMessage);
     } catch (Exception e) {
       logger.error("Exception occurred while sending email", e);
