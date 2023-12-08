@@ -9,6 +9,7 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.VerificationTokenRepository;
 import com.elit.outildedecision.service.VerificationTokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.MimeMessage;
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -213,8 +213,9 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   @Override
   public ResponseEntity<String> sendForgotPasswordEmail(final String email)
     throws JsonProcessingException, UserNotVerifiedException {
-    Map result = new ObjectMapper().readValue(email, Map.class);
-    User user = userRepository.findByUserEmail((String) result.get("email"));
+    JsonNode emailNode = new ObjectMapper().readTree(email);
+    String userEmail = emailNode.get("email").asText();
+    User user = userRepository.findByUserEmail(userEmail);
     if (Objects.isNull(user)) {
       return ResponseEntity.badRequest().body("Cet utilisateur n'existe pas !");
     }
@@ -225,7 +226,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     String recoveryUrl =
       backEndUrl + "/reset-password?token=" + verificationToken.getToken();
     String mailBody =
-      "<html><body> "
+      "<html><body>"
         + "<div style='background-color: #E2F0F9; padding: 20px; text-align: center;'>"
         + "<img src='cid:logoImage' style='display: block; margin: auto;' />"
         + "</div>"
@@ -240,15 +241,16 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         + "</body></html>";
     String mailSubject = "ELIT : Réinitialiser votre mot de passe";
     try {
-      MimeMessage mailMessage = javaMailSender.createMimeMessage();
-      MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+      MimeMessage message = javaMailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, true);
       helper.setFrom(senderEmail);
       helper.setTo(user.getUserEmail());
       helper.setText(mailBody, true);
       helper.setSubject(mailSubject);
       ClassPathResource file = new ClassPathResource("avatars/logoImage.png");
       helper.addInline("logoImage", file);
-      javaMailSender.send(mailMessage);
+      javaMailSender.send(message);
+      logger.info("Mail envoyé avec succés");
     } catch (Exception e) {
       logger.error("Exception occurred while sending email", e);
     }
