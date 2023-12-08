@@ -215,7 +215,9 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     throws JsonProcessingException, UserNotVerifiedException {
     JsonNode emailNode = new ObjectMapper().readTree(email);
     String userEmail = emailNode.get("email").asText();
-    User user = userRepository.findByUserEmail(userEmail);
+    logger.info("********** GET EMAIL**************: ", email);
+    logger.info("************ get userMailPR ************* ", userEmail);
+    User user = userRepository.findByUserEmail(email);
     if (Objects.isNull(user)) {
       return ResponseEntity.badRequest().body("Cet utilisateur n'existe pas !");
     }
