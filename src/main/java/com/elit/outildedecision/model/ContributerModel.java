@@ -43,6 +43,11 @@ public class ContributerModel implements Serializable {
      */
     private Boolean isAdmin;
 
+  /**
+   * A function of contributer.
+   */
+    private String func;
+
     /**
      * The role of the contributor within the project.
      */

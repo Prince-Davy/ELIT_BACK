@@ -278,6 +278,7 @@ public class ProjectServiceImpl implements ProjectService {
               user.getUserLastName(),
               null,
               null,
+              null,
               userPermission.getPermission()));
         }
 
@@ -443,6 +444,7 @@ public class ProjectServiceImpl implements ProjectService {
           user.getUserLastName(),
           user.getUserEmail(),
           user.getIsAdmin(),
+          null,
           userPermission.getPermission()));
     }
 

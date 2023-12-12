@@ -344,6 +344,7 @@ class ProjectServiceImplTest {
       user.getUserLastName(),
       user.getUserEmail(),
       user.getIsAdmin(),
+      null,
       projectUserPermission.getPermission());
     contributorModelList.add(contributerModel);
 
