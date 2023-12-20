@@ -83,7 +83,7 @@ public class UserController {
    * @throws IOException IOException
    */
   @GetMapping("/user/{userId}")
-  @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+  //@PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
   public UserResponseModel getUserById(@PathVariable final Long userId) throws IOException {
     return userService.getAllInfosUserById(userId);
   }

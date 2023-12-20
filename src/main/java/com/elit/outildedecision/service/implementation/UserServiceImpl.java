@@ -201,8 +201,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public ResponseEntity<String> sendRegistrationConfirmationEmailAgain(final UserModel user) throws UserAlreadyExistsException, CouldNotMailUserException {
     try {
       User userToMail = userRepository.findByUserEmail(user.getUserEmail());
+      if (userToMail.getIsUserActive()) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Ce compte a déjà été activé");
+      }
       sendRegistrationConfirmationEmail(userToMail);
-      return ResponseEntity.status(HttpStatus.CREATED).body("Le mail à correctement été envoyé");
+      return ResponseEntity.status(HttpStatus.CREATED).body("Le mail a correctement été envoyé");
     } catch (Exception e) {
       throw new CouldNotMailUserException("Une erreur est survenue lors de l'envoi du mail. Veuillez réessayer plus tard");
     }
@@ -424,8 +427,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public void sendRegistrationConfirmationEmail(final User user) {
     VerificationToken verificationToken =
       verificationTokenService.createToken(user, "confirm-account");
+    Long userId = user.getUserId();
+    String convertUserId = userId.toString();
     String confirmationUrl =
-      frontEndUrl + "/confirm-account?token=" + verificationToken.getToken();
+      frontEndUrl + "/confirm-account?token=" + verificationToken.getToken() + "&id=" + convertUserId;
+    System.out.println(verificationToken.getToken());
     String mailSubject = "ELIT : Confirmation de votre compte";
     String mailBody =
       "<html><body> "

@@ -3,6 +3,7 @@ package com.elit.outildedecision.filters;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.elit.outildedecision.config.JwtProperties;
+import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -29,6 +31,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   private final AuthenticationManager authenticationManager;
 
   private final UserServiceImpl customUserDetailsService;
+
 
   /**
    * Constructor of JwtAuthenticationFilter.
@@ -61,8 +64,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     try {
       Map<String, String> requestMap =
         new ObjectMapper().readValue(request.getInputStream(), Map.class);
-      String username = requestMap.get("username");
+      String userEmail = "username";
+      String username = requestMap.get(userEmail);
       String password = requestMap.get("password");
+      request.setAttribute(userEmail, username);
 
       AppUserPrincipal appUserPrincipal = new AppUserPrincipal(customUserDetailsService.findByEmail(username));
 
@@ -156,10 +161,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             final HttpServletResponse response,
                                             final AuthenticationException failed) throws IOException {
 
-    Map<String, String> errors = new HashMap<>();
-    errors.put("error", "Email or password incorrect");
+    // Parse the request to get username and password
+    String username = (String) request.getAttribute("username");
 
-    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
-    new ObjectMapper().writeValue(response.getOutputStream(), errors); // send the error message
+    // Find user by username/email
+    User user = customUserDetailsService.findByEmail(username);
+
+    // Check if the account is activated
+    if (user != null && !Optional.ofNullable(user.getIsUserActive()).orElse(false)) {
+      // Handle the case where the account is not activated
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write("Account is not activated");
+    } else if (user == null) {
+      // Handle other authentication failures
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write("Authentication failed: " + failed.getMessage());
+    }
   }
 }
