@@ -432,7 +432,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     String confirmationUrl =
       frontEndUrl + "/confirm-account?token=" + verificationToken.getToken() + "&id=" + convertUserId;
     System.out.println(verificationToken.getToken());
-    String mailSubject = "ELIT : Confirmation de votre compte";
+    String mailSubject = "ELIT : Activer votre compte";
     String mailBody =
       "<html><body> "
         + "<div style='background-color: #E2F0F9; padding: 20px; text-align: center;'>"
@@ -441,7 +441,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         + "<p>Bonjour " + user.getUserFirstName() + ",</p>"
         + "<p>Vous y êtes presque ! Veuillez cliquer sur le lien ci-dessous afin de finaliser la création de votre compte :</p>"
         + "<div style='text-align: center;'>"
-        + "<a href='" + confirmationUrl + "' style='background-color: #116E9C; color: white; padding: 14px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;'>Confirmez votre compte</a>"
+        + "<a href='" + confirmationUrl + "' style='background-color: #116E9C; color: white; padding: 14px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;'>Confirmation d'inscription</a>"
         + "</div>"
         + "<p>Attention, le lien a une durée de validité de 48 heures.</p>"
         + "<p>Cordialement,</p>"
