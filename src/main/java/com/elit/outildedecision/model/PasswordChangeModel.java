@@ -26,11 +26,9 @@ public class PasswordChangeModel {
    * It must match the password pattern specified in the @Pattern annotation.
    */
   @Pattern(
-    regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+    regexp = "^(?=.*[~!@#$%^&*()_+`\\-=\\[\\]\\{\\};':\\\",./<>?éàè])(?=.*\\d)(?=.*[a-zéàè])(?=.*[A-ZZÉÀÈ])\\S{12,32}$",
     message =
-      "le mot de passe doit contenir au moins 8 caractères,"
-        + " une lettre majuscule, une lettre minuscule,"
-        + " un chiffre et un caractère spécial")
+      "Veuillez vérifier que le mot de passe inscrit comporte bien les caractères recommandés.")
   private String newPassword;
 
   /**
@@ -38,10 +36,8 @@ public class PasswordChangeModel {
    * It must match the password pattern specified in the @Pattern annotation.
    */
   @Pattern(
-    regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+    regexp = "^(?=.*[~!@#$%^&*()_+`\\-=\\[\\]\\{\\};':\\\",./<>?éàè])(?=.*\\d)(?=.*[a-zéàè])(?=.*[A-ZZÉÀÈ])\\S{12,32}$",
     message =
-      "le mot de passe doit contenir au moins 8 caractères,"
-        + " une lettre majuscule, une lettre minuscule,"
-        + " un chiffre et un caractère spécial")
+      "Veuillez vérifier que le mot de passe inscrit comporte bien les caractères recommandés.")
   private String confirmPassword;
 }

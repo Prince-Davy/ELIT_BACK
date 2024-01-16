@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -36,10 +37,15 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   /**
    * The sender email address used for sending emails.
    */
-
   private static final String FORGOT_PASSWORD = "";
   @Value("${spring.mail.username}")
-  private static String senderEmail;
+  private String senderEmail;
+
+  /**
+   * Value of frontend url.
+   */
+  @Value("${frontend.value-url}")
+  private String frontEndUrl;
 
   /**
    * The password encoder used for encoding passwords.
@@ -70,15 +76,12 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
    * The expiration time for password recovery tokens.
    */
   private static final Long TOKEN_EXPIRATION_TIME = 30 * 60 * 1000L;
+
   /**
    * The logger for this class.
    */
   private final Logger logger;
-  /**
-   * Value of backend url.
-   */
-  @Value("${backend.value-url}")
-  private String backEndUrl;
+
 
   /**
    * Constructs a new instance of the verification token service implementation.
@@ -214,19 +217,18 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
   public ResponseEntity<String> sendForgotPasswordEmail(final String email)
     throws JsonProcessingException, UserNotVerifiedException {
     JsonNode emailNode = new ObjectMapper().readTree(email);
-    String userEmail = emailNode.get("email").asText();
-    logger.info("********** GET EMAIL**************: ", email);
-    logger.info("************ get userMailPR ************* ", userEmail);
-    User user = userRepository.findByUserEmail(email);
+    String userEmail = emailNode.path("email").asText();
+    User user = userRepository.findByUserEmail(userEmail);
     if (Objects.isNull(user)) {
-      return ResponseEntity.badRequest().body("Cet utilisateur n'existe pas !");
+      return ResponseEntity.badRequest().body("Aucun compte n'a été trouvé pour l'e-mail " + userEmail + ", Veuillez réessayer.");
     }
     if (Boolean.FALSE.equals(user.getIsEmailVerified())) {
       throw new UserNotVerifiedException("Votre compte n'est pas vérifié");
     }
     VerificationToken verificationToken = createToken(user, FORGOT_PASSWORD);
     String recoveryUrl =
-      backEndUrl + "/reset-password?token=" + verificationToken.getToken();
+      frontEndUrl + "/reset-password?token=" + verificationToken.getToken();
+    String mailSubject = "ELIT : Réinitialiser votre mot de passe";
     String mailBody =
       "<html><body>"
         + "<div style='background-color: #E2F0F9; padding: 20px; text-align: center;'>"
@@ -241,7 +243,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         + "<p>Cordialement,</p>"
         + "<p>L'équipe ELIT</p>"
         + "</body></html>";
-    String mailSubject = "ELIT : Réinitialiser votre mot de passe";
+
     try {
       MimeMessage message = javaMailSender.createMimeMessage();
       MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -252,10 +254,11 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
       ClassPathResource file = new ClassPathResource("avatars/logoImage.png");
       helper.addInline("logoImage", file);
       javaMailSender.send(message);
-      logger.info("Mail envoyé avec succés");
+      return ResponseEntity.ok("Email de récupération envoyé");
     } catch (Exception e) {
-      logger.error("Exception occurred while sending email", e);
+      logger.error(e.getMessage());
+      return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body("Une erreur est survenue lors de l'envoi du mail." + "Veuillez réessayer plus tard; ");
     }
-    return ResponseEntity.ok("Email de récupération envoyé");
+
   }
 }

@@ -5,6 +5,7 @@ import com.elit.outildedecision.model.PasswordChangeModel;
 import com.elit.outildedecision.service.VerificationTokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,4 +67,25 @@ public class VerificationController {
       throws JsonProcessingException, UserNotVerifiedException {
     return verificationTokenService.sendForgotPasswordEmail(email.getBody());
   }
+
+  /**
+   * method used to send email to user to forget password.
+   * @param email the email of user.
+   * @return ResponseEntity<String> the response of sending email.
+   * @throws JsonProcessingException when there is an error in parsing json.
+   * @throws UserNotVerifiedException when user could not be verified.
+   */
+  @PostMapping("/")
+  public ResponseEntity<String> forgotPassword(@RequestBody final String email) {
+    try {
+      return verificationTokenService.sendForgotPasswordEmail(email);
+    } catch (JsonProcessingException e) {
+      return ResponseEntity.badRequest().body("JSON processing error: " + e.getMessage());
+    } catch (UserNotVerifiedException e) {
+      return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("User verification error: " + e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError().body("An unexpected error occurred: " + e.getMessage());
+    }
+  }
+
 }
