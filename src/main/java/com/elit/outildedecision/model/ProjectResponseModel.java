@@ -72,4 +72,9 @@ public class ProjectResponseModel {
    * A list of multicriteria analyse response models associated with the project.
    */
   private ArrayList<MulticriteriaAnalyseResponseModel> multiCriteriaAnalysisList;
+
+  /**
+   * The status of the multi criteria analysis.
+   */
+  private String multiCriteriaStatus;
 }

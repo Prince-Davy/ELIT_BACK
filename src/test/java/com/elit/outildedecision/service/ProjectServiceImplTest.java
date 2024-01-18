@@ -365,7 +365,8 @@ class ProjectServiceImplTest {
       projectToSave.getIsArchived(),
       contributorModelList,
       attachmentModelList,
-      multicriteriaAnaliseodelList
+      multicriteriaAnaliseodelList,
+      null
     );
 
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectToSave));
