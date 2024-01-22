@@ -8,6 +8,7 @@ import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.ProjectServiceImpl;
+import com.elit.outildedecision.util.ProjectAnalysisState;
 import com.elit.outildedecision.util.ProjectConfirmationState;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.apache.tomcat.util.json.ParseException;
@@ -87,6 +88,7 @@ class ProjectServiceImplTest {
     projectToReturn.setContributors(project.getContributers());
     projectToReturn.setCreatedAt(projectToSave.getCreatedAt());
     projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());
+    projectToReturn.setMultiCriteriaStatus(ProjectAnalysisState.NOT_STARTED.toString());
 
     Assertions.assertEquals(projectToReturn, projectServiceImpl.persistProject(project));
   }

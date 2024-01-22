@@ -202,6 +202,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectToReturn.setContributors(project.getContributers());
         projectToReturn.setCreatedAt(projectToSave.getCreatedAt());
         projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());
+        projectToReturn.setMultiCriteriaStatus(ProjectAnalysisState.NOT_STARTED.toString());
 
         return projectToReturn;
     }
