@@ -8,11 +8,22 @@
 - Documentation will be available at the following url for json format :               `${BACKEND_URL}/api/v3/api-docs`
 - Documentation will be available at the following url for yaml format : `              ${BACKEND_URL}/api/v3/api-docs.yaml`
 
- ## Launch the application in development mode in the same way as in production mode
+## Launch the application in development mode in the same way as in production mode
+
 - Create an .env file from the .env.tpl file and Uncomment rhe following variables :
-    # MYSQL_URL=db 
-    # SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/outilprisedecision 
+  # MYSQL_URL=db
+  # SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/outilprisedecision
 
 - Lancer la commande docker-compose suivante :
-    docker-compose -f dev.docker-compose.yml up --build --force-recreate --remove-orphans
+  docker-compose -f dev.docker-compose.yml up --build --force-recreate --remove-orphans
 - You will have 3 docker containers, the back, the DB and an Adminer container for database management.
+
+## Users local account
+
+ Id | First name | Last name | Login                 | Password     
+:---|:-----------|:----------|:----------------------|:-------------
+ 1  | John       | Doe       | user@user.com         | Azerty1234!? 
+ 2  | Nancy      | Michel    | admin@elite.fr        | Azerty1234!? 
+ 3  | Charles    | Baker     | contributer@elite.com | Azerty1234!? 
+ 4  | Rochelle   | Wright    | observer@elite.com    | Azerty1234!? 
+
