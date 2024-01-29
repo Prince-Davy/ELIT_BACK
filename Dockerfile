@@ -22,12 +22,12 @@ ENV TZ 'Europe/Paris'
 RUN echo $TZ > /etc/timezone
 
 # Install filebeat
+# RUN apt update
+# RUN apt install apt-transport-https supervisor wget gnupg gnupg2 gnupg1 -y
+# RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+# RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list
 RUN apt update
-RUN apt install apt-transport-https supervisor wget gnupg gnupg2 gnupg1 -y
-RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list
-RUN apt update
-RUN apt install filebeat -y
+# RUN apt install filebeat -y
 
 # Clean up
 RUN apt-get autoremove -y \
@@ -44,7 +44,7 @@ RUN mkdir -p /app/avatars
 RUN mkdir -p /app/projects
 COPY --from=BUILDER /app/target/*-SNAPSHOT.jar .
 
-ADD ./filebeat/filebeat.yml /usr/share/filebeat/config/filebeat.yml
+# ADD ./filebeat/filebeat.yml /usr/share/filebeat/config/filebeat.yml
 # Use supervisor to launch multiple programs
 ADD ./supervisor/prod-supervisor.conf /etc/supervisor.conf
 
