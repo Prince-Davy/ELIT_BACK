@@ -90,7 +90,7 @@ public class ProjectController {
         @ApiResponse(responseCode = "404", description = "Not found - The product was not found")
       })
   @GetMapping("/user/projects/getdata/{projectId}")
-  @PreAuthorize("hasAnyAuthority('ADMIN') or  isContributer(#projectId) or isObserver(#projectId)")
+  @PreAuthorize("hasAnyAuthority('USER') or hasAnyAuthority('ADMIN') or isContributer(#projectId) or isObserver(#projectId)")
   public ProjectResponseModel getProjectData(@PathVariable final Long projectId)
     throws ProjectNotFoundException, UserNotAuthorizedException, ExecutionPlanNotFoundException {
     return projectService.getProjectData(projectId);

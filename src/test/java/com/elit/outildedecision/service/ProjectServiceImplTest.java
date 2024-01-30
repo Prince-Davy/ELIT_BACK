@@ -84,7 +84,7 @@ class ProjectServiceImplTest {
     projectToReturn.setName(project.getName());
     projectToReturn.setDescription(projectToSave.getDescription());
     projectToReturn.setIsArchived(false);
-    projectToReturn.setConfirmationState("WAITING");
+    projectToReturn.setConfirmationState("CONFIRMED");
     projectToReturn.setContributors(project.getContributers());
     projectToReturn.setCreatedAt(projectToSave.getCreatedAt());
     projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());

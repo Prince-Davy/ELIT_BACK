@@ -163,7 +163,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectToSave.setChefId(chef.getUserId());
         projectToSave.setDescription(project.getDescription());
         projectToSave.setName(project.getName());
-        projectToSave.setConfirmationState(ProjectConfirmationState.WAITING.name());
+        projectToSave.setConfirmationState(ProjectConfirmationState.CONFIRMED.name());
         projectToSave.setIsArchived(false);
         Long projectId = projectRepository.save(projectToSave).getProjectId();
 
