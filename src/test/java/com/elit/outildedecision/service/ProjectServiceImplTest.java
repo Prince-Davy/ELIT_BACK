@@ -114,6 +114,7 @@ class ProjectServiceImplTest {
     projectToReturn.setDescription(projectToSave.getDescription());
     projectToReturn.setIsArchived(false);
     projectToReturn.setConfirmationState("CONFIRMED");
+    projectToReturn.setChefId(user1.getUserId());
     projectToReturn.setContributors(project.getContributers());
     projectToReturn.setCreatedAt(projectToSave.getCreatedAt());
     projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());

@@ -215,7 +215,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectToReturn.setDescription(projectToSave.getDescription());
         projectToReturn.setIsArchived(projectToSave.getIsArchived());
         projectToReturn.setConfirmationState(projectToSave.getConfirmationState());
-
+        projectToReturn.setChefId(projectToSave.getChefId());
 
         projectToReturn.setContributors(contributorsReturn);
         projectToReturn.setCreatedAt(projectToSave.getCreatedAt());
@@ -272,6 +272,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectResponseModel> getUserProjectList(final String keyword) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      // getting the connected user
+      UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      User chef = userRepository.findByUserEmail(principal.getUsername());
 
         List<ProjectResponseModel> projects = new ArrayList<>();
         List<ProjectUserPermission> projectUserPermissions = projectUserPermissionRepository.findAll().stream()
@@ -290,9 +293,10 @@ public class ProjectServiceImpl implements ProjectService {
                 ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
                 for (ProjectUserPermission userPermission : userPermissionList) {
                     User user = userPermission.getUser();
-                    contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
-                      user.getUserLastName(), null, null, userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
-
+                    if (!(chef.equals(user))) {
+                      contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
+                        user.getUserLastName(), null, null, userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
+                    }
 
                 }
 
@@ -319,7 +323,7 @@ public class ProjectServiceImpl implements ProjectService {
 
                 projects.add(new ProjectResponseModel(project.getProjectId(), project.getName(),
                         project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(),
-                        project.getConfirmationState(), null, null, contributorModelList, null, null, projectStatus));
+                        project.getConfirmationState(), project.getChefId(), null, contributorModelList, null, null, projectStatus));
             }
         }
         if (keyword != null && !keyword.isEmpty()) {
