@@ -72,12 +72,41 @@ class ProjectServiceImplTest {
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
 
+    ArrayList<ContributerModel> contributeurs = new ArrayList<>();
+
+    ContributerModel contributerModel1 = new ContributerModel();
+    contributerModel1.setContributerId(1l);
+    contributerModel1.setFirstName("First Name Contributeur 1");
+    contributerModel1.setLastName("Last Name Contributeur 1");
+
+    ContributerModel contributerModel2 = new ContributerModel();
+    contributerModel2.setContributerId(2l);
+    contributerModel2.setFirstName("First Name Contributeur 2");
+    contributerModel2.setLastName("Last Name Contributeur 2");
+
+    User user1 = new User();
+    user1.setUserId(1l);
+    user1.setUserFirstName("First Name Contributeur 1");
+    user1.setUserLastName("Last Name Contributeur 1");
+
+    User user2 = new User();
+    user2.setUserId(2l);
+    user2.setUserFirstName("First Name Contributeur 2");
+    user2.setUserLastName("Last Name Contributeur 2");
+
+    contributeurs.add(contributerModel1);
+    contributeurs.add(contributerModel2);
+
     ProjectModel project = new ProjectModel();
     project.setName("nameProject");
-    project.setContributers(null);
+    project.setContributers(contributeurs);
 
     when(userRepository.findByUserEmail(user.getUserEmail())).thenReturn(user);
     when(projectRepository.save(any())).thenReturn(projectToSave);
+
+    when(userRepository.findById(1l)).thenReturn(Optional.of(user1));
+    when(userRepository.findById(2l)).thenReturn(Optional.of(user2));
+
 
     ProjectResponseModel projectToReturn = new ProjectResponseModel();
     projectToReturn.setProjectId(projectToSave.getProjectId());
@@ -346,7 +375,8 @@ class ProjectServiceImplTest {
       user.getUserLastName(),
       user.getUserEmail(),
       user.getIsAdmin(),
-      null,
+      projectUserPermission.getUserFunction(),
+      user.getUserAvatarPath(),
       projectUserPermission.getPermission());
     contributorModelList.add(contributerModel);
 

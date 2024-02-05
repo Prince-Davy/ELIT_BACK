@@ -175,6 +175,8 @@ public class ProjectServiceImpl implements ProjectService {
         projectChefPermission.setId(new ProjectPropertyKey(projectId, chef.getUserId()));
         projectUserPermissionRepository.save(projectChefPermission);
 
+        ArrayList<ContributerModel> contributorsReturn = new ArrayList<>();
+
         if (Objects.nonNull(project.getContributers())) {
             for (ContributerModel contributer : project.getContributers()) {
                 User user = userRepository.findById(contributer.getContributerId())
@@ -183,8 +185,22 @@ public class ProjectServiceImpl implements ProjectService {
                 projectUserPermission.setUser(user);
                 projectUserPermission.setProject(projectRepository.getById(projectId));
                 projectUserPermission.setPermission(contributer.getRole());
+                projectUserPermission.setUserFunction(contributer.getFunc());
                 projectUserPermission.setId(new ProjectPropertyKey(projectId, user.getUserId()));
                 projectUserPermissionRepository.save(projectUserPermission);
+
+                ContributerModel contributerLoaded = new ContributerModel();
+
+                contributerLoaded.setContributerId(user.getUserId());
+                contributerLoaded.setEmail(user.getUserEmail());
+                contributerLoaded.setLastName(user.getUserLastName());
+                contributerLoaded.setFirstName(user.getUserFirstName());
+                contributerLoaded.setFunc(contributer.getFunc());
+                contributerLoaded.setAvatarPath(user.getUserAvatarPath());
+                contributerLoaded.setRole(projectUserPermission.getPermission());
+
+
+                contributorsReturn.add(contributerLoaded);
             }
         }
         if (Objects.nonNull(project.getFiles())) {
@@ -199,7 +215,9 @@ public class ProjectServiceImpl implements ProjectService {
         projectToReturn.setDescription(projectToSave.getDescription());
         projectToReturn.setIsArchived(projectToSave.getIsArchived());
         projectToReturn.setConfirmationState(projectToSave.getConfirmationState());
-        projectToReturn.setContributors(project.getContributers());
+
+
+        projectToReturn.setContributors(contributorsReturn);
         projectToReturn.setCreatedAt(projectToSave.getCreatedAt());
         projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());
         projectToReturn.setMultiCriteriaStatus(ProjectAnalysisState.NOT_STARTED.toString());
@@ -273,7 +291,9 @@ public class ProjectServiceImpl implements ProjectService {
                 for (ProjectUserPermission userPermission : userPermissionList) {
                     User user = userPermission.getUser();
                     contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
-                            user.getUserLastName(), null, null, null, userPermission.getPermission()));
+                      user.getUserLastName(), null, null, userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
+
+
                 }
 
                 String projectStatus;
@@ -449,13 +469,13 @@ public class ProjectServiceImpl implements ProjectService {
             User user = userPermission.getUser();
             contributorModelList
                     .add(new ContributerModel(user.getUserId(), user.getUserFirstName(), user.getUserLastName(),
-                            user.getUserEmail(), user.getIsAdmin(), null, userPermission.getPermission()));
+                          user.getUserEmail(), user.getIsAdmin(), userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
         }
 
         ArrayList<AttachmentResponseModel> attachmentList = new ArrayList<>();
         for (Attachment attachment : project.getAttachments()) {
             attachmentList.add(new AttachmentResponseModel(attachment.getAttachmentId(), attachment.getFileName(),
-                    attachment.getFilePath(), attachment.getContentType()));
+                    attachment.getFilePath(), attachment.getContentType(), attachment.getCreatedAt(), attachment.getUpdatedAt()));
         }
 
         ArrayList<MulticriteriaAnalyseResponseModel> multicriteriaAnaliseList = new ArrayList<>();

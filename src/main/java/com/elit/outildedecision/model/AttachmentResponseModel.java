@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+import java.sql.Timestamp;
+
 /**
  * This class represents an attachment response model, containing information about an attachment.
  * It is used to provide a structured response after a file has been uploaded or when retrieving file details.
@@ -33,4 +36,8 @@ public class AttachmentResponseModel {
    * The MIME content type of the file.
    */
   private String contentType;
+
+  private Timestamp createdAt;
+
+  private Timestamp updatedAt;
 }

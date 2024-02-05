@@ -48,6 +48,9 @@ public class ContributerModel implements Serializable {
    */
     private String func;
 
+
+    private String avatarPath;
+
     /**
      * The role of the contributor within the project.
      */

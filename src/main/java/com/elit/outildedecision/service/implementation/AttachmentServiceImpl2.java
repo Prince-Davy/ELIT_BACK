@@ -98,6 +98,8 @@ public class AttachmentServiceImpl2 implements AttachmentService {
                 .fileName(file.getOriginalFilename())
                 .contentType(file.getContentType())
                 .project(project)
+                .createdAt(project.getCreatedAt())
+                .updatedAt(project.getUpdatedAt())
                 .build();
         attachmentRepository.save(attachment);
       } catch (IOException e) {

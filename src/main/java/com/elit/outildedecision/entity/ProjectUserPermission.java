@@ -28,6 +28,8 @@ public class ProjectUserPermission implements Serializable {
   private ProjectPropertyKey id;
   private String permission;
 
+  private String userFunction;
+
   @ManyToOne(optional = false, fetch = FetchType.EAGER)
   @MapsId("projectId")
   @JoinColumn(name = "project_id", referencedColumnName = "projectId", nullable = true)
