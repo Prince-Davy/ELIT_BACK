@@ -27,6 +27,7 @@ public interface ProjectService {
    * Persists a new project.
    *
    * @param project a ProjectModel object representing the project to create
+   * @param userName user name
    * @return a ProjectResponseModel object representing the newly created project
    * @throws ProjectFolderAlreadyExistsException if a folder with the same name already exists.
    * @throws UserNotFoundException if the chef or a contributer user cannot be found.
@@ -35,7 +36,7 @@ public interface ProjectService {
    * @throws ParseException if there is an error parsing the multicriteria analysis form.
    * @throws org.json.simple.parser.ParseException if there is an error parsing the multicriteria analysis form JSON.
    */
-  ProjectResponseModel persistProject(ProjectModel project) throws ProjectFolderAlreadyExistsException,
+  ProjectResponseModel persistProject(ProjectModel project, String userName) throws ProjectFolderAlreadyExistsException,
     UserNotFoundException,
     ProjectNotFoundException,
     IOException,

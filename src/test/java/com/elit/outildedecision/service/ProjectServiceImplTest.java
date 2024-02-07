@@ -120,7 +120,7 @@ class ProjectServiceImplTest {
     projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());
     projectToReturn.setMultiCriteriaStatus(ProjectAnalysisState.NOT_STARTED.toString());
 
-    Assertions.assertEquals(projectToReturn, projectServiceImpl.persistProject(project));
+    Assertions.assertEquals(projectToReturn, projectServiceImpl.persistProject(project,"userEmail"));
   }
 
   @Test
@@ -141,7 +141,7 @@ class ProjectServiceImplTest {
     when(userRepository.findByUserEmail(user.getUserEmail())).thenReturn(user);
     when(projectRepository.save(any())).thenReturn(projectToSave);
 
-    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, ()-> projectServiceImpl.persistProject(project));
+    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, ()-> projectServiceImpl.persistProject(project,"userEmail"));
     Assertions.assertEquals("Cet utilisateur n'existe pas.", exception.getMessage());
   }
 
@@ -357,7 +357,9 @@ class ProjectServiceImplTest {
     userPermissionList.add(projectUserPermission);
     projectToSave.setProjectUserPermissions(userPermissionList);
     ArrayList<Attachment> attachmentList = new ArrayList<>();
-    attachmentList.add(new Attachment());
+    Attachment attachment = new Attachment();
+    attachment.setCreator(new User());
+    attachmentList.add(attachment);
     projectToSave.setAttachments(attachmentList);
     ArrayList<MultiCriteriaAnalysis> multicriteriaAnaliseList = new ArrayList<>();
     MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();

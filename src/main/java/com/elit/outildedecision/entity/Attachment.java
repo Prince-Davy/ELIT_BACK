@@ -59,4 +59,8 @@ public class Attachment implements Serializable {
     return this.project;
   }
 
+  @ManyToOne
+  @JoinColumn(name = "CREATOR_ID", referencedColumnName = "userId")
+  private User creator;
+
 }

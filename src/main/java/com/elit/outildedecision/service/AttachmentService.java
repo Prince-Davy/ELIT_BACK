@@ -32,11 +32,12 @@ public interface AttachmentService {
    *
    * @param files the files to upload
    * @param projectId the ID of the project to upload the attachments to
+   * @param userEmail user email
    * @throws IOException if there is an error reading the files
    * @throws ProjectNotFoundException if the project with the given ID does not exist
    * @return a ResponseEntity representing the result of the operation
    */
-  ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId)
+  ResponseEntity<Object> uploadAttachment(List<MultipartFile> files, Long projectId, String userEmail)
           throws IOException, ProjectNotFoundException, FileCouldNotBeSaved;
 
   /**

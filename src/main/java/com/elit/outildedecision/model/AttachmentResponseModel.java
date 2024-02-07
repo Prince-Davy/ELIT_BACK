@@ -37,7 +37,23 @@ public class AttachmentResponseModel {
    */
   private String contentType;
 
+  /**
+   * Date of creation.
+   */
   private Timestamp createdAt;
 
+  /**
+   * Date of update.
+   */
   private Timestamp updatedAt;
+
+  /**
+   * Last name of the creator.
+   */
+  private String creatorLastName;
+
+  /**
+   * First name of the creator.
+   */
+  private String creatorFirstName;
 }

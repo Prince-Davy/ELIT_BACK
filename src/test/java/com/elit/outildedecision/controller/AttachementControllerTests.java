@@ -85,15 +85,16 @@ class AttachementControllerTests {
   @Test
   void uploadAttachment_whenFile_isDownloaded_Successfully() throws Exception {
 
-    when(attachmentService.uploadAttachment(files, projectId)).thenReturn(ResponseEntity.ok().body("Fichiers enregistrés avec succés"));
+    when(attachmentService.uploadAttachment(files, projectId,"userEmail")).thenReturn(ResponseEntity.ok().body("Fichiers enregistrés avec succés"));
     mockMvc.perform(MockMvcRequestBuilders.multipart("/user/attachments/upload/"+ projectId)
       .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(200));
   }
 
-  @WithMockUser(authorities = {"USER", "ADMIN"})
+  @WithMockUser(authorities = {"USER", "ADMIN"},username = "userEmail")
   @Test
   void uploadAttachment_whenFile_isNotDownloaded() throws Exception {
-    when(attachmentService.uploadAttachment(files, projectId)).thenReturn(ResponseEntity.badRequest().body("Erreur lors de l'enregistrement du fichier : " + files.get(0).getOriginalFilename()));
+    when(attachmentService.uploadAttachment(files, projectId,"userEmail")).thenReturn(ResponseEntity.badRequest().body("Erreur lors de l'enregistrement du fichier : " + files.get(0).getOriginalFilename()));
+
     mockMvc.perform(MockMvcRequestBuilders.multipart("/user/attachments/upload/"+ projectId)
       .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(400));
   }
@@ -164,6 +165,7 @@ class AttachementControllerTests {
     Assertions.assertEquals(400, response.andReturn().getResponse().getStatus());
   }
 
+  @WithMockUser(authorities = {"USER", "ADMIN"})
   @Test
   void previewAttachmentWithoutDownload_whenAttachment_exists() throws Exception {
     HttpServletResponse httpServletResponse = new MockHttpServletResponse();

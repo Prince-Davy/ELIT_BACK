@@ -8,6 +8,9 @@ import com.elit.outildedecision.service.AttachmentService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,7 +57,9 @@ public class AttachementController {
   public ResponseEntity<Object> uploadAttachment(@PathVariable final Long projectId,
                                                  @RequestParam("files") final List<MultipartFile> files)
     throws ProjectNotFoundException, IOException, FileCouldNotBeSaved {
-    return attachmentService.uploadAttachment(files, projectId);
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails user = (UserDetails) auth.getPrincipal();
+    return attachmentService.uploadAttachment(files, projectId, user.getUsername());
   }
   /**
    * this method is used to rename attachments of a project.

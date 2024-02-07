@@ -9,6 +9,7 @@ import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.ProjectService;
 import com.elit.outildedecision.util.ProjectPermession;
@@ -25,6 +26,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -92,12 +96,19 @@ class ProjectControllerTest {
     user.setUserProjectPermissions(List.of(permission));
   }
 
-  @WithMockUser(authorities = {"USER"})
+  @WithMockUser(authorities = {"USER"}, username = "userEmail")
   @Test
   void createProject() throws Exception {
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
     ProjectModel project = new ProjectModel();
     ProjectResponseModel projectToReturn = new ProjectResponseModel();
-    when(projectService.persistProject(project)).thenReturn(projectToReturn);
+    when(projectService.persistProject(project,"userEmail")).thenReturn(projectToReturn);
     mockMvc.perform(MockMvcRequestBuilders.multipart("/user/projects")
       .file((MockMultipartFile) files.get(0))).andDo(print()).andExpect(status().is(200));
   }
@@ -106,9 +117,9 @@ class ProjectControllerTest {
   @Test
   void createProject_whenProjectFolderAlreadyExists() throws Exception {
     ProjectModel project = new ProjectModel();
-    when(projectService.persistProject(project)).thenThrow(new ProjectFolderAlreadyExistsException("Dossier du projet dupliqué, réessayer plus tard."));
+    when(projectService.persistProject(project,"userEmail")).thenThrow(new ProjectFolderAlreadyExistsException("Dossier du projet dupliqué, réessayer plus tard."));
     Exception exception = assertThrows(ProjectFolderAlreadyExistsException.class, () -> {
-      projectService.persistProject(project);
+      projectService.persistProject(project,"userEmail");
     });
     String expectedMessage = "Dossier du projet dupliqué, réessayer plus tard.";
     String actualMessage = exception.getMessage();

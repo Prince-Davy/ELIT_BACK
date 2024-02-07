@@ -129,6 +129,7 @@ public class ProjectServiceImpl implements ProjectService {
      * Persists a new project in the database with the provided data.
      *
      * @param project the project model containing the data to persist.
+     * @param userEmail user email.
      * @return the response model of the newly created project.
      * @throws ProjectFolderAlreadyExistsException   if a folder with the same name
      *                                               already exists.
@@ -145,7 +146,7 @@ public class ProjectServiceImpl implements ProjectService {
      *                                               JSON.
      */
     @Override
-    public ProjectResponseModel persistProject(final ProjectModel project)
+    public ProjectResponseModel persistProject(final ProjectModel project, final String userEmail)
             throws ProjectFolderAlreadyExistsException, UserNotFoundException, ProjectNotFoundException, IOException,
             ParseException, org.json.simple.parser.ParseException, FileCouldNotBeSaved {
         Project projectToSave = new Project();
@@ -204,7 +205,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         if (Objects.nonNull(project.getFiles())) {
-            attachmentService.uploadAttachment(project.getFiles(), projectId);
+            attachmentService.uploadAttachment(project.getFiles(), projectId, userEmail);
         }
 
         multiCriteriaService.createMulticriteriaAnalysisForm(projectId);
@@ -479,7 +480,7 @@ public class ProjectServiceImpl implements ProjectService {
         ArrayList<AttachmentResponseModel> attachmentList = new ArrayList<>();
         for (Attachment attachment : project.getAttachments()) {
             attachmentList.add(new AttachmentResponseModel(attachment.getAttachmentId(), attachment.getFileName(),
-                    attachment.getFilePath(), attachment.getContentType(), attachment.getCreatedAt(), attachment.getUpdatedAt()));
+                    attachment.getFilePath(), attachment.getContentType(), attachment.getCreatedAt(), attachment.getUpdatedAt(), attachment.getCreator().getUserFirstName(), attachment.getCreator().getUserLastName()));
         }
 
         ArrayList<MulticriteriaAnalyseResponseModel> multicriteriaAnaliseList = new ArrayList<>();

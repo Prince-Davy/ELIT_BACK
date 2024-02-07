@@ -3,11 +3,13 @@ package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.AttachmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -46,6 +48,8 @@ public class AttachmentServiceImpl2 implements AttachmentService {
   private final ProjectRepository projectRepository;
   /** The Attachment repository.*/
   private final AttachmentRepository attachmentRepository;
+  /** The User repository.*/
+  private final UserRepository userRepository;
   /**
    * The Storing directory.
    * this is used to store the attachments of a project.
@@ -63,11 +67,13 @@ public class AttachmentServiceImpl2 implements AttachmentService {
    *
    * @param projectRepository    the project repository
    * @param attachmentRepository the attachment repository
+   * @param userRepository the user repository
    */
   public AttachmentServiceImpl2(
-    final ProjectRepository projectRepository, final AttachmentRepository attachmentRepository) {
+    final ProjectRepository projectRepository, final AttachmentRepository attachmentRepository, final UserRepository userRepository) {
     this.projectRepository = projectRepository;
     this.attachmentRepository = attachmentRepository;
+    this.userRepository = userRepository;
     this.logger = LoggerFactory.getLogger(AttachmentServiceImpl2.class);
   }
 
@@ -76,22 +82,26 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     *
     * @param files the files to upload
     * @param projectId the project id to which the files will be attached
+    * @param userEmail user email
     * @return the response entity
     * @throws ProjectNotFoundException the project not found exception if the project does not exist
     * @throws FileCouldNotBeSaved the file could not be saved exception if the file could not be saved
     */
   @Override
-  public ResponseEntity<Object> uploadAttachment(final List<MultipartFile> files, final Long projectId)
+  public ResponseEntity<Object> uploadAttachment(final List<MultipartFile> files, final Long projectId, final String userEmail)
     throws ProjectNotFoundException, FileCouldNotBeSaved {
     Project project =
         projectRepository
             .findById(projectId)
             .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas !"));
     String folderPath = StringUtils.cleanPath(storingDirectory + project.getFolderPath());
+
+
     for (MultipartFile file : files) {
       try {
         String filePath = StringUtils.cleanPath(folderPath.concat("\\").concat(file.getOriginalFilename()));
         Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
+        User user = userRepository.findByUserEmail(userEmail);
         Attachment attachment =
             Attachment.builder()
                 .filePath(filePath)
@@ -100,6 +110,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
                 .project(project)
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .creator(user)
                 .build();
         attachmentRepository.save(attachment);
       } catch (IOException e) {
