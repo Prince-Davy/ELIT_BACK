@@ -404,6 +404,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectUserPermission.setUser(user);
         projectUserPermission.setProject(project);
         projectUserPermission.setPermission(contributor.getRole());
+        projectUserPermission.setUserFunction(contributor.getFunc());
         projectUserPermission.setId(new ProjectPropertyKey(projectId, user.getUserId()));
         projectUserPermissionRepository.save(projectUserPermission);
 
