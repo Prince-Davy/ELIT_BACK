@@ -44,12 +44,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * The ProjectServiceImpl class implements the ProjectService interface and
@@ -264,77 +265,79 @@ public class ProjectServiceImpl implements ProjectService {
         return projects;
     }
 
-    /**
-     * The method for getting the list of projects of a user.
-     *
-     * @param keyword the keyword to search for.
-     * @return the list of projects of a user.
-     */
-    @Override
-    public List<ProjectResponseModel> getUserProjectList(final String keyword) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      // getting the connected user
-      UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      User chef = userRepository.findByUserEmail(principal.getUsername());
+  /**
+   * The method for getting the list of projects of a user.
+   *
+   * @param keyword the keyword to search for.
+   * @return the list of projects of a user.
+   */
+  @Override
+  public List<ProjectResponseModel> getUserProjectList(final String keyword) {
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    // getting the connected user
+    UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User chef = userRepository.findByUserEmail(principal.getUsername());
 
-        List<ProjectResponseModel> projects = new ArrayList<>();
-        List<ProjectUserPermission> projectUserPermissions = projectUserPermissionRepository.findAll().stream()
-                .filter(projectUserPermission -> projectUserPermission.getUser().getUserEmail()
-                        .equals(userDetails.getUsername()))
-                .collect(Collectors.toList());
+    List<ProjectResponseModel> projects = new ArrayList<>();
+    List<ProjectUserPermission> projectUserPermissions = projectUserPermissionRepository.findAll().stream()
+      .filter(projectUserPermission -> projectUserPermission.getUser().getUserEmail()
+        .equals(userDetails.getUsername()))
+      .collect(Collectors.toList());
 
-        if (!projectUserPermissions.isEmpty()) {
-            for (ProjectUserPermission projectUserPermission : projectUserPermissions) {
-                Project project = projectUserPermission.getProject();
+    if (!projectUserPermissions.isEmpty()) {
+      for (ProjectUserPermission projectUserPermission : projectUserPermissions) {
+        Project project = projectUserPermission.getProject();
 
-                List<ProjectUserPermission> userPermissionList = projectUserPermissionRepository.findAll().stream()
-                        .filter(permission -> permission.getProject().getProjectId().equals(project.getProjectId()))
-                        .collect(Collectors.toList());
+        Optional<User> ownerUserProject = userRepository.findById(project.getChefId());
 
-                ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
-                for (ProjectUserPermission userPermission : userPermissionList) {
-                    User user = userPermission.getUser();
-                    if (!(chef.equals(user))) {
-                      contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
-                        user.getUserLastName(), null, null, userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
-                    }
+        List<ProjectUserPermission> userPermissionList = projectUserPermissionRepository.findAll().stream()
+          .filter(permission -> permission.getProject().getProjectId().equals(project.getProjectId()))
+          .collect(Collectors.toList());
 
-                }
+        ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
+        for (ProjectUserPermission userPermission : userPermissionList) {
+          User user = userPermission.getUser();
+          if (!(chef.equals(user))) {
+            contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
+              user.getUserLastName(), null, null, userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
+          }
 
-                String projectStatus;
+        }
 
-                if (project.getMultiCriteriaAnalysisList().size() == 1
-                        && !project.getMultiCriteriaAnalysisList().get(0).getIsFinished()) {
-                    projectStatus = ProjectAnalysisState.NOT_STARTED.toString();
-                } else {
-                    boolean isFinished = true;
-                    for (MultiCriteriaAnalysis multiCriteriaAnalysis : project.getMultiCriteriaAnalysisList()) {
-                        if (!multiCriteriaAnalysis.getIsFinished()) {
-                            isFinished = false;
-                            break;
-                        }
-                    }
+        String projectStatus;
 
-                    if (isFinished) {
-                        projectStatus = ProjectAnalysisState.DONE.toString();
-                    } else {
-                        projectStatus = ProjectAnalysisState.IN_PROGRESS.toString();
-                    }
-                }
-
-                projects.add(new ProjectResponseModel(project.getProjectId(), project.getName(),
-                        project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(),
-                        project.getConfirmationState(), project.getChefId(), null, contributorModelList, null, null, projectStatus));
+        if (project.getMultiCriteriaAnalysisList().size() == 1
+          && !project.getMultiCriteriaAnalysisList().get(0).getIsFinished()) {
+          projectStatus = ProjectAnalysisState.NOT_STARTED.toString();
+        } else {
+          boolean isFinished = true;
+          for (MultiCriteriaAnalysis multiCriteriaAnalysis : project.getMultiCriteriaAnalysisList()) {
+            if (!multiCriteriaAnalysis.getIsFinished()) {
+              isFinished = false;
+              break;
             }
+          }
+
+          if (isFinished) {
+            projectStatus = ProjectAnalysisState.DONE.toString();
+          } else {
+            projectStatus = ProjectAnalysisState.IN_PROGRESS.toString();
+          }
         }
-        if (keyword != null && !keyword.isEmpty()) {
-            return projects.stream()
-                    .filter(project -> Objects.nonNull(project.getDescription())
-                            && project.getDescription().contains(keyword) || project.getName().contains(keyword))
-                    .collect(Collectors.toList());
-        }
-        return projects;
+
+        projects.add(new ProjectResponseModel(project.getProjectId(), project.getName(),
+          project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(),
+          project.getConfirmationState(), project.getChefId(), ownerUserProject.get().getUserLastName(), ownerUserProject.get().getUserFirstName(), null, contributorModelList, null, null, projectStatus));
+      }
     }
+    if (keyword != null && !keyword.isEmpty()) {
+      return projects.stream()
+        .filter(project -> Objects.nonNull(project.getDescription())
+          && project.getDescription().contains(keyword) || project.getName().contains(keyword))
+        .collect(Collectors.toList());
+    }
+    return projects;
+  }
 
     /**
      * Updates the confirmation state of a project to either CONFIRMED or REJECTED
@@ -506,7 +509,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(),
-                project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), project.getChefId(),
+                project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), project.getChefId(), null, null,
                 project.getIsArchived(), contributorModelList, attachmentList, multicriteriaAnaliseList, null);
     }
 

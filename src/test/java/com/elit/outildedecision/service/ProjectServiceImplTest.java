@@ -397,6 +397,8 @@ class ProjectServiceImplTest {
       projectToSave.getUpdatedAt(),
       projectToSave.getConfirmationState(),
       projectToSave.getChefId(),
+      user.getUserLastName(),
+      user.getUserFirstName(),
       projectToSave.getIsArchived(),
       contributorModelList,
       attachmentModelList,

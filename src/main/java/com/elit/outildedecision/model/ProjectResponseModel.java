@@ -54,6 +54,16 @@ public class ProjectResponseModel {
   private Long chefId;
 
   /**
+   * The lastname of the chef project owner.
+   */
+  private String chefLasName;
+
+  /**
+   * The firstname of the chef project owner.
+   */
+  private String chefFirstName;
+
+  /**
    * The archived status of the project.
    */
   private Boolean isArchived;
