@@ -44,8 +44,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -188,7 +191,9 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   }
 
   private JSONObject readQuestionsJsonFile() throws IOException, ParseException {
-    FileReader reader = new FileReader(questionsJsonFile);
+    FileInputStream fileInputStream = new FileInputStream(questionsJsonFile);
+    InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
+    BufferedReader reader = new BufferedReader(inputStreamReader);
     JSONParser jsonParser = new JSONParser();
     return (JSONObject) jsonParser.parse(reader);
   }
