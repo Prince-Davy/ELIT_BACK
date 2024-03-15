@@ -2,10 +2,10 @@
   "Spécificité": {
     "stepRef": 1,
     "Questions": {
-      "Spec_1": "Quel est le produit final du projet ?",
+      "Spec_1": "Quel est le livrable final du projet ? ",
       "Spec_2": "Quels sont les motivations du projet liées à l’environnement ?",
-      "Spec_3": "Quels sont les enjeux qui sont à la fois connus et acceptés ?",
-      "Spec_4": "Quel est le minimum attendu pour considérer le projet comme réussi ?"
+      "Spec_3": "Quels sont les enjeux à la fois identifiés et acceptés ?",
+      "Spec_4": "Quelle est la réalisation minimale considérée comme un succès ? "
     },
     "Criterias": [
       {
@@ -25,9 +25,9 @@
   "Incertitude": {
     "stepRef": 2,
     "Questions": {
-      "Unc_1": "Les exigences sont-elles complètes ?",
-      "Unc_2": "Jusqu’à quel point l’utilité du produit dans son périmètre business paraît-elle claire ?",
-      "Unc_3": "A quel degré sont et seront disponibles le management et les commanditaires/sponsors du projet ? "
+      "Unc_1": "Les exigences ont-elles été exhaustivement définies ?",
+      "Unc_2": "Dans quelle mesure la pertinence du produit dans son contexte professionnel apparaît-elle clairement définie ?",
+      "Unc_3": "Dans quelle mesure le management ainsi que les commanditaires/sponsors du projet sont-ils actuellement disponibles et prévus à l'avenir ?"
     },
     "Criterias": [
       {
@@ -43,10 +43,10 @@
   "Manoeuvrabilité": {
     "stepRef": 3,
     "Questions": {
-      "Man_1": "A quel point ou avec quelle probabilité les futures exigences devraient-elles être acceptées ?",
-      "Man_2": "A quel degré les parties prenantes seront-elles disponibles pendant l’exécution ?",
-      "Man_3": "Avec quelle régularité le projet requerra-t-il d’intégrer de nouveaux membres au sein des équipes ?",
-      "Man_4": "Y-a-t-il des projets similaires terminés et réussis qui pourraient servir de modèle ?"
+      "Man_1": "Dans quelle mesure ou avec quelle probabilité pouvons-nous anticiper l'acceptation des futures exigences ?",
+      "Man_2": "Dans quelle mesure les parties prenantes seront-elles disponibles pendant l'exécution du projet ?",
+      "Man_3": "À quelle fréquence le projet nécessitera-t-il l'intégration de nouveaux membres au sein des équipes ?",
+      "Man_4": "Existe-t-il des projets similaires qui ont été menés à terme avec succès et pourraient servir de modèle ?"
     },
     "Criterias": [
       {
