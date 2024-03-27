@@ -32,6 +32,7 @@ import com.elit.outildedecision.util.ProjectAnalysisState;
 import com.elit.outildedecision.util.ProjectConfirmationState;
 import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -534,7 +535,15 @@ public class ProjectServiceImpl implements ProjectService {
             pup.getUser().detachPermission(pup);
             projectUserPermissionRepository.delete(pup);
         }
-        projectRepository.delete(projectToDelete);
+      // Chemin du dossier à supprimer
+        String projectToDeletePath = storingDirectory + projectToDelete.getFolderPath();
+        try {
+          FileUtils.deleteDirectory(new File(projectToDeletePath));
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+
+      projectRepository.delete(projectToDelete);
         return ResponseEntity.ok().body("Le projet a été bien supprimé");
     }
 }
