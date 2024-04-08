@@ -1,6 +1,14 @@
 package com.elit.outildedecision.service;
 
+import com.azure.communication.email.EmailClient;
+import com.azure.communication.email.models.EmailMessage;
+import com.azure.communication.email.models.EmailSendResult;
+import com.azure.communication.email.models.EmailSendStatus;
+import com.azure.core.util.polling.LongRunningOperationStatus;
+import com.azure.core.util.polling.PollResponse;
+import com.azure.core.util.polling.SyncPoller;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.entity.VerificationToken;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
@@ -13,6 +21,8 @@ import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ModelSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,6 +37,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -36,9 +47,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -49,7 +60,17 @@ class UserServiceImplTests {
   private MultipartFile file;
   @Mock
   private PasswordEncoder passwordEncoder;
-  private final String avatarUploadDir="src/main/resources/avatars/";
+
+  @Mock
+  private VerificationTokenService verificationTokenService;
+
+  @Mock
+  private EmailClient emailClientMock;
+
+  @Captor
+  private ArgumentCaptor<EmailMessage> emailMessageCaptor;
+
+  private final String avatarUploadDir = "src/main/resources/avatars/";
 
   @InjectMocks
   private UserServiceImpl userServiceImpl;
@@ -68,10 +89,10 @@ class UserServiceImplTests {
     user.setUserId(1L);
     user.setUserPassword(passwordEncoder.encode(OLD_PASS));
     user.setUserPassword(passwordEncoder.encode(OLD_PASS));
-   }
+  }
 
   @Test
-  void loadUserByUsername_Success(){
+  void loadUserByUsername_Success() {
     when(userRepository.findByUserEmailAndIsVerified(USER_EMAIL)).thenReturn(user);
     UserDetails result = userServiceImpl.loadUserByUsername(USER_EMAIL);
     assertEquals(USER_EMAIL, result.getUsername());
@@ -103,14 +124,16 @@ class UserServiceImplTests {
     when(userRepository.save(user)).thenReturn(user);
     assertThrows(CouldNotSaveUserException.class, () -> userServiceImpl.saveUser(usermodel));
   }
+
   @Test
   void updatePasswordDifferent() throws Exception {
     UserModel usermodel = new UserModel();
     usermodel.setUserEmail(USER_EMAIL);
     usermodel.setUserPassword("123456789");
     usermodel.setUserPasswordConfirmation("987654321");
-     assertThrows(CouldNotSaveUserException.class, () -> userServiceImpl.saveUser(usermodel));
+    assertThrows(CouldNotSaveUserException.class, () -> userServiceImpl.saveUser(usermodel));
   }
+
   @Test
   void updatePasswordUserById_httpNotAcceptable() throws Exception {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
@@ -145,11 +168,11 @@ class UserServiceImplTests {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
     when(userRepository.save(user)).thenReturn(user);
     MockMultipartFile file
-      = new MockMultipartFile(
-      "file",
-      "hello.txt",
-      MediaType.TEXT_PLAIN_VALUE,
-      "Hello, World!".getBytes()
+            = new MockMultipartFile(
+            "file",
+            "hello.txt",
+            MediaType.TEXT_PLAIN_VALUE,
+            "Hello, World!".getBytes()
     );
     assertEquals(HttpStatus.OK, userServiceImpl.updateAvatarByIdUser(USER_ID, file).getStatusCode());
   }
@@ -161,6 +184,7 @@ class UserServiceImplTests {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
     assertThrows(UserNotFoundException.class, () -> userServiceImpl.updateInfosByIdUser(USER_ID, "firstname", "lastname"));
   }
+
   @Test
   void updateInfosByIdUser_Success() throws Exception {
     UserModel usermodel = new UserModel();
@@ -169,27 +193,28 @@ class UserServiceImplTests {
     when(userRepository.save(user)).thenReturn(user);
     assertEquals(HttpStatus.OK, userServiceImpl.updateInfosByIdUser(USER_ID, "", "").getStatusCode());
   }
+
   @Test
   void getAllInfosUserById_Success() {
     when(userRepository.getById(USER_ID)).thenReturn(user);
     assertEquals(UserResponseModel.builder()
-      .userId(user.getUserId())
-      .userFirstName(user.getUserFirstName())
-      .userLastName(user.getUserLastName())
-      .username(user.getUsername())
-      .userEmail(user.getUserEmail())
-      .build(), userServiceImpl.getAllInfosUserById(USER_ID));
+            .userId(user.getUserId())
+            .userFirstName(user.getUserFirstName())
+            .userLastName(user.getUserLastName())
+            .username(user.getUsername())
+            .userEmail(user.getUserEmail())
+            .build(), userServiceImpl.getAllInfosUserById(USER_ID));
   }
 
   @Test
   void saveAvatar_Success() throws IOException {
     MockMultipartFile file
-      = new MockMultipartFile(
-      "avatar.png",
-      "avatar.png",
-      MediaType.IMAGE_PNG_VALUE,
-      "avatar.png".getBytes());
-    assertEquals("null"+file.getOriginalFilename(), userServiceImpl.saveAvatar(file));
+            = new MockMultipartFile(
+            "avatar.png",
+            "avatar.png",
+            MediaType.IMAGE_PNG_VALUE,
+            "avatar.png".getBytes());
+    assertEquals("null" + file.getOriginalFilename(), userServiceImpl.saveAvatar(file));
 
   }
 
@@ -197,22 +222,22 @@ class UserServiceImplTests {
   void findUsersByKeyworld_SuccesskeyworldNullFour() throws IOException {
     List<UserResponseModel> foundUsers = new ArrayList<>();
     String keyworld = null;
-    user.setUserAvatarPath(avatarUploadDir+"avatar.png");
+    user.setUserAvatarPath(avatarUploadDir + "avatar.png");
     List<User> users = new ArrayList<>();
     users.add(user);
     File file = new File(user.getUserAvatarPath());
     when(userRepository.findAll()).thenReturn(users);
     UserResponseModel userResponseModel =
-      UserResponseModel.builder()
-        .userId(user.getUserId())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .userAvatar(Files.readAllBytes(file.toPath()))
-        .build();
+            UserResponseModel.builder()
+                    .userId(user.getUserId())
+                    .userFirstName(user.getUserFirstName())
+                    .userLastName(user.getUserLastName())
+                    .username(user.getUsername())
+                    .userEmail(user.getUserEmail())
+                    .userAvatar(Files.readAllBytes(file.toPath()))
+                    .build();
     foundUsers.add(userResponseModel);
-    assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
+    assertEquals(foundUsers, userServiceImpl.findUsersByKeyword(keyworld));
   }
 
   @Test
@@ -224,37 +249,37 @@ class UserServiceImplTests {
     users.add(user);
     when(userRepository.findAll()).thenReturn(users);
     UserResponseModel userResponseModel =
-      UserResponseModel.builder()
-        .userId(user.getUserId())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .build();
+            UserResponseModel.builder()
+                    .userId(user.getUserId())
+                    .userFirstName(user.getUserFirstName())
+                    .userLastName(user.getUserLastName())
+                    .username(user.getUsername())
+                    .userEmail(user.getUserEmail())
+                    .build();
     foundUsers.add(userResponseModel);
-    assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
+    assertEquals(foundUsers, userServiceImpl.findUsersByKeyword(keyworld));
   }
 
   @Test
   void findUsersByKeyworld_SuccesskeyworldNullOne() throws IOException {
     List<UserResponseModel> foundUsers = new ArrayList<>();
     String keyworld = "";
-    user.setUserAvatarPath(avatarUploadDir+"avatar.png");
+    user.setUserAvatarPath(avatarUploadDir + "avatar.png");
     List<User> users = new ArrayList<>();
     users.add(user);
     File file = new File(user.getUserAvatarPath());
     when(userRepository.findAll()).thenReturn(users);
     UserResponseModel userResponseModel =
-      UserResponseModel.builder()
-        .userId(user.getUserId())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .userAvatar(Files.readAllBytes(file.toPath()))
-        .build();
+            UserResponseModel.builder()
+                    .userId(user.getUserId())
+                    .userFirstName(user.getUserFirstName())
+                    .userLastName(user.getUserLastName())
+                    .username(user.getUsername())
+                    .userEmail(user.getUserEmail())
+                    .userAvatar(Files.readAllBytes(file.toPath()))
+                    .build();
     foundUsers.add(userResponseModel);
-    assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
+    assertEquals(foundUsers, userServiceImpl.findUsersByKeyword(keyworld));
   }
 
   @Test
@@ -266,40 +291,40 @@ class UserServiceImplTests {
     users.add(user);
     when(userRepository.findAll()).thenReturn(users);
     UserResponseModel userResponseModel =
-      UserResponseModel.builder()
-        .userId(user.getUserId())
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .build();
+            UserResponseModel.builder()
+                    .userId(user.getUserId())
+                    .userFirstName(user.getUserFirstName())
+                    .userLastName(user.getUserLastName())
+                    .username(user.getUsername())
+                    .userEmail(user.getUserEmail())
+                    .build();
     foundUsers.add(userResponseModel);
-    assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
+    assertEquals(foundUsers, userServiceImpl.findUsersByKeyword(keyworld));
   }
 
   @Test
   void shouldfindUsersByKeyworld_Success() throws Exception {
     List<UserResponseModel> foundUsers = new ArrayList<>();
     String keyworld = "test";
-    user.setUserAvatarPath(avatarUploadDir+"avatar.png");
+    user.setUserAvatarPath(avatarUploadDir + "avatar.png");
     List<User> users = new ArrayList<>();
     users.add(user);
     when(userRepository.findAllByUserEmailOrUsernameContaining(keyworld)).thenReturn(users);
     UserResponseModel userResponseModel =
-      UserResponseModel.builder()
-        .userId(1L)
-        .userFirstName(user.getUserFirstName())
-        .userLastName(user.getUserLastName())
-        .username(user.getUsername())
-        .userEmail(user.getUserEmail())
-        .userAvatar(Files.readAllBytes(Paths.get(user.getUserAvatarPath())))
-        .build();
+            UserResponseModel.builder()
+                    .userId(1L)
+                    .userFirstName(user.getUserFirstName())
+                    .userLastName(user.getUserLastName())
+                    .username(user.getUsername())
+                    .userEmail(user.getUserEmail())
+                    .userAvatar(Files.readAllBytes(Paths.get(user.getUserAvatarPath())))
+                    .build();
     foundUsers.add(userResponseModel);
-    assertEquals(foundUsers,userServiceImpl.findUsersByKeyword(keyworld));
+    assertEquals(foundUsers, userServiceImpl.findUsersByKeyword(keyworld));
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
+  @WithMockUser(authorities = {"ADMIN", "USER"}, username = "user@user.com")
   void updateUser_USERNOTFOUND() throws CouldNotSaveUserException {
     UserModel usermodel = ModelSamples.UserSamples.getUserModel();
     usermodel.setUserEmail("super@elite.com");
@@ -311,11 +336,11 @@ class UserServiceImplTests {
     when(userRepository.findByUserEmail(anyString())).thenReturn(null);
     Map<String, String> errorMap = new HashMap<>();
     errorMap.put("NOT_FOUND", Constants.USER_NOT_FOUND);
-    assertEquals(errorMap.entrySet(),userServiceImpl.updateUser(usermodel).getBody().entrySet());
+    assertEquals(errorMap.entrySet(), userServiceImpl.updateUser(usermodel).getBody().entrySet());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
+  @WithMockUser(authorities = {"ADMIN", "USER"}, username = "user@user.com")
   void updateUser_EmailNotTheSame() throws CouldNotSaveUserException {
     UserModel usermodel = new UserModel();
     usermodel.setUsername(USER_EMAIL);
@@ -331,11 +356,11 @@ class UserServiceImplTests {
     when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     Map<String, String> errorMap = new HashMap<>();
     errorMap.put(Constants.CONFLICT, "Les emails doivent être identiques");
-    assertEquals(errorMap.entrySet(),userServiceImpl.updateUser(usermodel).getBody().entrySet());
+    assertEquals(errorMap.entrySet(), userServiceImpl.updateUser(usermodel).getBody().entrySet());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
+  @WithMockUser(authorities = {"ADMIN", "USER"}, username = "user@user.com")
   void updateUser_Success() throws CouldNotSaveUserException {
     UserModel usermodel = new UserModel();
     usermodel.setUsername(USER_EMAIL);
@@ -351,7 +376,36 @@ class UserServiceImplTests {
     when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     Map<String, String> errorMap = new HashMap<>();
     errorMap.put("SUCCESS", "Utilisateur mis à jour");
-    assertEquals(errorMap.entrySet(),userServiceImpl.updateUser(usermodel).getBody().entrySet());
+    assertEquals(errorMap.entrySet(), userServiceImpl.updateUser(usermodel).getBody().entrySet());
   }
 
+
+  @Test
+  void sendRegistrationConfirmationEmail_Success() {
+    // Given
+    UserServiceImpl userServiceImpl = new UserServiceImpl(userRepository, passwordEncoder, verificationTokenService, emailClientMock);
+    VerificationToken verificationToken = new VerificationToken();
+    verificationToken.setToken("token");
+    verificationToken.setUser(user);
+    verificationToken.setType("type");
+    verificationToken.setExpiryDate(new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L));
+    ReflectionTestUtils.setField(userServiceImpl, "senderEmail", "exemple@test.com");
+    ReflectionTestUtils.setField(userServiceImpl, "frontEndUrl", "test.com");
+
+    SyncPoller<EmailSendResult, EmailSendResult> poller = mock(SyncPoller.class);
+    EmailSendResult simulatedEmailSendResult = new EmailSendResult("1", EmailSendStatus.SUCCEEDED, null);
+    PollResponse<EmailSendResult> simulatedPollResponse = new PollResponse<>(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED, simulatedEmailSendResult);
+    // When
+    when(verificationTokenService.createToken(any(), any())).thenReturn(verificationToken);
+    when(emailClientMock.beginSend(any(), eq(null))).thenReturn(poller);
+    when(poller.poll()).thenReturn(simulatedPollResponse);
+
+    userServiceImpl.sendRegistrationConfirmationEmail(user);
+    // Then
+    verify(emailClientMock, times(1)).beginSend(emailMessageCaptor.capture(), eq(null));
+    EmailMessage capturedEmailMessage = emailMessageCaptor.getValue();
+    assertNotNull(capturedEmailMessage);
+    assertEquals("exemple@test.com", capturedEmailMessage.getSenderAddress());
+    assertEquals("ELIT : Activer votre compte", capturedEmailMessage.getSubject());
+  }
 }

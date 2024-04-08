@@ -1,5 +1,6 @@
 package com.elit.outildedecision.service;
 
+import com.azure.communication.email.EmailClient;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.VerificationToken;
 import com.elit.outildedecision.exception.UserNotVerifiedException;
@@ -8,7 +9,6 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.VerificationTokenRepository;
 import com.elit.outildedecision.service.implementation.VerificationTokenServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
-import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class VerificationTokenServiceImplTest {
@@ -35,6 +36,11 @@ class VerificationTokenServiceImplTest {
   PasswordEncoder passwordEncoder;
   @Mock
   UserRepository userRepository;
+
+  @Mock
+  VerificationTokenService verificationTokenService;
+  @Mock
+  private EmailClient emailClientMock;
 
   private String token;
   private User user;
@@ -166,6 +172,31 @@ class VerificationTokenServiceImplTest {
     Assertions.assertEquals(ResponseEntity.badRequest().body("les mots de passes ne sont pas identiques"), verificationTokenServiceImpl.reinstateForgotPassword(token, changePasswordModel));
   }
 
+  @Test
+  void sendForgotPasswordEmail_UserNotFound() throws UserNotVerifiedException, JsonProcessingException {
+    // Given
+    VerificationTokenServiceImpl verificationTokenService = new VerificationTokenServiceImpl(passwordEncoder,verificationTokenRepository,userRepository,emailClientMock);
+    String userEmail = "test@example.com";
+    when(userRepository.findByUserEmail(userEmail)).thenReturn(null);
+    // When
+    ResponseEntity<String> response = verificationTokenService.sendForgotPasswordEmail("{\"email\":\"" + userEmail + "\"}");
+    // Then
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals("Aucun compte n'a été trouvé pour l'e-mail " + userEmail + ", Veuillez réessayer.", response.getBody());
+  }
+
+  @Test
+  void sendForgotPasswordEmail_UserNotVerified() {
+    // Given
+    VerificationTokenServiceImpl verificationTokenService = new VerificationTokenServiceImpl(passwordEncoder, verificationTokenRepository, userRepository, emailClientMock);
+    String userEmail = "test@example.com";
+    User user = new User();
+    user.setUserEmail(userEmail);
+    user.setIsEmailVerified(false);
+    when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
+    // When et Then
+    assertThrows(UserNotVerifiedException.class, () -> verificationTokenService.sendForgotPasswordEmail("{\"email\":\"" + userEmail + "\"}"));
+  }
   /* @Test
   void forgotPassword() throws UserNotVerifiedException, JsonProcessingException {
      user.setIsEmailVerified(true);
