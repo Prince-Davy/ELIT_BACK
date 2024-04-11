@@ -306,7 +306,6 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         String projectStatus;
-
         if (project.getMultiCriteriaAnalysisList().size() == 1
           && !project.getMultiCriteriaAnalysisList().get(0).getIsFinished()) {
           projectStatus = ProjectAnalysisState.NOT_STARTED.toString();
@@ -325,7 +324,6 @@ public class ProjectServiceImpl implements ProjectService {
             projectStatus = ProjectAnalysisState.IN_PROGRESS.toString();
           }
         }
-
         projects.add(new ProjectResponseModel(project.getProjectId(), project.getName(),
           project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(),
           project.getConfirmationState(), project.getChefId(), ownerUserProject.get().getUserLastName(), ownerUserProject.get().getUserFirstName(), null, contributorModelList, null, null, projectStatus));

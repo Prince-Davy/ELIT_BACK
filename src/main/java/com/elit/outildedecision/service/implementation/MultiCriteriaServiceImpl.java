@@ -119,18 +119,18 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * Constructor for the {@link MultiCriteriaServiceImpl} class. it's for dependency injection.
    *
    * @param multiCriteriaAnalysisRepository the repository for multi-criteria analysis entities
-   * @param formStepRepo the repository for form step entities
-   * @param formQuestionRepository the repository for form question entities
-   * @param criteriaRepository the repository for criteria entities
-   * @param stepWeightRepo the repository for step weight entities
-   * @param userRepository the repository for user entities
+   * @param formStepRepo                    the repository for form step entities
+   * @param formQuestionRepository          the repository for form question entities
+   * @param criteriaRepository              the repository for criteria entities
+   * @param stepWeightRepo                  the repository for step weight entities
+   * @param userRepository                  the repository for user entities
    * @param projectUserPermissionRepository the repository for project user permission entities
-   * @param projectRepository the repository for project entities
+   * @param projectRepository               the repository for project entities
    */
   public MultiCriteriaServiceImpl(final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository, final FormStepRepo formStepRepo,
-    final FormQuestionRepository formQuestionRepository, final CriteriaRepository criteriaRepository, final StepWeightRepo stepWeightRepo,
-    final UserRepository userRepository, final ProjectUserPermissionRepository projectUserPermissionRepository,
-    final ProjectRepository projectRepository) {
+                                  final FormQuestionRepository formQuestionRepository, final CriteriaRepository criteriaRepository, final StepWeightRepo stepWeightRepo,
+                                  final UserRepository userRepository, final ProjectUserPermissionRepository projectUserPermissionRepository,
+                                  final ProjectRepository projectRepository) {
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.formStepRepo = formStepRepo;
     this.formQuestionRepository = formQuestionRepository;
@@ -147,7 +147,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @param projectId the id of the project to create the form for.
    * @return a ResponseEntity with a success message if the form was created successfully, or a conflict status if there is already an
    * ongoing analysis for the project.
-   * @throws IOException if there is an error reading the JSON file.
+   * @throws IOException    if there is an error reading the JSON file.
    * @throws ParseException if there is an error parsing the JSON file.
    */
   @Override
@@ -166,6 +166,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
     return ResponseEntity.ok().body("Votre Analyse multicritère est crée avec succés");
   }
+
   private Project getProject(final Long projectId) throws ProjectNotFoundException {
     return projectRepository
       .findById(projectId)
@@ -181,7 +182,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   }
 
   private MultiCriteriaAnalysis createNewMultiCriteriaAnalysis(final Project project,
-    final MultiCriteriaAnalysis existingMultiCriteriaAnalysis) {
+                                                               final MultiCriteriaAnalysis existingMultiCriteriaAnalysis) {
     MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
     multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(
       Objects.nonNull(existingMultiCriteriaAnalysis) ? existingMultiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1 : 1);
@@ -243,10 +244,22 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
       for (int i = 0; i < criterias.size(); i++) {
         JSONObject criteriaData = (JSONObject) criterias.get(i);
-        criteriaRepository.save(
-          Criteria.builder().criteriaName(criteriaData.get("name").toString()).formQuestion(persistedFormQuestion).build());
+        boolean skipSave = sortCriteriaQuestion(question, criteriaData);
+        if (!skipSave) {
+          criteriaRepository.save(
+            Criteria.builder().criteriaName(criteriaData.get("name").toString()).formQuestion(persistedFormQuestion).build());
+        }
       }
     }
+  }
+
+  private boolean sortCriteriaQuestion(final Map.Entry<String, String> question, final JSONObject criteriaData) {
+    String questionString = question.toString();
+    String criteriaName = criteriaData.get("name").toString();
+    if (questionString.contains("Spec_1") && criteriaName.contains("Rigueur") || questionString.contains("Unc_2") && criteriaName.contains("Complétude") || questionString.contains("Man_1") && criteriaName.contains("Disponibilité") || questionString.contains("Man_2") && criteriaName.contains("Régularité") || questionString.contains("Man_4") && criteriaName.contains("Régularité")) {
+      return true;
+    }
+    return false;
   }
 
   private FormQuestion saveFormQuestion(final FormStep persistedStep, final Map.Entry<String, String> question) {
@@ -286,13 +299,12 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   /**
    * Update a MultiCriteriaAnalysis.
    *
-   * @param projectId the id of the project
+   * @param projectId                 the id of the project
    * @param multiCriteriaAnalysisStep the step of the MultiCriteriaAnalysis to update
-   *
    * @throws RuntimeException if the project or the step do not exist
    */
   @Override
- // @PreAuthorize("isProjectOwner(#projectId)")
+  // @PreAuthorize("isProjectOwner(#projectId)")
   public void updateMultiCriteriaAnalysis(
     final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException {
     FormStep formStepToUpdate =
@@ -358,7 +370,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   /**
    * Updates a multi-criteria question's answer text and criteria values based on the provided {@link FormQuestionModel}.
    *
-   * @param projectId the id of the project
+   * @param projectId         the id of the project
    * @param formQuestionModel the {@link FormQuestionModel} containing the updated answer text and criteria values
    * @return a Boolean to inform the success or not of the update
    * @throws MulticriteriaNotFoundException if the multi-criteria question with the provided ID is not found
@@ -392,7 +404,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @param projectId the ID of the project to calculate the score for
    * @return a ResponseEntity containing the calculated score in a MultiCriteriaAnalysisScoreModel object
    * @throws QuestionsNotFoundException if the questions for the multi-criteria analysis cannot be found
-   * @throws EscoreException if there is an error while calculating the E-score
+   * @throws EscoreException            if there is an error while calculating the E-score
    */
   @Override
   @Transactional
@@ -410,12 +422,12 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   /**
    * Checks whether the current user has a specific permission for a project.
    *
-   * @param projectId the ID of the project to check
+   * @param projectId      the ID of the project to check
    * @param permissionName the name of the permission to check
    * @return true if the user has the specified permission, false otherwise
    */
   private boolean checkPermissions(final Long projectId, final String permissionName) {
-    UserDetails userDetails = (UserDetails)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User user = userRepository.findByUserEmail(userDetails.getUsername());
 
     ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(projectId, user.getUserId());
@@ -427,7 +439,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    *
    * @param analyseId the ID of the MultiCriteriaAnalysis to update
    * @throws MulticriteriaNotFoundException if the MultiCriteriaAnalysis with the given ID does not exist
-   * @throws UserNotAuthorizedException if the user does not have the necessary permissions to update the iteration number
+   * @throws UserNotAuthorizedException     if the user does not have the necessary permissions to update the iteration number
    */
   @Override
   public void increaseMulticriteriaIteration(final Long analyseId)
@@ -457,16 +469,16 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @param analyseId the ID of the MultiCriteriaAnalysis to update
    * @return a ResponseEntity with a success message if the update was successful
    * @throws MulticriteriaNotFoundException if the MultiCriteriaAnalysis with the given ID does not exist
-   * @throws ProjectNotFoundException if the specified project does not exist
+   * @throws ProjectNotFoundException       if the specified project does not exist
    */
   @Override
   public boolean increaseMulticriteriaIteration(final Long projectId, final Long analyseId) throws MulticriteriaNotFoundException {
     MultiCriteriaAnalysis multiCriteriaAnalysis = multiCriteriaAnalysisRepository.findById(analyseId)
-    .orElseThrow(() -> new MulticriteriaNotFoundException("Cette analyse multicritères n'existe pas."));
+      .orElseThrow(() -> new MulticriteriaNotFoundException("Cette analyse multicritères n'existe pas."));
     if (Objects.equals(multiCriteriaAnalysis.getProject().getProjectId(), projectId)) {
-        multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
-        multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
-        return true;
+      multiCriteriaAnalysis.setMultiCriteriaAnalysisIteration(multiCriteriaAnalysis.getMultiCriteriaAnalysisIteration() + 1);
+      multiCriteriaAnalysisRepository.save(multiCriteriaAnalysis);
+      return true;
     }
     return false;
   }
@@ -477,12 +489,12 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * scores for each step.
    *
    * @param multiCriteriaAnalysisFormSteps the list of FormStep objects to iterate over
-   * @param multiCriteriaAnalysisScore the MultiCriteriaAnalysisScoreModel object to populate with calculated scores
+   * @param multiCriteriaAnalysisScore     the MultiCriteriaAnalysisScoreModel object to populate with calculated scores
    * @throws QuestionsNotFoundException if a required question is not found in the database
-   * @throws EscoreException if an error occurs while calculating the eScore
+   * @throws EscoreException            if an error occurs while calculating the eScore
    */
   private void iterateOverSteps(final List<FormStep> multiCriteriaAnalysisFormSteps,
-    final MultiCriteriaAnalysisScoreModel multiCriteriaAnalysisScore) throws QuestionsNotFoundException, EscoreException {
+                                final MultiCriteriaAnalysisScoreModel multiCriteriaAnalysisScore) throws QuestionsNotFoundException, EscoreException {
     for (FormStep formStep : multiCriteriaAnalysisFormSteps) {
       MultiCriteriaStepScoreModel multiCriteriaStepScore = new MultiCriteriaStepScoreModel();
       float eScore = calculateMultiCriteriaStepEscore(formStep);
@@ -509,12 +521,13 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @param formStep The form step for which to calculate the e-score.
    * @return The calculated e-score.
    * @throws QuestionsNotFoundException If the questions for the form step cannot be found.
-   * @throws EscoreException If the denominator of the e-score calculation is 0.
+   * @throws EscoreException            If the denominator of the e-score calculation is 0.
    */
   private float calculateMultiCriteriaStepEscore(final FormStep formStep) throws QuestionsNotFoundException, EscoreException {
     Set<Criteria> criterias = formStep.getFormQuestions()
       .stream()
-      .findFirst()
+      .sorted((q1, q2) -> Integer.compare(q2.getCriterias().size(), q1.getCriterias().size()))
+      .findAny()
       .orElseThrow(() -> new QuestionsNotFoundException("Erreur lors de la récupération des questions"))
       .getCriterias();
     float multiCriteriaStepEscoreNumenator = 0;
@@ -570,18 +583,21 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   private List<CriteriaScoreModel> calculteCriteriaScore(final FormStep formStep) throws QuestionsNotFoundException {
     Set<Criteria> criterias = formStep.getFormQuestions()
       .stream()
-      .findFirst()
+      .sorted((q1, q2) -> Integer.compare(q2.getCriterias().size(), q1.getCriterias().size()))
+      .findAny()
       .orElseThrow(() -> new QuestionsNotFoundException("Erreur lors de la récupération des questions"))
       .getCriterias();
-    int questionSize = formStep.getFormQuestions().size();
+
     List<CriteriaScoreModel> criteriaScoreModels = new ArrayList<>();
     for (Criteria criteria : criterias) {
       CriteriaScoreModel criteriaScoreModel = new CriteriaScoreModel();
       criteriaScoreModel.setCriteriaName(criteria.getCriteriaName());
-      float criteriaScore = iterateOverQuestionAndCalculateCriteriaSum(criteria, formStep) / questionSize;
+      List<Criteria> criteriaList = criteriaRepository.getCriteriaByStepIdAndCriteriaName(formStep.getStepId(), criteria.getCriteriaName());
+      float criteriaScore = iterateOverQuestionAndCalculateCriteriaSum(criteria, formStep) / criteriaList.size();
       criteriaScoreModel.setCriteriaScore(criteriaScore);
       criteriaScoreModels.add(criteriaScoreModel);
     }
     return criteriaScoreModels;
   }
 }
+
