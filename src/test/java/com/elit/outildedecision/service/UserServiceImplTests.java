@@ -406,6 +406,6 @@ class UserServiceImplTests {
     EmailMessage capturedEmailMessage = emailMessageCaptor.getValue();
     assertNotNull(capturedEmailMessage);
     assertEquals("exemple@test.com", capturedEmailMessage.getSenderAddress());
-    assertEquals("ELIT : Activer votre compte", capturedEmailMessage.getSubject());
+    assertEquals("ELIT : Activez votre compte", capturedEmailMessage.getSubject());
   }
 }

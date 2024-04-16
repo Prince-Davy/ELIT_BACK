@@ -253,7 +253,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         VerificationToken verificationToken = createToken(user, FORGOT_PASSWORD);
         String recoveryUrl =
                 frontEndUrl + "/reset-password?token=" + verificationToken.getToken();
-        String mailSubject = "ELIT : Réinitialiser votre mot de passe";
+        String mailSubject = "ELIT : Réinitialisez votre mot de passe";
         ClassPathResource logoFile = new ClassPathResource("avatars/logoImage.png");
         EmailAttachment emailAttachment;
         try {

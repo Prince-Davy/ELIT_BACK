@@ -257,7 +257,7 @@ public class VoteServiceImpl implements VoteService {
     List<VoteModelResponse> result = new ArrayList<>();
     List<ProjectUserPermission> usersPermission = projectUserPermissionRepository.findAllByProjectId(project.getProjectId());
     for (ProjectUserPermission userP : usersPermission) {
-      if (userP.getPermission().equals(ProjectPermession.CONTRIBUTER.toString())
+      if (userP.getPermission().equals(ProjectPermession.CONTRIBUTER.name())
         || userP.getPermission().equals(ProjectPermession.CDP.name())) {
         Vote userVote = voteRepository.findByPredictibilityAnalysisAndUserId(predictibilityAnalysisId, userP.getUser().getUserId());
         result.add(createVoteModelResponse(userVote, predictibilityAnalysisId, userP.getUser().getUserId()));

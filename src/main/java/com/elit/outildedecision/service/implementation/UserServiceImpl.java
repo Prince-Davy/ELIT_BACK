@@ -486,7 +486,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         String confirmationUrl =
                 frontEndUrl + "/confirm-account?token=" + verificationToken.getToken() + "&id=" + convertUserId;
         System.out.println(verificationToken.getToken());
-        String mailSubject = "ELIT : Activer votre compte";
+        String mailSubject = "ELIT : Activez votre compte";
         ClassPathResource logoFile = new ClassPathResource("avatars/logoImage.png");
         EmailAttachment emailAttachment;
         try {
