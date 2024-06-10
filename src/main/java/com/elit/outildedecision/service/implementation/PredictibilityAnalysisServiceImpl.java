@@ -233,7 +233,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
       // Add in array votes per methodology
       intVotesList.add(voteSum);
 
-      float result = (voteSum * SUM_CONSTANT) / usersCount;
+      float result = voteSum * SUM_CONSTANT / usersCount;
       MethodologyScoreModel methodologyScoreModel =
         MethodologyScoreModel.builder()
           .name(methodologyName.name())

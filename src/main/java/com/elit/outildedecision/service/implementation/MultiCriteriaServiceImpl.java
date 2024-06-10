@@ -351,25 +351,6 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   /**
    * Updates a multi-criteria question's answer text and criteria values based on the provided {@link FormQuestionModel}.
    *
-   * @param formQuestionModel the {@link FormQuestionModel} containing the updated answer text and criteria values
-   * @throws MulticriteriaNotFoundException if the multi-criteria question with the provided ID is not found
-   */
-  @Override
-  public void updateMultiCriteriaQuestion(final FormQuestionModel formQuestionModel) throws MulticriteriaNotFoundException {
-    FormQuestion formQuestion = formQuestionRepository.findById(formQuestionModel.getQuestionId())
-      .orElseThrow(() -> new MulticriteriaNotFoundException("Ce fichier n'existe pas !"));
-    formQuestion.setAnswerText(formQuestionModel.getAnswerText());
-    formQuestionRepository.save(formQuestion);
-    for (CriteriaModel criteriaModel : formQuestionModel.getCriterias()) {
-      Criteria criteria = criteriaRepository.getById(criteriaModel.getCriteriaId());
-      criteria.setCriteriaValue(criteriaModel.getCriteriaValue());
-      criteriaRepository.save(criteria);
-    }
-  }
-
-  /**
-   * Updates a multi-criteria question's answer text and criteria values based on the provided {@link FormQuestionModel}.
-   *
    * @param projectId         the id of the project
    * @param formQuestionModel the {@link FormQuestionModel} containing the updated answer text and criteria values
    * @return a Boolean to inform the success or not of the update

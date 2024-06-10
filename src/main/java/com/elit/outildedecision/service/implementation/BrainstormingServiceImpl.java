@@ -40,9 +40,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.elit.outildedecision.util.Constants.ANALYSIS_DOESNT_EXIST;
-import static com.elit.outildedecision.util.Constants.BRAINSTORMING_DOESNT_EXIST;
-
 /**
  * this class is the implementation of the BrainstormingService interface.
  * and it contains all the methods that are used to manage the brainstorming
@@ -114,7 +111,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
       predictibilityAnalysisRepository
         .findById(brainstormingModel.getPredictibilityAnalysisId())
         .orElseThrow(
-          () -> new PredictibilityAnalysisNotFoundException(ANALYSIS_DOESNT_EXIST));
+          () -> new PredictibilityAnalysisNotFoundException(Constants.ANALYSIS_DOESNT_EXIST));
 
     if (!Objects.equals(predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
       throw  new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
@@ -157,7 +154,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
       brainstormingRepository
         .findById(brainstormingModel.getBrainstormingId())
         .orElseThrow(
-          () -> new BrainstormingNotFoundException(BRAINSTORMING_DOESNT_EXIST));
+          () -> new BrainstormingNotFoundException(Constants.BRAINSTORMING_DOESNT_EXIST));
 
     if (!Objects.equals(brainstorming.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
       throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
@@ -193,7 +190,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
       brainstormingRepository
         .findById(brainstormingId)
         .orElseThrow(
-          () -> new BrainstormingNotFoundException(BRAINSTORMING_DOESNT_EXIST));
+          () -> new BrainstormingNotFoundException(Constants.BRAINSTORMING_DOESNT_EXIST));
 
     if (!Objects.equals(brainstorming.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
       throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
@@ -218,7 +215,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
       brainstormingRepository
         .findById(brainstormingId)
         .orElseThrow(
-          () -> new BrainstormingNotFoundException(BRAINSTORMING_DOESNT_EXIST));
+          () -> new BrainstormingNotFoundException(Constants.BRAINSTORMING_DOESNT_EXIST));
 
     if (!Objects.equals(brainstorming.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
       throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
@@ -246,7 +243,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
       predictibilityAnalysisRepository
         .findById(predictabilityAnalysisId)
         .orElseThrow(
-          () -> new PredictibilityAnalysisNotFoundException(ANALYSIS_DOESNT_EXIST));
+          () -> new PredictibilityAnalysisNotFoundException(Constants.ANALYSIS_DOESNT_EXIST));
 
     if (!Objects.equals(predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
       throw  new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
@@ -273,12 +270,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
   private List<FormStepModelForBrainstorming> getFormStepsWithBrainstorming(final PredictibilityAnalysis predictibilityAnalysis) {
     List<FormStep> formStepList =
       predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps().stream()
-        .filter(
-          formStep ->
-            formStep.getFormQuestions().stream()
-              .filter(formQuestion -> !formQuestion.getBrainstormings().isEmpty())
-              .count()
-              > 0)
+        .filter(formStep -> formStep.getEScore() < 0.5)
         .collect(Collectors.toList());
     this.log.info("ABSTRACT formStepList size: {}", formStepList.size());
 

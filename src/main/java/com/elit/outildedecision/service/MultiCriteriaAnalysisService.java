@@ -55,15 +55,6 @@ public interface MultiCriteriaAnalysisService {
   /**
    * Updates an existing multi-criteria analysis question.
    *
-   * @param formQuestion a FormQuestionModel object representing the question to update
-   * @throws MulticriteriaNotFoundException if the specified multi-criteria analysis does not exist
-   */
-  void updateMultiCriteriaQuestion(FormQuestionModel formQuestion) throws MulticriteriaNotFoundException;
-
-
-  /**
-   * Updates an existing multi-criteria analysis question.
-   *
    * @param projectId the projectId
    * @param formQuestion a FormQuestionModel object representing the question to update
    * @return a ResponseEntity indicating the success or failure of the update operation

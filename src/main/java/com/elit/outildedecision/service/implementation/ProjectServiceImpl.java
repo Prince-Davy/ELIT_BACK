@@ -298,7 +298,7 @@ public class ProjectServiceImpl implements ProjectService {
         ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
         for (ProjectUserPermission userPermission : userPermissionList) {
           User user = userPermission.getUser();
-          if (!(chef.equals(user))) {
+          if (!chef.equals(user)) {
             contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
               user.getUserLastName(), null, null, userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
           }
