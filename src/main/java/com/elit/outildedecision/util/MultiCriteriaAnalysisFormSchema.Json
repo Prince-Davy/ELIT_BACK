@@ -22,7 +22,7 @@
       }
     ]
   },
-  "Incertitude": {
+  "Certitude": {
     "stepRef": 2,
     "Questions": {
       "Unc_1": "Les exigences ont-elles été exhaustivement définies ?",

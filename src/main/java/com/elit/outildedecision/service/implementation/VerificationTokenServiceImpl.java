@@ -1,12 +1,11 @@
 package com.elit.outildedecision.service.implementation;
 
 import com.azure.communication.email.EmailClient;
-import com.azure.communication.email.models.EmailAttachment;
+
 import com.azure.communication.email.models.EmailMessage;
 import com.azure.communication.email.models.EmailSendResult;
 import com.azure.communication.email.models.EmailSendStatus;
 import com.azure.core.exception.AzureException;
-import com.azure.core.util.BinaryData;
 import com.azure.core.util.polling.LongRunningOperationStatus;
 import com.azure.core.util.polling.PollResponse;
 import com.azure.core.util.polling.SyncPoller;
@@ -29,10 +28,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
 
@@ -148,8 +149,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
      */
     @Override
     public VerificationToken createToken(final User user, final String type) {
-        String token = passwordEncoder.encode(
-                user.getUsername() + user.getUserEmail());
+      String token = passwordEncoder.encode(user.getUsername() + user.getUserEmail());
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setToken(token);
         verificationToken.setUser(user);
@@ -254,36 +254,43 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         String recoveryUrl =
                 frontEndUrl + "/reset-password?token=" + verificationToken.getToken();
         String mailSubject = "ELIT : Réinitialisez votre mot de passe";
-        ClassPathResource logoFile = new ClassPathResource("avatars/logoImage.png");
-        EmailAttachment emailAttachment;
-        try {
-            emailAttachment = new EmailAttachment("logoImage.png", "image/png",
-                    BinaryData.fromStream(logoFile.getInputStream()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        String mailBody =
-                "<html><body>"
-                        + "<div style='background-color: #E2F0F9; padding: 20px; text-align: center;'>"
-                        + "<img src='cid:logoImage' style='display: block; margin: auto;' />"
-                        + "</div>"
-                        + "<p>Bonjour " + user.getUserFirstName() + ",</p>"
-                        + "<p>Vous y êtes presque !</p>"
-                        + "<p>Veuillez cliquer sur le lien ci-dessous afin de réinitialiser votre mot de passe :</p>"
-                        + "<div style='text-align: center;'>"
-                        + "<a href='" + recoveryUrl + "' style='background-color: #116E9C; color: white; padding: 14px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;'>Réinitialiser le mot de passe</a>"
-                        + "</div>"
-                        + "<p>Attention, le lien a une durée de validité de 48 heures.</p>"
-                        + "<p>Cordialement,</p>"
-                        + "<p>L'équipe ELIT</p>"
-                        + "</body></html>";
-        try {
+        ClassPathResource logoFile = new ClassPathResource("avatars/LogoImageEmail.png");
+      String base64Image = "";
+      try {
+        byte[] bytes = Files.readAllBytes(Path.of(logoFile.getURI()));
+        base64Image = Base64Utils.encodeToString(bytes);
+      } catch (IOException e) {
+        throw new RuntimeException("Erreur lors de la lecture du fichier image", e);
+      }
+      String mailBody = "<html><body style='margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;'> "
+        + "<div style='max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;'> "
+        + "<div style='background-color: #e9f2fb; padding: 50px; text-align: center;'> "
+        + "<img src='data:image/png;base64," + base64Image + "' alt='ELIT' style='display: block; margin: auto;'> "
+        + "</div> "
+        + "<div style='padding: 20px; text-align: left; font-size: medium;'> "
+        + "<p>Bonjour " + user.getUserFirstName() + ",</p> "
+        + "<p>Vous y êtes presque ! </p> "
+        + "<p>Veuillez cliquer sur le lien ci-dessous afin de réinitialiser votre mot de passe :</p> "
+        + "<div style='text-align: center;'> "
+        + "<a href='" + recoveryUrl + "' style='display: inline-block; padding: 14px 20px; margin: 20px 0; font-size: 16px; color: #ffffff; background-color: #116E9C; text-decoration: none; border-radius: 8px;'>Réinitialiser le mot de passe</a> "
+        + "</div> "
+        + "<p>Attention, le lien a une durée de validité de 48 heures.</p> "
+        + "<p>Cordialement, L'équipe ELIT</p> "
+        + "</div> "
+        + "<hr style='border: none; height: 5px; background-color: #12abdb; width: calc(100% - 40px);'> "
+        + "<div style='display: flex; align-items: center; padding: 2px 20px 20px 2px;'> "
+        + "<img src='data:image/png;base64," + base64Image + "' alt='ELIT' style='margin-right: 20px; height: 30px;'> "
+        + "<span style='font-size: 12px; color: #666666;'>La méthodologie à la mesure de votre projet</span> "
+        + "</div> "
+        + "</div> "
+        + "</body></html>";
+
+      try {
             EmailMessage message = new EmailMessage()
                     .setSenderAddress(senderEmail)
                     .setToRecipients(user.getUserEmail())
                     .setSubject(mailSubject)
-                    .setBodyHtml(mailBody)
-                    .setAttachments(Collections.singletonList(emailAttachment));
+                    .setBodyHtml(mailBody);
 
             SyncPoller<EmailSendResult, EmailSendResult> poller =
                     emailClient.beginSend(message, null);
