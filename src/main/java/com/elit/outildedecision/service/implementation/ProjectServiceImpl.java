@@ -276,9 +276,6 @@ public class ProjectServiceImpl implements ProjectService {
   public List<ProjectResponseModel> getUserProjectList(final String keyword) {
     UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     // getting the connected user
-    UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User chef = userRepository.findByUserEmail(principal.getUsername());
-
     List<ProjectResponseModel> projects = new ArrayList<>();
     List<ProjectUserPermission> projectUserPermissions = projectUserPermissionRepository.findAll().stream()
       .filter(projectUserPermission -> projectUserPermission.getUser().getUserEmail()
@@ -298,11 +295,8 @@ public class ProjectServiceImpl implements ProjectService {
         ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
         for (ProjectUserPermission userPermission : userPermissionList) {
           User user = userPermission.getUser();
-          if (!chef.equals(user)) {
             contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
               user.getUserLastName(), null, null, userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
-          }
-
         }
 
         String projectStatus;
