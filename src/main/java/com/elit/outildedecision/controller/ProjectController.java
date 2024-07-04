@@ -122,7 +122,20 @@ public class ProjectController {
   public List<ProjectResponseModel> getProjectList(@RequestParam(required = false) final String keyword) {
     return projectService.getUserProjectList(keyword);
   }
-
+  /**
+   * update a project.
+   * @param projectModel the project data to update
+   * @param id the id of the project to update
+   * @return ResponseEntity<String>
+   * @throws ProjectNotFoundException if the specified project does not exist
+   * @throws IOException if an I/O error occurs while updating the project data
+   */
+  @PutMapping(value = "/user/projects/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize("hasAnyAuthority('USER') and isProjectOwner(#id)")
+  public ProjectResponseModel updateProject(@PathVariable final Long id, @ModelAttribute final ProjectModel projectModel)
+    throws ProjectNotFoundException, IOException {
+    return projectService.updateProject(id, projectModel);
+  }
   /**
    * update a project.
    * @param id the id of the project

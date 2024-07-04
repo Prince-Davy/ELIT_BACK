@@ -265,6 +265,48 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return projects;
     }
+  /**
+   * Updates the project with the given ID using the provided updated project data.
+   * This method can be safely overridden in a subclass if the subclass needs to
+   * change the way projects are updated. When overriding this method, make sure to
+   * call super.updateProject() to ensure the base class functionality is preserved.
+   *
+   * @param projectId The ID of the project to update.
+   * @param updatedProject The new project data to use for the update.
+   * @return The updated project.
+   * @throws ProjectNotFoundException If the project with the given ID does not exist.
+   */
+  @Override
+  @Transactional(rollbackFor = {ProjectNotFoundException.class, UserNotFoundException.class})
+  public ProjectResponseModel updateProject(final Long projectId, final ProjectModel updatedProject)
+    throws ProjectNotFoundException {
+    Optional<Project> optionalProject = projectRepository.findById(projectId);
+    if (!optionalProject.isPresent()) {
+      throw new ProjectNotFoundException(PROJECT_NOT_FOUND);
+    }
+    Project projectToSave = optionalProject.get();
+
+    // Update project details
+    projectToSave.setName(updatedProject.getName());
+    projectToSave.setDescription(updatedProject.getDescription());
+    //projectToSave.setUpdatedAt(new java.sql.Timestamp(new java.util.Date().getTime()));
+
+    // Save updated project
+    projectRepository.save(projectToSave);
+    ProjectResponseModel projectToReturn = new ProjectResponseModel();
+    projectToReturn.setProjectId(projectToSave.getProjectId());
+    projectToReturn.setName(projectToSave.getName());
+    projectToReturn.setDescription(projectToSave.getDescription());
+    projectToReturn.setIsArchived(projectToSave.getIsArchived());
+    projectToReturn.setConfirmationState(projectToSave.getConfirmationState());
+    projectToReturn.setChefId(projectToSave.getChefId());
+
+    projectToReturn.setCreatedAt(projectToSave.getCreatedAt());
+    projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());
+    projectToReturn.setMultiCriteriaStatus(ProjectAnalysisState.NOT_STARTED.toString());
+
+    return projectToReturn;
+  }
 
   /**
    * The method for getting the list of projects of a user.

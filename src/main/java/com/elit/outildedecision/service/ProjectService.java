@@ -75,6 +75,17 @@ public interface ProjectService {
    * @return a List of ProjectResponseModel objects representing the matching projects
    */
   List<ProjectResponseModel> getUserProjectList(String keyword);
+  /**
+   * Updates an existing project with the specified ID.
+   *
+   * @param id the ID of the project to update
+   * @param projectModel a ProjectModel object representing the updated project data
+   * @return a ResponseEntity indicating the success or failure of the update operation
+   * @throws ProjectNotFoundException if the specified project does not exist
+   * @throws IOException if an I/O error occurs while updating the project data
+   */
+  ProjectResponseModel updateProject(Long id, ProjectModel projectModel) throws ProjectNotFoundException, IOException;
+
 
   /**
    * Validates or rejects a project with the specified ID.
