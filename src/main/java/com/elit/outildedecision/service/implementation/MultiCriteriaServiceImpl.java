@@ -264,7 +264,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
   private FormQuestion saveFormQuestion(final FormStep persistedStep, final Map.Entry<String, String> question) {
     return formQuestionRepository.save(
-      FormQuestion.builder().formStep(persistedStep).questionText(question.getValue()).questionRef(question.getKey()).build());
+      FormQuestion.builder().formStep(persistedStep).questionText(question.getValue()).questionRef(question.getKey()).updateQuestion(false).build());
   }
 
   /**
@@ -368,6 +368,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
     if (Objects.equals(formStep.getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
       formQuestion.setAnswerText(formQuestionModel.getAnswerText());
+      formQuestion.setUpdateQuestion(true);
       formQuestionRepository.save(formQuestion);
       for (CriteriaModel criteriaModel : formQuestionModel.getCriterias()) {
         Criteria criteria = criteriaRepository.getById(criteriaModel.getCriteriaId());

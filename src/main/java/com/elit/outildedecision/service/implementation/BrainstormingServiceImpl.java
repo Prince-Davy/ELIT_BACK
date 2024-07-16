@@ -314,6 +314,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
             formQuestion.getQuestionText(),
             formQuestion.getAnswerText(),
             formQuestion.getQuestionRef(),
+            formQuestion.getUpdateQuestion(),
             formStep.getStepId(),
             criteriaList,
             braistormingList));

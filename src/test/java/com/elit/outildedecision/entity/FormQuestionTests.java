@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
     @Test
      void testToString(){
-        FormQuestion fq = new FormQuestion(null, 1L, "questionText", "answerText", null, null, null);
+        FormQuestion fq = new FormQuestion(null, 1L, "questionText", "answerText", null, false, null,null);
         final String fqToString = "FormQuestion{"
         + "questionId="
         + 1

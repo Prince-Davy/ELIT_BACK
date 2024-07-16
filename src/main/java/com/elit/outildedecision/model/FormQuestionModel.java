@@ -37,6 +37,8 @@ public class FormQuestionModel implements Serializable {
    */
   private String questionRef;
 
+  private Boolean updateQuestion;
+
   /**
    * A unique identifier for the step associated with the question.
    */

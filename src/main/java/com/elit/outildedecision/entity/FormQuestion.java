@@ -43,7 +43,7 @@ public class FormQuestion implements Serializable {
   private String questionText;
   private String answerText;
   private String questionRef;
-
+  private Boolean updateQuestion = false;
   @JsonManagedReference("question_criteria")
   @OneToMany(
       mappedBy = "formQuestion",
