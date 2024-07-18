@@ -105,7 +105,7 @@ public class BrainstormingController {
    * @throws BrainstormingNotFoundException : if the brainstorming is not found
    */
   @DeleteMapping("/{projectId}/{brainstormingId}")
-  @PreAuthorize("isProjectOwner(#projectId)")
+  @PreAuthorize("isProjectOwner(#projectId) or isContributer(#projectId)")
   public ResponseEntity<String> removeBrainstorming(@PathVariable final Long projectId, @PathVariable final Long brainstormingId)
     throws BrainstormingNotFoundException, ProjectNotFoundException {
     return brainstormingService.deleteBrainstorming(projectId, brainstormingId);

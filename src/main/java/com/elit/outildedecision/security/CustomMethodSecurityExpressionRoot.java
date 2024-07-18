@@ -85,8 +85,9 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     } catch (Exception e) {
       return false;
     }
+
     return permissions.contains(ProjectPermession.CDP.name())
-      || permissions.contains(ProjectPermession.CONTRIBUTER.name());
+      || permissions.contains(ProjectPermession.CONTRIBUTER.toString());
   }
 
   /**
@@ -106,7 +107,7 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     } catch (Exception e) {
       return false;
     }
-    return permissions.contains(ProjectPermession.OBSERVER.name());
+    return permissions.contains(ProjectPermession.OBSERVER.toString());
   }
   /**
    * Returns the object that was the filter object being processed when the method was invoked.

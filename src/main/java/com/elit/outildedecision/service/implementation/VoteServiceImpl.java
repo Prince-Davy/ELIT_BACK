@@ -257,7 +257,7 @@ public class VoteServiceImpl implements VoteService {
     List<VoteModelResponse> result = new ArrayList<>();
     List<ProjectUserPermission> usersPermission = projectUserPermissionRepository.findAllByProjectId(project.getProjectId());
     for (ProjectUserPermission userP : usersPermission) {
-      if (userP.getPermission().equals(ProjectPermession.CONTRIBUTER.name())
+      if (userP.getPermission().equals(ProjectPermession.CONTRIBUTER.toString())
         || userP.getPermission().equals(ProjectPermession.CDP.name())) {
         Vote userVote = voteRepository.findByPredictibilityAnalysisAndUserId(predictibilityAnalysisId, userP.getUser().getUserId());
         result.add(createVoteModelResponse(userVote, predictibilityAnalysisId, userP.getUser().getUserId()));
@@ -273,8 +273,10 @@ public class VoteServiceImpl implements VoteService {
    */
   private List<VoteModelResponse> getVoteForNonCDPUser(final User user, final Long predictibilityAnalysisId) {
     List<VoteModelResponse> result = new ArrayList<>();
-    Vote vote = voteRepository.findByPredictibilityAnalysisAndUserId(predictibilityAnalysisId, user.getUserId());
-    result.add(createVoteModelResponse(vote, predictibilityAnalysisId, user.getUserId()));
+    List<Vote> votes = voteRepository.findAllByPredictibilityAnalysisId(predictibilityAnalysisId);
+    for (Vote vote: votes) {
+      result.add(createVoteModelResponse(vote, predictibilityAnalysisId, user.getUserId()));
+    }
     return result;
   }
   /**

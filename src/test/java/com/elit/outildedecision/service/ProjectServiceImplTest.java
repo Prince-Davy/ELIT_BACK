@@ -312,7 +312,7 @@ class ProjectServiceImplTest {
   void deleteProjectContributor() throws UserNotFoundException, ProjectNotFoundException, ProjectOwnerException {
     Long projectId = 1L;
     Long contributorID = 1L;
-    projectUserPermission.setPermission(ProjectPermession.CONTRIBUTER.name());
+    projectUserPermission.setPermission(ProjectPermession.CONTRIBUTER.toString());
     when(projectRepository.existsById(projectId)).thenReturn(true);
     when(projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID)).thenReturn(projectUserPermission);
     Assertions.assertEquals(ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet"),projectServiceImpl.deleteProjectContributor(projectId,contributorID));

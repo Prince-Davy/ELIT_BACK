@@ -46,7 +46,7 @@ public class ExecutionPlanController {
    * @return ResponseEntity<Long>
    */
   @PostMapping("/executionPlan/create/{projectId}")
-  @PreAuthorize("isProjectOwner(#projectId)")
+  @PreAuthorize("isProjectOwner(#projectId) or isContributer(#projectId) or isObserver(#projectId)")
   ResponseEntity<Long> createExecutionPlan(@PathVariable final Long projectId) {
     return executionPlanService.createExecutionPlan(projectId);
   }

@@ -380,6 +380,11 @@ class VoteServiceImplTests {
     List< VoteModelResponse > result = new ArrayList<>();
     VoteModelResponse vMp = new VoteModelResponse(null,null,null,null,1L,null,1L);
     result.add(vMp);
+
+    List<Vote> voteList = new ArrayList<>();
+    Vote vote = new Vote();
+    voteList.add(vote);
+
     List<ProjectUserPermission> p = new ArrayList<>();
     MultiCriteriaAnalysis m = new MultiCriteriaAnalysis();
     m.setProject(testProject);
@@ -389,6 +394,7 @@ class VoteServiceImplTests {
     when(userRepository.findByUserEmail(user.getUsername())).thenReturn(user);
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
     when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
+    when(voteRepository.findAllByPredictibilityAnalysisId(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(voteList);
     Assertions.assertEquals(result, voteService.getVote(1L));
 
   }
@@ -446,6 +452,14 @@ class VoteServiceImplTests {
     List< VoteModelResponse > result = new ArrayList<>();
     VoteModelResponse vMp = new VoteModelResponse(1L,null,null,null,1L,null,1L);
     result.add(vMp);
+
+    List<Vote> voteList = new ArrayList<>();
+    Vote vote = new Vote();
+    vote.setVoteId(1L);
+    vote.setPredictibilityAnalysis(testPredictabilityAnalysis);
+    vote.setUser(user);
+    voteList.add(vote);
+
     List<ProjectUserPermission> p = new ArrayList<>();
     MultiCriteriaAnalysis m = new MultiCriteriaAnalysis();
     m.setProject(testProject);
@@ -459,7 +473,9 @@ class VoteServiceImplTests {
     when(userRepository.findByUserEmail(userDetails.getUsername())).thenReturn(user);
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
     when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.of(testPredictabilityAnalysis));
-    when(voteRepository.findByPredictibilityAnalysisAndUserId(testPredictabilityAnalysis.getPredictibilityAnalysisId(), user.getUserId())).thenReturn(testVote);
+    //when(voteRepository.findByPredictibilityAnalysisAndUserId(testPredictabilityAnalysis.getPredictibilityAnalysisId(), user.getUserId())).thenReturn(testVote);
+    when(voteRepository.findAllByPredictibilityAnalysisId(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(voteList);
+
     Assertions.assertEquals(result, voteService.getVote(1L));
 
   }

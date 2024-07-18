@@ -82,7 +82,7 @@ class BrainstormingControllerTest {
     permission = new ProjectUserPermission();
     permission.setProject(project);
     permission.setUser(user);
-    permission.setPermission(ProjectPermession.CONTRIBUTER.name());
+    permission.setPermission(ProjectPermession.CONTRIBUTER.toString());
     user.setUserProjectPermissions(List.of(permission));
 
     predictibilityAnalysisId = 1L;

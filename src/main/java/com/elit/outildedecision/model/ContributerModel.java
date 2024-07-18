@@ -54,6 +54,6 @@ public class ContributerModel implements Serializable {
     /**
      * The role of the contributor within the project.
      */
-    @Pattern(regexp = "^(CONTRIBUTER|OBSERVER|CDP)$", message = "Le role doit étre CONTRIBUTER, OBSERVER, ou CDP.")
+    @Pattern(regexp = "^(?i)(CONTRIBUTEUR|OBSERVATEUR|CDP)$", message = "Le role doit étre CONTRIBUTER, OBSERVER, ou CDP.")
     private String role;
 }

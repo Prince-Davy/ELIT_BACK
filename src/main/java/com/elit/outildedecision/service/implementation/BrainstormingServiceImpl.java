@@ -191,7 +191,6 @@ public class BrainstormingServiceImpl implements BrainstormingService {
         .findById(brainstormingId)
         .orElseThrow(
           () -> new BrainstormingNotFoundException(Constants.BRAINSTORMING_DOESNT_EXIST));
-
     if (!Objects.equals(brainstorming.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
       throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
     }
