@@ -306,7 +306,7 @@ public class VoteServiceImpl implements VoteService {
         .justification(vote.getJustification())
         .chosenPMM(vote.getChosenPMM())
         .predictibilityValue(vote.getPredictibilityValue())
-        .userId(userId)
+        .userId(vote.getUser().getUserId())
         .build();
     }
   }

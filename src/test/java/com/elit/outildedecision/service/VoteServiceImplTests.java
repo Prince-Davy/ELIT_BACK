@@ -383,6 +383,7 @@ class VoteServiceImplTests {
 
     List<Vote> voteList = new ArrayList<>();
     Vote vote = new Vote();
+    vote.setUser(testUser);
     voteList.add(vote);
 
     List<ProjectUserPermission> p = new ArrayList<>();
