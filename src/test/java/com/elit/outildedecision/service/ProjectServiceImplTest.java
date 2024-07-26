@@ -34,21 +34,19 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceImplTest {
-  @InjectMocks
-  private ProjectServiceImpl projectServiceImpl;
   @Mock
   UserRepository userRepository;
   @Mock
   ProjectRepository projectRepository;
-
   @Mock
   MultiCriteriaAnalysisService multiCriteriaService;
   @Mock
   ProjectUserPermissionRepository projectUserPermissionRepository;
-
   User user;
   Project projectToSave;
   ProjectUserPermission projectUserPermission;
+  @InjectMocks
+  private ProjectServiceImpl projectServiceImpl;
 
   @BeforeEach
   public void setUp() {
@@ -120,7 +118,7 @@ class ProjectServiceImplTest {
     projectToReturn.setUpdatedAt(projectToSave.getUpdatedAt());
     projectToReturn.setMultiCriteriaStatus(ProjectAnalysisState.NOT_STARTED.toString());
 
-    Assertions.assertEquals(projectToReturn, projectServiceImpl.persistProject(project,"userEmail"));
+    Assertions.assertEquals(projectToReturn, projectServiceImpl.persistProject(project, "userEmail"));
   }
 
   @Test
@@ -141,13 +139,13 @@ class ProjectServiceImplTest {
     when(userRepository.findByUserEmail(user.getUserEmail())).thenReturn(user);
     when(projectRepository.save(any())).thenReturn(projectToSave);
 
-    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, ()-> projectServiceImpl.persistProject(project,"userEmail"));
+    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> projectServiceImpl.persistProject(project, "userEmail"));
     Assertions.assertEquals("Cet utilisateur n'existe pas.", exception.getMessage());
   }
 
   @Test
   void getAllProjects() {
-    List <Project> projectList = new ArrayList<>();
+    List<Project> projectList = new ArrayList<>();
     projectList.add(projectToSave);
     when(projectRepository.findAll()).thenReturn(projectList);
     Assertions.assertEquals(projectList, projectServiceImpl.getAllProjects());
@@ -208,7 +206,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void validateOrRejectProject_whenProjectNotFound(){
+  void validateOrRejectProject_whenProjectNotFound() {
     Long id = 1L;
     String json = "{\"isConfirmed\": true}";
     HttpHeaders headers = new HttpHeaders();
@@ -217,7 +215,7 @@ class ProjectServiceImplTest {
 
     when(projectRepository.findById(id)).thenReturn(Optional.empty());
 
-    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, ()-> projectServiceImpl.validateOrRejectProject(id, isConfirmed));
+    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.validateOrRejectProject(id, isConfirmed));
     Assertions.assertEquals("Ce Projet n'existe pas!", exception.getMessage());
   }
 
@@ -292,9 +290,10 @@ class ProjectServiceImplTest {
     contributor.setContributerId(user.getUserId());
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
-    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, ()-> projectServiceImpl.addProjectContributor(projectId, contributor));
+    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.addProjectContributor(projectId, contributor));
     Assertions.assertEquals("Ce Projet n'existe pas! ", exception.getMessage());
   }
+
   @Test
   void addProjectContributor_whenUserDosNotExists() {
     Long projectId = 1L;
@@ -303,7 +302,7 @@ class ProjectServiceImplTest {
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectToSave));
     when(userRepository.findById(contributor.getContributerId())).thenReturn(Optional.empty());
 
-    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, ()-> projectServiceImpl.addProjectContributor(projectId, contributor));
+    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> projectServiceImpl.addProjectContributor(projectId, contributor));
     Assertions.assertEquals("Cet utilisateur n'existe pas !", exception.getMessage());
 
   }
@@ -315,7 +314,7 @@ class ProjectServiceImplTest {
     projectUserPermission.setPermission(ProjectPermession.CONTRIBUTER.toString());
     when(projectRepository.existsById(projectId)).thenReturn(true);
     when(projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID)).thenReturn(projectUserPermission);
-    Assertions.assertEquals(ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet"),projectServiceImpl.deleteProjectContributor(projectId,contributorID));
+    Assertions.assertEquals(ResponseEntity.ok().body("Le collaborateur a été bien retiré du projet"), projectServiceImpl.deleteProjectContributor(projectId, contributorID));
   }
 
   @Test
@@ -323,7 +322,7 @@ class ProjectServiceImplTest {
     Long projectId = 1L;
     Long contributorID = 1L;
     when(projectRepository.existsById(projectId)).thenReturn(false);
-    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, ()-> projectServiceImpl.deleteProjectContributor(projectId,contributorID));
+    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.deleteProjectContributor(projectId, contributorID));
 
     Assertions.assertEquals("Ce Projet n'existe pas!", exception.getMessage());
   }
@@ -334,7 +333,7 @@ class ProjectServiceImplTest {
     Long contributorID = 1L;
     when(projectRepository.existsById(projectId)).thenReturn(true);
     when(projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID)).thenReturn(null);
-    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, ()-> projectServiceImpl.deleteProjectContributor(projectId,contributorID));
+    UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> projectServiceImpl.deleteProjectContributor(projectId, contributorID));
 
     Assertions.assertEquals("Cet utilisateur n'existe pas dans le projet !", exception.getMessage());
   }
@@ -346,7 +345,7 @@ class ProjectServiceImplTest {
     Long contributorID = 1L;
     when(projectRepository.existsById(projectId)).thenReturn(true);
     when(projectUserPermissionRepository.findByProjectIdUserID(projectId, contributorID)).thenReturn(projectUserPermission);
-    ProjectOwnerException exception = Assertions.assertThrows(ProjectOwnerException.class, ()-> projectServiceImpl.deleteProjectContributor(projectId,contributorID));
+    ProjectOwnerException exception = Assertions.assertThrows(ProjectOwnerException.class, () -> projectServiceImpl.deleteProjectContributor(projectId, contributorID));
     Assertions.assertEquals("Cet utilisateur ne peut pas etre elimine car c'est le chef du projet!", exception.getMessage());
   }
 
@@ -364,7 +363,7 @@ class ProjectServiceImplTest {
     ArrayList<MultiCriteriaAnalysis> multicriteriaAnaliseList = new ArrayList<>();
     MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
     List<FormStep> formSteps = new ArrayList<>();
-      FormStep formStep = new FormStep();
+    FormStep formStep = new FormStep();
     formStep.setMultiCriteriaAnalysis(new MultiCriteriaAnalysis());
     formSteps.add(formStep);
     multiCriteriaAnalysis.setFormSteps(formSteps);
@@ -373,7 +372,7 @@ class ProjectServiceImplTest {
 
 
     ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
-    ContributerModel contributerModel = new ContributerModel( user.getUserId(),
+    ContributerModel contributerModel = new ContributerModel(user.getUserId(),
       user.getUserFirstName(),
       user.getUserLastName(),
       user.getUserEmail(),
@@ -410,11 +409,12 @@ class ProjectServiceImplTest {
     Assertions.assertEquals(projectResponseModel, projectServiceImpl.getProjectData(projectId));
 
   }
+
   @Test
   void getProjectData_whenProjectNotFound() {
     Long projectId = 1L;
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, ()-> projectServiceImpl.getProjectData(projectId));
+    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.getProjectData(projectId));
     Assertions.assertEquals("Ce Projet n'existe pas!", exception.getMessage());
 
   }
@@ -428,14 +428,19 @@ class ProjectServiceImplTest {
     user.setUserProjectPermissions(projectUserPermissionList);
     user.detachPermission(projectUserPermission);
     projectToDelete.setProjectUserPermissions(projectUserPermissionList);
+    MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
+    List<MultiCriteriaAnalysis> multiCriteriaAnalysisList = new ArrayList<>();
+    multiCriteriaAnalysisList.add(multiCriteriaAnalysis);
+    projectToDelete.setMultiCriteriaAnalysisList(multiCriteriaAnalysisList);
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectToDelete));
     Assertions.assertEquals(ResponseEntity.ok().body("Le projet a été bien supprimé"), projectServiceImpl.deleteProject(projectId));
   }
+
   @Test
   void deleteProject_WhenProjectNotFound() {
     Long projectId = 1L;
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, ()-> projectServiceImpl.deleteProject(projectId));
+    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.deleteProject(projectId));
     Assertions.assertEquals("Ce project n'existe pas !", exception.getMessage());
   }
 }
