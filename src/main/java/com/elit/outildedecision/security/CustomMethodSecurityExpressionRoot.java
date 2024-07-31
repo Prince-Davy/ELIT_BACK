@@ -57,7 +57,6 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     try {
       final UserDetails userDetails = (UserDetails) this.getPrincipal();
       User user = userService.findByEmail(userDetails.getUsername());
-
       user.getUserProjectPermissions().stream()
         .filter(p -> p.getProject().getProjectId().equals(projectId))
         .forEach(p -> permissions.add(p.getPermission()));
@@ -65,6 +64,7 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     } catch (Exception e) {
       return false;
     }
+
     return permissions.contains(ProjectPermession.CDP.name());
   }
 

@@ -1,4 +1,3 @@
-
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
@@ -8,6 +7,7 @@ import com.elit.outildedecision.service.AttachmentService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,12 +29,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/user/attachments")
 public class AttachementController {
-  /** The Attachment service. */
+  /**
+   * The Attachment service.
+   */
   private final AttachmentService attachmentService;
 
   /**
    * Instantiates a new Attachement controller.
    * dependency injection via constructor of the attachment service
+   *
    * @param attachmentService the attachment service
    */
   public AttachementController(final AttachmentService attachmentService) {
@@ -45,15 +48,15 @@ public class AttachementController {
    * this method is used to upload attachments of a project.
    *
    * @param projectId the project id
-   * @param files the files
+   * @param files     the files
    * @return the response entity
    * @throws ProjectNotFoundException the project not found exception
-   * @throws IOException the io exception
-   * @throws FileCouldNotBeSaved the file could not be saved
+   * @throws IOException              the io exception
+   * @throws FileCouldNotBeSaved      the file could not be saved
    */
   @PostMapping(
-      value = "/upload/{projectId}",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    value = "/upload/{projectId}",
+    consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Object> uploadAttachment(@PathVariable final Long projectId,
                                                  @RequestParam("files") final List<MultipartFile> files)
     throws ProjectNotFoundException, IOException, FileCouldNotBeSaved {
@@ -61,65 +64,71 @@ public class AttachementController {
     UserDetails user = (UserDetails) auth.getPrincipal();
     return attachmentService.uploadAttachment(files, projectId, user.getUsername());
   }
+
   /**
    * this method is used to rename attachments of a project.
    *
-   * @param attachmentId the attachment id
+   * @param attachmentId      the attachment id
    * @param newAttachmentName the new attachment name
    * @return the response entity
    * @throws AttachmentNotFoundException the attachment not found exception
-   * @throws IOException the io exception
+   * @throws IOException                 the io exception
    */
   @PutMapping("/edit/{attachmentId}")
   public ResponseEntity<String> editAttachment(
-      @PathVariable final Long attachmentId,
-      final HttpEntity<String> newAttachmentName)
-      throws AttachmentNotFoundException, IOException {
+    @PathVariable final Long attachmentId,
+    final HttpEntity<String> newAttachmentName)
+    throws AttachmentNotFoundException, IOException {
     return attachmentService.renameAttachment(attachmentId, newAttachmentName);
   }
+
   /**
    * this method is used to download an attachment of a project based on its id.
    *
    * @param attachmentId the attachment id
-   * @param response the response
+   * @param response     the response
    * @throws AttachmentNotFoundException the attachment not found exception
-   * @throws IOException the io exception
+   * @throws IOException                 the io exception
    */
   @GetMapping("/download/{projectId}/{attachmentId}")
   public void downloadAttachment(
-      @PathVariable("attachmentId") final Long attachmentId, final HttpServletResponse response)
-      throws  IOException, AttachmentNotFoundException {
+    @PathVariable("attachmentId") final Long attachmentId, final HttpServletResponse response)
+    throws IOException, AttachmentNotFoundException {
     attachmentService.downloadAttachment(attachmentId, response);
   }
+
   /**
    * this method is used to delete an attachment of a project based on its id.
    *
    * @param attachmentId the attachment id
+   * @param projectId the id of project
    * @return the response entity
    * @throws AttachmentNotFoundException the attachment not found exception
-   * @throws ProjectNotFoundException the project not found exception
+   * @throws ProjectNotFoundException    the project not found exception
    */
-  @DeleteMapping("/{attachmentId}")
-  public ResponseEntity<String> deleteAttachmentById(@PathVariable("attachmentId") final Long attachmentId)
+  @DeleteMapping("/{attachmentId}/{projectId}")
+  @PreAuthorize("hasAnyAuthority('USER') and isProjectOwner(#projectId)")
+  public ResponseEntity<String> deleteAttachmentById(@PathVariable("attachmentId") final Long attachmentId, @PathVariable("projectId") final Long projectId)
     throws AttachmentNotFoundException,
     ProjectNotFoundException {
     return attachmentService.deleteAttachment(attachmentId);
   }
+
   /**
    * this method is used to preview an attachment of a project based on its id.
    *
    * @param attachmentId the attachment id
-   * @param response the response
-   * @param request the request
+   * @param response     the response
+   * @param request      the request
    * @throws AttachmentNotFoundException the attachment not found exception
-   * @throws IOException the io exception
+   * @throws IOException                 the io exception
    */
   @GetMapping("/preview/{projectId}/{attachmentId}")
   public void previewAttachmentWithoutDownload(
-      final HttpServletRequest request,
-      final HttpServletResponse response,
-      @PathVariable("attachmentId") final Long attachmentId)
-      throws AttachmentNotFoundException, IOException {
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    @PathVariable("attachmentId") final Long attachmentId)
+    throws AttachmentNotFoundException, IOException {
     attachmentService.openAttachment(attachmentId, response);
   }
 }

@@ -2,15 +2,25 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Attachment;
 
+import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.ProjectUserPermission;
+import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.repository.AttachmentRepository;
+import com.elit.outildedecision.security.AppUserPrincipal;
+import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.implementation.AttachmentServiceImpl2;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
+import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,11 +32,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,12 +68,17 @@ class AttachementControllerTests {
   private UserServiceImpl userService;
   @MockBean
   AttachmentRepository attachmentRepository;
+  @Mock
+  CustomMethodSecurityExpressionRoot customMethodSecurity;
   @InjectMocks
   AttachementController attachementController;
 
   private List<MultipartFile> files;
   private Long projectId;
   private Long attachmentId;
+  private User user;
+  private Project project;
+  private ProjectUserPermission permission;
 
   @BeforeEach
   public void setup() {
@@ -69,9 +89,25 @@ class AttachementControllerTests {
         MediaType.APPLICATION_PDF_VALUE,
         "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
     files = new ArrayList<>();
-    projectId = 1L;
+    projectId = 2L;
     attachmentId = 1L;
     files.add(fileMultipart);
+
+//    MockitoAnnotations.initMocks(this);
+//    mockMvc = standaloneSetup(attachementController).setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
+
+    user = new User();
+    user.setUserEmail("user@user.com");
+    user.setUsername("user");
+    user.setUserId(3L);
+    project = new Project();
+    project.setProjectId(projectId);
+    project.setChefId(user.getUserId());
+    permission = new ProjectUserPermission();
+    permission.setProject(project);
+    permission.setUser(user);
+    permission.setPermission(ProjectPermession.CDP.name());
+    user.setUserProjectPermissions(List.of(permission));
   }
 
   public static String asJsonString(final Object obj) {
@@ -142,24 +178,40 @@ class AttachementControllerTests {
     Assertions.assertEquals(200, response.getStatus());
   }
 
-
+  @WithMockUser(authorities = {"USER"})
   @Test
   void deleteAttachmentById_whenAttachment_exists() throws Exception {
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(attachmentId);
+    List<Attachment> attachments = new ArrayList<>();
+    attachments.add(attachment);
+    project.setAttachments(attachments);
+
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(userService.findByEmail(user.getUsername())).thenReturn(user);
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
     when(attachmentService.deleteAttachment(attachmentId)).thenReturn(ResponseEntity.ok().body("Fichier supprimé avec succès."));
-    ResultActions response = mockMvc.perform(delete("/user/attachments/"+ attachmentId));
+
+    ResultActions response = mockMvc.perform(delete("/user/attachments/"+ attachmentId +"/"+project.getProjectId()));
     response.andExpect(status().isOk())
       .andDo(print());
     Assertions.assertEquals(200, response.andReturn().getResponse().getStatus());
   }
-
+  @WithMockUser(authorities = {"USER"})
   @Test
   void deleteAttachmentById_whenAttachment_doseNotExist() throws Exception {
     Attachment attachment = new Attachment();
     attachment.setAttachmentId(attachmentId);
+    List<Attachment> attachments = new ArrayList<>();
+    attachments.add(attachment);
+    project.setAttachments(attachments);
+
+    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
+    when(userService.findByEmail(user.getUsername())).thenReturn(user);
+    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
     when(attachmentService.deleteAttachment(attachmentId)).thenReturn(ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier."));
-    ResultActions response = mockMvc.perform(delete("/user/attachments/"+ attachmentId));
+
+    ResultActions response = mockMvc.perform(delete("/user/attachments/"+ attachmentId+"/"+project.getProjectId()));
     response.andExpect(status().isBadRequest())
       .andDo(print());
     Assertions.assertEquals(400, response.andReturn().getResponse().getStatus());
