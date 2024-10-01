@@ -7,6 +7,7 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.entity.ExecutionPlanVote;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
@@ -30,6 +31,7 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
 import com.elit.outildedecision.repository.ExecutionPlanRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
+import com.elit.outildedecision.repository.ExecutionPlanVoteRepo;
 import com.elit.outildedecision.service.AttachmentService;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
@@ -127,6 +129,12 @@ public class ProjectServiceImpl implements ProjectService {
   private final VoteRepository voteRepository;
 
   /**
+   * The executionPlanVoteRepo for managing the vote of the executionPlan.
+   */
+  private final ExecutionPlanVoteRepo executionPlanVoteRepo;
+
+
+  /**
    * The STORING_DIRECTORY for storing the projects files and attachments.
    */
   @Value("${file.upload-dir}")
@@ -162,6 +170,7 @@ public class ProjectServiceImpl implements ProjectService {
    *                                         the  predictibilityResults objects in the database.
    * @param voteRepository                   The voteRepository for accessing
    *                                         the  vote objects in the database.
+   * @param executionPlanVoteRepo            to access executionPlanVoteRepo
    */
   public ProjectServiceImpl(final ProjectRepository projectRepository, final UserRepository userRepository,
                             final ExecutionPlanService executionPlanService, final AttachmentService attachmentService,
@@ -169,7 +178,7 @@ public class ProjectServiceImpl implements ProjectService {
                             final MultiCriteriaAnalysisService multiCriteriaService, final ExecutionPlanRepository executionPlanRepository,
                             final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository, final BrainstormingRepository brainstormingRepository,
                             final PredictibilityResultsRepository predictibilityResultsRepository, final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
-                            final VoteRepository voteRepository) {
+                            final VoteRepository voteRepository, final ExecutionPlanVoteRepo executionPlanVoteRepo) {
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
     this.attachmentService = attachmentService;
@@ -177,6 +186,7 @@ public class ProjectServiceImpl implements ProjectService {
     this.projectUserPermissionRepository = projectUserPermissionRepository;
     this.multiCriteriaService = multiCriteriaService;
     this.executionPlanRepository = executionPlanRepository;
+    this.executionPlanVoteRepo = executionPlanVoteRepo;
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.brainstormingRepository = brainstormingRepository;
     this.predictibilityResultsRepository = predictibilityResultsRepository;
@@ -646,6 +656,8 @@ public class ProjectServiceImpl implements ProjectService {
           predictibilityAnalysisRepository.save(predictibilityAnalysis);
           // Delete related entities
           if (predictibilityAnalysis.getExecutionPlan() != null) {
+            List<ExecutionPlanVote> executionPlanVotes = executionPlanVoteRepo.findAllVotesByExecutionPlanId(predictibilityAnalysis.getExecutionPlan().getExecutionPlanId());
+            executionPlanVoteRepo.deleteAll(executionPlanVotes);
             executionPlanRepository.delete(predictibilityAnalysis.getExecutionPlan());
           }
           if (predictibilityAnalysis.getVotes() != null) {

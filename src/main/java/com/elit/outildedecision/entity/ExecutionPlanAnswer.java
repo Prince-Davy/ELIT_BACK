@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,7 +36,7 @@ public class ExecutionPlanAnswer implements Serializable {
   @JsonBackReference("executionPlan_answer")
   private ExecutionPlan executionPlan;
 
-  @ManyToOne(optional = false, cascade = CascadeType.ALL)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "execution_plan_question_id", nullable = false)
   @JsonBackReference("execution_plan_answer")
   private ExecutionPlanQuestion executionPlanQuestion;
