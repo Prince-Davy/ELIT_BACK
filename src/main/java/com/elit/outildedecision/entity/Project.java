@@ -1,7 +1,9 @@
 package com.elit.outildedecision.entity;
 
+import com.elit.outildedecision.config.View;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +40,7 @@ public class Project implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonView(View.AnswerIa.class)
   private Long projectId;
 
   @NotEmpty(message = "Ce champs est obligatoire !")

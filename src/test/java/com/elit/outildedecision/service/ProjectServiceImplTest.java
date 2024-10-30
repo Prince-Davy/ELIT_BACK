@@ -3,6 +3,7 @@ package com.elit.outildedecision.service;
 import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.*;
+import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
@@ -38,6 +39,8 @@ class ProjectServiceImplTest {
   UserRepository userRepository;
   @Mock
   ProjectRepository projectRepository;
+  @Mock
+  AnswerIaRepository answerIaRepository;
   @Mock
   MultiCriteriaAnalysisService multiCriteriaService;
   @Mock

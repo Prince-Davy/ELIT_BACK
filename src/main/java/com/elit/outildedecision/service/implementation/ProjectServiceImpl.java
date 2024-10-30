@@ -32,6 +32,7 @@ import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
 import com.elit.outildedecision.repository.ExecutionPlanRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.ExecutionPlanVoteRepo;
+import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.service.AttachmentService;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
@@ -133,6 +134,11 @@ public class ProjectServiceImpl implements ProjectService {
    */
   private final ExecutionPlanVoteRepo executionPlanVoteRepo;
 
+  /**
+   * The AnswerIaRepository for managing answers in the IA path.
+   */
+  private final AnswerIaRepository answerIaRepository;
+
 
   /**
    * The STORING_DIRECTORY for storing the projects files and attachments.
@@ -171,6 +177,8 @@ public class ProjectServiceImpl implements ProjectService {
    * @param voteRepository                   The voteRepository for accessing
    *                                         the  vote objects in the database.
    * @param executionPlanVoteRepo            to access executionPlanVoteRepo
+   *
+   * @param answerIaRepository               the answerIaRepository for managing answers of the ia path
    */
   public ProjectServiceImpl(final ProjectRepository projectRepository, final UserRepository userRepository,
                             final ExecutionPlanService executionPlanService, final AttachmentService attachmentService,
@@ -178,7 +186,7 @@ public class ProjectServiceImpl implements ProjectService {
                             final MultiCriteriaAnalysisService multiCriteriaService, final ExecutionPlanRepository executionPlanRepository,
                             final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository, final BrainstormingRepository brainstormingRepository,
                             final PredictibilityResultsRepository predictibilityResultsRepository, final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
-                            final VoteRepository voteRepository, final ExecutionPlanVoteRepo executionPlanVoteRepo) {
+                            final VoteRepository voteRepository, final ExecutionPlanVoteRepo executionPlanVoteRepo, final AnswerIaRepository answerIaRepository) {
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
     this.attachmentService = attachmentService;
@@ -192,6 +200,7 @@ public class ProjectServiceImpl implements ProjectService {
     this.predictibilityResultsRepository = predictibilityResultsRepository;
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
     this.voteRepository = voteRepository;
+    this.answerIaRepository = answerIaRepository;
   }
 
   /**
@@ -650,6 +659,8 @@ public class ProjectServiceImpl implements ProjectService {
     if (!projectToDelete.getMultiCriteriaAnalysisList().isEmpty()) {
       for (MultiCriteriaAnalysis multiCriteriaAnalysis : projectToDelete.getMultiCriteriaAnalysisList()) {
         PredictibilityAnalysis predictibilityAnalysis = multiCriteriaAnalysis.getPredictibilityAnalysis();
+        answerIaRepository.deleteByProject_ProjectId(projectId);
+
         if (predictibilityAnalysis != null) {
           // Nullify the foreign key reference to Methodology
           predictibilityAnalysis.setMethodology(null);
