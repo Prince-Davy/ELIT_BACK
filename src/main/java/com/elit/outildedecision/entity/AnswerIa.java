@@ -29,12 +29,10 @@ public class AnswerIa {
   @JsonView(View.AnswerIa.class)
   private String question;
 
-  @Id
   @Column(name = "category", nullable = false)
   @JsonView(View.AnswerIa.class)
   private String category;
 
-  @Id
   @Column(name = "answer", nullable = false)
   @JsonView(View.AnswerIa.class)
   private String answer;
