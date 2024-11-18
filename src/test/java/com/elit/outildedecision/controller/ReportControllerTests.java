@@ -36,28 +36,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class ReportControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
-
   @MockBean
   ReportService reportService;
-
   @InjectMocks
   ReportController reportController;
-
-
+  Integer iteration;
+  @Autowired
+  private MockMvc mockMvc;
   private MultipartFile fileMultipart;
   private Long projectId, analysisId, reportId;
-  Integer iteration;
   private String type;
 
   @BeforeEach
   public void setup() {
-     fileMultipart = new MockMultipartFile(
-        "file",
-        "test contract.pdf",
-        MediaType.APPLICATION_PDF_VALUE,
-        "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
+    fileMultipart = new MockMultipartFile(
+      "file",
+      "test contract.pdf",
+      MediaType.APPLICATION_PDF_VALUE,
+      "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
 
     projectId = 1l;
     analysisId = 1l;
@@ -67,81 +63,139 @@ class ReportControllerTests {
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReport_Success() throws Exception {
-    when(reportService.uploadReport(projectId, analysisId,type, fileMultipart)).thenReturn(ResponseEntity.ok().body("Fichier enregistré avec succès."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport(projectId, analysisId, type, fileMultipart)).thenReturn(ResponseEntity.ok().body("Fichier enregistré avec succès."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Fichier enregistr")));
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReport_ThrowPredictibilityAnalysisFoundException() throws Exception {
-    when(reportService.uploadReport(projectId, analysisId,type, fileMultipart)).thenThrow(new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport(projectId, analysisId, type, fileMultipart)).thenThrow(new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
-      .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));;
+      .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));
+    ;
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReport_ThrowMultiCreteriaException() throws Exception {
-    when(reportService.uploadReport(projectId, analysisId,type, fileMultipart)).thenThrow( new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport(projectId, analysisId, type, fileMultipart)).thenThrow(new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.status").value("NOT_FOUND"));
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReport_ThrowReportDoesntExist() throws Exception {
-    when(reportService.uploadReport(projectId, analysisId,type, fileMultipart)).thenThrow(new ProjectNotFoundException("Ce projet n'existe pas."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport(projectId, analysisId, type, fileMultipart)).thenThrow(new ProjectNotFoundException("Ce projet n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
-      .andExpect(jsonPath("$.message").value("Ce projet n'existe pas."));;
+      .andExpect(jsonPath("$.message").value("Ce projet n'existe pas."));
+    ;
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReportIteration_Success() throws Exception {
-    when(reportService.uploadReport2(projectId, analysisId,type,fileMultipart, iteration)).thenReturn(ResponseEntity.ok().body("Fichier enregistré avec succès."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type+"/"+iteration).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration)).thenReturn(ResponseEntity.ok().body("Fichier enregistré avec succès."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Fichier enregistr")));
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReportIteration_ThrowPredictibilityAnalysisFoundException() throws Exception {
-    when(reportService.uploadReport2(projectId, analysisId,type, fileMultipart, iteration)).thenThrow(new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type+"/"+iteration).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration)).thenThrow(new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
-      .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));;
+      .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));
+    ;
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReportIteration_ThrowMultiCreteriaException() throws Exception {
-    when(reportService.uploadReport2(projectId, analysisId,type, fileMultipart, iteration)).thenThrow( new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type+"/"+iteration).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration)).thenThrow(new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.status").value("NOT_FOUND"));
   }
 
   @Test
-  @WithMockUser (authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldUploadReportIteration_ThrowReportDoesntExist() throws Exception {
-    when(reportService.uploadReport2(projectId, analysisId,type, fileMultipart, iteration)).thenThrow(new ProjectNotFoundException("Ce projet n'existe pas."));
-    mockMvc.perform(multipart("/report/upload/"+projectId +"/"+analysisId+"/"+type+"/"+iteration).file((MockMultipartFile) fileMultipart))
+    when(reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration)).thenThrow(new ProjectNotFoundException("Ce projet n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration).file((MockMultipartFile) fileMultipart))
+      .andDo(print())
+      .andExpect(status().isNotFound())
+      .andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.message").value("Ce projet n'existe pas."));
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void shouldUpdateReportIteration_Success() throws Exception {
+    when(reportService.uploadAndUpdateReport2(projectId, analysisId, type, fileMultipart, iteration)).thenReturn(ResponseEntity.ok().body("Le fichier a été mis à jours avec succès."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration + "/update").file((MockMultipartFile) fileMultipart).with(request -> {
+        request.setMethod("PUT");
+        return request;
+      }))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().string(containsString("Le fichier a été mis à jours avec succès")));
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void shouldUpdateReportIteration_ThrowPredictibilityAnalysisFoundException() throws Exception {
+    when(reportService.uploadAndUpdateReport2(projectId, analysisId, type, fileMultipart, iteration)).thenThrow(new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration + "/update").file((MockMultipartFile) fileMultipart).with(request -> {
+        request.setMethod("PUT");
+        return request;
+      }))
+      .andDo(print())
+      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));
+    ;
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void shouldUpdateReportIteration_ThrowMultiCreteriaException() throws Exception {
+    when(reportService.uploadAndUpdateReport2(projectId, analysisId, type, fileMultipart, iteration)).thenThrow(new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration + "/update").file((MockMultipartFile) fileMultipart).with(request -> {
+        request.setMethod("PUT");
+        return request;
+      }))
+      .andDo(print())
+      .andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.status").value("NOT_FOUND"));
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void shouldUpdateReportIteration_ThrowReportDoesntExist() throws Exception {
+    when(reportService.uploadAndUpdateReport2(projectId, analysisId, type, fileMultipart, iteration)).thenThrow(new ProjectNotFoundException("Ce projet n'existe pas."));
+    mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration + "/update").file((MockMultipartFile) fileMultipart).with(request -> {
+        request.setMethod("PUT");
+        return request;
+      }))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(status().isNotFound())
@@ -153,8 +207,8 @@ class ReportControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldPreviewReport_Success() throws Exception {
     HttpServletResponse httpServletResponse = new MockHttpServletResponse();
-    willDoNothing().given(reportService).previewReport(reportId,httpServletResponse);
-    mockMvc.perform(get("/report/preview/"+ reportId))
+    willDoNothing().given(reportService).previewReport(reportId, httpServletResponse);
+    mockMvc.perform(get("/report/preview/" + reportId))
       .andExpect(status().isOk())
       .andDo(print());
   }
@@ -163,27 +217,28 @@ class ReportControllerTests {
   @WithMockUser(authorities = {"ADMIN", "USER"})
   void shouldDownoad_Success() throws Exception {
     HttpServletResponse httpServletResponse = new MockHttpServletResponse();
-    willDoNothing().given(reportService).downloadReport(reportId,httpServletResponse);
-    mockMvc.perform(get("/report/download/"+ reportId))
+    willDoNothing().given(reportService).downloadReport(reportId, httpServletResponse);
+    mockMvc.perform(get("/report/download/" + reportId))
       .andExpect(status().isOk())
       .andDo(print());
   }
-/* 
-  @Test
-  @WithMockUser(authorities = {"ADMIN", "User"})
-  void shouldGetReport_Sucess() throws Exception {
-    when(reportService.getReportsByProjectId(projectId)).thenReturn(ModelSamples.ReportSamples.getReportResponseModels());
-    mockMvc.perform(get("/report/"+projectId))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().json(ModelSamples.toJson(ModelSamples.ReportSamples.getReportResponseModels())));
-  }
-*/
+
+  /*
+    @Test
+    @WithMockUser(authorities = {"ADMIN", "User"})
+    void shouldGetReport_Sucess() throws Exception {
+      when(reportService.getReportsByProjectId(projectId)).thenReturn(ModelSamples.ReportSamples.getReportResponseModels());
+      mockMvc.perform(get("/report/"+projectId))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().json(ModelSamples.toJson(ModelSamples.ReportSamples.getReportResponseModels())));
+    }
+  */
   @Test
   @WithMockUser(authorities = {"ADMIN", "User"})
   void shouldGetReport_ThrowException() throws Exception {
     when(reportService.getReportsByProjectId(projectId)).thenThrow(new ProjectNotFoundException("Ce projet n'existe pas."));
-    mockMvc.perform(get("/report/"+projectId))
+    mockMvc.perform(get("/report/" + projectId))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.status").value("NOT_FOUND"))
@@ -194,7 +249,7 @@ class ReportControllerTests {
   @WithMockUser(authorities = {"ADMIN", "User"})
   void shouldDeleteReportById_Success() throws Exception {
     when(reportService.deleteReportById(reportId)).thenReturn(ResponseEntity.ok().body("Fichier supprimé avec succès"));
-    mockMvc.perform(delete("/report/"+projectId))
+    mockMvc.perform(delete("/report/" + projectId))
       .andDo(print())
       .andExpect(status().isOk());
   }
@@ -203,7 +258,7 @@ class ReportControllerTests {
   @WithMockUser(authorities = {"ADMIN", "User"})
   void shouldDeleteReportById_ThrowException() throws Exception {
     when(reportService.deleteReportById(reportId)).thenReturn(ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier."));
-    mockMvc.perform(delete("/report/"+projectId))
+    mockMvc.perform(delete("/report/" + projectId))
       .andDo(print())
       .andExpect(status().isBadRequest());
   }

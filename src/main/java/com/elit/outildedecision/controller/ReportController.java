@@ -69,6 +69,7 @@ public class ReportController {
     ExecutionPlanNotFoundException, PredictibilityAnalysisNotFoundException, FileCouldNotBeSaved {
     return reportService.uploadReport(projectId, analyseId, type, file);
   }
+
   /**
    * the second method to Upload report to database.
    * @param projectId Project id
@@ -96,6 +97,35 @@ public class ReportController {
     ExecutionPlanNotFoundException, PredictibilityAnalysisNotFoundException, IOException {
     return reportService.uploadReport2(projectId, analyseId, type, file, iteration);
   }
+
+  /**
+   * the method to Update report to database.
+   * @param projectId project Id
+   * @param analyseId analyse Id
+   * @param type type
+   * @param file File
+   * @param iteration number of iteration
+   * @return ResponseEntity
+   * @throws ProjectNotFoundException ProjectNotFoundException
+   * @throws MulticriteriaNotFoundException MulticriteriaNotFoundException
+   * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException
+   * @throws PredictibilityAnalysisNotFoundException PredictibilityAnaliseNotFoundException
+   * @throws IOException when there is a problem with the report file
+   */
+  @PutMapping(
+    value = "upload/{projectId}/{analyseId}/{type}/{iteration}/update",
+    consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Object> updateReport2(
+    @PathVariable final Long projectId,
+    @PathVariable final Long analyseId,
+    @PathVariable final String type,
+    @RequestParam("file") final MultipartFile file,
+    @PathVariable final Integer iteration)
+    throws ProjectNotFoundException, MulticriteriaNotFoundException,
+    ExecutionPlanNotFoundException, PredictibilityAnalysisNotFoundException, IOException {
+    return reportService.uploadAndUpdateReport2(projectId, analyseId, type, file, iteration);
+  }
+
  /**
    * Preview report by id.
    * @param reportId Report id

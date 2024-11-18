@@ -59,6 +59,26 @@ public interface ReportService {
     MulticriteriaNotFoundException, ExecutionPlanNotFoundException, IOException;
 
   /**
+   * Uploads and update a report file with an iteration number for the specified project, analysis,and type.
+   *
+   * @param projectId the ID of the project to associate the report with
+   * @param analyseId the ID of the analysis to associate the report with
+   * @param type a String representing the type of report being uploaded
+   * @param file the MultipartFile object representing the report file to upload
+   * @param iteration an Integer representing the iteration number to associate with the report
+   * @return a ResponseEntity containing the uploaded report data
+   * @throws ProjectNotFoundException if the specified project does not exist
+   * @throws PredictibilityAnalysisNotFoundException if the specified predictibility analysis does not exist
+   * @throws MulticriteriaNotFoundException if the specified multi-criteria analysis does not exist
+   * @throws ExecutionPlanNotFoundException if the specified execution plan does not exist
+   * @throws IOException if an I/O error occurs while uploading the report file
+   */
+  ResponseEntity<Object> uploadAndUpdateReport2(
+    Long projectId, Long analyseId, String type, MultipartFile file, Integer iteration)
+    throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException,
+    MulticriteriaNotFoundException, ExecutionPlanNotFoundException, IOException;
+
+  /**
    * Sends a preview of the report with the specified ID to the specified HttpServletResponse.
    *
    * @param reportId the ID of the report to preview
