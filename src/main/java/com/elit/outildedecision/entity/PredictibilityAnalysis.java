@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +41,7 @@ public class PredictibilityAnalysis implements Serializable {
 
   private Integer predictibilityAnalysisIteration;
   private Boolean isFinished;
+  private String chosenMethodology;
 
   @CreationTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
@@ -66,9 +68,9 @@ public class PredictibilityAnalysis implements Serializable {
   private List<Brainstorming> brainstormings;
 
   @OneToOne(
-      cascade = CascadeType.ALL
-      // orphanRemoval = true
-      )
+    cascade = CascadeType.ALL
+    // orphanRemoval = true
+  )
   @JoinColumn(name = "multi_criteria_analysis_id", referencedColumnName = "multiCriteriaAnalysisId")
   @JsonManagedReference("previsibility_multi")
   private MultiCriteriaAnalysis multiCriteriaAnalysis;
@@ -87,14 +89,14 @@ public class PredictibilityAnalysis implements Serializable {
   @Override
   public String toString() {
     return "PredictibilityAnalysis{"
-        + "predictibilityAnalysisId="
-        + predictibilityAnalysisId
-        + ", predictibilityAnalysisIteration='"
-        + predictibilityAnalysisIteration
-        + '\''
-        + ", isFinished='"
-        + isFinished
-        + '\''
-        + '}';
+      + "predictibilityAnalysisId="
+      + predictibilityAnalysisId
+      + ", predictibilityAnalysisIteration='"
+      + predictibilityAnalysisIteration
+      + '\''
+      + ", isFinished='"
+      + isFinished
+      + '\''
+      + '}';
   }
 }

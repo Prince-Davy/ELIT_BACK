@@ -611,7 +611,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         predictibilityAnalyse = new PredictibilityAnalyseResponseModel(
           predictibilityAnalysis.getPredictibilityAnalysisId(), predictibilityAnalysis.getIsFinished(),
-          predictibilityAnalysis.getPredictibilityAnalysisIteration(), executionPlanScore);
+          predictibilityAnalysis.getPredictibilityAnalysisIteration(), predictibilityAnalysis.getChosenMethodology(), executionPlanScore);
       }
       multicriteriaAnaliseList.add(new MulticriteriaAnalyseResponseModel(
         multicriteriaAnalise.getMultiCriteriaAnalysisId(), multicriteriaAnalise.getCreatedAt(),

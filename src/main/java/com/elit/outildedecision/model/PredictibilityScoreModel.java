@@ -36,4 +36,9 @@ public class PredictibilityScoreModel {
    * The predictibility iteration number.
    */
   private Integer predictibilityIteration;
+
+  /**
+   * The final chosen methodology.
+   */
+  private String chosenMethodology;
 }

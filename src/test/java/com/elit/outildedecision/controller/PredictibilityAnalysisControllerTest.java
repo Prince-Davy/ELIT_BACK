@@ -10,6 +10,8 @@ import com.elit.outildedecision.model.PredictibilityScoreModel;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.PredictibilityAnalysisService;
 import com.elit.outildedecision.util.ProjectPermession;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,12 +21,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -57,9 +62,10 @@ class PredictibilityAnalysisControllerTest {
   private ProjectUserPermission permission;
 
   Long projectId, analyseId;
+  String chosenMethodology;
 
   @BeforeEach
-  public void setup() {
+  public void setup() throws JsonProcessingException {
     MockitoAnnotations.initMocks(this);
     mockMvc = standaloneSetup(predictibilityAnalysisController).setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
 
@@ -75,6 +81,7 @@ class PredictibilityAnalysisControllerTest {
 
     projectId = 1L;
     analyseId = 1L;
+    chosenMethodology = "{\"chosenMethodology\": \"Agile\"}";
   }
 
   @Test
@@ -96,7 +103,6 @@ class PredictibilityAnalysisControllerTest {
       .andExpect(content().string(containsString("Ce projet n'existe pas")));
   }
 
-
   @Test
   void createPredictibilityAnalysis_old_whenPredictibilityAnalysisIsNotFinished() throws Exception {
     when(predictibilityAnalysisService.createPredictibilityForm(projectId)).thenReturn(ResponseEntity.status(HttpStatus.FORBIDDEN).body(-1L));
@@ -104,6 +110,35 @@ class PredictibilityAnalysisControllerTest {
     Assertions.assertEquals(403, response.getStatus());
   }
 
+  @Test
+  void addFinalChosenMethodology() throws Exception {
+    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
+    when(predictibilityAnalysisService.addFinalChosenMethodology(chosenMethodology, projectId, analyseId)).thenReturn(ResponseEntity.ok().body("La méthodologie finale choisie est : Agile"));
+    MockHttpServletResponse response = mockMvc.perform(post("/"+projectId+"/predictibility/"+analyseId+"/chosenMethodology").content(chosenMethodology)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  void addFinalChosenMethodology_whenBadRequest() throws Exception {
+    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
+    when(predictibilityAnalysisService.addFinalChosenMethodology(chosenMethodology, projectId, analyseId)).thenReturn(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors du traitement de la méthodologie choisie."));
+    MockHttpServletResponse response = mockMvc.perform(post("/"+projectId+"/predictibility/"+analyseId+"/chosenMethodology").content(chosenMethodology)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(400, response.getStatus());
+  }
+
+  @Test
+  void addFinalChosenMethodology_whenPredictibilityDoseNotExist() throws Exception {
+    when(customMethodSecurity.isProjectOwner(projectId)).thenReturn(true);
+    when(predictibilityAnalysisService.addFinalChosenMethodology(chosenMethodology, projectId, analyseId)).thenReturn(ResponseEntity.status(HttpStatus.CONFLICT).body("L'analyse de prédictibilté n'existe pas encore pour ce projet."));
+    MockHttpServletResponse response = mockMvc.perform(post("/"+projectId+"/predictibility/"+analyseId+"/chosenMethodology").content(chosenMethodology)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(409, response.getStatus());
+  }
 
   @Test
   void shouldGetPredictabilityAnalysisScore_success() throws Exception {

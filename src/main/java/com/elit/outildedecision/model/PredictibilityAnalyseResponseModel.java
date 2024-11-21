@@ -34,6 +34,11 @@ public class PredictibilityAnalyseResponseModel implements Serializable {
   private Integer predictibilityAnalysisIteration;
 
   /**
+   * The final choosen méthodology.
+   */
+  private String finalChosenMethodology;
+
+  /**
    * The execution plan associated with the predictibility analysis.
    */
   private ExecutionPlanScoreResponseModel executionPlan;
