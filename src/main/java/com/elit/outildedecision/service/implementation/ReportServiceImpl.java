@@ -289,10 +289,20 @@ public class ReportServiceImpl implements ReportService {
       reportRepository.findReportByAnalyseIdAndType2(analyseId, type, iteration);
 
     if (!Objects.isNull(reportFromDB) && !project.getReports().isEmpty()) {
-      String filePath = reportFromDB.getReportPath();
-      Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
-      reportRepository.save(reportFromDB);
-      return ResponseEntity.ok().body("Le fichier a été mis à jours avec succès.");
+      String folderPath = StringUtils.cleanPath(storingFolder + project.getFolderPath());
+      // update filePath whith the new name of update file
+      String newFilePath = StringUtils.cleanPath(folderPath.concat("\\").concat(file.getOriginalFilename()));
+
+      File fileToDelete = new File(reportFromDB.getReportPath());
+      if (FileSystemUtils.deleteRecursively(fileToDelete)) {
+        reportFromDB.setReportPath(newFilePath);
+        String filePath = reportFromDB.getReportPath();
+        Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
+        reportRepository.save(reportFromDB);
+        return ResponseEntity.ok().body("Le fichier a été mis à jours avec succès.");
+      } else {
+        return ResponseEntity.badRequest().body("Erreur lors de la suppression du fichier.");
+      }
     } else {
       return new ResponseEntity<>(
         "Le rapport n'existe pas pour cette analyse.", HttpStatus.CONFLICT);

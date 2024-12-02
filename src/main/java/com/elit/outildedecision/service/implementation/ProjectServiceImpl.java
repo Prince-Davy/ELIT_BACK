@@ -72,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
   /**
    * The PROJECT_NOT_FOUND message.
    */
-  private static final String PROJECT_NOT_FOUND = "Ce Projet n'existe pas!";
+  static final String PROJECT_NOT_FOUND = "Ce Projet n'existe pas!";
   /**
    * The projectRepository for accessing the project objects in the database.
    */
