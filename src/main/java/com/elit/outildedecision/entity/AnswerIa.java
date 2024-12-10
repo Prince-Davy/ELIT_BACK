@@ -43,5 +43,21 @@ public class AnswerIa {
   @JsonView(View.AnswerIa.class)
   private Project project;
 
+  /**
+   * get answer.
+   * @return answer
+   */
+  public String getAnswer() {
+    return answer;
+  }
+
+  /**
+   * set answer.
+   * @param answer answer
+   */
+  public void setAnswer(final String answer) {
+    this.answer = answer;
+  }
+
 
 }

@@ -41,4 +41,20 @@ public class ProjectUserPermission implements Serializable {
   @JoinColumn(name = "user_id", nullable = true)
   @JsonBackReference("user_permissions")
   private User user;
+
+  /**
+   * get permission.
+   * @return permission
+   */
+  public String getPermission() {
+    return permission;
+  }
+
+  /**
+   * set permission.
+   * @param permission permission
+   */
+  public void setPermission(final String permission) {
+    this.permission = permission;
+  }
 }

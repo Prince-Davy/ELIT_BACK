@@ -28,4 +28,20 @@ public class VerificationToken implements Serializable {
 
   @ManyToOne(fetch = FetchType.EAGER)
   private User user;
+
+  /**
+   * get token.
+   * @return token
+   */
+  public String getToken() {
+    return token;
+  }
+
+  /**
+   * set token.
+   * @param token token
+   */
+  public void setToken(final String token) {
+    this.token = token;
+  }
 }

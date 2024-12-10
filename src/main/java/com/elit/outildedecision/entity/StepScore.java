@@ -32,4 +32,20 @@ public class StepScore implements Serializable {
   @JoinColumn(name = "step_id", referencedColumnName = "stepId")
   @JsonBackReference("step_score")
   private FormStep formStep;
+
+  /**
+   * get criteriaName.
+   * @return criteriaName
+   */
+  public String getCriteriaName() {
+    return criteriaName;
+  }
+
+  /**
+   * set criteriaName.
+   * @param criteriaName criteriaName
+   */
+  public void setCriteriaName(final String criteriaName) {
+    this.criteriaName = criteriaName;
+  }
 }

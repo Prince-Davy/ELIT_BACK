@@ -15,4 +15,20 @@ public class AnswerIaKey implements Serializable {
   private String category;
   private String answer;
   private Long project;
+
+  /**
+   * get question.
+   * @return question
+   */
+  public String getQuestion() {
+    return question;
+  }
+
+  /**
+   * set question.
+   * @param question question
+   */
+  public void setQuestion(final String question) {
+    this.question = question;
+  }
 }

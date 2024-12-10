@@ -44,4 +44,19 @@ public class FeedbackIa {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
+  /**
+   * get methodology.
+   * @return methodology
+   */
+  public String getMethodology() {
+    return methodology;
+  }
+
+  /**
+   * set methodology.
+   * @param methodology methodo
+   */
+  public void setMethodology(final String methodology) {
+    this.methodology = methodology;
+  }
 }

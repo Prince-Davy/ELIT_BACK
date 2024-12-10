@@ -27,4 +27,20 @@ public class SurveyQuestion implements Serializable {
 
   private String question;
   private String type;
+
+  /**
+   * get question.
+   * @return question
+   */
+  public String getQuestion() {
+    return question;
+  }
+
+  /**
+   * set question.
+   * @param question question
+   */
+  public void setQuestion(final String question) {
+    this.question = question;
+  }
 }

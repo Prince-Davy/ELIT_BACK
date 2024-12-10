@@ -21,4 +21,20 @@ public class ProjectPropertyKey implements Serializable {
 
   @Column(name = "user_id")
   private Long userId;
+
+  /**
+   * get project ID.
+   * @return project Id
+   */
+  public Long getProjectId() {
+    return projectId;
+  }
+
+  /**
+   * set project ID.
+   * @param projectId project Id
+   */
+  public void setProjectId(final Long projectId) {
+    this.projectId = projectId;
+  }
 }

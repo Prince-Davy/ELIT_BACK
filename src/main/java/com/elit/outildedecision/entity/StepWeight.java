@@ -31,4 +31,20 @@ public class StepWeight implements Serializable {
   @JoinColumn(name = "stepId", referencedColumnName = "stepId")
   @JsonBackReference("step_weight")
   private FormStep formStep;
+
+  /**
+   * get criteriaName.
+   * @return criteriaName
+   */
+  public String getCriteriaName() {
+    return criteriaName;
+  }
+
+  /**
+   * set criteriaName.
+   * @param criteriaName criteriaName
+   */
+  public void setCriteriaName(final String criteriaName) {
+    this.criteriaName = criteriaName;
+  }
 }

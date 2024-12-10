@@ -33,4 +33,20 @@ public class SurveyAnswer {
   private AnswerType type;
 
   private String answerValue;
+
+  /**
+   * get answer Value.
+   * @return answerValue
+   */
+  public String getAnswerValue() {
+    return answerValue;
+  }
+
+  /**
+   * set answerValue.
+   * @param answerValue answerValue
+   */
+  public void setAnswerValue(final String answerValue) {
+    this.answerValue = answerValue;
+  }
 }

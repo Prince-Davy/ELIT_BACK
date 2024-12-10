@@ -28,3 +28,5 @@ SPRING_MAIL_PASSWORD = sxcwmyfhazuhtzic
 
 REACT_APP_BACKEND_API=http://localhost:8080
 FRONTEND_URL=http://localhost:3000
+AI_API_URL=https://integ.elit-pmm-pred.innovation-factory.io/api/process_predict
+KEYSTORE_PWD=

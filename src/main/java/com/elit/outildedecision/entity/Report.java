@@ -44,4 +44,20 @@ public class Report implements Serializable {
   @CreationTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
   private Timestamp createdAt;
+
+  /**
+   * get type of report.
+   * @return type
+   */
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * set type of report.
+   * @param type type
+   */
+  public void setType(final String type) {
+    this.type = type;
+  }
 }

@@ -40,4 +40,20 @@ public class ExecutionPlanVote {
   @JoinColumn(name = "method_id", referencedColumnName = "id", nullable = false)
   @JsonBackReference("execution_plan_vote_method")
   private Method method;
+
+  /**
+   * get user.
+   * @return user
+   */
+  public User getUser() {
+    return user;
+  }
+
+  /**
+   * set user.
+   * @param user user
+   */
+  public void setUser(final User user) {
+    this.user = user;
+  }
 }

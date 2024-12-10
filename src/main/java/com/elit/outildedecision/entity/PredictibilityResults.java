@@ -37,4 +37,20 @@ public class PredictibilityResults implements Serializable {
 
   private String name;
   private Float value;
+
+  /**
+   * get name.
+   * @return name
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * set name.
+   * @param name name
+   */
+  public void setName(final String name) {
+    this.name = name;
+  }
 }

@@ -21,4 +21,22 @@ public class AttachmentModel {
    * A list of attachments represented as MultipartFile objects.
    */
   private ArrayList<MultipartFile> attachments;
+
+  /**
+   * Get ArrayList<MultipartFile>.
+   *
+   * @return ArrayList<MultipartFile>
+   */
+  public ArrayList<MultipartFile> getAttachments() {
+    return attachments;
+  }
+
+  /**
+   * Set attachments.
+   *
+   * @param attachments ArrayList<MultipartFile>
+   */
+  public void setAttachments(final ArrayList<MultipartFile> attachments) {
+    this.attachments = attachments;
+  }
 }

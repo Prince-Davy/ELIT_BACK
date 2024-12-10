@@ -38,4 +38,20 @@ public class Opinion {
   @CreationTimestamp
   @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Europe/Paris")
   private Date createdAt;
+
+  /**
+   * get description.
+   * @return description
+   */
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * set description.
+   * @param description description
+   */
+  public void setDescription(final String description) {
+    this.description = description;
+  }
 }

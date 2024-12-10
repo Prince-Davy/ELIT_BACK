@@ -38,4 +38,20 @@ public class Notification implements Serializable {
   @JoinColumn(name = "project_id", referencedColumnName = "projectId")
   @JsonBackReference("notification_project")
   private Project project;
+
+  /**
+   * get title.
+   * @return title
+   */
+  public String getTitle() {
+    return title;
+  }
+
+  /**
+   * set title.
+   * @param title title
+   */
+  public void setTitle(final String title) {
+    this.title = title;
+  }
 }
