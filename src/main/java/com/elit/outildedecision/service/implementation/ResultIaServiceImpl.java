@@ -56,7 +56,6 @@ public class ResultIaServiceImpl implements ResultIaService {
     this.projectRepository = projectRepository;
   }
 
-
   /**
    * Send data to ia keep the result and then save response ia on DB.
    *

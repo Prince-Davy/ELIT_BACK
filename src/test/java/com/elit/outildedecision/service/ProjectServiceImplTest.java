@@ -3,10 +3,7 @@ package com.elit.outildedecision.service;
 import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.*;
-import com.elit.outildedecision.repository.AnswerIaRepository;
-import com.elit.outildedecision.repository.ProjectRepository;
-import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
-import com.elit.outildedecision.repository.UserRepository;
+import com.elit.outildedecision.repository.*;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.ProjectServiceImpl;
 import com.elit.outildedecision.util.ProjectAnalysisState;
@@ -39,6 +36,10 @@ class ProjectServiceImplTest {
   UserRepository userRepository;
   @Mock
   ProjectRepository projectRepository;
+  @Mock
+  FeedbackIaRepository feedbackIaRepository;
+  @Mock
+  ResultIaRepository resultIaRepository;
   @Mock
   AnswerIaRepository answerIaRepository;
   @Mock
@@ -435,9 +436,13 @@ class ProjectServiceImplTest {
     List<MultiCriteriaAnalysis> multiCriteriaAnalysisList = new ArrayList<>();
     multiCriteriaAnalysisList.add(multiCriteriaAnalysis);
     projectToDelete.setMultiCriteriaAnalysisList(multiCriteriaAnalysisList);
+    List<FeedbackIa> feedbacksOfProject = new ArrayList<>();
+    when(feedbackIaRepository.findByProject_ProjectId(projectId)).thenReturn(feedbacksOfProject);
+    when(resultIaRepository.findByProject(projectToDelete)).thenReturn(Optional.empty());
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectToDelete));
     Assertions.assertEquals(ResponseEntity.ok().body("Le projet a été bien supprimé"), projectServiceImpl.deleteProject(projectId));
   }
+
 
   @Test
   void deleteProject_WhenProjectNotFound() {

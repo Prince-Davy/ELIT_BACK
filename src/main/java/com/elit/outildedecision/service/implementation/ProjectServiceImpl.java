@@ -1,5 +1,7 @@
 package com.elit.outildedecision.service.implementation;
 
+import com.elit.outildedecision.entity.FeedbackIa;
+import com.elit.outildedecision.entity.ResultAi;
 import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.entity.PredictibilityAnalysis;
@@ -22,6 +24,8 @@ import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.model.PredictibilityAnalyseResponseModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.repository.FeedbackIaRepository;
+import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.repository.VoteRepository;
 import com.elit.outildedecision.repository.BrainstormingRepository;
 import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
@@ -51,7 +55,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -94,6 +97,11 @@ public class ProjectServiceImpl implements ProjectService {
    * objects in the database.
    */
   private final ProjectUserPermissionRepository projectUserPermissionRepository;
+
+
+  private final FeedbackIaRepository feedbackIaRepository;
+
+  private final ResultIaRepository resultIaRepository;
   /**
    * The multiCriteriaService for managing the multi criteria analysis of the
    * projects.
@@ -161,29 +169,30 @@ public class ProjectServiceImpl implements ProjectService {
    * @param projectUserPermissionRepository  The projectUserPermissionRepository
    *                                         for accessing the project user
    *                                         permission objects in the database.
+   * @param feedbackIaRepository
+   * @param resultIaRepository
    * @param multiCriteriaService             The multiCriteriaService for managing
    *                                         the multi criteria analysis of the
    *                                         projects.
-   * @param brainstormingRepository          The brainstormingRepository for accessing
-   *                                         the brainstorming objects in the database.
    * @param executionPlanRepository          The executionPlanRepository for accessing
    *                                         the executionPlan objects in the database.
    * @param multiCriteriaAnalysisRepository  The multiCriteriaAnalysisRepository for accessing
    *                                         the multiCriteriaAnalysis objects in the database.
-   * @param predictibilityAnalysisRepository The predictibilityAnalysisRepository for accessing
-   *                                         the  predictibilityAnalysis objects in the database.
+   * @param brainstormingRepository          The brainstormingRepository for accessing
+   *                                         the brainstorming objects in the database.
    * @param predictibilityResultsRepository  The predictibilityResultsRepository for accessing
    *                                         the  predictibilityResults objects in the database.
+   * @param predictibilityAnalysisRepository The predictibilityAnalysisRepository for accessing
+   *                                         the  predictibilityAnalysis objects in the database.
    * @param voteRepository                   The voteRepository for accessing
    *                                         the  vote objects in the database.
    * @param executionPlanVoteRepo            to access executionPlanVoteRepo
-   *
    * @param answerIaRepository               the answerIaRepository for managing answers of the ia path
    */
   public ProjectServiceImpl(final ProjectRepository projectRepository, final UserRepository userRepository,
                             final ExecutionPlanService executionPlanService, final AttachmentService attachmentService,
                             final ProjectUserPermissionRepository projectUserPermissionRepository,
-                            final MultiCriteriaAnalysisService multiCriteriaService, final ExecutionPlanRepository executionPlanRepository,
+                            final FeedbackIaRepository feedbackIaRepository, final ResultIaRepository resultIaRepository, final MultiCriteriaAnalysisService multiCriteriaService, final ExecutionPlanRepository executionPlanRepository,
                             final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository, final BrainstormingRepository brainstormingRepository,
                             final PredictibilityResultsRepository predictibilityResultsRepository, final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
                             final VoteRepository voteRepository, final ExecutionPlanVoteRepo executionPlanVoteRepo, final AnswerIaRepository answerIaRepository) {
@@ -192,6 +201,8 @@ public class ProjectServiceImpl implements ProjectService {
     this.attachmentService = attachmentService;
     this.executionPlanService = executionPlanService;
     this.projectUserPermissionRepository = projectUserPermissionRepository;
+    this.feedbackIaRepository = feedbackIaRepository;
+    this.resultIaRepository = resultIaRepository;
     this.multiCriteriaService = multiCriteriaService;
     this.executionPlanRepository = executionPlanRepository;
     this.executionPlanVoteRepo = executionPlanVoteRepo;
@@ -646,7 +657,6 @@ public class ProjectServiceImpl implements ProjectService {
       pup.getUser().detachPermission(pup);
       projectUserPermissionRepository.delete(pup);
     }
-
     // Chemin du dossier à supprimer
     String projectToDeletePath = storingDirectory + projectToDelete.getFolderPath();
     try {
@@ -654,7 +664,16 @@ public class ProjectServiceImpl implements ProjectService {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
+    // verifier si le projet possédes des feedback pour la partie IA
+    List<FeedbackIa> feedbacksOfProject = feedbackIaRepository.findByProject_ProjectId(projectId);
+    if (!feedbacksOfProject.isEmpty()) {
+      feedbackIaRepository.deleteAll(feedbacksOfProject);
+    }
+    // verifier si le projet possédes un résultat généré par IA
+    Optional<ResultAi> resultAIforProject = resultIaRepository.findByProject(projectToDelete);
+    if (!resultAIforProject.isEmpty()) {
+      resultIaRepository.deleteById(resultAIforProject.get().getId());
+    }
     // Handle related PredictibilityAnalysis entity
     if (!projectToDelete.getMultiCriteriaAnalysisList().isEmpty()) {
       for (MultiCriteriaAnalysis multiCriteriaAnalysis : projectToDelete.getMultiCriteriaAnalysisList()) {
