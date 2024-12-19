@@ -45,6 +45,9 @@ public class ResultIaServiceImpl implements ResultIaService {
   @Value("${iaCert.value-pwd}")
   private String pwdKeystore;
 
+  @Value("${keystore.path}")
+  private String keyStorePath;
+
   /**
    * ResultIa service implements.
    *
@@ -70,7 +73,7 @@ public class ResultIaServiceImpl implements ResultIaService {
     try {
       // Charger le certificat depuis le fichier Keystore
       KeyStore keyStore = KeyStore.getInstance("JKS");
-      try (FileInputStream fis = new FileInputStream("keystore.jks")) {
+      try (FileInputStream fis = new FileInputStream(keyStorePath)) {
         keyStore.load(fis, pwdKeystore.toCharArray()); // "pwdKeystore" est le mot de passe du keystore voire dans .env
       }
       // Configurer le TrustManager pour utiliser le keystore
