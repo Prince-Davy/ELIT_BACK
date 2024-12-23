@@ -338,7 +338,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
     Methodology methodology = predictibilityAnalysis.getMethodology();
     List<Method> methodList;
-    if (methodology.getName().equals("Hybride")) {
+
+    if (methodology.getName().equalsIgnoreCase("Hybride") || methodology.getName().equalsIgnoreCase("Hybrid")) {
       methodList = methodRepository.findAll();
     } else {
       methodList = methodology.getMethods();
