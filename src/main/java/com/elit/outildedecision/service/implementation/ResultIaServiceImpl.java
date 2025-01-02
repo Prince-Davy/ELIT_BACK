@@ -9,20 +9,20 @@ import com.elit.outildedecision.model.ResultAiModel;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.service.ResultIaService;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.google.gson.Gson;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-
 import javax.transaction.Transactional;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -73,7 +73,8 @@ public class ResultIaServiceImpl implements ResultIaService {
     try {
       // Charger le certificat depuis le fichier Keystore
       KeyStore keyStore = KeyStore.getInstance("JKS");
-      try (FileInputStream fis = new FileInputStream(keyStorePath)) {
+      ClassPathResource keyStoreResource = new ClassPathResource(keyStorePath);
+      try (InputStream fis = keyStoreResource.getInputStream()) {
         keyStore.load(fis, pwdKeystore.toCharArray()); // "pwdKeystore" est le mot de passe du keystore voire dans .env
       }
       // Configurer le TrustManager pour utiliser le keystore
