@@ -398,11 +398,13 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
       projectUserPermissionRepository.findByProjectIdUserID(
         project.getProjectId(), user.getUserId());
 
-    Methodology methodology = predictibilityAnalysis.getMethodology();
+    String choosenMethodology = predictibilityAnalysis.getChosenMethodology();
     List<Method> methodList;
-    if (methodology.getName().equals("Hybride")) {
+
+    if (choosenMethodology.equalsIgnoreCase("Hybride") || choosenMethodology.equalsIgnoreCase("Hybrid")) {
       methodList = methodRepository.findAll();
     } else {
+      Methodology methodology = predictibilityAnalysis.getMethodology();
       methodList = methodology.getMethods();
     }
 
