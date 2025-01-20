@@ -42,8 +42,6 @@ RUN mkdir -p /app/template
 RUN mkdir -p /app/logs
 RUN mkdir -p /app/avatars
 RUN mkdir -p /app/projects
-RUN mkdir -p /app/keystore
-COPY --from=BUILDER /app/src/main/resources/keystore.jks ./keystore/keystore.jks
 COPY --from=BUILDER /app/target/*-SNAPSHOT.jar .
 
 # ADD ./filebeat/filebeat.yml /usr/share/filebeat/config/filebeat.yml

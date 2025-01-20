@@ -31,6 +31,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,10 +90,15 @@ public class ResultIaServiceImpl implements ResultIaService {
       sslContext.init(null, trustManagerFactory.getTrustManagers(), new java.security.SecureRandom());
 
       // Print details
-      Certificate[] moncertificats = keyStore.getCertificateChain("moncertificat");
+      Certificate[] moncertificats = keyStore.getCertificateChain("elit-pmm");
       LOGGER.info("Certificate chain");
-      for (Certificate c : moncertificats) {
-        LOGGER.info(c.toString());
+      LOGGER.info(Arrays.toString(moncertificats));
+      if (moncertificats != null) {
+        for (Certificate c : moncertificats) {
+          if (c != null) {
+            LOGGER.info(c.toString());
+          }
+        }
       }
 
       // Configurer HttpsURLConnection pour utiliser le contexte SSL
