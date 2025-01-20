@@ -12,6 +12,8 @@ import com.elit.outildedecision.service.ResultIaService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +39,7 @@ import static com.elit.outildedecision.service.implementation.ProjectServiceImpl
 @Service
 public class ResultIaServiceImpl implements ResultIaService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResultIaServiceImpl.class);
   private final ResultIaRepository resultIaRepository;
   private final ProjectRepository projectRepository;
 
@@ -83,6 +87,14 @@ public class ResultIaServiceImpl implements ResultIaService {
       // Initialiser le contexte SSL pour le certificat https
       SSLContext sslContext = SSLContext.getInstance("TLS");
       sslContext.init(null, trustManagerFactory.getTrustManagers(), new java.security.SecureRandom());
+
+      // Print details
+      Certificate[] moncertificats = keyStore.getCertificateChain("moncertificat");
+      LOGGER.info("Certificate chain");
+      for (Certificate c : moncertificats) {
+        LOGGER.info(c.toString());
+      }
+
       // Configurer HttpsURLConnection pour utiliser le contexte SSL
       URL url = new URL(urlApiAI);
       HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -137,6 +149,7 @@ public class ResultIaServiceImpl implements ResultIaService {
         return ResponseEntity.internalServerError().body("IA Api Request failed with response code: " + responseCode);
       }
     } catch (Exception e) {
+      LOGGER.error(e.getMessage(), e);
       return ResponseEntity.badRequest().body("An unexpected error occurred: " + e.getMessage());
     }
     return ResponseEntity.ok("AI prediction" + "\n" + iaResponse);
