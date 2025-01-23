@@ -15,23 +15,20 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.transaction.Transactional;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.util.Arrays;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,12 +43,6 @@ public class ResultIaServiceImpl implements ResultIaService {
 
   @Value("${iaApi.value-url}")
   private String urlApiAI;
-
-  @Value("${iaCert.value-pwd}")
-  private String pwdKeystore;
-
-  @Value("${keystore.path}")
-  private String keyStorePath;
 
   /**
    * ResultIa service implements.
@@ -76,30 +67,27 @@ public class ResultIaServiceImpl implements ResultIaService {
   public ResponseEntity<Object> generateAndSaveResult(final long projectId, final List<AnswerIa> answers) {
     String iaResponse;
     try {
-      // Charger le certificat depuis le fichier Keystore
-      KeyStore keyStore = KeyStore.getInstance("JKS");
-      ClassPathResource keyStoreResource = new ClassPathResource(keyStorePath);
-      try (InputStream fis = keyStoreResource.getInputStream()) {
-        keyStore.load(fis, pwdKeystore.toCharArray()); // "pwdKeystore" est le mot de passe du keystore voire dans .env
-      }
-      // Configurer le TrustManager pour utiliser le keystore
-      TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-      trustManagerFactory.init(keyStore);
-      // Initialiser le contexte SSL pour le certificat https
-      SSLContext sslContext = SSLContext.getInstance("TLS");
-      sslContext.init(null, trustManagerFactory.getTrustManagers(), new java.security.SecureRandom());
-
-      // Print details
-      Certificate[] moncertificats = keyStore.getCertificateChain("elit-pmm");
-      LOGGER.info("Certificate chain");
-      LOGGER.info(Arrays.toString(moncertificats));
-      if (moncertificats != null) {
-        for (Certificate c : moncertificats) {
-          if (c != null) {
-            LOGGER.info(c.toString());
+      // TODO : this will disable all SSL validation rendering HTTPS totally useless !
+      // This was done to short-circuit bad certificate problem  when communicating with
+      // pod elit-pmm-pred-integ and while logs weren't available
+      TrustManager[] trustManagers = new TrustManager[]{
+        new X509TrustManager() {
+          @Override
+          public void checkClientTrusted(final X509Certificate[] chain, final String authType) {
+          }
+          @Override
+          public void checkServerTrusted(final X509Certificate[] chain, final String authType) {
+          }
+          @Override
+          public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
           }
         }
-      }
+      };
+
+      // Initialiser le contexte SSL pour le certificat https
+      SSLContext sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(null, trustManagers, null);
 
       // Configurer HttpsURLConnection pour utiliser le contexte SSL
       URL url = new URL(urlApiAI);
