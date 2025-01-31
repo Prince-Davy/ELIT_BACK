@@ -11,7 +11,8 @@
 #SPRING_MAIL_PASSWORD = sxcwmyfhazuhtzic
 FILE_UPLOAD_DIR = src/main/resources/projects/
 AVATAR_UPLOAD_DIR = src/main/resources/avatars/
-FILE_QUESTIONS = src/main/java/com/elit/outildedecision/util/MultiCriteriaAnalysisFormSchema.Json
+FILE_QUESTIONS=sharedresources/com/elit/outildedecision/util/MultiCriteriaAnalysisFormSchema.Json
+FILE_RECOMMANDATIONS=sharedresources/com/elit/outildedecision/util/RecommandationsIA.json
 
 MYSQL_USER=root
 MYSQL_PASSWORD=root

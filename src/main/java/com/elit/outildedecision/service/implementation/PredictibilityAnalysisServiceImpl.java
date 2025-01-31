@@ -9,8 +9,8 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.Vote;
-import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisAlreadyUpdated;
+import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.FormStepModel;
@@ -26,7 +26,7 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.VoteRepository;
 import com.elit.outildedecision.service.PredictibilityAnalysisService;
 import com.elit.outildedecision.util.Constants;
-import com.elit.outildedecision.util.MethodologyTypes;
+import com.elit.outildedecision.util.MethodologyType;
 import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -259,7 +259,7 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     List<PredictibilityResults> predictibilityResultsList =
       predictibilityResultsRepository.findAllPredictibilityResultsByPreAnalysisId(
         predictibilityAnalysis.getPredictibilityAnalysisId());
-    for (MethodologyTypes methodologyName : MethodologyTypes.values()) {
+    for (MethodologyType methodologyName : MethodologyType.values()) {
       // Count nbs of votesList
       long usersCount =
         votesList.stream()

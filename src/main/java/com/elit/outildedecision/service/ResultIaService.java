@@ -1,8 +1,12 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.AnswerIa;
+import com.elit.outildedecision.exception.AnswerIaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
+import com.elit.outildedecision.exception.ResultAiNotFoundException;
+import com.elit.outildedecision.model.RecommandationItemModel;
+import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.ResultAiModel;
 import org.springframework.http.ResponseEntity;
 
@@ -37,4 +41,23 @@ public interface ResultIaService {
    * @throws ResponseNotFoundException if exception
    */
   ResponseEntity<String> deleteResultAnalysisAI(long resultIaId) throws ResponseNotFoundException;
+
+  /**
+   * Lookup the recommandation mapping for the project ID, assuming the user has completed AI anlysis survey and
+   * PMM responded successfully.
+   *
+   * @param projectId the project id
+   * @return the mapping
+   */
+  ResponseEntity<List<RecommandationItemModel>> getMapping(String projectId)
+    throws AnswerIaNotFoundException, ResultAiNotFoundException;
+
+  /**
+   * Lookup Kiviat project values for the project id.
+   *
+   * @param projectId the project id
+   * @return kiviat project values
+   */
+  ResponseEntity<RecommandationKiviatModel> getKiviatProjectValues(String projectId)
+    throws ResultAiNotFoundException;
 }

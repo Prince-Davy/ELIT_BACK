@@ -3,11 +3,15 @@ package com.elit.outildedecision.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * FIXME : extended class is deprecated, need to review relevance / alternatives.
+ */
 public class RequestInterceptor extends HandlerInterceptorAdapter {
-    private Logger log = LoggerFactory.getLogger(RequestInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestInterceptor.class);
 
     /**
      * This method is called before the actual handler is executed. It logs the request URL, URI,
@@ -24,11 +28,14 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
-//        throw new ResourceNotFoundException();
-        log.info("Request URL: " + request.getRequestURL());
-        log.info("Request URI: " + request.getRequestURI());
-        log.info("Response Status: " + response.getStatus());
 
-        return super.preHandle(request, response, handler);
+      // Micro optimization
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Request URL: {}", request.getRequestURL());
+        LOGGER.debug("Request URI: {}", request.getRequestURI());
+        LOGGER.debug("Response Status: {}", response.getStatus());
+      }
+
+      return super.preHandle(request, response, handler);
     }
 }

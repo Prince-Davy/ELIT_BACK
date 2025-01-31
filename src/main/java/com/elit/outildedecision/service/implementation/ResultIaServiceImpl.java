@@ -3,11 +3,17 @@ package com.elit.outildedecision.service.implementation;
 import com.elit.outildedecision.entity.AnswerIa;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ResultAi;
+import com.elit.outildedecision.exception.AnswerIaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
+import com.elit.outildedecision.exception.ResultAiNotFoundException;
+import com.elit.outildedecision.model.RecommandationItemModel;
+import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.ResultAiModel;
+import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
+import com.elit.outildedecision.service.RecommandationService;
 import com.elit.outildedecision.service.ResultIaService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -38,8 +44,11 @@ import static com.elit.outildedecision.service.implementation.ProjectServiceImpl
 public class ResultIaServiceImpl implements ResultIaService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ResultIaServiceImpl.class);
+
   private final ResultIaRepository resultIaRepository;
   private final ProjectRepository projectRepository;
+  private final RecommandationService recommandationService;
+  private final AnswerIaRepository answerIaRepository;
 
   @Value("${iaApi.value-url}")
   private String urlApiAI;
@@ -49,10 +58,15 @@ public class ResultIaServiceImpl implements ResultIaService {
    *
    * @param resultIaRepository resultIaRepository
    * @param projectRepository  projectRepository
+   * @param recommandationService reccommandationService
+   * @param answerIaRepository answerIaRepository
    */
-  public ResultIaServiceImpl(final ResultIaRepository resultIaRepository, final ProjectRepository projectRepository) {
+  public ResultIaServiceImpl(final ResultIaRepository resultIaRepository, final ProjectRepository projectRepository,
+                             final RecommandationService recommandationService, final AnswerIaRepository answerIaRepository) {
     this.resultIaRepository = resultIaRepository;
     this.projectRepository = projectRepository;
+    this.recommandationService = recommandationService;
+    this.answerIaRepository = answerIaRepository;
   }
 
   /**
@@ -189,6 +203,44 @@ public class ResultIaServiceImpl implements ResultIaService {
       resultIaRepository.deleteById(resultIaId);
     }
     return ResponseEntity.ok().body("Le résultat de l'analyse IA pour ce projet a bien été supprimé");
+  }
+
+  /**
+   * Gets the mapping for the given projectid, assuming the user has completed AI anlysis survey and AI responded
+   * successfully.
+   *
+   * @param projectId the project id
+   * @return the mapping
+   */
+  @Override
+  public ResponseEntity<List<RecommandationItemModel>> getMapping(final String projectId)
+    throws AnswerIaNotFoundException, ResultAiNotFoundException {
+    Long projectID = Long.valueOf(projectId);
+
+    List<AnswerIa> answerIas = answerIaRepository.findByProject_ProjectId(projectID);
+    if (answerIas == null || answerIas.isEmpty()) {
+      throw new AnswerIaNotFoundException("No answer ai found for this projectId");
+    }
+    ResultAi resultAi = resultIaRepository.findByProject_ProjectId(projectID)
+      .orElseThrow(() -> new ResultAiNotFoundException("No result ai found for this projectId"));
+
+    return recommandationService.getMappings(answerIas, resultAi);
+  }
+
+  /**
+   *
+   * @param projectId the project id
+   * @return the mapping
+   */
+  @Override
+  public ResponseEntity<RecommandationKiviatModel> getKiviatProjectValues(final String projectId)
+    throws ResultAiNotFoundException {
+    Long projectID = Long.valueOf(projectId);
+
+    ResultAi resultAi = resultIaRepository.findByProject_ProjectId(projectID)
+      .orElseThrow(() -> new ResultAiNotFoundException("No result ai found for this projectId"));
+
+    return recommandationService.getKiviatProjectValues(resultAi);
   }
 
 }

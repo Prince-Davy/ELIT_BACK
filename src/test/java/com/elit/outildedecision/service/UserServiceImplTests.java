@@ -19,6 +19,8 @@ import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ModelSamples;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,9 +29,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,13 +45,28 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -80,6 +97,26 @@ class UserServiceImplTests {
   private static final String NEW_PASS = "Azertyuio12!";
   private User user;
 
+  @AfterAll
+  static void cleanUp() {
+      try (Stream<Path> files = Files.walk(Path.of("."))) {
+        files
+          .filter(path -> path.getFileName().toString().matches("null.*"))
+          .map(Path::toFile)
+          .forEach(file -> {
+            boolean delete = file.delete();
+            if (delete) {
+              log.trace("File {} successfully deleted", file);
+            }
+            else {
+              log.error("File {} could not be deleted, continuing anyway", file);
+            }
+          });
+        ;
+      } catch (IOException e) {
+        log.error("Error cleaning up, will not reattempt it", e);
+      }
+  }
 
   @BeforeEach
   public void setUp() {

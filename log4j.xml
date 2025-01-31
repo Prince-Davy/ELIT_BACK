@@ -7,7 +7,7 @@
           <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
         </PatternLayout>
         <Filters>
-          <ThresholdFilter level="DEBUG"/>
+          <ThresholdFilter level="INFO"/>
         </Filters>
       </Console>
       <RollingFile name="RollingDebugLogFile" fileName="logs/app-debug.json" filePattern="logs/$${date:yyyy-MM}/app-debug-%d{MM-dd-yyyy}-%i.json.gz">
@@ -29,7 +29,6 @@
       </Logger>
       <Root level="INFO">
         <AppenderRef ref = "Console" />
-        <AppenderRef ref="RollingDebugLogFile" />
       </Root>
     </Loggers>
 </Configuration>

@@ -4,6 +4,7 @@
  * <p> The class {@link com.elit.outildedecision.exception.RestResponseEntityExceptionHandler} is used to handle the exceptions thrown by the application.</p>
  * <p> The class {@link com.elit.outildedecision.model.ErrorMessage} is used to return the error message to the client.</p>
  * Refer the classes in this package for more details.
+ * TODO : Construct a generic EntityNotFound with entity class name to avoid recreating a different class each time ?
  */
 
 package com.elit.outildedecision.exception;

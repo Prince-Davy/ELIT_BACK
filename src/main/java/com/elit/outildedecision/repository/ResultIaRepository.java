@@ -18,4 +18,10 @@ public interface ResultIaRepository extends JpaRepository<ResultAi, Long> {
    */
   Optional<ResultAi> findByProject(Project project);
 
+  /**
+   * Find resultAI by project id.
+   * @param projectId the project id
+   * @return the ResultAi if found, Optional.EMPTY otherwise
+   */
+  Optional<ResultAi> findByProject_ProjectId(Long projectId);
 }

@@ -1,15 +1,37 @@
 package com.elit.outildedecision.service;
 
-import com.elit.outildedecision.entity.*;
-import com.elit.outildedecision.exception.*;
-import com.elit.outildedecision.model.*;
-import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.entity.Attachment;
+import com.elit.outildedecision.entity.FeedbackIa;
+import com.elit.outildedecision.entity.FormStep;
+import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
+import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.ProjectUserPermission;
+import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
+import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.ProjectOwnerException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.UserNotFoundException;
+import com.elit.outildedecision.model.AttachmentResponseModel;
+import com.elit.outildedecision.model.ContributerModel;
+import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
+import com.elit.outildedecision.model.ProjectModel;
+import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.repository.AnswerIaRepository;
+import com.elit.outildedecision.repository.FeedbackIaRepository;
+import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
+import com.elit.outildedecision.repository.ResultIaRepository;
+import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.ProjectServiceImpl;
 import com.elit.outildedecision.util.ProjectAnalysisState;
 import com.elit.outildedecision.util.ProjectConfirmationState;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.apache.tomcat.util.json.ParseException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,21 +39,34 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceImplTest {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImplTest.class);
+
   @Mock
   UserRepository userRepository;
   @Mock
@@ -63,6 +98,27 @@ class ProjectServiceImplTest {
     projectUserPermission.setProject(projectToSave);
     projectUserPermission.setUser(user);
     projectUserPermission.setPermission(ProjectPermession.CDP.name());
+  }
+
+  @AfterAll
+  static void cleanUp() {
+      try (Stream<Path> files = Files.walk(Path.of("."))) {
+        files
+          .filter(path -> path.getFileName().toString().matches("null.*"))
+          .map(Path::toFile)
+          .forEach(file -> {
+            boolean delete = file.delete();
+            if (delete) {
+              LOGGER.trace("File {} successfully deleted", file);
+            }
+            else {
+              LOGGER.error("File {} could not be deleted, continuing anyway", file);
+            }
+          });
+        ;
+      } catch (IOException e) {
+        LOGGER.error("Error cleaning up, will not reattempt it", e);
+      }
   }
 
   @Test

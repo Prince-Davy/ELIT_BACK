@@ -1,11 +1,32 @@
 package com.elit.outildedecision.service;
 
-import com.elit.outildedecision.entity.*;
-import com.elit.outildedecision.exception.*;
+import com.elit.outildedecision.entity.Brainstorming;
+import com.elit.outildedecision.entity.Criteria;
+import com.elit.outildedecision.entity.FormQuestion;
+import com.elit.outildedecision.entity.FormStep;
+import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
+import com.elit.outildedecision.entity.PredictibilityAnalysis;
+import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.ProjectUserPermission;
+import com.elit.outildedecision.entity.StepWeight;
+import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.EscoreException;
+import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
+import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
-import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.repository.CriteriaRepository;
+import com.elit.outildedecision.repository.FormQuestionRepository;
+import com.elit.outildedecision.repository.FormStepRepo;
+import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
+import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
+import com.elit.outildedecision.repository.StepWeightRepo;
+import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.MultiCriteriaServiceImpl;
 import org.json.simple.parser.ParseException;
@@ -33,7 +54,11 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MultiCriteriaServiceImplTests {
@@ -140,7 +165,7 @@ public class MultiCriteriaServiceImplTests {
     multiCriteriaAnalysisStep.getFormQuestions().add(formQuestion);
 
     ReflectionTestUtils.setField(multiCriteriaServiceImpl, "questionsJsonFile",
-      "src/main/java/com/elit/outildedecision/util/MultiCriteriaAnalysisFormSchema.Json");
+      "sharedresources/com/elit/outildedecision/util/MultiCriteriaAnalysisFormSchema.Json");
 
   }
 

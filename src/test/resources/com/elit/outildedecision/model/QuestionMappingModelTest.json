@@ -1,0 +1,79 @@
+{
+  "id": "ProjectComplexity",
+  "questionText": "Quelle est la complexité du projet ?",
+  "questionNumber": 1,
+  "responses": [
+    {
+      "id": "low",
+      "label": "Faible (composant unique)",
+      "recommandations": [
+        {
+          "id": "classique",
+          "title": "Complexité du projet - Faible",
+          "description": "La méthodologie traditionnelle convient bien aux projets simples sans dépendances complexes, car elle suit un déroulement séquentiel où chaque phase est terminée avant de passer à la suivante.",
+          "level": "Green"
+        },
+        {
+          "id": "hybrid",
+          "title": "Complexité du projet - Faible",
+          "description": "Appliquer une méthodologie hybride à un projet simple pourrait ajouter une complexité inutile et allonger les processus de validation.",
+          "level": "Yellow"
+        },
+        {
+          "id": "agile",
+          "title": "Complexité du projet - Faible",
+          "description": "Pour un projet simple sans dépendances, l’agilité permet de s’adapter facilement grâce à des itérations continues.",
+          "level": "Green"
+        }
+      ]
+    },
+    {
+      "id": "medium",
+      "label": "Modérée (collection d'éléments et de sous-systèmes interactifs pour un seul produit)",
+      "recommandations": [
+        {
+          "id": "classique",
+          "title": "Complexité du projet - Moyenne",
+          "description": "Pour un projet de complexité modérée, cette méthodologie fonctionne bien mais exige une planification séquentielle précise pour gérer les dépendances limitées.",
+          "level": "Green"
+        },
+        {
+          "id": "hybrid",
+          "title": "Complexité du projet - Moyenne",
+          "description": "Combiner planification et flexibilité dans une approche hybride facilite la gestion des interdépendances.",
+          "level": "Green"
+        },
+        {
+          "id": "agile",
+          "title": "Complexité du projet - Moyenne",
+          "description": "Avec un projet de complexité modérée, l'agilité offre la possibilité de s’adapter rapidement aux interdépendances, facilitant les modifications en fonction de l’évolution des besoins.",
+          "level": "Green"
+        }
+      ]
+    },
+    {
+      "id": "high",
+      "label": "Élevée (ensemble important de systèmes différents qui fonctionnent ensemble)",
+      "recommandations": [
+        {
+          "id": "classique",
+          "title": "Complexité du projet - Élevée",
+          "description": "Dans les projets très complexes, la gestion minutieuse des interdépendances devient cruciale avec une méthodologie traditionnelle.",
+          "level": "Yellow"
+        },
+        {
+          "id": "hybrid",
+          "title": "Complexité du projet - Élevée",
+          "description": "La coordination des équipes et des pratiques peut être compliquée dans un projet géré en hybride, entrainant des risques de retards.",
+          "level": "Yellow"
+        },
+        {
+          "id": "agile",
+          "title": "Complexité du projet - Élevée",
+          "description": "Une approche agile est avantageuse pour des projets complexes, où des ajustements continus et une flexibilité accrue sont nécessaires pour gérer l'interdépendance des éléments.",
+          "level": "Green"
+        }
+      ]
+    }
+  ]
+}
