@@ -137,6 +137,9 @@
       <version>1.0.9</version>
     </dependency>
 
+    <!-- com.googlecode.json-simple:json-simple:1.1.1 was released in 2012, last development commit is dated from 2014
+         and... forgets to use features introduced with Java 1.5 released in 2004. Please remove this library when
+         code that uses it is refactored. PLEASE. -->
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>

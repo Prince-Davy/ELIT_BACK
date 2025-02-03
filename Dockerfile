@@ -10,6 +10,7 @@ RUN mkdir ./images
 RUN touch /logs/java.logs
 # RUN mvn dependency:go-offline -B
 COPY ./src ./src
+COPY ./sharedresources ./sharedresources
 
 
 # in the process, already tested in qbuild phase, in publish phase this is just preventing integration tests
