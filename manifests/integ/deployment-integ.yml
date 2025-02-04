@@ -89,6 +89,11 @@ spec:
                 secretKeyRef:
                   key: FILE_QUESTIONS
                   name: lge-elit-integ-config
+            - name: FILE_RECOMMANDATIONS
+              valueFrom:
+                secretKeyRef:
+                  key: FILE_RECOMMANDATIONS
+                  name: lge-elit-integ-config
             - name: SPRING_MAIL_USERNAME
               valueFrom:
                 secretKeyRef:
