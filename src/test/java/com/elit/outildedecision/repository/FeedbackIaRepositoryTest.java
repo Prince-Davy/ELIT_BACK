@@ -64,7 +64,8 @@ class FeedbackIaRepositoryTest {
 
   @Test
   void testFindByProjectIdAndUserId_ShouldReturnFeedback() {
-    FeedbackIa retrievedFeedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), user.getUserId());
+    FeedbackIa retrievedFeedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), user.getUserId())
+      .orElse(null);
 
     assertThat(retrievedFeedback).isNotNull();
     assertThat(retrievedFeedback.getUser().getUserId()).isEqualTo(user.getUserId());
@@ -74,7 +75,8 @@ class FeedbackIaRepositoryTest {
 
   @Test
   void testFindByProjectIdAndUserId_WhenNoFeedbacks_ShouldReturnEmptyList() {
-    FeedbackIa feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), -1L);
+    FeedbackIa feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), -1L)
+      .orElse(null);
 
     assertThat(feedback).isNull();
   }

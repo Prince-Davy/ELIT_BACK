@@ -1,18 +1,19 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.FeedbackIa;
+import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.model.FeedBackIaModel;
 import com.elit.outildedecision.service.FeedbackIaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class FeedbackIaController {
    */
   @PostMapping("/projectIa/{ignoredProjectId}")
   @PreAuthorize("isProjectOwner(#ignoredProjectId) or isContributer(#ignoredProjectId)")
-  public ResponseEntity<Object> saveFeedback(@RequestBody final FeedbackIa feedbackIa, @PathVariable final Long ignoredProjectId) throws ProjectNotFoundException {
+  public ResponseEntity<Object> saveFeedback(@RequestBody final FeedbackIa feedbackIa, @PathVariable final Long ignoredProjectId) throws ProjectNotFoundException, FeedBackNotFoundException {
     // ignoredProjectId est utilisé dans l'annotation @PreAuthorize pour vérifier les autorisations
     return feedbackIaService.saveFeedback(feedbackIa);
   }
@@ -82,7 +83,7 @@ public class FeedbackIaController {
    */
   @GetMapping("/projectIa/{projectId}/{userId}")
   @PreAuthorize("hasAnyAuthority('USER')")
-  public ResponseEntity<FeedBackIaModel> getFeedbackByProjectIdAndUserId(@PathVariable final Long projectId, @PathVariable final Long userId) {
+  public ResponseEntity<FeedBackIaModel> getFeedbackByProjectIdAndUserId(@PathVariable final Long projectId, @PathVariable final Long userId) throws FeedBackNotFoundException {
     FeedBackIaModel feedback = feedbackIaService.getFeedbackByProjectIdAndUserId(projectId, userId);
 
     return ResponseEntity.ok(feedback);

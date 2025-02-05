@@ -3,6 +3,7 @@ package com.elit.outildedecision.service;
 import com.elit.outildedecision.entity.FeedbackIa;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.model.FeedBackIaModel;
 import com.elit.outildedecision.repository.FeedbackIaRepository;
@@ -19,8 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class FeedbackIaServiceImplTest {
 
@@ -58,10 +65,10 @@ class FeedbackIaServiceImplTest {
   }
 
   @Test
-  void saveFeedback_ShouldSaveFeedback_WhenNoConflict() throws ProjectNotFoundException {
+  void saveFeedback_ShouldSaveFeedback_WhenNoConflict() throws ProjectNotFoundException, FeedBackNotFoundException {
     when(projectRepository.findById(project.getProjectId())).thenReturn(Optional.of(project));
     when(feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), user.getUserId()))
-      .thenReturn(null);
+      .thenReturn(Optional.empty());
 
     ResponseEntity<Object> response = feedbackIaService.saveFeedback(feedbackIa);
 
@@ -72,10 +79,10 @@ class FeedbackIaServiceImplTest {
   }
 
   @Test
-  void saveFeedback_ShouldReturnConflict_WhenFeedbackExists() throws ProjectNotFoundException {
+  void saveFeedback_ShouldReturnConflict_WhenFeedbackExists() throws ProjectNotFoundException, FeedBackNotFoundException {
     when(projectRepository.findById(project.getProjectId())).thenReturn(Optional.of(project));
     when(feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), user.getUserId()))
-      .thenReturn(feedbackIa);
+      .thenReturn(Optional.of(feedbackIa));
 
     ResponseEntity<Object> response = feedbackIaService.saveFeedback(feedbackIa);
 
@@ -107,9 +114,9 @@ class FeedbackIaServiceImplTest {
   }
 
   @Test
-  void getFeedbackByProjectIdAndUserId_ShouldReturnFeedback() {
+  void getFeedbackByProjectIdAndUserId_ShouldReturnFeedback() throws FeedBackNotFoundException {
     when(feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), user.getUserId()))
-      .thenReturn(feedbackIa);
+      .thenReturn(Optional.of(feedbackIa));
 
     FeedBackIaModel feedbackModel = feedbackIaService.getFeedbackByProjectIdAndUserId(project.getProjectId(), user.getUserId());
 
@@ -133,7 +140,7 @@ class FeedbackIaServiceImplTest {
   @Test
   void deleteFeedbackByUserAndProject_ShouldDeleteFeedback_WhenExists() {
     when(feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), user.getUserId()))
-      .thenReturn(feedbackIa);
+      .thenReturn(Optional.of(feedbackIa));
 
     ResponseEntity<Object> response = feedbackIaService.deleteFeedbackByUserAndProject(project.getProjectId(), user.getUserId());
 
@@ -146,7 +153,7 @@ class FeedbackIaServiceImplTest {
   @Test
   void deleteFeedbackByUserAndProject_ShouldReturnNotFound_WhenFeedbackDoesNotExist() {
     when(feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(project.getProjectId(), user.getUserId()))
-      .thenReturn(null);
+      .thenReturn(Optional.empty());
 
     ResponseEntity<Object> response = feedbackIaService.deleteFeedbackByUserAndProject(project.getProjectId(), user.getUserId());
 

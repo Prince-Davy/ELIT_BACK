@@ -84,16 +84,6 @@ spec:
                 secretKeyRef:
                   key: AVATAR_UPLOAD_DIR
                   name: lge-elit-integ-config
-            - name: FILE_QUESTIONS
-              valueFrom:
-                secretKeyRef:
-                  key: FILE_QUESTIONS
-                  name: lge-elit-integ-config
-            - name: FILE_RECOMMANDATIONS
-              valueFrom:
-                secretKeyRef:
-                  key: FILE_RECOMMANDATIONS
-                  name: lge-elit-integ-config
             - name: SPRING_MAIL_USERNAME
               valueFrom:
                 secretKeyRef:

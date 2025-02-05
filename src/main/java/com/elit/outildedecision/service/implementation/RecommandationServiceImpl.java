@@ -18,11 +18,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -45,7 +45,18 @@ public class RecommandationServiceImpl implements RecommandationService {
   @Value("${file.recommandations-file}")
   private String recommandationsFile;
 
+  private final ResourceLoader resourceLoader;
+
   private List<QuestionMappingModel> questions;
+
+  /**
+   * Constructor for RecommandationServiceImpl.
+   *
+   * @param resourceLoader the resource loader
+   */
+  public RecommandationServiceImpl(final ResourceLoader resourceLoader) {
+    this.resourceLoader = resourceLoader;
+  }
 
   /**
    * Post bean construct init to load json file from disk.
@@ -56,21 +67,20 @@ public class RecommandationServiceImpl implements RecommandationService {
    */
   @PostConstruct
   void init() {
+    try (InputStream is = resourceLoader.getResource(recommandationsFile).getInputStream()) {
+      ObjectMapper mapper = new ObjectMapper();
+      SimpleModule module = new SimpleModule();
+      module.addDeserializer(MethodologyType.class, new RecommandationIaMethodologyDeserializer());
+      mapper.registerModule(module);
 
-    ObjectMapper mapper = new ObjectMapper();
-    SimpleModule module = new SimpleModule();
-    module.addDeserializer(MethodologyType.class, new RecommandationIaMethodologyDeserializer());
-    mapper.registerModule(module);
+      TypeReference<List<QuestionMappingModel>> questionListTypeReference = new TypeReference<>() {
+        //
+      };
 
-    TypeReference<List<QuestionMappingModel>> questionListTypeReference = new TypeReference<>() {
-      //
-    };
-
-    try (InputStream is = new FileInputStream(recommandationsFile)) {
       questions = mapper.readValue(is, questionListTypeReference);
     } catch (Exception e) {
-      LOGGER.error("Startup error, cannot read json recommandation file: ", e);
       LOGGER.info("Tried to lookup file at : {}", recommandationsFile);
+      LOGGER.error("Startup error, cannot read json recommandation file: ", e);
       LOGGER.error("Continuing without json recommandations, all subsequent call will result in no data");
       questions = new ArrayList<>();
     }

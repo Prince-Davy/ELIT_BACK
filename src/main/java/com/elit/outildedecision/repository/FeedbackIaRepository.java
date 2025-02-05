@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FeedbackIaRepository extends JpaRepository<FeedbackIa, Long> {
@@ -25,7 +26,7 @@ public interface FeedbackIaRepository extends JpaRepository<FeedbackIa, Long> {
    * @param userId    userId
    * @return List<FeedbackIa>
    */
-  FeedbackIa findByProject_ProjectIdAndUser_UserId(Long projectId, Long userId);
+  Optional<FeedbackIa> findByProject_ProjectIdAndUser_UserId(Long projectId, Long userId);
 
   /**
    * Permet de supprimer un feedback lié à un utilisateur pour un projet spécifique.
@@ -35,4 +36,3 @@ public interface FeedbackIaRepository extends JpaRepository<FeedbackIa, Long> {
    */
   void deleteByProject_ProjectIdAndUser_UserId(Long projectId, Long userId);
 }
-

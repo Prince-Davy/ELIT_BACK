@@ -37,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -165,7 +166,8 @@ public class MultiCriteriaServiceImplTests {
     multiCriteriaAnalysisStep.getFormQuestions().add(formQuestion);
 
     ReflectionTestUtils.setField(multiCriteriaServiceImpl, "questionsJsonFile",
-      "sharedresources/com/elit/outildedecision/util/MultiCriteriaAnalysisFormSchema.Json");
+      "com/elit/outildedecision/service/implementation/MultiCriteriaAnalysisFormSchema.Json");
+    ReflectionTestUtils.setField(multiCriteriaServiceImpl, "resourceLoader", new DefaultResourceLoader());
 
   }
 

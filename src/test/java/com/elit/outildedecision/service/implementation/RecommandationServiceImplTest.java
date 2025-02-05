@@ -20,11 +20,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.File;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
@@ -48,8 +47,8 @@ class RecommandationServiceImplTest {
   private final MemoryTestAppender appender = new MemoryTestAppender();
 
   // Json files
-  private static final String VALID_JSON = "com/elit/outildedecision/service/implementation/RecommandationsIA.json";
-  private static final String INVALID_JSON = "com/elit/outildedecision/service/implementation/RecommandationsIA_invalid.json";
+  private static final String VALID_JSON = "com/elit/outildedecision/service/implementation/RecommandationsIATest.json";
+  private static final String INVALID_JSON = "com/elit/outildedecision/service/implementation/RecommandationsIATest_invalid.json";
   private static final String INVALID_PATH = "dummy";
 
   // SUT
@@ -58,7 +57,7 @@ class RecommandationServiceImplTest {
   @BeforeEach
   void setUp(TestInfo testInfo) {
     // Create SUT
-    recommandationServiceImpl = new RecommandationServiceImpl();
+    recommandationServiceImpl = new RecommandationServiceImpl(new DefaultResourceLoader());
 
     // Initialize logging interception
     Logger logger = (Logger) LoggerFactory.getLogger(LOGGER_NAME);
@@ -228,12 +227,7 @@ class RecommandationServiceImplTest {
    * @param jsonPath the path to json recommandation file
    */
   private void injectJsonPath(String jsonPath) {
-    ClassLoader classLoader = getClass().getClassLoader();
-    URL recommandationURL = classLoader.getResource(jsonPath);
-    // If we use an invalid path, URL is null
-    File resource = new File(recommandationURL == null ? jsonPath : recommandationURL.getFile());
-
-    ReflectionTestUtils.setField(recommandationServiceImpl, "recommandationsFile", resource.getAbsolutePath());
+    ReflectionTestUtils.setField(recommandationServiceImpl, "recommandationsFile", jsonPath);
   }
 
   @Tag("loadJson")

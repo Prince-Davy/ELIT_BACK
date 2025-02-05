@@ -78,7 +78,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
    * @param ex  the Exception to handle.
    * @return  a {@code ResponseEntity<ErrorMessage>} with an error message and  HTTP  status code 409 (CONFLICT).
    */
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler({
     SQLIntegrityConstraintViolationException.class, ExistingBrainstormingException.class, FormStepAlreadyExistsException.class,
     VoteAlreadyExistException.class, OpinionAlreadyExistException.class, PredictibilityAnalysisAlreadyUpdated.class,
@@ -96,6 +95,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
    * The types handled by this method include:
    * <ul>
    *   <li>{@link VoteNotFoundException}</li>
+   *   <li>{@link FeedBackNotFoundException}</li>
    *   <li>{@link ProjectNotFoundException}</li>
    *   <li>{@link UserNotFoundException}</li>
    *   <li>{@link AvatarNotFoundException}</li>
@@ -117,7 +117,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     VoteNotFoundException.class, ProjectNotFoundException.class, UserNotFoundException.class, AvatarNotFoundException.class,
     ProjectOwnerException.class, AttachmentNotFoundException.class, MulticriteriaNotFoundException.class,
     PredictibilityAnalysisNotFoundException.class, BrainstormingNotFoundException.class, StepFormNotFoundException.class,
-    ResponseNotFoundException.class, StepWeightNotFoundException.class
+    ResponseNotFoundException.class, StepWeightNotFoundException.class, FeedBackNotFoundException.class
   })
   public ResponseEntity<ErrorMessage>  handleNotFoundException(final Exception ex) {
     LOGGER.error("Not Found Exception occured", ex);

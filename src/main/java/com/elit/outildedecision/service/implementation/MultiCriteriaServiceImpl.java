@@ -9,12 +9,12 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.StepWeight;
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.EscoreException;
+import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.CriteriaScoreModel;
 import com.elit.outildedecision.model.FormQuestionModel;
@@ -36,7 +36,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,8 +48,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -72,6 +75,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * The value of a half.
    */
   private static final float HALF = 0.5f;
+  private static final Logger LOGGER = LoggerFactory.getLogger(MultiCriteriaServiceImpl.class);
   /**
    * Repository for accessing multi-criteria analysis data.
    */
@@ -116,6 +120,11 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   private String questionsJsonFile;
 
   /**
+   * The resource loader.
+   */
+  private final ResourceLoader resourceLoader;
+
+  /**
    * Constructor for the {@link MultiCriteriaServiceImpl} class. it's for dependency injection.
    *
    * @param multiCriteriaAnalysisRepository the repository for multi-criteria analysis entities
@@ -126,11 +135,12 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * @param userRepository                  the repository for user entities
    * @param projectUserPermissionRepository the repository for project user permission entities
    * @param projectRepository               the repository for project entities
+   * @param resourceLoader                  the resources loadaer
    */
   public MultiCriteriaServiceImpl(final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository, final FormStepRepo formStepRepo,
                                   final FormQuestionRepository formQuestionRepository, final CriteriaRepository criteriaRepository, final StepWeightRepo stepWeightRepo,
                                   final UserRepository userRepository, final ProjectUserPermissionRepository projectUserPermissionRepository,
-                                  final ProjectRepository projectRepository) {
+                                  final ProjectRepository projectRepository, final ResourceLoader resourceLoader) {
     this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
     this.formStepRepo = formStepRepo;
     this.formQuestionRepository = formQuestionRepository;
@@ -139,6 +149,7 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
     this.userRepository = userRepository;
     this.projectUserPermissionRepository = projectUserPermissionRepository;
     this.projectRepository = projectRepository;
+    this.resourceLoader = resourceLoader;
   }
 
   /**
@@ -192,11 +203,11 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   }
 
   private JSONObject readQuestionsJsonFile() throws IOException, ParseException {
-    FileInputStream fileInputStream = new FileInputStream(questionsJsonFile);
-    InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
-    BufferedReader reader = new BufferedReader(inputStreamReader);
-    JSONParser jsonParser = new JSONParser();
-    return (JSONObject) jsonParser.parse(reader);
+    try (InputStream resourceAsStream = resourceLoader.getResource(questionsJsonFile).getInputStream()) {
+      InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(resourceAsStream), StandardCharsets.UTF_8);
+      BufferedReader reader = new BufferedReader(inputStreamReader);
+      return (JSONObject) new JSONParser().parse(reader);
+    }
   }
 
   private void processMultiCriteriaJson(final JSONObject multiCriteriaJson, final MultiCriteriaAnalysis persistedAnalysis) {
@@ -582,4 +593,3 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
     return criteriaScoreModels;
   }
 }
-

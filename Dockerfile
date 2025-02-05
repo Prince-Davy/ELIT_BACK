@@ -10,7 +10,6 @@ RUN mkdir ./images
 RUN touch /logs/java.logs
 # RUN mvn dependency:go-offline -B
 COPY ./src ./src
-COPY ./sharedresources ./sharedresources
 
 
 # in the process, already tested in qbuild phase, in publish phase this is just preventing integration tests
@@ -40,11 +39,8 @@ RUN mkdir -p /app/template
 RUN mkdir -p /app/logs
 RUN mkdir -p /app/avatars
 RUN mkdir -p /app/projects
-RUN mkdir -p /app/sharedresources
 COPY --from=BUILDER /app/db ./db
 COPY --from=BUILDER /app/log4j.xml ./log4j.xml
-COPY --from=BUILDER /app/sharedresources/com/elit/outildedecision/util/MultiCriteriaAnalysisFormSchema.Json ./sharedresources/MultiCriteriaAnalysisFormSchema.Json
-COPY --from=BUILDER /app/sharedresources/com/elit/outildedecision/util/RecommandationsIA.json ./sharedresources/RecommandationsIA.json
 COPY --from=BUILDER /app/target/*-SNAPSHOT.jar .
 
 # ADD ./filebeat/filebeat.yml /usr/share/filebeat/config/filebeat.yml

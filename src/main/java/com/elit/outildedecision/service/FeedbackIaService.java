@@ -1,6 +1,7 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.FeedbackIa;
+import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.model.FeedBackIaModel;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public interface FeedbackIaService {
    * @param feedbackIa feedbackIa
    * @return ResponseEntity<Object>
    */
-  ResponseEntity<Object> saveFeedback(FeedbackIa feedbackIa) throws ProjectNotFoundException;
+  ResponseEntity<Object> saveFeedback(FeedbackIa feedbackIa) throws ProjectNotFoundException, FeedBackNotFoundException;
 
   /**
    * Permet de récupérer tous les feedbacks.
@@ -31,7 +32,7 @@ public interface FeedbackIaService {
    * @param userId userId
    * @return List<FeedBackIaModel>
    */
-  FeedBackIaModel getFeedbackByProjectIdAndUserId(Long projectId, Long userId);
+  FeedBackIaModel getFeedbackByProjectIdAndUserId(Long projectId, Long userId) throws FeedBackNotFoundException;
 
   /**
    * Permet de récupérer tous les feedbacks d'un projet.

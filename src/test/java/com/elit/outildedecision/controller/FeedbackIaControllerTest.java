@@ -5,6 +5,7 @@ import com.elit.outildedecision.entity.FeedbackIa;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.FeedBackIaModel;
@@ -23,11 +24,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 @ActiveProfiles("Test")
@@ -69,7 +72,7 @@ class FeedbackIaControllerTest {
   }
 
   @Test
-  void shouldSaveFeedback() throws ProjectNotFoundException {
+  void shouldSaveFeedback() throws ProjectNotFoundException, FeedBackNotFoundException {
     // Arrange
     Long projectId = 1L;
     ResponseEntity<Object> expectedResponse = ResponseEntity.status(201).body(feedbackIa);
@@ -123,7 +126,7 @@ class FeedbackIaControllerTest {
   }
 
   @Test
-  void shouldGetFeedbackByProjectIdAndUserId() {
+  void shouldGetFeedbackByProjectIdAndUserId() throws FeedBackNotFoundException {
     // Arrange
     Long projectId = 1L;
     Long userId = 1L;

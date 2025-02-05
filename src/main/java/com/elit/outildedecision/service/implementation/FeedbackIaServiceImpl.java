@@ -18,12 +18,14 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.elit.outildedecision.service.implementation.ProjectServiceImpl.PROJECT_NOT_FOUND;
 
 @Service
 public class FeedbackIaServiceImpl implements FeedbackIaService {
 
+  public static final String FEEDBACK_NOT_FOUND = "Ce Feedback n'existe pas !";
   private final FeedbackIaRepository feedbackIaRepository;
   private final ProjectRepository projectRepository;
   @PersistenceContext
@@ -41,18 +43,19 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
   /**
    * Enregistrer un feedback.
    *
-   * @param feedbackIa feedbackIa envoyé depuis le front
+   * @param feedbackIa feedbackIa envoy&eacute; depuis le front
    * @return ResponseEntity<Object>
    * @throws ProjectNotFoundException Si le projet n'existe pas
+   * @throws FeedBackNotFoundException Si le feedback n'existe pas
    */
   @Override
   @Transactional
   public ResponseEntity<Object> saveFeedback(final FeedbackIa feedbackIa) throws ProjectNotFoundException {
     Project project = projectRepository.findById(feedbackIa.getProject().getProjectId())
       .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
-    FeedbackIa feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(feedbackIa.getProject().getProjectId(), feedbackIa.getUser().getUserId());
+    Optional<FeedbackIa> feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(feedbackIa.getProject().getProjectId(), feedbackIa.getUser().getUserId());
 
-    if (Objects.nonNull(project.getProjectId()) && Objects.nonNull(feedback)) {
+    if (Objects.nonNull(project.getProjectId()) && feedback.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body("Vous avez déjà un feedback pour ce projet!");
     } else {
       try {
@@ -117,10 +120,13 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
    * @param projectId projectId
    * @param userId userId
    * @return FeedBackIaModel
+   * @throws FeedBackNotFoundException Si le feedback n'existe pas
    */
   @Override
-  public FeedBackIaModel getFeedbackByProjectIdAndUserId(final Long projectId, final Long userId) {
-    FeedbackIa feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId);
+  public FeedBackIaModel getFeedbackByProjectIdAndUserId(final Long projectId, final Long userId)
+    throws FeedBackNotFoundException {
+    FeedbackIa feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+      .orElseThrow(() -> new FeedBackNotFoundException(FEEDBACK_NOT_FOUND));
     FeedBackIaModel feedBackModel = new FeedBackIaModel();
     feedBackModel.setProjectId(feedback.getProject().getProjectId());
     feedBackModel.setFeedbackAnswer(feedback.getFeedbackAnswer());
@@ -140,7 +146,9 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
   @Transactional
   public ResponseEntity<Object> deleteFeedbackByUserAndProject(final Long projectId, final Long userId) {
     try {
-      FeedbackIa feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId);
+      FeedbackIa feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+        .orElseThrow(() -> new FeedBackNotFoundException("Feedback non trouvé pour le projet ID " + projectId + " et l'utilisateur ID " + userId));
+
       if (Objects.isNull(feedback)) {
         throw new FeedBackNotFoundException("Feedback non trouvé pour le projet ID " + projectId + " et l'utilisateur ID " + userId);
       }

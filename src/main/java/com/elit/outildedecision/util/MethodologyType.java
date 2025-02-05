@@ -16,7 +16,7 @@ public enum MethodologyType {
   /**
    * Classic methodology.
    */
-  CLASSIC("classique", Pattern.compile("classi(c|que)", Pattern.CASE_INSENSITIVE));
+  CLASSIC("classique", Pattern.compile("(classi(c|que)|Traditionnelle)", Pattern.CASE_INSENSITIVE));
 
   private final String methodologyTypesName;
   private final Pattern methodologyTypesPattern;
