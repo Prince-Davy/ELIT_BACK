@@ -38,72 +38,82 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_USER
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_PASSWORD
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_ROOT_PASSWORD
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_DATABASE
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: DB_SERVER
               valueFrom:
                 secretKeyRef:
                   key: DB_SERVER
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: SPRING_BACK_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: SPRING_BACK_USERNAME
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: SPRING_BACK_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: SPRING_BACK_PASSWORD
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: JWT_SECRET_BACK
               valueFrom:
                 secretKeyRef:
                   key: JWT_SECRET_BACK
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: FILE_UPLOAD_DIR
               valueFrom:
                 secretKeyRef:
                   key: FILE_UPLOAD_DIR
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: AVATAR_UPLOAD_DIR
               valueFrom:
                 secretKeyRef:
                   key: AVATAR_UPLOAD_DIR
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
+            - name: FILE_QUESTIONS
+              valueFrom:
+                secretKeyRef:
+                  key: FILE_QUESTIONS
+                  name: lge-elit-back-config-integ
             - name: SPRING_MAIL_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: SPRING_MAIL_USERNAME
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: SPRING_MAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: SPRING_MAIL_PASSWORD
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: REACT_APP_BACKEND_API
               valueFrom:
                 secretKeyRef:
                   key: REACT_APP_BACKEND_API
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
             - name: FRONTEND_URL
               valueFrom:
                 secretKeyRef:
                   key: FRONTEND_URL
-                  name: lge-elit-integ-config
+                  name: lge-elit-back-config-integ
+            - name: FILE_RECOMMANDATIONS
+              valueFrom:
+                secretKeyRef:
+                  key: FILE_RECOMMANDATIONS
+                  name: lge-elit-back-config-integ
       volumes:
         - name: secrets-store-inline
           csi:

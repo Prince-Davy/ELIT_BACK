@@ -1,0 +1,96 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: secret-provider-lge-elit-integ
+spec:
+  provider: vault
+  secretObjects:
+    - secretName: lge-elit-back-config-integ
+      type: Opaque
+      data:
+        - objectName: MYSQL_USER
+          key: MYSQL_USER
+        - objectName: MYSQL_PASSWORD
+          key: MYSQL_PASSWORD
+        - objectName: MYSQL_ROOT_PASSWORD
+          key: MYSQL_ROOT_PASSWORD
+        - objectName: MYSQL_DATABASE
+          key: MYSQL_DATABASE
+        - objectName: DB_SERVER
+          key: DB_SERVER
+        - objectName: SPRING_BACK_USERNAME
+          key: SPRING_BACK_USERNAME
+        - objectName: SPRING_BACK_PASSWORD
+          key: SPRING_BACK_PASSWORD
+        - objectName: JWT_SECRET_BACK
+          key: JWT_SECRET_BACK
+        - objectName: FILE_UPLOAD_DIR
+          key: FILE_UPLOAD_DIR
+        - objectName: AVATAR_UPLOAD_DIR
+          key: AVATAR_UPLOAD_DIR
+        - objectName: FILE_QUESTIONS
+          key: FILE_QUESTIONS
+        - objectName: SPRING_MAIL_USERNAME
+          key: SPRING_MAIL_USERNAME
+        - objectName: SPRING_MAIL_PASSWORD
+          key: SPRING_MAIL_PASSWORD
+        - objectName: REACT_APP_BACKEND_API
+          key: REACT_APP_BACKEND_API
+        - objectName: FRONTEND_URL
+          key: FRONTEND_URL
+        - objectName: FILE_RECOMMANDATIONS
+          key: FILE_RECOMMANDATIONS
+
+
+  parameters:
+    vaultAddress: "http://vault.vault.svc.cluster.local:8200"
+    roleName: "lge-elit-integ"
+    objects: |
+      - objectName: MYSQL_USER
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: MYSQL_USER
+      - objectName: MYSQL_PASSWORD
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: MYSQL_PASSWORD
+      - objectName: MYSQL_ROOT_PASSWORD
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: MYSQL_ROOT_PASSWORD
+      - objectName: MYSQL_DATABASE
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: MYSQL_DATABASE
+      - objectName: DB_SERVER
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: DB_SERVER
+      - objectName: SPRING_BACK_USERNAME
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: SPRING_BACK_USERNAME
+      - objectName: SPRING_BACK_PASSWORD
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: SPRING_BACK_PASSWORD
+      - objectName: JWT_SECRET_BACK
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: JWT_SECRET_BACK
+      - objectName: FILE_UPLOAD_DIR
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: FILE_UPLOAD_DIR
+      - objectName: AVATAR_UPLOAD_DIR
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: AVATAR_UPLOAD_DIR
+      - objectName: FILE_QUESTIONS
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: FILE_QUESTIONS
+      - objectName: SPRING_MAIL_USERNAME
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: SPRING_MAIL_USERNAME
+      - objectName: SPRING_MAIL_PASSWORD
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: SPRING_MAIL_PASSWORD
+      - objectName: REACT_APP_BACKEND_API
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: REACT_APP_BACKEND_API
+      - objectName: FRONTEND_URL
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: FRONTEND_URL
+      - objectName: FILE_RECOMMANDATIONS
+        secretPath: "secret/data/lge/elit/integ"
+        secretKey: FILE_RECOMMANDATIONS

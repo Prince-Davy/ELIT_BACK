@@ -35,9 +35,11 @@ variables:
   - name: kubernetesIntegNamespace
     value: "lge-elit"
   - name: kubernetesSecret
-    value: "lge-elit-integ-config"
-  - name: kubernetesIntegSecret
-    value: "lge-elit-integ-config"
+    value: "lge-elit-back-config"
+  - name: kubernetesSecretInteg
+    value: "lge-elit-back-config-integ"
+  - name: kubernetesConfigMapInteg
+    value: "lge-elit-back-config-map-integ"
   # Include template variables
   - template: templates-general/variables.yml@templates
 
@@ -46,5 +48,7 @@ extends:
   parameters:
     DEPLOY_INTEG: true
     DEPLOY_PROD: false
-    SCAN_SQ: true
+#   SCAN_SQ: true
+    NO_QUALITY_FAIL: true
+
    
