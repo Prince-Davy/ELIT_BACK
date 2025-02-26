@@ -312,6 +312,30 @@
             "level": "Green"
           }
         ]
+      },
+      {
+        "id": "veryHigh",
+        "label": "Très élevé : Le respect des besoins n'est pas strictement requis",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "Des variations très importantes dans les besoins du client peuvent poser des problèmes de coût et de complexité car la méthodologie traditionnelle repose sur des spécifications définies en début de projet.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "Une gestion hybride s’adapte bien aux changements des besoins clients grâces aux itérations fréquentes.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "La méthodologie Agile est idéale pour s'adapter aux changements réguliers des besoins du client, permettant de les ajuster continuellement au fil des itérations.",
+            "level": "Green"
+          }
+        ]
       }
     ]
   },
