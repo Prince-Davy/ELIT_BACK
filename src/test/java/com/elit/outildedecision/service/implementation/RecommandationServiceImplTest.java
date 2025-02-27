@@ -8,7 +8,6 @@ import com.elit.outildedecision.MemoryTestAppender;
 import com.elit.outildedecision.entity.AnswerIa;
 import com.elit.outildedecision.entity.ResultAi;
 import com.elit.outildedecision.model.RecommandationItemModel;
-import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.RecommandationLevel;
 import com.elit.outildedecision.util.MethodologyType;
 import org.junit.jupiter.api.AfterEach;
@@ -125,18 +124,6 @@ class RecommandationServiceImplTest {
     );
   }
 
-  /**
-   * RecommadationKiviatModel for each values of methodology
-   *
-   * @return a source for parametrized test (Methodology, ModelValues)
-   */
-  static Stream<Object> methodologyAndKiviatValues() {
-    return Stream.of(
-      Arguments.of(MethodologyType.HYBRID, new RecommandationKiviatModel(MethodologyType.HYBRID, 3, 2.5, 2.5, 3, 3)),
-      Arguments.of(MethodologyType.AGILE, new RecommandationKiviatModel(MethodologyType.AGILE, 5, 4.5, 1.5, 1, 5)),
-      Arguments.of(MethodologyType.CLASSIC, new RecommandationKiviatModel(MethodologyType.CLASSIC, 1, 1.5, 4.5, 5, 1))
-    );
-  }
 
   /**
    * Test init in default conditions - file present, well formatted.
@@ -273,25 +260,5 @@ class RecommandationServiceImplTest {
       previousRecommandation = actualRecommandation;
     }
 
-  }
-
-  @ParameterizedTest
-  @MethodSource("methodologyAndKiviatValues")
-  void getKiviatProjectValuesTest(MethodologyType methodology, RecommandationKiviatModel expectedModel) {
-    // Mocking the ResultAi object
-    ResultAi resultAi = mock(ResultAi.class);
-    when(resultAi.getPredictedMethod()).thenReturn(methodology.name());
-
-    // Instantiating the class to be tested
-    ResponseEntity<RecommandationKiviatModel> response = recommandationServiceImpl.getKiviatProjectValues(resultAi);
-
-    // Assertions
-    assertNotNull(response);
-    assertEquals(200, response.getStatusCodeValue());
-
-    RecommandationKiviatModel actualModel = response.getBody();
-    assertNotNull(actualModel);
-
-    assertEquals(expectedModel, actualModel);
   }
 }

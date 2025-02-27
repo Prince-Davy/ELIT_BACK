@@ -5,7 +5,6 @@ import com.elit.outildedecision.entity.ResultAi;
 import com.elit.outildedecision.exception.MalformedDataException;
 import com.elit.outildedecision.model.QuestionMappingModel;
 import com.elit.outildedecision.model.RecommandationItemModel;
-import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.RecommandationLevel;
 import com.elit.outildedecision.model.RecommandationModel;
 import com.elit.outildedecision.model.ResponseModel;
@@ -150,32 +149,5 @@ public class RecommandationServiceImpl implements RecommandationService {
     return ResponseEntity.ok().body(result);
   }
 
-  /**
-   *  For each methodology return assign values.
-   *
-   * @param resultAi call model ResultAi
-   * @return RecommandationKiviatModel for projet value methodology
-   */
-  @Override
-  public ResponseEntity<RecommandationKiviatModel> getKiviatProjectValues(final ResultAi resultAi) {
-    RecommandationKiviatModel result;
 
-    // Parse methodology type, fail-fast if doesn't exists
-    MethodologyType aiResultMethodology = MethodologyType.find(resultAi.getPredictedMethod());
-
-    switch (aiResultMethodology) {
-      case HYBRID:
-        result = new RecommandationKiviatModel(aiResultMethodology, 3, 2.5, 2.5, 3, 3);
-        break;
-      case AGILE:
-        result = new RecommandationKiviatModel(aiResultMethodology, 5, 4.5, 1.5, 1, 5);
-        break;
-      case CLASSIC:
-        result = new RecommandationKiviatModel(aiResultMethodology, 1, 1.5, 4.5, 5, 1);
-        break;
-        default:
-          throw new IllegalArgumentException("Unknown methodology type: " + aiResultMethodology); //Should Never happen
-    }
-    return ResponseEntity.ok().body(result);
-  }
 }

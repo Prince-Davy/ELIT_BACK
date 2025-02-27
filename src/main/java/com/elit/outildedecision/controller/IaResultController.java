@@ -6,7 +6,6 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
 import com.elit.outildedecision.model.RecommandationItemModel;
-import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.ResultAiModel;
 import com.elit.outildedecision.service.ResultIaService;
 import org.springframework.http.ResponseEntity;
@@ -92,17 +91,5 @@ public class IaResultController {
   public ResponseEntity<List<RecommandationItemModel>> getAnalysisIaResultMapping(@PathVariable final String projectId)
     throws AnswerIaNotFoundException, ResultAiNotFoundException {
     return resultIaService.getMapping(projectId);
-  }
-
-  /**
-   *
-   * @param projectId the project id
-   * @return the value for kiviat graph project
-   */
-  @GetMapping("/kiviatProject/{projectId}")
-  @PreAuthorize("isProjectOwner(#projectId)")
-  public ResponseEntity<RecommandationKiviatModel> getKiviatProjectValues(@PathVariable final String projectId)
-    throws ResultAiNotFoundException {
-    return resultIaService.getKiviatProjectValues(projectId);
   }
 }

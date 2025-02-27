@@ -8,7 +8,6 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
 import com.elit.outildedecision.model.RecommandationItemModel;
-import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.ResultAiModel;
 import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
@@ -225,22 +224,6 @@ public class ResultIaServiceImpl implements ResultIaService {
       .orElseThrow(() -> new ResultAiNotFoundException("No result ai found for this projectId"));
 
     return recommandationService.getMappings(answerIas, resultAi);
-  }
-
-  /**
-   *
-   * @param projectId the project id
-   * @return the mapping
-   */
-  @Override
-  public ResponseEntity<RecommandationKiviatModel> getKiviatProjectValues(final String projectId)
-    throws ResultAiNotFoundException {
-    Long projectID = Long.valueOf(projectId);
-
-    ResultAi resultAi = resultIaRepository.findByProject_ProjectId(projectID)
-      .orElseThrow(() -> new ResultAiNotFoundException("No result ai found for this projectId"));
-
-    return recommandationService.getKiviatProjectValues(resultAi);
   }
 
 }

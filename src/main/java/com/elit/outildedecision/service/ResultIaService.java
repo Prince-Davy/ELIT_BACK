@@ -6,7 +6,6 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
 import com.elit.outildedecision.model.RecommandationItemModel;
-import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.ResultAiModel;
 import org.springframework.http.ResponseEntity;
 
@@ -51,13 +50,4 @@ public interface ResultIaService {
    */
   ResponseEntity<List<RecommandationItemModel>> getMapping(String projectId)
     throws AnswerIaNotFoundException, ResultAiNotFoundException;
-
-  /**
-   * Lookup Kiviat project values for the project id.
-   *
-   * @param projectId the project id
-   * @return kiviat project values
-   */
-  ResponseEntity<RecommandationKiviatModel> getKiviatProjectValues(String projectId)
-    throws ResultAiNotFoundException;
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Model class for recommandations given in json file depending on AI survey (step 1) answers.
+ * The RecommandationKiviatModel class is used for make kiviat graph.
  */
 @Data
 @AllArgsConstructor
