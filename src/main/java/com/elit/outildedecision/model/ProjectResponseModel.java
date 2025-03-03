@@ -1,5 +1,6 @@
 package com.elit.outildedecision.model;
 
+import com.elit.outildedecision.util.FormProgressStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -67,6 +68,11 @@ public class ProjectResponseModel {
    * The archived status of the project.
    */
   private Boolean isArchived;
+
+  /**
+   * The form type status of the project.
+   */
+  private FormProgressStatus formProgressStatus;
 
   /**
    * A list of contributor models associated with the project.

@@ -140,7 +140,23 @@ public class ModelSamples {
     }
 
     public static Project getProject() {
-      Project project = new Project(new ArrayList<>(), 1L, "projectName", "this is a test project", "/test/folder/path", 1L, "confirmed", true, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+      Project project = Project.builder()
+        .projectUserPermissions(new ArrayList<>())
+        .projectId(1L)
+        .name("projectName")
+        .description("this is a test project")
+        .folderPath("/test/folder/path")
+        .chefId(1L)
+        .confirmationState("confirmed")
+        .isArchived(true)
+        .formProgressStatus(FormProgressStatus.None)
+        .createdAt(new Timestamp(System.currentTimeMillis()))
+        .updatedAt(new Timestamp(System.currentTimeMillis()))
+        .attachments(new ArrayList<>())
+        .multiCriteriaAnalysisList(new ArrayList<>())
+        .reports(new ArrayList<>())
+        .notifications(new ArrayList<>())
+        .build();
       ProjectUserPermission projectUserPermission = new ProjectUserPermission();
       projectUserPermission.setUser(UserSamples.getUser());
       projectUserPermission.setProject(project);

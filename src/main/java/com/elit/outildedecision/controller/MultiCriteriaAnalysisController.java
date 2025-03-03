@@ -12,6 +12,8 @@ import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
+import com.elit.outildedecision.service.ProjectService;
+import com.elit.outildedecision.util.FormProgressStatus;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,15 +39,21 @@ public class MultiCriteriaAnalysisController {
    * MultiCriteriaAnalysis Service.
    */
   private final MultiCriteriaAnalysisService multiCriteriaAnalysisService;
+  /**
+   * Project Service.
+   */
+  private final ProjectService projectService;
 
   /**
    *
    * Constructor for MultiCriteriaAnalysisController.
    * dependency injection for MultiCriteriaAnalysisService
    * @param multiCriteriaAnalysisService MultiCriteriaAnalysisService
+   * @param projectService projectService
    */
-  public MultiCriteriaAnalysisController(final MultiCriteriaAnalysisService multiCriteriaAnalysisService) {
+  public MultiCriteriaAnalysisController(final MultiCriteriaAnalysisService multiCriteriaAnalysisService, final ProjectService projectService) {
     this.multiCriteriaAnalysisService = multiCriteriaAnalysisService;
+    this.projectService = projectService;
   }
 
   /**
@@ -113,9 +121,9 @@ public class MultiCriteriaAnalysisController {
   @PutMapping("/multi-criteria-analysis/{projectId}")
   @PreAuthorize("isContributer(#projectId)")
   public ResponseEntity<String> updateMultiCriteriaAnalysis(@PathVariable final Long projectId,
-    @RequestBody final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException {
+    @RequestBody final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException, ProjectNotFoundException {
     multiCriteriaAnalysisService.updateMultiCriteriaAnalysis(projectId, multiCriteriaAnalysisStep);
-
+    projectService.updateFormTypeStatus(projectId, FormProgressStatus.COLLABORATIVE);
     return ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés");
   }
 

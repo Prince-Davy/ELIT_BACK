@@ -1,6 +1,7 @@
 package com.elit.outildedecision.entity;
 
 import com.elit.outildedecision.config.View;
+import com.elit.outildedecision.util.FormProgressStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -55,6 +56,7 @@ public class Project implements Serializable {
   private Long chefId;
   private String confirmationState;
   private Boolean isArchived;
+  private FormProgressStatus formProgressStatus;
 
   @CreationTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
@@ -95,6 +97,7 @@ public class Project implements Serializable {
   public List<Attachment> getAttachments() {
     return this.attachments;
   }
+
   /**
    * return the project as a string.
    * @return project as a string

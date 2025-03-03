@@ -13,6 +13,8 @@ import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
+import com.elit.outildedecision.service.ProjectService;
+import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.util.ModelSamples;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.jupiter.api.Assertions;
@@ -53,6 +55,9 @@ class MultiCriteriaAnalysisControllerTests {
   MultiCriteriaAnalysisService multiCriteriaAnalysisService;
   @Mock
   CustomMethodSecurityExpressionRoot customMethodSecurity;
+  @Mock
+  ProjectService projectService;
+
   @InjectMocks
   MultiCriteriaAnalysisController multiCriteriaAnalysisController;
   private MockMvc mockMvc;
@@ -133,6 +138,7 @@ class MultiCriteriaAnalysisControllerTests {
   void shouldUpdateMultiCriteriaAnalysis_Success() throws Exception {
     when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
     when(customMethodSecurity.isContributer(project.getProjectId())).thenReturn(true);
+    when(projectService.updateFormTypeStatus(project.getProjectId(), FormProgressStatus.COLLABORATIVE)).thenReturn(true);
 
     MultiCriteriaStepModel multiCriteriaAnalysisStep = new MultiCriteriaStepModel();
 

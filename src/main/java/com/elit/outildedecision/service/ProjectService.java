@@ -12,6 +12,7 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.util.FormProgressStatus;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -133,4 +134,16 @@ public interface ProjectService {
  * @throws UserNotAuthorizedException if the user is not authorized to access the project
  */
   ProjectResponseModel getProjectData(Long projectId) throws ProjectNotFoundException, UserNotAuthorizedException, ExecutionPlanNotFoundException;
+
+  /**
+   * Updates the form type status of a project.
+   *
+   * @param projectId the ID of the project to update
+   * @param newFormTypeStatus the new form type status to set
+   * @return a ResponseEntity indicating the success or failure of the update operation
+   * @throws ProjectNotFoundException if the specified project does not exist
+   */
+  boolean updateFormTypeStatus(Long projectId, FormProgressStatus newFormTypeStatus) throws ProjectNotFoundException;
 }
+
+

@@ -7,6 +7,8 @@ import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.AnswerIaService;
+import com.elit.outildedecision.service.ProjectService;
+import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,9 @@ class AnswerIaControllerTest {
 
   @Mock
   AnswerIaService answerIaService;
+
+  @Mock
+  ProjectService projectService;
 
   @InjectMocks
   AnswerIaController answerIaController;
@@ -94,6 +99,7 @@ class AnswerIaControllerTest {
     // Given
     when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
     when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+    when(projectService.updateFormTypeStatus(project.getProjectId(), FormProgressStatus.IA)).thenReturn(true);
 
     List<AnswerIa> answerIa = List.of(new AnswerIa("Question", "Category", "Response", project));
 

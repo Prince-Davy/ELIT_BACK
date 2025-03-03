@@ -2,7 +2,10 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.config.View;
 import com.elit.outildedecision.entity.AnswerIa;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.service.AnswerIaService;
+import com.elit.outildedecision.service.ProjectService;
+import com.elit.outildedecision.util.FormProgressStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +26,11 @@ import java.util.List;
 public class AnswerIaController {
 
   private final AnswerIaService answerIaService;
+  private final ProjectService projectService;
 
-  AnswerIaController(final AnswerIaService answerIaService) {
+  AnswerIaController(final AnswerIaService answerIaService, final ProjectService projectService) {
     this.answerIaService = answerIaService;
+    this.projectService = projectService;
   }
 
   /**
@@ -48,11 +53,11 @@ public class AnswerIaController {
    */
   @PostMapping("/{ignoredProjectId}")
   @PreAuthorize("isProjectOwner(#ignoredProjectId)")
-  public ResponseEntity<?> saveMultipleAnswers(@PathVariable final long ignoredProjectId, @RequestBody final List<AnswerIa> answers) {
+  public ResponseEntity<?> saveMultipleAnswers(@PathVariable final long ignoredProjectId, @RequestBody final List<AnswerIa> answers) throws ProjectNotFoundException {
     // ignoredProjectId est utilisé dans l'annotation @PreAuthorize pour vérifier les autorisations
     answerIaService.saveAll(answers);
+    projectService.updateFormTypeStatus(ignoredProjectId, FormProgressStatus.IA);
     return new ResponseEntity<>(HttpStatus.CREATED);
-
   }
 
   /**

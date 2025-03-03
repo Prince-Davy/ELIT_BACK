@@ -41,6 +41,7 @@ import com.elit.outildedecision.service.AttachmentService;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
 import com.elit.outildedecision.service.ProjectService;
+import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.util.ProjectAnalysisState;
 import com.elit.outildedecision.util.ProjectConfirmationState;
 import com.elit.outildedecision.util.ProjectPermession;
@@ -255,6 +256,7 @@ public class ProjectServiceImpl implements ProjectService {
     projectToSave.setName(project.getName());
     projectToSave.setConfirmationState(ProjectConfirmationState.CONFIRMED.name());
     projectToSave.setIsArchived(false);
+    projectToSave.setFormProgressStatus(FormProgressStatus.None);
     Long projectId = projectRepository.save(projectToSave).getProjectId();
 
     // adding permissions to project chef and contributers
@@ -448,9 +450,23 @@ public class ProjectServiceImpl implements ProjectService {
             projectStatus = ProjectAnalysisState.IN_PROGRESS.toString();
           }
         }
-        projects.add(new ProjectResponseModel(project.getProjectId(), project.getName(),
-          project.getDescription(), project.getCreatedAt(), project.getUpdatedAt(),
-          project.getConfirmationState(), project.getChefId(), ownerUserProject.get().getUserLastName(), ownerUserProject.get().getUserFirstName(), null, contributorModelList, null, null, projectStatus));
+        projects.add(new ProjectResponseModel(
+          project.getProjectId(),
+          project.getName(),
+          project.getDescription(),
+          project.getCreatedAt(),
+          project.getUpdatedAt(),
+          project.getConfirmationState(),
+          project.getChefId(),
+          ownerUserProject.get().getUserLastName(),
+          ownerUserProject.get().getUserFirstName(),
+          null,
+          project.getFormProgressStatus(),
+          contributorModelList,
+          null,
+          null,
+          projectStatus)
+        );
       }
     }
     if (keyword != null && !keyword.isEmpty()) {
@@ -633,8 +649,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     return new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(),
       project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), project.getChefId(), null, null,
-      project.getIsArchived(), contributorModelList, attachmentList, multicriteriaAnaliseList, null);
+      project.getIsArchived(), project.getFormProgressStatus(), contributorModelList, attachmentList, multicriteriaAnaliseList, null);
   }
+
 
   /**
    * Deletes a project and all its related data from the system.
@@ -711,5 +728,32 @@ public class ProjectServiceImpl implements ProjectService {
     projectRepository.delete(projectToDelete);
     return ResponseEntity.ok().body("Le projet a été bien supprimé");
   }
+
+  /**
+   * Updates the form type status of a project.
+   *
+   * @param projectId the ID of the project to update
+   * @param newFormTypeStatus the new form type status to set
+   * @return a ResponseEntity indicating the success or failure of the update operation
+   * @throws ProjectNotFoundException if the specified project does not exist
+   */
+  @Override
+  @Transactional
+  public boolean updateFormTypeStatus(final Long projectId, final FormProgressStatus newFormTypeStatus) throws ProjectNotFoundException {
+    Project project = projectRepository.findById(projectId)
+      .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
+
+    FormProgressStatus currentFormTypeStatus = project.getFormProgressStatus();
+
+    if (currentFormTypeStatus == FormProgressStatus.IA || currentFormTypeStatus == FormProgressStatus.COLLABORATIVE || currentFormTypeStatus == FormProgressStatus.BOTH) {
+      project.setFormProgressStatus(FormProgressStatus.BOTH);
+    } else {
+      project.setFormProgressStatus(newFormTypeStatus);
+    }
+
+    projectRepository.save(project);
+    return true;
+  }
+
 
 }
