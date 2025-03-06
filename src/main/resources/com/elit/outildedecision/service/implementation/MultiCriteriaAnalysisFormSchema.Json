@@ -3,7 +3,7 @@
     "stepRef": 1,
     "Questions": {
       "Spec_1": "Quel est le produit final du projet ?",
-      "Spec_2": "Quels sont les motivations du projet liées à l’environnement ?",
+      "Spec_2": "Quelles sont les motivations du projet liées à l’environnement ?",
       "Spec_3": "Quels sont les enjeux qui sont à la fois connus et acceptés ?",
       "Spec_4": "Quel est le minimum attendu pour considérer le projet comme réussi ?"
     },
@@ -27,39 +27,39 @@
     "Questions": {
       "Unc_1": "Les exigences sont-elles complètes ?",
       "Unc_2": "Jusqu’à quel point l’utilité du produit dans son périmètre business paraît-elle claire ?",
-      "Unc_3": "A quel degré sont et seront disponibles le management et les commanditaires/sponsors du projet ? "
+      "Unc_3": "À quel degré sont et seront disponibles le management et les commanditaires/sponsors du projet ?"
     },
     "Criterias": [
       {
         "name": "Complétude",
-        "description": "Dans quelle mesure l'élément que l'attribut de découverte interroge est-il exhaustif c’est-à-dire complet, offrant une vue d'ensemble holistique."
+        "description": "Dans quelle mesure l'élément que l'attribut de découverte interrogé est-il exhaustif c’est-à-dire complet, offrant une vue d'ensemble holistique."
       },
       {
         "name": "Clarté",
-        "description": "Dans quelle mesure la réponse à la ou aux questions qui déclenche l'attribut Découverte est-elle claire, c'est-à-dire sans équivoque, non conflictuelle ou cohérente."
+        "description": "Dans quelle mesure la réponse à la ou aux questions qui déclenchent l'attribut de découverte est-elle claire, c'est-à-dire sans équivoque, non conflictuelle ou cohérente."
       }
     ]
   },
   "Manoeuvrabilité": {
     "stepRef": 3,
     "Questions": {
-      "Man_1": "A quel point ou avec quelle probabilité les futures exigences devraient-elles être acceptées ?",
-      "Man_2": "A quel degré les parties prenantes seront-elles disponibles pendant l’exécution ?",
+      "Man_1": "À quel point ou avec quelle probabilité les futures exigences devraient-elles être acceptées ?",
+      "Man_2": "À quel degré les parties prenantes seront-elles disponibles pendant l’exécution ?",
       "Man_3": "Avec quelle régularité le projet requerra-t-il d’intégrer de nouveaux membres au sein des équipes ?",
       "Man_4": "Y-a-t-il des projets similaires terminés et réussis qui pourraient servir de modèle ?"
     },
     "Criterias": [
       {
         "name": "Disponibilité",
-        "description": "Dans quelle mesure l'élément/l'individu que l'attribut de découverte interroge est-il disponible, c'est-à-dire accessible, récupérable ou prête à rester impliquée."
+        "description": "Dans quelle mesure l'élément/l'individu que l'attribut de découverte interroge est-il disponible, c'est-à-dire accessible, récupérable ou prêt à rester impliqué."
       },
       {
         "name": "Adaptabilité",
-        "description": "Dans quelle mesure l'élément/l'individu que l'attribut Découverte interroge est-il adaptable, c’est-à-dire tolérant au changement."
+        "description": "Dans quelle mesure l'élément/l'individu que l'attribut de découverte interroge est-il adaptable, c’est-à-dire tolérant au changement."
       },
       {
         "name": "Régularité",
-        "description": "Dans quelle mesure l'élément/l'individu que l'attribut découverte interroge est-il régulier, c'est-à-dire récurrent et se produisant ou contribuant souvent."
+        "description": "Dans quelle mesure l'élément/l'individu que l'attribut de découverte interroge est-il régulier, c'est-à-dire récurrent et se produisant ou contribuant souvent."
       }
     ]
   }
