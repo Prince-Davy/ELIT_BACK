@@ -12,6 +12,7 @@ resources:
       type: git
       endpoint: SogetiLabsFranceRepository
       name: LGE_Templates/LGE_Templates
+      ref: wip-experimental-helm
 
 pool: labs-pool
 
@@ -19,27 +20,21 @@ variables:
   - name: project_group
     value: "ELIT"
   - name: project_name
-    value: "lge_elit_back"
+    value: "lge-elit-back"
   - name: imageRepository
     value: lge-elit/lge-elit-back
   - name: dockerRegistryServiceConnection
     value: SogetiLabsFranceRegistry
   - name: dockerfilePath
     value: $(Build.SourcesDirectory)/Dockerfile
-  - name: deploymentName
-    value: "elit-back"
-  - name: deploymentIntegName
-    value: "elit-back"
   - name: kubernetesNamespace
     value: "lge-elit"
-  - name: kubernetesIntegNamespace
+  - name: kubernetesNamespaceInteg
     value: "lge-elit"
-  - name: kubernetesSecret
-    value: "lge-elit-back-config"
-  - name: kubernetesSecretInteg
-    value: "lge-elit-back-config-integ"
-  - name: kubernetesConfigMapInteg
-    value: "lge-elit-back-config-map-integ"
+  # - name: kubernetesSecretInteg
+  #   value: "lge-elit-back-config-integ"
+  # - name: kubernetesConfigMapInteg
+  #   value: "lge-elit-back-config-map-integ"
   # Include template variables
   - template: templates-general/variables.yml@templates
 

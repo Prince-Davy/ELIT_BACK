@@ -2,7 +2,7 @@ version: '3'
 
 services:
     # Application Container
-  lge_elit_back:
+  lge-elit-back:
     build: ./build
     volumes:
       - ./:/var/workspace
