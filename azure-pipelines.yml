@@ -4,7 +4,10 @@ trigger:
       - "*.*.*"
   branches:
     include:
-      - "*"
+      - develop
+      - devops
+      - main
+      - release/*
 
 resources:
   repositories:
@@ -46,4 +49,4 @@ extends:
 #   SCAN_SQ: true
     NO_QUALITY_FAIL: true
 
-   
+

@@ -59,14 +59,14 @@ ingress:
       # more_set_headers "X-Forwarded-Host $host";
       # more_set_headers "Forwarded $proxy_add_forwarded";
   hosts:
-    - host: lge-elit.innovation-factory.io
+    - host: integ.lge-elit.innovation-factory.io
       paths:
         - path: /api/(.*)
           pathType: ImplementationSpecific
   tls:
    - secretName: integ.lge-elit.innovation-factory.io-secret
      hosts:
-       - lge-elit.innovation-factory.io
+       - integ.lge-elit.innovation-factory.io
 
 # Setup your application's resources here.
 # m = milliCPU, 1000m = 1.
