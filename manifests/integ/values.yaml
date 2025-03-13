@@ -82,7 +82,7 @@ resources:
     memory: 64Mi
   limits:
     # cpu: 100m
-    memory: 128Mi
+    memory: 1Gi
 
 # Use key-value pairs to define the deployment's environment variables.
 env:

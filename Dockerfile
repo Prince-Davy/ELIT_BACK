@@ -44,6 +44,5 @@ COPY --from=BUILDER /app/log4j.xml ./log4j.xml
 COPY --from=BUILDER /app/target/*-SNAPSHOT.jar .
 
 # ADD ./filebeat/filebeat.yml /usr/share/filebeat/config/filebeat.yml
-# Use supervisor to launch multiple programs
 
-CMD ["java", "-jar", "outildedecision-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-Xmx750m", "-jar", "outildedecision-0.0.1-SNAPSHOT.jar"]
