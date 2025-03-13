@@ -45,6 +45,5 @@ COPY --from=BUILDER /app/target/*-SNAPSHOT.jar .
 
 # ADD ./filebeat/filebeat.yml /usr/share/filebeat/config/filebeat.yml
 # Use supervisor to launch multiple programs
-ADD ./supervisor/prod-supervisor.conf /etc/supervisor.conf
 
-CMD ["supervisord", "-c", "/etc/supervisor.conf"]
+CMD ["java", "-jar", "outildedecision-0.0.1-SNAPSHOT.jar"]
