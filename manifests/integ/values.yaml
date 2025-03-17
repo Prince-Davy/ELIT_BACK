@@ -50,7 +50,6 @@ ingress:
   enabled: true
   className: ""
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
     # nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -61,8 +60,8 @@ ingress:
   hosts:
     - host: integ.lge-elit.innovation-factory.io
       paths:
-        - path: /api/(.*)
-          pathType: ImplementationSpecific
+        - path: /api
+          pathType: Prefix
   tls:
    - secretName: integ.lge-elit.innovation-factory.io-secret
      hosts:
@@ -88,6 +87,7 @@ resources:
 env:
   PORT: 8080
   ASPNETCORE_ENVIRONMENT: Development
+  SPRING_MAIL_USERNAME: "$(SPRING_MAIL_USERNAME)"
 
 # The secret path defined on the top level is where secrets are queried from.
 # It can be overridden for each variable.
