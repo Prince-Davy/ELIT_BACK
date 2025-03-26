@@ -420,15 +420,15 @@ class ProjectServiceImplTest {
     attachment.setCreator(new User());
     attachmentList.add(attachment);
     projectToSave.setAttachments(attachmentList);
-    ArrayList<MultiCriteriaAnalysis> multicriteriaAnaliseList = new ArrayList<>();
+    ArrayList<MultiCriteriaAnalysis> multicriteriaAnalysisList = new ArrayList<>();
     MultiCriteriaAnalysis multiCriteriaAnalysis = new MultiCriteriaAnalysis();
     List<FormStep> formSteps = new ArrayList<>();
     FormStep formStep = new FormStep();
     formStep.setMultiCriteriaAnalysis(new MultiCriteriaAnalysis());
     formSteps.add(formStep);
     multiCriteriaAnalysis.setFormSteps(formSteps);
-    multicriteriaAnaliseList.add(multiCriteriaAnalysis);
-    projectToSave.setMultiCriteriaAnalysisList(multicriteriaAnaliseList);
+    multicriteriaAnalysisList.add(multiCriteriaAnalysis);
+    projectToSave.setMultiCriteriaAnalysisList(multicriteriaAnalysisList);
 
 
     ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
@@ -444,10 +444,10 @@ class ProjectServiceImplTest {
 
     ArrayList<AttachmentResponseModel> attachmentModelList = new ArrayList<>();
     attachmentModelList.add(new AttachmentResponseModel());
-    ArrayList<MulticriteriaAnalyseResponseModel> multicriteriaAnaliseodelList = new ArrayList<>();
+    ArrayList<MulticriteriaAnalyseResponseModel> multicriteriaAnalysisodelList = new ArrayList<>();
     MulticriteriaAnalyseResponseModel multicriteriaAnalyseResponseModel = new MulticriteriaAnalyseResponseModel();
     multicriteriaAnalyseResponseModel.setFormSteps(formSteps);
-    multicriteriaAnaliseodelList.add(multicriteriaAnalyseResponseModel);
+    multicriteriaAnalysisodelList.add(multicriteriaAnalyseResponseModel);
     ProjectResponseModel projectResponseModel = new ProjectResponseModel(
       projectToSave.getProjectId(),
       projectToSave.getName(),
@@ -462,7 +462,8 @@ class ProjectServiceImplTest {
       projectToSave.getFormProgressStatus(),
       contributorModelList,
       attachmentModelList,
-      multicriteriaAnaliseodelList,
+      multicriteriaAnalysisodelList,
+      null,
       null
     );
 

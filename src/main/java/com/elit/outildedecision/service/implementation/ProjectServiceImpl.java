@@ -10,20 +10,21 @@ import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.ExecutionPlanVote;
-import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
-import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.ProjectOwnerException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.UserNotFoundException;
-import com.elit.outildedecision.model.AttachmentResponseModel;
-import com.elit.outildedecision.model.ContributerModel;
-import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
-import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
-import com.elit.outildedecision.model.PredictibilityAnalyseResponseModel;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.exception.ProjectOwnerException;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.model.ContributerModel;
+import com.elit.outildedecision.model.AttachmentResponseModel;
+import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
+import com.elit.outildedecision.model.PredictibilityAnalyseResponseModel;
+import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
+import com.elit.outildedecision.model.ResultAiModel;
 import com.elit.outildedecision.repository.FeedbackIaRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.repository.VoteRepository;
@@ -267,7 +268,7 @@ public class ProjectServiceImpl implements ProjectService {
     projectChefPermission.setId(new ProjectPropertyKey(projectId, chef.getUserId()));
     projectUserPermissionRepository.save(projectChefPermission);
 
-    ArrayList<ContributerModel> contributorsReturn = new ArrayList<>();
+    List<ContributerModel> contributorsReturn = new ArrayList<>();
 
     if (Objects.nonNull(project.getContributers())) {
       for (ContributerModel contributer : project.getContributers()) {
@@ -405,7 +406,7 @@ public class ProjectServiceImpl implements ProjectService {
    * @return the list of projects of a user.
    */
   @Override
-  public List<ProjectResponseModel> getUserProjectList(final String keyword) {
+  public List<ProjectResponseModel> getUserProjectList(final String keyword) throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     // getting the connected user
     List<ProjectResponseModel> projects = new ArrayList<>();
@@ -424,7 +425,7 @@ public class ProjectServiceImpl implements ProjectService {
           .filter(permission -> permission.getProject().getProjectId().equals(project.getProjectId()))
           .collect(Collectors.toList());
 
-        ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
+        List<ContributerModel> contributorModelList = new ArrayList<>();
         for (ProjectUserPermission userPermission : userPermissionList) {
           User user = userPermission.getUser();
           contributorModelList.add(new ContributerModel(user.getUserId(), user.getUserFirstName(),
@@ -450,6 +451,42 @@ public class ProjectServiceImpl implements ProjectService {
             projectStatus = ProjectAnalysisState.IN_PROGRESS.toString();
           }
         }
+
+        List<MulticriteriaAnalyseResponseModel> multicriteriaAnalysisList = new ArrayList<>();
+        for (MultiCriteriaAnalysis multicriteriaAnalysis : project.getMultiCriteriaAnalysisList()) {
+          PredictibilityAnalyseResponseModel predictibilityAnalyse = null;
+          PredictibilityAnalysis predictibilityAnalysis = multicriteriaAnalysis.getPredictibilityAnalysis();
+          if (predictibilityAnalysis != null) {
+            ExecutionPlanScoreResponseModel executionPlanScore = null;
+            if (predictibilityAnalysis.getExecutionPlan() != null) {
+              executionPlanScore = executionPlanService
+                .getExecutionPlanScore(predictibilityAnalysis.getExecutionPlan().getExecutionPlanId());
+            }
+            predictibilityAnalyse = new PredictibilityAnalyseResponseModel(
+              predictibilityAnalysis.getPredictibilityAnalysisId(), predictibilityAnalysis.getIsFinished(),
+              predictibilityAnalysis.getPredictibilityAnalysisIteration(), predictibilityAnalysis.getChosenMethodology(),
+              predictibilityAnalysis.getBrainstormings(),
+              predictibilityAnalysis.getVotes(),
+              executionPlanScore);
+          }
+          multicriteriaAnalysisList.add(new MulticriteriaAnalyseResponseModel(
+            multicriteriaAnalysis.getMultiCriteriaAnalysisId(), multicriteriaAnalysis.getCreatedAt(),
+            multicriteriaAnalysis.getUpdatedAt(), multicriteriaAnalysis.getMultiCriteriaAnalysisIteration(),
+            multicriteriaAnalysis.getIsFinished(), new ArrayList<>(multicriteriaAnalysis.getFormSteps()),
+            predictibilityAnalyse));
+        }
+
+        // A.I. results
+        Optional<ResultAi> result = resultIaRepository.findByProject(project);
+        ResultAiModel resultAnalyseIa = new ResultAiModel();
+        if (result.isPresent()) {
+          resultAnalyseIa.setId(result.get().getId());
+          resultAnalyseIa.setProjectId(result.get().getId());
+          resultAnalyseIa.setPredictedProba(result.get().getPredictedProba());
+          resultAnalyseIa.setPredictedMethod(result.get().getPredictedMethod());
+          resultAnalyseIa.setProjectId(result.get().getProject().getProjectId());
+        }
+
         projects.add(new ProjectResponseModel(
           project.getProjectId(),
           project.getName(),
@@ -464,8 +501,9 @@ public class ProjectServiceImpl implements ProjectService {
           project.getFormProgressStatus(),
           contributorModelList,
           null,
-          null,
-          projectStatus)
+          multicriteriaAnalysisList,
+          projectStatus,
+          resultAnalyseIa)
         );
       }
     }
@@ -612,7 +650,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     List<ProjectUserPermission> userPermissionList = project.getProjectUserPermissions();
 
-    ArrayList<ContributerModel> contributorModelList = new ArrayList<>();
+    List<ContributerModel> contributorModelList = new ArrayList<>();
     for (ProjectUserPermission userPermission : userPermissionList) {
       User user = userPermission.getUser();
       contributorModelList
@@ -620,16 +658,16 @@ public class ProjectServiceImpl implements ProjectService {
           user.getUserEmail(), user.getIsAdmin(), userPermission.getUserFunction(), user.getUserAvatarPath(), userPermission.getPermission()));
     }
 
-    ArrayList<AttachmentResponseModel> attachmentList = new ArrayList<>();
+    List<AttachmentResponseModel> attachmentList = new ArrayList<>();
     for (Attachment attachment : project.getAttachments()) {
       attachmentList.add(new AttachmentResponseModel(attachment.getAttachmentId(), attachment.getFileName(),
         attachment.getFilePath(), attachment.getContentType(), attachment.getCreatedAt(), attachment.getUpdatedAt(), attachment.getCreator().getUserFirstName(), attachment.getCreator().getUserLastName()));
     }
 
-    ArrayList<MulticriteriaAnalyseResponseModel> multicriteriaAnaliseList = new ArrayList<>();
-    for (MultiCriteriaAnalysis multicriteriaAnalise : project.getMultiCriteriaAnalysisList()) {
+    List<MulticriteriaAnalyseResponseModel> multicriteriaAnalysisList = new ArrayList<>();
+    for (MultiCriteriaAnalysis multicriteriaAnalysis : project.getMultiCriteriaAnalysisList()) {
       PredictibilityAnalyseResponseModel predictibilityAnalyse = null;
-      PredictibilityAnalysis predictibilityAnalysis = multicriteriaAnalise.getPredictibilityAnalysis();
+      PredictibilityAnalysis predictibilityAnalysis = multicriteriaAnalysis.getPredictibilityAnalysis();
       if (predictibilityAnalysis != null) {
         ExecutionPlanScoreResponseModel executionPlanScore = null;
         if (predictibilityAnalysis.getExecutionPlan() != null) {
@@ -638,18 +676,21 @@ public class ProjectServiceImpl implements ProjectService {
         }
         predictibilityAnalyse = new PredictibilityAnalyseResponseModel(
           predictibilityAnalysis.getPredictibilityAnalysisId(), predictibilityAnalysis.getIsFinished(),
-          predictibilityAnalysis.getPredictibilityAnalysisIteration(), predictibilityAnalysis.getChosenMethodology(), executionPlanScore);
+          predictibilityAnalysis.getPredictibilityAnalysisIteration(), predictibilityAnalysis.getChosenMethodology(),
+          predictibilityAnalysis.getBrainstormings(),
+          predictibilityAnalysis.getVotes(),
+          executionPlanScore);
       }
-      multicriteriaAnaliseList.add(new MulticriteriaAnalyseResponseModel(
-        multicriteriaAnalise.getMultiCriteriaAnalysisId(), multicriteriaAnalise.getCreatedAt(),
-        multicriteriaAnalise.getUpdatedAt(), multicriteriaAnalise.getMultiCriteriaAnalysisIteration(),
-        multicriteriaAnalise.getIsFinished(), new ArrayList<>(multicriteriaAnalise.getFormSteps()),
+      multicriteriaAnalysisList.add(new MulticriteriaAnalyseResponseModel(
+        multicriteriaAnalysis.getMultiCriteriaAnalysisId(), multicriteriaAnalysis.getCreatedAt(),
+        multicriteriaAnalysis.getUpdatedAt(), multicriteriaAnalysis.getMultiCriteriaAnalysisIteration(),
+        multicriteriaAnalysis.getIsFinished(), new ArrayList<>(multicriteriaAnalysis.getFormSteps()),
         predictibilityAnalyse));
     }
 
     return new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(),
       project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), project.getChefId(), null, null,
-      project.getIsArchived(), project.getFormProgressStatus(), contributorModelList, attachmentList, multicriteriaAnaliseList, null);
+      project.getIsArchived(), project.getFormProgressStatus(), contributorModelList, attachmentList, multicriteriaAnalysisList, null, null);
   }
 
 
@@ -745,7 +786,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     FormProgressStatus currentFormTypeStatus = project.getFormProgressStatus();
 
-    if (currentFormTypeStatus == FormProgressStatus.IA || currentFormTypeStatus == FormProgressStatus.COLLABORATIVE || currentFormTypeStatus == FormProgressStatus.BOTH) {
+    if (currentFormTypeStatus != newFormTypeStatus && (currentFormTypeStatus == FormProgressStatus.IA || currentFormTypeStatus == FormProgressStatus.COLLABORATIVE || currentFormTypeStatus == FormProgressStatus.BOTH)) {
       project.setFormProgressStatus(FormProgressStatus.BOTH);
     } else {
       project.setFormProgressStatus(newFormTypeStatus);

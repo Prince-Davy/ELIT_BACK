@@ -1,10 +1,13 @@
 package com.elit.outildedecision.model;
 
+import com.elit.outildedecision.entity.Brainstorming;
+import com.elit.outildedecision.entity.Vote;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * This class represents a predictibility analysis response model containing information about a predictibility analysis.
@@ -37,6 +40,16 @@ public class PredictibilityAnalyseResponseModel implements Serializable {
    * The final choosen méthodology.
    */
   private String finalChosenMethodology;
+
+  /**
+   * The list of the brainstormings.
+   */
+  private List<Brainstorming> brainstormings;
+
+  /**
+   * The list of the votes.
+   */
+  private List<Vote> votes;
 
   /**
    * The execution plan associated with the predictibility analysis.

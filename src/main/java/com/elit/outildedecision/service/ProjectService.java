@@ -75,7 +75,7 @@ public interface ProjectService {
    * @param keyword a String representing the keyword to search for
    * @return a List of ProjectResponseModel objects representing the matching projects
    */
-  List<ProjectResponseModel> getUserProjectList(String keyword);
+  List<ProjectResponseModel> getUserProjectList(String keyword) throws UserNotAuthorizedException, ExecutionPlanNotFoundException;
   /**
    * Updates an existing project with the specified ID.
    *

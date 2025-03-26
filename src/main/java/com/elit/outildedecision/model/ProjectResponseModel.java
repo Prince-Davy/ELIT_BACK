@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a project response model containing information about a project.
@@ -77,20 +78,25 @@ public class ProjectResponseModel {
   /**
    * A list of contributor models associated with the project.
    */
-  private ArrayList<ContributerModel> contributors;
+  private List<ContributerModel> contributors;
 
   /**
    * A list of attachment response models associated with the project.
    */
-  private ArrayList<AttachmentResponseModel> attachments;
+  private List<AttachmentResponseModel> attachments;
 
   /**
    * A list of multicriteria analyse response models associated with the project.
    */
-  private ArrayList<MulticriteriaAnalyseResponseModel> multiCriteriaAnalysisList;
+  private List<MulticriteriaAnalyseResponseModel> multiCriteriaAnalysisList;
 
   /**
    * The status of the multi criteria analysis.
    */
   private String multiCriteriaStatus;
+
+  /**
+   * The results of the A.I. analysis
+   */
+  private ResultAiModel resultAi;
 }

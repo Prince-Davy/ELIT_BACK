@@ -119,7 +119,7 @@ public class ProjectController {
    */
   @GetMapping("/user/projectlist/")
   @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-  public List<ProjectResponseModel> getProjectList(@RequestParam(required = false) final String keyword) {
+  public List<ProjectResponseModel> getProjectList(@RequestParam(required = false) final String keyword) throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     return projectService.getUserProjectList(keyword);
   }
   /**
