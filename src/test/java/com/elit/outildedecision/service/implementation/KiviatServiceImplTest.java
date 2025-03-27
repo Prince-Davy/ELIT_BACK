@@ -92,26 +92,49 @@ class KiviatServiceImplTest {
     Project project = new Project();
     project.setProjectId(1L);
     List<AnswerIa> answersIas = List.of(
-      new AnswerIa("3", "category", "Faible : La durée doit être strictement respectée", project),
-      new AnswerIa("3", "category", "Faible : La durée doit être strictement respectée", project),
+      new AnswerIa("3", "category", "Élevée : Un écart considérable par rapport à la durée initiale est autorisé", project),
       new AnswerIa("4", "category", "Faible : Le budget doit être strictement respecté", project),
-      new AnswerIa("5", "category", "Exigences fonctionnelles uniquement", project),
+      new AnswerIa("5", "category", "Exigences fonctionnelles et non fonctionnelles", project),
       new AnswerIa("6", "category", "Faible : Les besoins doivent êtres strictement respectés", project),
       new AnswerIa("8", "category", "Faible : moins de 10%", project),
       new AnswerIa("9", "category", "Faible", project),
       new AnswerIa("11", "category", "Faible : la présence du client pendant les moments clés du projet", project),
-      new AnswerIa("12", "category", "Toutes les 2 à 4 semaines", project),
-      new AnswerIa("13", "category", "Faible", project),
+      new AnswerIa("12", "category", "Supérieur à 4 semaines", project),
+      new AnswerIa("13", "category", "Élevé", project),
       new AnswerIa("14", "category", "Faible", project),
       new AnswerIa("16", "category", "Faible : il est difficile pour l'équipe d'apprendre de nouvelles connaissances et technologies, de s'adapter aux changements", project)
     );
-    RecommandationKiviatModel expectedModel = new RecommandationKiviatModel(null, 1.0, 2.5, 3.5, 1.0, 2.33);
+    RecommandationKiviatModel expectedModel = new RecommandationKiviatModel(null, 2.33, 1.5, 4.5, 5.0, 2.33);
     return Stream.of(Arguments.of(answersIas, expectedModel));
+  }
+
+  static Stream<Object> answersIaValuesAdditional() {
+    Project project = new Project();
+    project.setProjectId(2L);
+
+    // Cas avec des valeurs différentes pour vérifier d'autres comportements
+    List<AnswerIa> answersIas = List.of(
+      new AnswerIa("3", "category", "Élevée : Un écart considérable par rapport à la durée initiale est autorisé", project),
+      new AnswerIa("4", "category", "Faible : Le budget doit être strictement respecté", project),
+      new AnswerIa("5", "category", "Exigences fonctionnelles et non fonctionnelles", project),
+      new AnswerIa("6", "category", "Faible : Les besoins doivent êtres strictement respectés", project),
+      new AnswerIa("8", "category", "Faible : moins de 10%", project),
+      new AnswerIa("9", "category", "Faible", project),
+      new AnswerIa("11", "category", "Faible : la présence du client pendant les moments clés du projet", project),
+      new AnswerIa("12", "category", "Supérieur à 4 semaines", project),
+      new AnswerIa("13", "category", "Élevé", project),
+      new AnswerIa("14", "category", "Faible", project),
+      new AnswerIa("16", "category", "Faible : il est difficile pour l'équipe d'apprendre de nouvelles connaissances et technologies, de s'adapter aux changements", project)
+    );
+    RecommandationKiviatModel expectedModel = new RecommandationKiviatModel(null, 2.33, 1.5, 4.5, 5.0, 2.33);
+    return Stream.of(
+      Arguments.of(answersIas, expectedModel)
+    );
   }
 
 
   @ParameterizedTest
-  @MethodSource("methodologyAndKiviatValues")
+  @MethodSource({"methodologyAndKiviatValues"})
   void getKiviatMethodologyValuesTest(MethodologyType methodology, RecommandationKiviatModel expectedModel) throws ResultAiNotFoundException {
     // Mocking the ResultAi object
     ResultAi resultAi = mock(ResultAi.class);
@@ -138,7 +161,7 @@ class KiviatServiceImplTest {
 
   @Tag("loadJson")
   @ParameterizedTest
-  @MethodSource("answersIaValuesLow")
+  @MethodSource({"answersIaValuesLow", "answersIaValuesAdditional"})
   public void testGetKiviatProjetValues(List<AnswerIa> answersIas, RecommandationKiviatModel expectedModel) throws AnswerIaNotFoundException {
     Long projectId = 1L;
 
@@ -154,6 +177,7 @@ class KiviatServiceImplTest {
     assertEquals(expectedModel, result);
 
   }
+
 
   @Test
   public void testGetKiviatProjetValues_NoAnswers() {

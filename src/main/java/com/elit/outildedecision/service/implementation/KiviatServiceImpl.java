@@ -133,11 +133,13 @@ public class KiviatServiceImpl implements KiviatService {
     //Parcours le Json KiviatProjectMatrix
     questions.forEach(q ->
       answersIas.stream()
-        .filter(a -> q.getQuestionNumber().toString().equals(a.getQuestion()))
+        .filter(a -> q.getQuestionNumber().toString().trim().equals(a.getQuestion().trim()))
         .forEach(a ->
           q.getResponses().stream()
-            .filter(resp -> resp.getLabel().equals(a.getAnswer()))
-            .forEach(r -> table.get(q.getTheme()).add(r.getNote()))
+            .filter(resp -> resp.getLabel().trim().equalsIgnoreCase(a.getAnswer().trim()))
+            .forEach(r -> {
+              table.get(q.getTheme()).add(r.getNote());
+            })
         )
     );
 
