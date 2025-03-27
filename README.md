@@ -24,6 +24,12 @@
 :---|:-----------|:----------|:----------------------|:-------------
  1  | John       | Doe       | user@user.com         | Azerty1234!? 
  2  | Nancy      | Michel    | admin@elite.fr        | Azerty1234!? 
- 3  | Charles    | Baker     | contributer@elite.com | Azerty1234!? 
- 4  | Rochelle   | Wright    | observer@elite.com    | Azerty1234!? 
+ 3  | Charles    | Baker     | contributer@elit.com  | Azerty1234!? 
+ 4  | Rochelle   | Wright    | observer@elit.com     | Azerty1234!? 
 
+
+## Init project
+`mvn clean install`
+
+## Start project 
+`bash spring-boot:run`
