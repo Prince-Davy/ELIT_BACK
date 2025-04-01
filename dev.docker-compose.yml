@@ -1,16 +1,30 @@
 version: '3.3'
 
 services:
-
   db:
     container_name: 'elit_database'
     image: mysql:5.7
     environment:
-      POSTGRES_USER: ${MYSQL_USER}
-      POSTGRES_PASSWORD: ${MYSQL_PASSWORD}
-      db_address: ${MYSQL_URL}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
     volumes:
-        - elit-volume:/var/lib/mysql
+      - elit-volume:/var/lib/mysql
+    networks:
+      - elit_network
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - elit_network
 
   back:
     container_name: 'elit_backend'
@@ -18,23 +32,17 @@ services:
       context: "."
       dockerfile: Dockerfile
     env_file: .env
-    ports: 
-      - 8080:8080
-    environment:
-        db_address: ${SPRING_DATASOURCE_URL}
-    volumes:
-        - ./out/:/usr/src/app/out/
-    depends_on:
-        - db
-
-  adminer:
-    container_name: 'elit_adminer'
-    image: 'adminer:4.8.1-standalone'
     ports:
-      - '8083:8080'
-    environment:
-      - ADMINER_DEFAULT_SERVER=${_ADMINER_DEFAULT_SERVER}
-      - ADMINER_DESIGN=${_ADMINER_DESIGN}
+      - "8080:8080"
+    volumes:
+      - ./out/:/usr/src/app/out/
+    depends_on:
+      - db
+    networks:
+      - elit_network
 
 volumes:
   elit-volume:
+
+networks:
+  elit_network:

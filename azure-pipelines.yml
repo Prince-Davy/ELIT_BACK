@@ -46,7 +46,3 @@ extends:
   parameters:
     DEPLOY_INTEG: true
     DEPLOY_PROD: false
-#   SCAN_SQ: true
-    NO_QUALITY_FAIL: true
-
-
