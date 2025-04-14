@@ -62,7 +62,7 @@ public class PredictibilityAnalysisController {
    * @throws ProjectNotFoundException If the project doesn't exist.
    * @throws PredictibilityAnalysisNotFoundException If the given analysis ID is invalid.
    */
-  @PostMapping("/{projectId}/predictibility/{analyseId}/chosenMethodology")
+  @PostMapping("/{analyseId}/predictibility/{projectId}/chosenMethodology")
   @PreAuthorize("isProjectOwner(#projectId)")
   ResponseEntity<String> addFinalChosenMethodology(@RequestBody final String chosenMethodology, @PathVariable final Long projectId, @PathVariable final Long analyseId) throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
     return predictibilityAnalysisService.addFinalChosenMethodology(chosenMethodology, projectId, analyseId);
