@@ -186,6 +186,12 @@
         <artifactId>commons-io</artifactId>
         <version>2.11.0</version>
         </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.9.3</version> <!-- ou une version récente -->
+      <scope>test</scope>
+    </dependency>
     </dependencies>
 
 	<build>
