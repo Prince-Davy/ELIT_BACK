@@ -16,8 +16,6 @@ import java.util.ArrayList;
 @NoArgsConstructor
 public class ProjectModel {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * The name of the project.
    */

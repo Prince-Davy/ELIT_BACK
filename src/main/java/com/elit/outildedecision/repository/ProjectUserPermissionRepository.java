@@ -3,6 +3,8 @@ package com.elit.outildedecision.repository;
 
 import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -53,4 +55,17 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
   @Query("SELECT p FROM ProjectUserPermission p "
     + "WHERE p.project.projectId=:pProjectID")
   List<ProjectUserPermission> findAllByProjectId(@Param("pProjectID") Long projectId);
+
+  /**
+   * Finds all project user permissions for the given user ID.
+   *
+   * @param pageable the pagination information
+   * @param keyword the keyword to search for in project name or description
+   * @return a list of all project user permissions for the given user ID
+   */
+  @Query("SELECT p FROM ProjectUserPermission p "
+    + "WHERE LOWER(p.project.name)  LIKE CONCAT('%',:keyword,'%')"
+    + " OR LOWER(p.project.description)  LIKE CONCAT('%',:keyword,'%')"
+    + "GROUP BY p ORDER BY p.project.createdAt desc")
+  Page<ProjectUserPermission> findProjetByKey(@Param("keyword") String keyword, Pageable pageable);
 }

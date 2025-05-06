@@ -9,9 +9,12 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * This class represents a project response model containing information about a project.
- * It is used to store and manage data associated with projects, including name, description,
- * creation and update timestamps, confirmation state, chef ID, archived status, a list of contributors,
+ * This class represents a project response model containing information about a
+ * project.
+ * It is used to store and manage data associated with projects, including name,
+ * description,
+ * creation and update timestamps, confirmation state, chef ID, archived status,
+ * a list of contributors,
  * a list of attachments, and a list of multicriteria analyses.
  * It uses Lombok annotations to generate constructors, getters, and setters.
  */

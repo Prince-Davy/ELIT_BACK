@@ -369,7 +369,7 @@
   </changeSet>
   <changeSet id="1742481471260-29" author="tpiotrow">
     <createTable tableName="vote">
-      <column name="vote_id" type="BIGINT">
+      <column name="vote_id" type="BIGINT" autoIncrement="true">
         <constraints primaryKey="true" primaryKeyName="pk_vote"/>
       </column>
       <column name="created_at" type="DATETIME"/>
