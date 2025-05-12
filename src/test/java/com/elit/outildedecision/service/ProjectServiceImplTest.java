@@ -460,6 +460,7 @@ class ProjectServiceImplTest {
       user.getUserFirstName(),
       projectToSave.getIsArchived(),
       projectToSave.getFormProgressStatus(),
+      projectToSave.getProjectState(),
       contributorModelList,
       attachmentModelList,
       multicriteriaAnalysisodelList,

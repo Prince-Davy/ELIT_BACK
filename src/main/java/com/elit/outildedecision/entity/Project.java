@@ -2,6 +2,7 @@ package com.elit.outildedecision.entity;
 
 import com.elit.outildedecision.config.View;
 import com.elit.outildedecision.util.FormProgressStatus;
+import com.elit.outildedecision.util.ProjectState;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -60,6 +61,8 @@ public class Project implements Serializable {
   private Boolean isArchived;
   @Enumerated(EnumType.STRING)
   private FormProgressStatus formProgressStatus;
+  @Enumerated(EnumType.STRING)
+  private ProjectState projectState;
 
   @CreationTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")

@@ -46,6 +46,7 @@ import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.util.ProjectAnalysisState;
 import com.elit.outildedecision.util.ProjectConfirmationState;
 import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.util.ProjectState;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.json.ParseException;
@@ -282,6 +283,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectToSave.setConfirmationState(ProjectConfirmationState.CONFIRMED.name());
         projectToSave.setIsArchived(false);
         projectToSave.setFormProgressStatus(FormProgressStatus.None);
+        projectToSave.setProjectState(ProjectState.PENDING);
         Long projectId = projectRepository.save(projectToSave).getProjectId();
 
         // adding permissions to project chef and contributers
@@ -431,11 +433,12 @@ public class ProjectServiceImpl implements ProjectService {
      * The method for getting the list of projects of a user.
      *
      * @param keyword the keyword to search for.
+     * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL").
      * @param page    the page number.
      * @param size    the size of the page.
      * @return the list of projects of a user.
      */
-    public Page<ProjectResponseModel> getUserProjectList(final int page, final int size, final String keyword)
+    public Page<ProjectResponseModel> getUserProjectList(final int page, final int size, final String keyword, final String status)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // getting the connected user
@@ -540,14 +543,30 @@ public class ProjectServiceImpl implements ProjectService {
                         ownerUserProject.get().getUserFirstName(),
                         null,
                         project.getFormProgressStatus(),
+                        project.getProjectState(),
                         contributorModelList,
                         null,
                         multicriteriaAnalysisList,
                         projectStatus,
                         resultAnalyseIa));
             }
+
         }
-        return new PageImpl<>(projects, pageable, projectUserPermissionPagination.getTotalElements());
+
+      // filtrage par statut
+      if (status != null && !status.isEmpty() && !status.equalsIgnoreCase("ALL")) {
+        projects = projects.stream()
+          .filter(project -> project.getProjectState() != null
+            && project.getProjectState().toString().equalsIgnoreCase(status))
+          .collect(Collectors.toList());
+      }
+
+      // Pagination manuelle après transformation
+//      int start = (int) pageable.getOffset();
+//      int end = Math.min(start + pageable.getPageSize(), projects.size());
+//      List<ProjectResponseModel> pagedProjects = projects.subList(start, end);
+
+      return new PageImpl<>(projects, pageable, projects.size());
     }
 
     /**
@@ -731,7 +750,7 @@ public class ProjectServiceImpl implements ProjectService {
         return new ProjectResponseModel(project.getProjectId(), project.getName(), project.getDescription(),
                 project.getCreatedAt(), project.getUpdatedAt(), project.getConfirmationState(), project.getChefId(),
                 null, null,
-                project.getIsArchived(), project.getFormProgressStatus(), contributorModelList, attachmentList,
+                project.getIsArchived(), project.getFormProgressStatus(), project.getProjectState(), contributorModelList, attachmentList,
                 multicriteriaAnalysisList, null, null);
     }
 
@@ -839,7 +858,7 @@ public class ProjectServiceImpl implements ProjectService {
         } else {
             project.setFormProgressStatus(newFormTypeStatus);
         }
-
+        project.setProjectState(ProjectState.IN_PROGRESS);
         projectRepository.save(project);
         return true;
     }

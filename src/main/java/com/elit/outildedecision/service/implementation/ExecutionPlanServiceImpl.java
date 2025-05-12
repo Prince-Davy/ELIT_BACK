@@ -39,6 +39,7 @@ import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.util.ProjectState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -759,6 +760,11 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     if (Boolean.FALSE.equals(executionPlan.getIsFinished())) {
       executionPlan.setIsFinished(true);
       executionPlanRepository.save(executionPlan);
+
+      // mise à jour du statut du projet
+      Project project = projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException("Projet introuvable avec l'ID : " + projectId));
+      project.setProjectState(ProjectState.COMPLETED);
+      projectRepository.save(project);
     } else {
       throw new ExecutionPlanException("Le plan d'exécution est déjà terminé.");
     }

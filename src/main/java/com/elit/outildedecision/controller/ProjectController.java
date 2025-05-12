@@ -133,6 +133,7 @@ public class ProjectController {
      * get all projects of a user.
      *
      * @param keyword the keyword to search for a project
+     * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL")
      * @param page    the page number
      * @param size    the page size
      * @throws UserNotAuthorizedException     UserNotAuthorizedException if the user
@@ -146,11 +147,14 @@ public class ProjectController {
      */
     @GetMapping("/user/projectlist/")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public Page<ProjectResponseModel> getProjectList(@RequestParam(required = false) final String keyword,
-            @RequestParam(defaultValue = "0") final int page,
-            @RequestParam(defaultValue = "10") final int size)
+    public Page<ProjectResponseModel> getProjectList(
+      @RequestParam(required = false) final String keyword,
+      @RequestParam(required = false) final String status,
+      @RequestParam(defaultValue = "0") final int page,
+      @RequestParam(defaultValue = "10") final int size
+    )
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException {
-        return projectService.getUserProjectList(page, size, keyword);
+        return projectService.getUserProjectList(page, size, keyword, status);
     }
 
     /**

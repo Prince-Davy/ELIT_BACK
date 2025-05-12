@@ -88,6 +88,7 @@ public interface ProjectService {
      * the specified keyword.
      *
      * @param keyword a String representing the keyword to search for
+     * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL")
      * @param page    the page number to retrieve
      * @param size    the number of items per page
      * @throws UserNotAuthorizedException     if the user is not authorized to
@@ -97,7 +98,7 @@ public interface ProjectService {
      * @return a List of ProjectResponseModel objects representing the matching
      *         projects
      */
-    Page<ProjectResponseModel> getUserProjectList(int page, int size, String keyword)
+    Page<ProjectResponseModel> getUserProjectList(int page, int size, String keyword, String status)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException;
 
     /**

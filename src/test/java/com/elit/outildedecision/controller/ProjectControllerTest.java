@@ -170,7 +170,7 @@ class ProjectControllerTest {
   void getProjectList() throws Exception {
     String keyword = "query";
     List<ProjectResponseModel> projectList = new ArrayList<>();
-    when(projectService.getUserProjectList(0,10,keyword)).thenReturn(new PageImpl<>(projectList));
+    when(projectService.getUserProjectList(0,10,keyword,null)).thenReturn(new PageImpl<>(projectList));
     MockHttpServletResponse response = mockMvc.perform(get("/user/projectlist/").param("required","false")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }

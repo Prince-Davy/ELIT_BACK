@@ -14,6 +14,7 @@ import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.service.RecommandationService;
 import com.elit.outildedecision.service.ResultIaService;
+import com.elit.outildedecision.util.ProjectState;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -149,6 +150,10 @@ public class ResultIaServiceImpl implements ResultIaService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Le résultat de l'analyse IA existe déjà pour ce projet.");
           } else {
             resultIaRepository.save(resultAi);
+
+            //mise à jour du statut du projet
+            project.setProjectState(ProjectState.COMPLETED);
+            projectRepository.save(project);
           }
           iaResponse = response.toString();
         }
