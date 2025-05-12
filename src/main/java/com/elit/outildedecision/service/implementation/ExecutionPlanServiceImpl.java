@@ -429,10 +429,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
       for (ExecutionPlanVote vote : votesModelList) {
         ExecutionVoteModel voteModel = new ExecutionVoteModel();
         voteModel.setId(vote.getId());
-        voteModel.setUserId(
-          projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
-            ? vote.getUser().getUserId()
-            : null);
+        voteModel.setUserId(vote.getUser().getUserId());
         votesList.add(voteModel);
       }
       model.setVotes(votesList);
