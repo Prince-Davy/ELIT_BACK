@@ -239,7 +239,7 @@
   {
     "id": "ProjectRequirementsFlexibility",
     "questionText": "Quelle flexibilité est permise sur le respect des besoins du client ?",
-    "questionNumber": 6,
+    "questionNumber": 7,
     "responses": [
       {
         "id": "low",
@@ -342,7 +342,7 @@
   {
     "id": "ProjectTechnicalDifficulty",
     "questionText": "Quel est le défi technologique du projet ?",
-    "questionNumber": 7,
+    "questionNumber": 8,
     "responses": [
       {
         "id": "low",
@@ -445,7 +445,7 @@
   {
     "id": "ProjectRiskRate",
     "questionText": "Quel est le taux de risque dans le projet (risque stratégique, opérationnel, tactique) ?",
-    "questionNumber": 8,
+    "questionNumber": 9,
     "responses": [
       {
         "id": "low",
@@ -548,7 +548,7 @@
   {
     "id": "ProjectManagementInvolvement",
     "questionText": "Quel est le niveau d'engagement du management et de la direction (Disponibilité, décision, …) ?",
-    "questionNumber": 9,
+    "questionNumber": 10,
     "responses": [
       {
         "id": "low",
@@ -627,7 +627,7 @@
   {
     "id": "ProjectClientInvolvement",
     "questionText": "Quel est le niveau d'implication et de participation du client ?",
-    "questionNumber": 11,
+    "questionNumber": 12,
     "responses": [
       {
         "id": "low",
@@ -706,7 +706,7 @@
   {
     "id": "ProjectClientKnowledge",
     "questionText": "Quel est le niveau de connaissance du client sur ses besoins et sur le produit ?",
-    "questionNumber": 13,
+    "questionNumber": 14,
     "responses": [
       {
         "id": "low",
@@ -785,7 +785,7 @@
   {
     "id": "ProjectTeamInvolvment",
     "questionText": "Quel est le niveau d'implication des participants ?",
-    "questionNumber": 16,
+    "questionNumber": 18,
     "responses": [
       {
         "id": "low",
