@@ -136,6 +136,7 @@ public class ProjectController {
      * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL")
      * @param page    the page number
      * @param size    the page size
+     * @param isSortByDate sort by date
      * @throws UserNotAuthorizedException     UserNotAuthorizedException if the user
      *                                        is not authorized
      * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException if the
@@ -151,10 +152,11 @@ public class ProjectController {
       @RequestParam(required = false) final String keyword,
       @RequestParam(required = false) final String status,
       @RequestParam(defaultValue = "0") final int page,
-      @RequestParam(defaultValue = "10") final int size
+      @RequestParam(defaultValue = "10") final int size,
+      @RequestParam(defaultValue = "false") final boolean isSortByDate
     )
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException {
-        return projectService.getUserProjectList(page, size, keyword, status);
+        return projectService.getUserProjectList(page, size, keyword, status, isSortByDate);
     }
 
     /**

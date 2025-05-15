@@ -436,18 +436,21 @@ public class ProjectServiceImpl implements ProjectService {
      * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL").
      * @param page    the page number.
      * @param size    the size of the page.
+     * @param isSortByDate sort by date
      * @return the list of projects of a user.
      */
-    public Page<ProjectResponseModel> getUserProjectList(final int page, final int size, final String keyword, final String status)
+    public Page<ProjectResponseModel> getUserProjectList(final int page, final int size, final String keyword, final String status, final boolean isSortByDate)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // getting the connected user
         List<ProjectResponseModel> projects = new ArrayList<>();
         String keywordNew = (keyword != null) ? keyword : "";
         String statusNew = (status != null && !status.isEmpty()) ? status : "ALL";
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        Page<ProjectUserPermission> projectUserPermissionPagination = projectUserPermissionRepository
+        Pageable pageable = PageRequest.of(page, size, Sort.by("project.createdAt").descending());
+        if (isSortByDate) {
+          pageable = PageRequest.of(page, size, Sort.by("project.createdAt").ascending());
+        }
+      Page<ProjectUserPermission> projectUserPermissionPagination = projectUserPermissionRepository
                 .findProject(keywordNew, statusNew, pageable);
         List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent().stream()
                 .filter(projectUserPermission -> projectUserPermission.getUser().getUserEmail()
@@ -560,7 +563,7 @@ public class ProjectServiceImpl implements ProjectService {
 //      int end = Math.min(start + pageable.getPageSize(), projects.size());
 //      List<ProjectResponseModel> pagedProjects = projects.subList(start, end);
 
-      return new PageImpl<>(projects, pageable, projects.size());
+      return new PageImpl<>(projects, pageable, projectUserPermissionPagination.getTotalElements());
     }
 
     /**

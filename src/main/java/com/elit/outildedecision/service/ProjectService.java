@@ -91,6 +91,7 @@ public interface ProjectService {
      * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL")
      * @param page    the page number to retrieve
      * @param size    the number of items per page
+     * @param isSortByDate sort by date
      * @throws UserNotAuthorizedException     if the user is not authorized to
      *                                        access the project
      * @throws ExecutionPlanNotFoundException if the execution plan is not found
@@ -98,7 +99,7 @@ public interface ProjectService {
      * @return a List of ProjectResponseModel objects representing the matching
      *         projects
      */
-    Page<ProjectResponseModel> getUserProjectList(int page, int size, String keyword, String status)
+    Page<ProjectResponseModel> getUserProjectList(int page, int size, String keyword, String status, boolean isSortByDate)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException;
 
     /**

@@ -68,8 +68,7 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
     + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
     + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
     + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) "
-    + "GROUP BY p.project.projectId, p.user.userId, p.project.createdAt "
-    + "ORDER BY p.project.createdAt DESC")
+    + "GROUP BY p")
   Page<ProjectUserPermission> findProject(
     @Param("keyword") String keyword,
     @Param("status") String status,
