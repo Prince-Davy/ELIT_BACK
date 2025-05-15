@@ -61,11 +61,17 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
    *
    * @param pageable the pagination information
    * @param keyword the keyword to search for in project name or description
+   * @param status the project status to filter by
    * @return a list of all project user permissions for the given user ID
    */
   @Query("SELECT p FROM ProjectUserPermission p "
-    + "WHERE LOWER(p.project.name)  LIKE CONCAT('%',:keyword,'%')"
-    + " OR LOWER(p.project.description)  LIKE CONCAT('%',:keyword,'%')"
-    + "GROUP BY p ORDER BY p.project.createdAt desc")
-  Page<ProjectUserPermission> findProjetByKey(@Param("keyword") String keyword, Pageable pageable);
+    + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
+    + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
+    + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) "
+    + "GROUP BY p.project.projectId, p.user.userId, p.project.createdAt "
+    + "ORDER BY p.project.createdAt DESC")
+  Page<ProjectUserPermission> findProject(
+    @Param("keyword") String keyword,
+    @Param("status") String status,
+    Pageable pageable);
 }

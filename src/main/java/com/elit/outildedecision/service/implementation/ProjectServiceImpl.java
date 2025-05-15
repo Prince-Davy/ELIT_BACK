@@ -444,9 +444,11 @@ public class ProjectServiceImpl implements ProjectService {
         // getting the connected user
         List<ProjectResponseModel> projects = new ArrayList<>();
         String keywordNew = (keyword != null) ? keyword : "";
+        String statusNew = (status != null && !status.isEmpty()) ? status : "ALL";
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<ProjectUserPermission> projectUserPermissionPagination = projectUserPermissionRepository
-                .findProjetByKey(keywordNew, pageable);
+                .findProject(keywordNew, statusNew, pageable);
         List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent().stream()
                 .filter(projectUserPermission -> projectUserPermission.getUser().getUserEmail()
                         .equals(userDetails.getUsername()))
@@ -552,14 +554,6 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
         }
-
-      // filtrage par statut
-      if (status != null && !status.isEmpty() && !status.equalsIgnoreCase("ALL")) {
-        projects = projects.stream()
-          .filter(project -> project.getProjectState() != null
-            && project.getProjectState().toString().equalsIgnoreCase(status))
-          .collect(Collectors.toList());
-      }
 
       // Pagination manuelle après transformation
 //      int start = (int) pageable.getOffset();
