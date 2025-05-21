@@ -451,11 +451,8 @@ public class ProjectServiceImpl implements ProjectService {
           pageable = PageRequest.of(page, size, Sort.by("project.createdAt").ascending());
         }
       Page<ProjectUserPermission> projectUserPermissionPagination = projectUserPermissionRepository
-                .findProject(keywordNew, statusNew, pageable);
-        List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent().stream()
-                .filter(projectUserPermission -> projectUserPermission.getUser().getUserEmail()
-                        .equals(userDetails.getUsername()))
-                .collect(Collectors.toList());
+                .findProject(keywordNew, statusNew, userDetails.getUsername(), pageable);
+        List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent();
 
         if (!projectUserPermissions.isEmpty()) {
             for (ProjectUserPermission projectUserPermission : projectUserPermissions) {
