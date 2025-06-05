@@ -130,6 +130,8 @@ secrets:
     key: FRONTEND_URL
   - vaultKey: FILE_RECOMMANDATIONS
     key: FILE_RECOMMANDATIONS
+  - vaultKey: PORT
+    key: PORT
 
 
 # --- THIS SECTION IS FOR MORE COMPLEX CONFIGURATION --- #
