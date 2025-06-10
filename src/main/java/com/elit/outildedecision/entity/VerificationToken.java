@@ -1,5 +1,6 @@
 package com.elit.outildedecision.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class VerificationToken implements Serializable {
   private String type;
 
   @ManyToOne(fetch = FetchType.EAGER)
+  @JsonIgnore
   private User user;
 
   /**
