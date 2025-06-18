@@ -17,13 +17,14 @@ import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
-import com.elit.outildedecision.model.ProjectModel;
-import com.elit.outildedecision.model.ProjectResponseModel;
-import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.AttachmentResponseModel;
+import com.elit.outildedecision.model.ContributerModel;
+import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.model.PredictibilityAnalyseResponseModel;
-import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
+import com.elit.outildedecision.model.ProjectModel;
+import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.model.ResultAiModel;
 import com.elit.outildedecision.repository.FeedbackIaRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
@@ -437,12 +438,14 @@ public class ProjectServiceImpl implements ProjectService {
      * @param page    the page number.
      * @param size    the size of the page.
      * @param isSortByDate sort by date
+     * @param isMyProjectsCreated is list projects created by me
      * @return the list of projects of a user.
      */
-    public Page<ProjectResponseModel> getUserProjectList(final int page, final int size, final String keyword, final String status, final boolean isSortByDate)
+    public ResponsePageProject getUserProjectList(final int page, final int size, final String keyword, final String status, final boolean isSortByDate, final boolean isMyProjectsCreated)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // getting the connected user
+        ResponsePageProject responsePageProject = new ResponsePageProject();
         List<ProjectResponseModel> projects = new ArrayList<>();
         String keywordNew = (keyword != null) ? keyword : "";
         String statusNew = (status != null && !status.isEmpty()) ? status : "ALL";
@@ -450,8 +453,14 @@ public class ProjectServiceImpl implements ProjectService {
         if (isSortByDate) {
           pageable = PageRequest.of(page, size, Sort.by("project.createdAt").ascending());
         }
-      Page<ProjectUserPermission> projectUserPermissionPagination = projectUserPermissionRepository
-                .findProject(keywordNew, statusNew, userDetails.getUsername(), pageable);
+      Page<ProjectUserPermission> projectUserPermissionPagination = new PageImpl<>(new ArrayList<>());
+        if (isMyProjectsCreated) {
+            projectUserPermissionPagination = projectUserPermissionRepository
+                    .findProjectCeatedByUser(keywordNew, statusNew, userDetails.getUsername(), pageable);
+        } else {
+            projectUserPermissionPagination = projectUserPermissionRepository
+                    .findProjectAffected(keywordNew, statusNew, userDetails.getUsername(), pageable);
+        }
         List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent();
 
         if (!projectUserPermissions.isEmpty()) {
@@ -554,13 +563,10 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
         }
-
-      // Pagination manuelle après transformation
-//      int start = (int) pageable.getOffset();
-//      int end = Math.min(start + pageable.getPageSize(), projects.size());
-//      List<ProjectResponseModel> pagedProjects = projects.subList(start, end);
-
-      return new PageImpl<>(projects, pageable, projectUserPermissionPagination.getTotalElements());
+        responsePageProject.setProjectsPage(new PageImpl<>(projects, pageable, projectUserPermissionPagination.getTotalElements()));
+        responsePageProject.setTotalProjetCreated(projectUserPermissionRepository.getTotalProjectCreatedUser(keywordNew, statusNew, userDetails.getUsername()));
+        responsePageProject.setTotalProjetAffected(projectUserPermissionRepository.getTotalProjectAffectedUser(keywordNew, statusNew, userDetails.getUsername()));
+      return responsePageProject;
     }
 
     /**

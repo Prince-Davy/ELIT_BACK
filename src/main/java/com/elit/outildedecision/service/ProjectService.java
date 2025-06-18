@@ -1,7 +1,7 @@
 
 package com.elit.outildedecision.service;
 
-import org.springframework.data.domain.Page;
+import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
@@ -92,6 +92,7 @@ public interface ProjectService {
      * @param page    the page number to retrieve
      * @param size    the number of items per page
      * @param isSortByDate sort by date
+     * @param isMyProjectsCreated is list projet created by me
      * @throws UserNotAuthorizedException     if the user is not authorized to
      *                                        access the project
      * @throws ExecutionPlanNotFoundException if the execution plan is not found
@@ -99,7 +100,7 @@ public interface ProjectService {
      * @return a List of ProjectResponseModel objects representing the matching
      *         projects
      */
-    Page<ProjectResponseModel> getUserProjectList(int page, int size, String keyword, String status, boolean isSortByDate)
+    ResponsePageProject getUserProjectList(int page, int size, String keyword, String status, boolean isSortByDate, boolean isMyProjectsCreated)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException;
 
     /**

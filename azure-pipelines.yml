@@ -7,6 +7,7 @@ trigger:
       - develop
       - devops
       - main
+      - recette
       - release/*
 
 resources:
@@ -30,21 +31,21 @@ variables:
     value: SogetiLabsFranceRegistry
   - name: dockerfilePath
     value: $(Build.SourcesDirectory)/Dockerfile
-  - name: kubernetesNamespace
-    value: "lge-elit"
   - name: kubernetesNamespaceInteg
     value: "lge-elit"
-  # - name: kubernetesSecretInteg
-  #   value: "lge-elit-back-config-integ"
-  # - name: kubernetesConfigMapInteg
-  #   value: "lge-elit-back-config-map-integ"
-  # Include template variables
+  - name: kubernetesNamespaceTest
+    value: "lge-elit-recette"
+  - name: kubernetesNamespace
+    value: "lge-elit-recette"
   - template: templates-general/variables.yml@templates
+  - name: deployOnTestNamespace
+    value: $[eq(variables['Build.SourceBranchName'], 'recette')]
 
 extends:
   template: templates-general/azure-general-java-tpl.yml@templates
   parameters:
-    DEPLOY_INTEG: true
+    DEPLOY_INTEG: false
+    DEPLOY_TEST: true
     DEPLOY_PROD: false
     SCAN_SQ: true
     NO_QUALITY_FAIL: true

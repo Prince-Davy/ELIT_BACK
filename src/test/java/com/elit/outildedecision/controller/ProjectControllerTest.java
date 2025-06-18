@@ -9,6 +9,7 @@ import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.ProjectService;
@@ -169,8 +170,8 @@ class ProjectControllerTest {
   @Test
   void getProjectList() throws Exception {
     String keyword = "query";
-    List<ProjectResponseModel> projectList = new ArrayList<>();
-    when(projectService.getUserProjectList(0,10,keyword,null,false)).thenReturn(new PageImpl<>(projectList));
+    ResponsePageProject responsePageProject = new ResponsePageProject();
+    when(projectService.getUserProjectList(0,10,keyword,null,false,false)).thenReturn(responsePageProject);
     MockHttpServletResponse response = mockMvc.perform(get("/user/projectlist/").param("required","false")).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200, response.getStatus());
   }

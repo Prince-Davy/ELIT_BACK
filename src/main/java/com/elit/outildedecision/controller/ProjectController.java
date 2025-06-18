@@ -2,7 +2,7 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Project;
-import org.springframework.data.domain.Page;
+import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -137,6 +136,7 @@ public class ProjectController {
      * @param page    the page number
      * @param size    the page size
      * @param isSortByDate sort by date
+     * @param isMyProjectsCreated is my project created list
      * @throws UserNotAuthorizedException     UserNotAuthorizedException if the user
      *                                        is not authorized
      * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException if the
@@ -148,15 +148,16 @@ public class ProjectController {
      */
     @GetMapping("/user/projectlist/")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public Page<ProjectResponseModel> getProjectList(
+    public ResponsePageProject getProjectList(
       @RequestParam(required = false) final String keyword,
       @RequestParam(required = false) final String status,
       @RequestParam(defaultValue = "0") final int page,
       @RequestParam(defaultValue = "10") final int size,
-      @RequestParam(defaultValue = "false") final boolean isSortByDate
+      @RequestParam(defaultValue = "false") final boolean isSortByDate,
+      @RequestParam(defaultValue = "true") final boolean isMyProjectsCreated
     )
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException {
-        return projectService.getUserProjectList(page, size, keyword, status, isSortByDate);
+        return projectService.getUserProjectList(page, size, keyword, status, isSortByDate, isMyProjectsCreated);
     }
 
     /**
