@@ -40,6 +40,7 @@ variables:
   #   value: "lge-elit-back-config-map-integ"
   # Include template variables
   - template: templates-general/variables.yml@templates
+  - group: elit_back_library
 
 extends:
   template: templates-general/azure-general-java-tpl.yml@templates
