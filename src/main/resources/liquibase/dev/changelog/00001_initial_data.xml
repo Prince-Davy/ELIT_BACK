@@ -37,4 +37,9 @@
     <changeSet id="1743089422606-1" author="tpiotrow (generated)">
         <sqlFile path="../sql/permissions.sql" relativeToChangelogFile="true" />
     </changeSet>
+
+    <!-- init audit-->
+    <changeSet id="1743089422606-2" author="chkebe">
+        <sqlFile path="../sql/audit.sql" relativeToChangelogFile="true" />
+    </changeSet>
 </databaseChangeLog>

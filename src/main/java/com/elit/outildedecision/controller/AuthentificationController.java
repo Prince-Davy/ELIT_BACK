@@ -53,8 +53,10 @@ public class AuthentificationController {
    * Instantiates a new Authentification controller.
    * dependency injection via constructor of the user service
    *
-   * @param jwtProperties the jwt properties used to get the secret key to sign the JWT token.
-   * @param userService   userService an instance of the UserService class, used to interact with the user data store.
+   * @param jwtProperties the jwt properties used to get the secret key to sign
+   *                      the JWT token.
+   * @param userService   userService an instance of the UserService class, used
+   *                      to interact with the user data store.
    */
   public AuthentificationController(final JwtProperties jwtProperties, final UserService userService) {
     this.jwtProperties = jwtProperties;
@@ -66,12 +68,14 @@ public class AuthentificationController {
    *
    * @param user the user to register
    * @return ResponseEntity<String>
-   * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
-   * @throws UserAlreadyExistsException the exception thrown when the user already exist
+   * @throws CouldNotSaveUserException  the exception thrown when the user cannot
+   *                                    be saved
+   * @throws UserAlreadyExistsException the exception thrown when the user already
+   *                                    exist
    */
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid final UserModel user)
-    throws CouldNotSaveUserException, UserAlreadyExistsException {
+      throws CouldNotSaveUserException, UserAlreadyExistsException {
     return userService.saveUser(user);
   }
 
@@ -84,8 +88,8 @@ public class AuthentificationController {
    */
   @GetMapping("/refreshToken")
   public void refreshToken(final HttpServletRequest request,
-                           final HttpServletResponse response)
-    throws IOException, RefreshTokenException {
+      final HttpServletResponse response)
+      throws IOException, RefreshTokenException {
     String jwtAuthorizationToken = request.getHeader("Authorization");
     if (jwtAuthorizationToken != null && jwtAuthorizationToken.startsWith("Bearer ")) {
       try {
@@ -97,8 +101,7 @@ public class AuthentificationController {
         User user = userService.findByEmail(userEmail);
         List<String> roles = new ArrayList<>();
         roles.add(Boolean.TRUE.equals(user.getIsAdmin()) ? "ADMIN" : "USER");
-        String accessToken =
-          JWT.create()
+        String accessToken = JWT.create()
             .withSubject(user.getUserEmail())
             .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getAccessTokenExpirationTime()))
             .withIssuer(request.getRequestURL().toString())
@@ -125,17 +128,20 @@ public class AuthentificationController {
       throw new RefreshTokenException("Refresh token is missing");
     }
   }
+
   /**
    * Send a new mail for user.
    *
    * @param user the user to register
    * @return ResponseEntity<String>
-   * @throws CouldNotSaveUserException the exception thrown when the user cannot be saved
-   * @throws UserAlreadyExistsException the exception thrown when the user already exist
+   * @throws CouldNotSaveUserException  the exception thrown when the user cannot
+   *                                    be saved
+   * @throws UserAlreadyExistsException the exception thrown when the user already
+   *                                    exist
    */
   @PostMapping("/sendRegistrationConfirmationEmailAgain")
   public ResponseEntity<String> sendRegistrationConfirmationEmailAgain(@RequestBody @Valid final UserModel user)
-    throws CouldNotMailUserException, UserAlreadyExistsException {
+      throws CouldNotMailUserException, UserAlreadyExistsException {
     return userService.sendRegistrationConfirmationEmailAgain(user);
   }
 }

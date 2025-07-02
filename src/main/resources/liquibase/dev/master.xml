@@ -4,6 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <include file="changelog/00000_initial_schema.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/00001_initial_data.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/00000_initial_schema.xml" relativeToChangelogFile="true" />
+    <include file="changelog/00001_initial_data.xml" relativeToChangelogFile="true" />
+    <!-- Add audit table migration following Open/Closed Principle -->
+    <include file="changelog/00002_audit_table.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

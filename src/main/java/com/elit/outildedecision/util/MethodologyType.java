@@ -24,8 +24,9 @@ public enum MethodologyType {
   /**
    * Constructor for creating a new MethodologyTypes instance.
    *
-   * @param reportTypeName The name of the report type.
-   * @param methodologyTypesPattern the pattern of acceptable sequences for easier finding
+   * @param reportTypeName          The name of the report type.
+   * @param methodologyTypesPattern the pattern of acceptable sequences for easier
+   *                                finding
    */
   MethodologyType(final String reportTypeName, final Pattern methodologyTypesPattern) {
     this.methodologyTypesName = reportTypeName;
@@ -39,9 +40,11 @@ public enum MethodologyType {
 
   /**
    * Finds a methodology given a loosely matching string.
+   * 
    * @param methodolody the loosely matching methodology we want to look for.
    * @return the exact methodology
-   * @throws UnsupportedMethodologyTypeException if the given string does not match with defined methodologies
+   * @throws UnsupportedMethodologyTypeException if the given string does not
+   *                                             match with defined methodologies
    */
   public static MethodologyType find(final String methodolody) throws UnsupportedMethodologyTypeException {
     if (methodolody == null) {
@@ -54,7 +57,7 @@ public enum MethodologyType {
       }
     }
     throw new UnsupportedMethodologyTypeException("The methodology " + methodolody
-      + " cannot be converted to known methodologies. Please contact your local administrator");
+        + " cannot be converted to known methodologies. Please contact your local administrator");
   }
 
   private Pattern getMethodologyTypesPattern() {

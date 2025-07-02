@@ -1,6 +1,7 @@
 package com.elit.outildedecision.entity;
 
 import com.elit.outildedecision.config.View;
+import com.elit.outildedecision.features.audit.Audit;
 import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.util.ProjectState;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -75,19 +76,11 @@ public class Project implements Serializable {
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Attachment> attachments;
 
-  @OneToMany(
-      mappedBy = "project",
-      fetch = FetchType.LAZY,
-      cascade = CascadeType.ALL,
-      orphanRemoval = true)
+  @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("multiCriteria_project")
   private List<MultiCriteriaAnalysis> multiCriteriaAnalysisList;
 
-  @OneToMany(
-      mappedBy = "project",
-      fetch = FetchType.LAZY,
-      cascade = CascadeType.ALL,
-      orphanRemoval = true)
+  @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("report_project")
   private List<Report> reports;
 
@@ -95,8 +88,13 @@ public class Project implements Serializable {
   @JsonManagedReference("notification_project")
   private List<Notification> notifications;
 
+  @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JsonManagedReference("audit_project")
+  private List<Audit> audits;
+
   /**
    * get the list of attachments of the project.
+   * 
    * @return list of attachments
    */
   @JsonManagedReference("project_attachment")
@@ -106,6 +104,7 @@ public class Project implements Serializable {
 
   /**
    * return the project as a string.
+   * 
    * @return project as a string
    */
   @Override
