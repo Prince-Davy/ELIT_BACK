@@ -1,6 +1,6 @@
 package com.elit.outildedecision.features.audit.question;
 
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.enumeration.QuestionCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -3,7 +3,7 @@
  */
 package com.elit.outildedecision.model;
 
-import com.elit.outildedecision.util.AnswerType;
+import com.elit.outildedecision.enumeration.AnswerType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

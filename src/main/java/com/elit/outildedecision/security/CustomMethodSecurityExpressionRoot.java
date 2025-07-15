@@ -3,7 +3,7 @@ package com.elit.outildedecision.security;
 
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.service.UserService;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectPermession;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;

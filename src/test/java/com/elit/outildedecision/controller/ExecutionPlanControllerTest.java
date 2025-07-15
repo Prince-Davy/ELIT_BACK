@@ -12,7 +12,7 @@ import com.elit.outildedecision.model.ExecutionVoteRequestModel;
 import com.elit.outildedecision.repository.ExecutionPlanRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.service.ExecutionPlanService;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectPermession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

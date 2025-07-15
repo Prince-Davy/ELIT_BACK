@@ -1,6 +1,6 @@
 package com.elit.outildedecision.features.audit.question;
 
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.enumeration.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,7 +48,7 @@ public class QuestionResponseModel {
   private Long auditId;
 
   /**
-   * Label of the answer
+   * Label of the answer.
    */
   private String auditAnswerLabel;
 
@@ -108,7 +108,7 @@ public class QuestionResponseModel {
       this.maxPossibleScore = 2 * weight;
 
       if (maxPossibleScore > 0) {
-        this.scorePercentage = (weightedScore.doubleValue() / maxPossibleScore.doubleValue()) * 100.0;
+        this.scorePercentage = weightedScore / maxPossibleScore * 100.0;
       } else {
         this.scorePercentage = 0.0;
       }

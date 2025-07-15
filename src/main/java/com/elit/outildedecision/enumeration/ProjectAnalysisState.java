@@ -1,5 +1,5 @@
 
-package com.elit.outildedecision.util;
+package com.elit.outildedecision.enumeration;
 
 public enum ProjectAnalysisState {
     NOT_STARTED("NOT_STARTED"), IN_PROGRESS("IN_PROGRESS"), DONE("DONE");

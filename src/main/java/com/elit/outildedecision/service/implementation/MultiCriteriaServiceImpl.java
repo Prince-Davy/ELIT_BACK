@@ -31,7 +31,7 @@ import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.StepWeightRepo;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectPermession;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

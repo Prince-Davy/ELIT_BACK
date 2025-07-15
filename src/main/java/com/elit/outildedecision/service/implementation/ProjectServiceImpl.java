@@ -10,6 +10,12 @@ import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.ExecutionPlanVote;
+import com.elit.outildedecision.enumeration.FormProgressStatus;
+import com.elit.outildedecision.enumeration.ProjectAnalysisState;
+import com.elit.outildedecision.enumeration.ProjectConfirmationState;
+import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectState;
+import com.elit.outildedecision.enumeration.TriType;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
@@ -26,6 +32,7 @@ import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
 import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.model.ResultAiModel;
+import com.elit.outildedecision.model.TriModel;
 import com.elit.outildedecision.repository.FeedbackIaRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.repository.VoteRepository;
@@ -43,11 +50,6 @@ import com.elit.outildedecision.service.AttachmentService;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
 import com.elit.outildedecision.service.ProjectService;
-import com.elit.outildedecision.util.FormProgressStatus;
-import com.elit.outildedecision.util.ProjectAnalysisState;
-import com.elit.outildedecision.util.ProjectConfirmationState;
-import com.elit.outildedecision.util.ProjectPermession;
-import com.elit.outildedecision.util.ProjectState;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.json.ParseException;
@@ -429,37 +431,46 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectToReturn;
     }
+    /**
+     * The method for getting pageable to sort data.
+     *
+     * @param triModel Object contains data filter.
+     * @return pageable.
+     */
+    public Pageable getPageableForSort(final TriModel triModel) {
+        Pageable pageable = PageRequest.of(triModel.getPage(), triModel.getSize());
+        if (TriType.DATEDESC.toString().equals(triModel.getSort())) {
+            pageable = PageRequest.of(triModel.getPage(), triModel.getSize(), Sort.by("project.createdAt").descending());
+        } else if (TriType.DATEASC.toString().equals(triModel.getSort())) {
+            pageable = PageRequest.of(triModel.getPage(), triModel.getSize(), Sort.by("project.createdAt").ascending());
+        } else if (TriType.NAMEDESC.toString().equals(triModel.getSort())) {
+            pageable = PageRequest.of(triModel.getPage(), triModel.getSize(), Sort.by("project.name").ascending());
+        } else if (TriType.NAMEASC.toString().equals(triModel.getSort())) {
+            pageable = PageRequest.of(triModel.getPage(), triModel.getSize(), Sort.by("project.name").descending());
+        }
+        return pageable;
+    }
 
     /**
      * The method for getting the list of projects of a user.
      *
-     * @param keyword the keyword to search for.
-     * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL").
-     * @param page    the page number.
-     * @param size    the size of the page.
-     * @param isSortByDate sort by date
-     * @param isMyProjectsCreated is list projects created by me
+     * @param triModel Object contains data filter.
      * @return the list of projects of a user.
      */
-    public ResponsePageProject getUserProjectList(final int page, final int size, final String keyword, final String status, final boolean isSortByDate, final boolean isMyProjectsCreated)
+    public ResponsePageProject getUserProjectList(final TriModel triModel)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // getting the connected user
         ResponsePageProject responsePageProject = new ResponsePageProject();
         List<ProjectResponseModel> projects = new ArrayList<>();
-        String keywordNew = (keyword != null) ? keyword : "";
-        String statusNew = (status != null && !status.isEmpty()) ? status : "ALL";
-        Pageable pageable = PageRequest.of(page, size, Sort.by("project.createdAt").descending());
-        if (isSortByDate) {
-          pageable = PageRequest.of(page, size, Sort.by("project.createdAt").ascending());
-        }
+        Pageable pageable = getPageableForSort(triModel);
       Page<ProjectUserPermission> projectUserPermissionPagination = new PageImpl<>(new ArrayList<>());
-        if (isMyProjectsCreated) {
+        if (triModel.isActiveTab()) {
             projectUserPermissionPagination = projectUserPermissionRepository
-                    .findProjectCeatedByUser(keywordNew, statusNew, userDetails.getUsername(), pageable);
+                    .findProjectCeatedByUser(triModel.getKey(), triModel.getStatus(), userDetails.getUsername(), pageable);
         } else {
             projectUserPermissionPagination = projectUserPermissionRepository
-                    .findProjectAffected(keywordNew, statusNew, userDetails.getUsername(), pageable);
+                    .findProjectAffected(triModel.getKey(), triModel.getStatus(), userDetails.getUsername(), pageable);
         }
         List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent();
 
@@ -564,8 +575,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         }
         responsePageProject.setProjectsPage(new PageImpl<>(projects, pageable, projectUserPermissionPagination.getTotalElements()));
-        responsePageProject.setTotalProjetCreated(projectUserPermissionRepository.getTotalProjectCreatedUser(keywordNew, statusNew, userDetails.getUsername()));
-        responsePageProject.setTotalProjetAffected(projectUserPermissionRepository.getTotalProjectAffectedUser(keywordNew, statusNew, userDetails.getUsername()));
+        responsePageProject.setTotalProjetCreated(projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getStatus(), userDetails.getUsername()));
+        responsePageProject.setTotalProjetAffected(projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getStatus(), userDetails.getUsername()));
       return responsePageProject;
     }
 

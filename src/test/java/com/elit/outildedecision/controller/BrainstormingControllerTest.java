@@ -9,8 +9,7 @@ import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.implementation.BrainstormingServiceImpl;
 import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ModelSamples;
-import com.elit.outildedecision.util.ProjectPermession;
-import org.junit.jupiter.api.Assertions;
+import com.elit.outildedecision.enumeration.ProjectPermession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,17 +19,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.elit.outildedecision.util.Constants.ANALYSIS_DOESNT_EXIST;
 import static com.elit.outildedecision.util.Constants.BRAINSTORMING_DOESNT_EXIST;

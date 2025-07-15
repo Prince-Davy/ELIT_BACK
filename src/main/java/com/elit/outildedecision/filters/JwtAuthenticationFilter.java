@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * JwtAuthenticationFilter to configuration jwt.
+ */
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
   private final JwtProperties jwtProperties;
   private final AuthenticationManager authenticationManager;
@@ -51,7 +54,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
    * and then we use the authentication manager to authenticate the user
    * If the authentication is successful, we will generate a JWT token
    * and send it back to the client.
-   *
    * @param request  the request
    * @param response the response
    * @return Authentication the authentication object that contains the
@@ -93,7 +95,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
    * @param response   the response
    * @param chain      the filter chain
    * @param authResult the authentication object that contains the authenticated
-   *                   user details
+   * user details
    * @throws IOException if there is an error while writing the token to the
    *                     response body
    */
@@ -183,6 +185,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
   /**
    * Extract username from request following Open/Closed Principle.
+   * @param  requestMap requestMap for saving data
+   * @return extract username from request
    * Supports both 'username' and 'userEmail' fields.
    */
   private String extractUsernameFromRequest(final Map<String, String> requestMap) {

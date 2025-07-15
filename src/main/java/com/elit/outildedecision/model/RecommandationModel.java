@@ -1,6 +1,6 @@
 package com.elit.outildedecision.model;
 
-import com.elit.outildedecision.util.MethodologyType;
+import com.elit.outildedecision.enumeration.MethodologyType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

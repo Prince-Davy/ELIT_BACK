@@ -2,7 +2,6 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
@@ -13,6 +12,8 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
+import com.elit.outildedecision.model.ResponsePageProject;
+import com.elit.outildedecision.model.TriModel;
 import com.elit.outildedecision.service.ProjectService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,9 +31,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -131,12 +134,7 @@ public class ProjectController {
     /**
      * get all projects of a user.
      *
-     * @param keyword the keyword to search for a project
-     * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL")
-     * @param page    the page number
-     * @param size    the page size
-     * @param isSortByDate sort by date
-     * @param isMyProjectsCreated is my project created list
+     * @param triModel Object contains data filter.
      * @throws UserNotAuthorizedException     UserNotAuthorizedException if the user
      *                                        is not authorized
      * @throws ExecutionPlanNotFoundException ExecutionPlanNotFoundException if the
@@ -146,18 +144,12 @@ public class ProjectController {
      *                                        is not found
      * @return List<Project> list of projects
      */
-    @GetMapping("/user/projectlist/")
+    @PostMapping("/user/projectlist/")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponsePageProject getProjectList(
-      @RequestParam(required = false) final String keyword,
-      @RequestParam(required = false) final String status,
-      @RequestParam(defaultValue = "0") final int page,
-      @RequestParam(defaultValue = "10") final int size,
-      @RequestParam(defaultValue = "false") final boolean isSortByDate,
-      @RequestParam(defaultValue = "true") final boolean isMyProjectsCreated
-    )
+    public ResponsePageProject getProjectList(@RequestBody final TriModel triModel)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException {
-        return projectService.getUserProjectList(page, size, keyword, status, isSortByDate, isMyProjectsCreated);
+        System.out.println(triModel.toString());
+        return projectService.getUserProjectList(triModel);
     }
 
     /**

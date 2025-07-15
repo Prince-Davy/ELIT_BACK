@@ -13,7 +13,7 @@ import com.elit.outildedecision.model.MultiCriteriaStepModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
 import com.elit.outildedecision.service.ProjectService;
-import com.elit.outildedecision.util.FormProgressStatus;
+import com.elit.outildedecision.enumeration.FormProgressStatus;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.elit.outildedecision.features.audit.question.QuestionRequestModel;
-import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.enumeration.MethodType;
 
 /**
  * Model for audit creation request.

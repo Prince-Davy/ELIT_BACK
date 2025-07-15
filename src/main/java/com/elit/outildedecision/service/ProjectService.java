@@ -1,7 +1,6 @@
 
 package com.elit.outildedecision.service;
 
-import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
@@ -10,10 +9,12 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.UserNotFoundException;
+import com.elit.outildedecision.enumeration.FormProgressStatus;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
-import com.elit.outildedecision.util.FormProgressStatus;
+import com.elit.outildedecision.model.ResponsePageProject;
+import com.elit.outildedecision.model.TriModel;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -87,12 +88,7 @@ public interface ProjectService {
      * Retrieves a list of project response models for the specified user that match
      * the specified keyword.
      *
-     * @param keyword a String representing the keyword to search for
-     * @param status the status to filter by (e.g., "IN_PROGRESS", "COMPLETED", "PENDING", or "ALL")
-     * @param page    the page number to retrieve
-     * @param size    the number of items per page
-     * @param isSortByDate sort by date
-     * @param isMyProjectsCreated is list projet created by me
+     * @param triModel Object contains data filter.
      * @throws UserNotAuthorizedException     if the user is not authorized to
      *                                        access the project
      * @throws ExecutionPlanNotFoundException if the execution plan is not found
@@ -100,7 +96,7 @@ public interface ProjectService {
      * @return a List of ProjectResponseModel objects representing the matching
      *         projects
      */
-    ResponsePageProject getUserProjectList(int page, int size, String keyword, String status, boolean isSortByDate, boolean isMyProjectsCreated)
+    ResponsePageProject getUserProjectList(TriModel triModel)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException;
 
     /**

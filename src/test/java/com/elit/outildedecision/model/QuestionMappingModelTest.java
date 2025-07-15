@@ -1,6 +1,6 @@
 package com.elit.outildedecision.model;
 
-import com.elit.outildedecision.util.MethodologyType;
+import com.elit.outildedecision.enumeration.MethodologyType;
 import com.elit.outildedecision.util.RecommandationIaMethodologyDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;

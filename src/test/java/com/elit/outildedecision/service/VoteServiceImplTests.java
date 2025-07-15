@@ -5,14 +5,13 @@ import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundExceptio
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.exception.VoteAlreadyExistException;
-import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.repository.*;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.VoteServiceImpl;
 import com.elit.outildedecision.util.Constants;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectPermession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

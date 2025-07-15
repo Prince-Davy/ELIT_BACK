@@ -1,6 +1,8 @@
 package com.elit.outildedecision.util;
 
 import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.enumeration.AnswerType;
+import com.elit.outildedecision.enumeration.FormProgressStatus;
 import com.elit.outildedecision.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.elit.outildedecision.model.UserModel;

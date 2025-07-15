@@ -8,7 +8,7 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.implementation.SuperAdminServiceImpl;
-import com.elit.outildedecision.util.ProjectConfirmationState;
+import com.elit.outildedecision.enumeration.ProjectConfirmationState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

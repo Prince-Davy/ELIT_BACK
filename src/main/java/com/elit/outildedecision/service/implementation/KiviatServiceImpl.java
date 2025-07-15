@@ -10,7 +10,7 @@ import com.elit.outildedecision.model.ThemeModelKiviatId;
 import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.service.KiviatService;
-import com.elit.outildedecision.util.MethodologyType;
+import com.elit.outildedecision.enumeration.MethodologyType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

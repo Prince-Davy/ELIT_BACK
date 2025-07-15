@@ -14,7 +14,7 @@ import com.elit.outildedecision.repository.SurveyAnswerRepository;
 import com.elit.outildedecision.repository.SurveyQuestionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.SurveyAnswerService;
-import com.elit.outildedecision.util.AnswerType;
+import com.elit.outildedecision.enumeration.AnswerType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;

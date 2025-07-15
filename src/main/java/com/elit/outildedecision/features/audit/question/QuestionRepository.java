@@ -1,6 +1,6 @@
 package com.elit.outildedecision.features.audit.question;
 
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.enumeration.QuestionCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

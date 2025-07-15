@@ -51,7 +51,14 @@ public class AuditServiceImpl implements AuditService {
     this.userRepository = userRepository;
     this.questionRepository = questionRepository;
   }
-
+  /**
+   * Create a new audit.
+   * @param auditRequest the audit request model
+   * @param userEmail    the user email
+   * @return the created audit response
+   * @throws ProjectNotFoundException if project not found
+   * @throws UserNotFoundException    if user not found
+   */
   @Override
   public ResponseEntity<AuditResponseModel> createAudit(final AuditRequestModel auditRequest,
       final String userEmail)
@@ -92,7 +99,12 @@ public class AuditServiceImpl implements AuditService {
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
-
+  /**
+   * Get audit by project.
+   * @param projectId project ID
+   * @return list of audit response model
+   * @throws ProjectNotFoundException if project not found
+   */
   @Override
   public List<AuditResponseModel> getAuditsByProject(final Long projectId)
       throws ProjectNotFoundException {
@@ -108,7 +120,14 @@ public class AuditServiceImpl implements AuditService {
         .map(this::mapToResponseModel)
         .collect(Collectors.toList());
   }
-
+  /**
+   * Get audit by project paginated.
+   * @param projectId project ID
+   * @param page oage
+   * @param size size
+   * @return list of audit response model
+   * @throws ProjectNotFoundException if project not found
+   */
   @Override
   public Page<AuditResponseModel> getAuditsByProjectPaginated(final Long projectId,
       final int page,

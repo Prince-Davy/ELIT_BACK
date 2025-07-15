@@ -8,7 +8,7 @@ import com.elit.outildedecision.exception.ResultAiNotFoundException;
 import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
-import com.elit.outildedecision.util.MethodologyType;
+import com.elit.outildedecision.enumeration.MethodologyType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

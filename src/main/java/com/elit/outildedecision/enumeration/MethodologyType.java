@@ -1,4 +1,4 @@
-package com.elit.outildedecision.util;
+package com.elit.outildedecision.enumeration;
 
 import com.elit.outildedecision.exception.UnsupportedMethodologyTypeException;
 
@@ -40,7 +40,6 @@ public enum MethodologyType {
 
   /**
    * Finds a methodology given a loosely matching string.
-   * 
    * @param methodolody the loosely matching methodology we want to look for.
    * @return the exact methodology
    * @throws UnsupportedMethodologyTypeException if the given string does not

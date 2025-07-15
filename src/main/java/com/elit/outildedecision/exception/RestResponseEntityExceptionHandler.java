@@ -1,5 +1,6 @@
 package com.elit.outildedecision.exception;
 
+import com.elit.outildedecision.enumeration.MethodType;
 import com.elit.outildedecision.model.ErrorMessage;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;
@@ -47,7 +48,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
    * to gain access to the system or tamper with data.
    * TODO : evaluate relevance to send such data back to front.
    * <p>
-   * 
    * @param ex      The MethodArgumentNotValidException that was thrown.
    * @param headers The HttpHeaders to be included in the response.
    * @param status  The HttpStatus to be included in the response.
@@ -147,7 +147,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   /**
    * Handles multiple exceptions and returns a response with an error message and
    * HTTP status code 400 (BAD REQUEST).
-   *
    * TODO : evaluate relevance of sending bad request to client
    * <p>
    * The types handled by this method include:
@@ -157,7 +156,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
    * <li>{@link ResponseNotValidException}</li>
    * </ul>
    * </p>
-   * 
    * @param ex the Exception to handle.
    * @return a {@code ResponseEntity<ErrorMessage>} with an error message and HTTP
    *         status code 400 (BAD REQUEST).
@@ -241,7 +239,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     String detailedMessage = String.format(
         "%s. Valeurs acceptées: [%s]",
         ex.getMessage(),
-        Arrays.stream(com.elit.outildedecision.util.MethodType.values())
+        Arrays.stream(MethodType.values())
             .map(Enum::name)
             .collect(Collectors.joining(", ")));
 

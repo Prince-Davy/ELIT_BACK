@@ -1,4 +1,4 @@
-package com.elit.outildedecision.util;
+package com.elit.outildedecision.enumeration;
 
 /**
  * Enumeration representing the different categories of questions in an audit

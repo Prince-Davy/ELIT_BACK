@@ -1,6 +1,6 @@
 package com.elit.outildedecision.entity;
 
-import com.elit.outildedecision.util.AnswerType;
+import com.elit.outildedecision.enumeration.AnswerType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

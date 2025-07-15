@@ -1,7 +1,7 @@
 package com.elit.outildedecision.exception;
 
 /**
- * Runtime exception when methodology cannot be converted to a {@link com.elit.outildedecision.util.MethodologyType}.
+ * Runtime exception when methodology cannot be converted to MethodologyType.
  */
 public class UnsupportedMethodologyTypeException extends RuntimeException {
   /**

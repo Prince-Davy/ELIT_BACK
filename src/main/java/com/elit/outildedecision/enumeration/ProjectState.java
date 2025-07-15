@@ -1,4 +1,4 @@
-package com.elit.outildedecision.util;
+package com.elit.outildedecision.enumeration;
 
 import lombok.Getter;
 

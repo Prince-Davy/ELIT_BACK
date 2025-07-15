@@ -1,5 +1,6 @@
 package com.elit.outildedecision.util;
 
+import com.elit.outildedecision.enumeration.MethodologyType;
 import com.elit.outildedecision.exception.UnsupportedMethodologyTypeException;
 import org.junit.jupiter.api.Test;
 

@@ -9,9 +9,8 @@ import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.PredictibilityScoreModel;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.PredictibilityAnalysisService;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectPermession;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,9 +26,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;

@@ -1,4 +1,4 @@
-package com.elit.outildedecision.util;
+package com.elit.outildedecision.enumeration;
 
 import com.elit.outildedecision.exception.UnsupportedMethodologyTypeException;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -48,7 +48,6 @@ public enum MethodType {
 
   /**
    * Finds a method type given a loosely matching string.
-   * 
    * @param method the loosely matching method we want to look for.
    * @return the exact method type
    * @throws UnsupportedMethodologyTypeException if the given string does not

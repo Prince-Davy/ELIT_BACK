@@ -10,7 +10,7 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.FeedBackIaModel;
 import com.elit.outildedecision.service.FeedbackIaService;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectPermession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

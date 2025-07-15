@@ -9,7 +9,7 @@ import com.elit.outildedecision.entity.AnswerIa;
 import com.elit.outildedecision.entity.ResultAi;
 import com.elit.outildedecision.model.RecommandationItemModel;
 import com.elit.outildedecision.model.RecommandationLevel;
-import com.elit.outildedecision.util.MethodologyType;
+import com.elit.outildedecision.enumeration.MethodologyType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;

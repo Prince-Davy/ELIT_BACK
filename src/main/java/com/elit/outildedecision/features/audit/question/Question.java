@@ -1,14 +1,24 @@
 package com.elit.outildedecision.features.audit.question;
 
 import com.elit.outildedecision.features.audit.Audit;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.enumeration.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -95,10 +105,8 @@ public class Question implements Serializable {
   @Column(name = "current_score", nullable = false)
   @NotNull(message = "Current score is required")
   private Integer currentScore;
-  
   /**
    * Determines if this question has been answered.
-   *
    * @return true if the question has a current answer
    */
   public boolean isAnswered() {
@@ -127,20 +135,6 @@ public class Question implements Serializable {
     }
     // Maximum score is always 2 regardless of answer type
     return auditAnswerValue * weight;
-  }
-
-  /**
-   * Calculates the score percentage for this question.
-   * Useful for progress tracking and reporting.
-   *
-   * @return the score as a percentage (0-100)
-   */
-  public Double getScorePercentage() {
-    Integer maxScore = getMaxPossibleScore();
-    if (maxScore == 0) {
-      return 0.0;
-    }
-    return (getWeightedScore().doubleValue() / maxScore.doubleValue()) * 100.0;
   }
 
   /**

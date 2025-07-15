@@ -1,7 +1,7 @@
 package com.elit.outildedecision.features.audit;
 
 import com.elit.outildedecision.features.audit.question.QuestionResponseModel;
-import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.enumeration.MethodType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

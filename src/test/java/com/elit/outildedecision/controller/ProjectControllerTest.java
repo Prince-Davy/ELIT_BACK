@@ -6,14 +6,12 @@ import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
-import com.elit.outildedecision.model.ContributerModel;
-import com.elit.outildedecision.model.ProjectModel;
-import com.elit.outildedecision.model.ProjectResponseModel;
-import com.elit.outildedecision.model.ResponsePageProject;
+import com.elit.outildedecision.model.*;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.ProjectService;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -171,8 +168,17 @@ class ProjectControllerTest {
   void getProjectList() throws Exception {
     String keyword = "query";
     ResponsePageProject responsePageProject = new ResponsePageProject();
-    when(projectService.getUserProjectList(0,10,keyword,null,false,false)).thenReturn(responsePageProject);
-    MockHttpServletResponse response = mockMvc.perform(get("/user/projectlist/").param("required","false")).andDo(print()).andReturn().getResponse();
+    TriModel triModel = new TriModel("", "ALL", "DATEDESC", true, 0, 10);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String triModelJson = objectMapper.writeValueAsString(triModel);
+
+    MockHttpServletResponse response = mockMvc.perform(post("/user/projectlist/")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(triModelJson))
+            .andDo(print())
+            .andReturn()
+            .getResponse();
+
     Assertions.assertEquals(200, response.getStatus());
   }
   @WithMockUser(authorities = {"ADMIN"})
