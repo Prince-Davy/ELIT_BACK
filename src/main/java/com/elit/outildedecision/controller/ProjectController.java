@@ -148,7 +148,6 @@ public class ProjectController {
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponsePageProject getProjectList(@RequestBody final TriModel triModel)
             throws UserNotAuthorizedException, ExecutionPlanNotFoundException, ProjectNotFoundException {
-        System.out.println(triModel.toString());
         return projectService.getUserProjectList(triModel);
     }
 
