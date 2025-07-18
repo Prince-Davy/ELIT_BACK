@@ -34,10 +34,13 @@ variables:
     value: "lge-elit"
   - name: kubernetesNamespaceInteg
     value: "lge-elit"
-  # - name: kubernetesSecretInteg
-  #   value: "lge-elit-back-config-integ"
-  # - name: kubernetesConfigMapInteg
-  #   value: "lge-elit-back-config-map-integ"
+ # Include specific variables of Quality and Security
+  - name: SKIP_DOXYGEN
+    value: false
+  - name: SKIP_QUALITY
+    value: false
+  - name: SKIP_SECURITY
+    value: false
   # Include template variables
   - template: templates-general/variables.yml@templates
   - group: elit_back_library
@@ -47,5 +50,9 @@ extends:
   parameters:
     DEPLOY_INTEG: true
     DEPLOY_PROD: false
-    SCAN_SQ: false
+    DEPLOY_TEST: false
+    NO_DOXYGEN_FAIL: true
     NO_QUALITY_FAIL: true
+    NO_SECURITY_FAIL: true
+    NO_SONAR_FAIL: true
+    SCAN_SQ: true
