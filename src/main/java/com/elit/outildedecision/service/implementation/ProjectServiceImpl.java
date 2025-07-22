@@ -467,10 +467,10 @@ public class ProjectServiceImpl implements ProjectService {
       Page<ProjectUserPermission> projectUserPermissionPagination = new PageImpl<>(new ArrayList<>());
         if (triModel.isActiveTab()) {
             projectUserPermissionPagination = projectUserPermissionRepository
-                    .findProjectCeatedByUser(triModel.getKey(), triModel.getStatus(), userDetails.getUsername(), pageable);
+                    .findProjectCeatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
         } else {
             projectUserPermissionPagination = projectUserPermissionRepository
-                    .findProjectAffected(triModel.getKey(), triModel.getStatus(), userDetails.getUsername(), pageable);
+                    .findProjectAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
         }
         List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent();
 
@@ -575,8 +575,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         }
         responsePageProject.setProjectsPage(new PageImpl<>(projects, pageable, projectUserPermissionPagination.getTotalElements()));
-        responsePageProject.setTotalProjetCreated(projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getStatus(), userDetails.getUsername()));
-        responsePageProject.setTotalProjetAffected(projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getStatus(), userDetails.getUsername()));
+        responsePageProject.setTotalProjetCreated(projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername()));
+        responsePageProject.setTotalProjetAffected(projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername()));
       return responsePageProject;
     }
 

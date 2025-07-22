@@ -14,4 +14,5 @@ public class TriModel {
     private boolean isActiveTab;
     private int page;
     private int size;
+    private String typeAnalyse;
 }

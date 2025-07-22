@@ -168,7 +168,7 @@ class ProjectControllerTest {
   void getProjectList() throws Exception {
     String keyword = "query";
     ResponsePageProject responsePageProject = new ResponsePageProject();
-    TriModel triModel = new TriModel("", "ALL", "DATEDESC", true, 0, 10);
+    TriModel triModel = new TriModel("", "ALL", "DATEDESC", true, 0, 10,"ALL");
     ObjectMapper objectMapper = new ObjectMapper();
     String triModelJson = objectMapper.writeValueAsString(triModel);
 
