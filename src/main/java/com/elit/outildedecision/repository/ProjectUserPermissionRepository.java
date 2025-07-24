@@ -89,7 +89,7 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
           + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
           + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
           + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) AND "
-          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse)) AND "
+          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR (LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse) OR (p.project.formProgressStatus='BOTH' AND :typeAnalyse!='AUDIT'))) AND "
           + "p.user.userEmail=:userEmail and  p.project.chefId = p.user.userId")
     long getTotalProjectCreatedUser(
             @Param("keyword") String keyword,
@@ -109,7 +109,7 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
           + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
           + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
           + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) AND "
-          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse)) AND "
+          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR (LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse) OR (p.project.formProgressStatus='BOTH' AND :typeAnalyse!='AUDIT'))) AND "
           + "p.user.userEmail=:userEmail and  p.project.chefId != p.user.userId")
     long getTotalProjectAffectedUser(
             @Param("keyword") String keyword,
@@ -132,7 +132,7 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
           + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
           + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
           + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) AND "
-          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse)) AND "
+          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR (LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse) OR (p.project.formProgressStatus='BOTH' AND :typeAnalyse!='AUDIT'))) AND "
           + "p.user.userEmail=:userEmail  and  p.project.chefId != p.user.userId "
           + "GROUP BY p")
   Page<ProjectUserPermission> findProjectAffected(
@@ -156,7 +156,7 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
           + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
           + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
           + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) AND "
-          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse)) AND "
+          + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR (LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse) OR (p.project.formProgressStatus='BOTH' AND :typeAnalyse!='AUDIT'))) AND "
           + "p.user.userEmail=:userEmail  and  p.project.chefId = p.user.userId "
           + "GROUP BY p")
   Page<ProjectUserPermission> findProjectCeatedByUser(
