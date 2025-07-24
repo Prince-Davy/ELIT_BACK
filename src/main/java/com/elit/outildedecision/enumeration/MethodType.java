@@ -23,7 +23,13 @@ public enum MethodType {
   /**
    * Waterfall methodology.
    */
-  WATERFALL("waterfall", Pattern.compile("waterfall", Pattern.CASE_INSENSITIVE));
+  WATERFALL("waterfall", Pattern.compile("waterfall", Pattern.CASE_INSENSITIVE)),
+
+  /**
+   * Scaled Agility methodology.
+   */
+  SCALED_AGILITY("scaledAgility", Pattern.compile("scaledAgility", Pattern.CASE_INSENSITIVE));
+
 
   private final String methodTypeName;
   private final Pattern methodTypePattern;
