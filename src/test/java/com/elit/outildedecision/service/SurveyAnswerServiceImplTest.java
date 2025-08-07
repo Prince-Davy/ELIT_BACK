@@ -10,7 +10,7 @@ import com.elit.outildedecision.repository.SurveyAnswerRepository;
 import com.elit.outildedecision.repository.SurveyQuestionRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.implementation.SurveyAnswerServiceImpl;
-import com.elit.outildedecision.enumeration.AnswerType;
+import com.elit.outildedecision.util.AnswerType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.elit.outildedecision.enumeration.AnswerType.SELECTED_ANSWER;
+import static com.elit.outildedecision.util.AnswerType.SELECTED_ANSWER;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

@@ -18,7 +18,7 @@ import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ReportRepository;
 import com.elit.outildedecision.service.ReportService;
-import com.elit.outildedecision.enumeration.ReportTypes;
+import com.elit.outildedecision.util.ReportTypes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;

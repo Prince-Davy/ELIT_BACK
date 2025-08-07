@@ -18,7 +18,7 @@ import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.service.VoteService;
 import com.elit.outildedecision.util.Constants;
-import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.elit.outildedecision.util.ProjectPermession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

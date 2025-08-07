@@ -1,9 +1,6 @@
 package com.elit.outildedecision.util;
 
-import com.elit.outildedecision.enumeration.ProjectState;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectStateTest {
 

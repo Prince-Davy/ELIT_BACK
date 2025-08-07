@@ -9,7 +9,7 @@ import com.elit.outildedecision.model.RecommandationLevel;
 import com.elit.outildedecision.model.RecommandationModel;
 import com.elit.outildedecision.model.ResponseModel;
 import com.elit.outildedecision.service.RecommandationService;
-import com.elit.outildedecision.enumeration.MethodologyType;
+import com.elit.outildedecision.util.MethodologyType;
 import com.elit.outildedecision.util.RecommandationIaMethodologyDeserializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

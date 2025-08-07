@@ -9,7 +9,7 @@ import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.VoteService;
 import com.elit.outildedecision.util.ModelSamples;
-import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

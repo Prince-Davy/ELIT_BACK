@@ -9,7 +9,7 @@ import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.PredictibilityScoreModel;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.PredictibilityAnalysisService;
-import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

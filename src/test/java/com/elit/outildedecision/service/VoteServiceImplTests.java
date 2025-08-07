@@ -11,7 +11,7 @@ import com.elit.outildedecision.repository.*;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.VoteServiceImpl;
 import com.elit.outildedecision.util.Constants;
-import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.elit.outildedecision.util.ProjectPermession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
 package com.elit.outildedecision.entity;
 
 import com.elit.outildedecision.config.View;
-import com.elit.outildedecision.features.audit.Audit;
-import com.elit.outildedecision.enumeration.FormProgressStatus;
-import com.elit.outildedecision.enumeration.ProjectState;
+import com.elit.outildedecision.audit.entity.Audit;
+import com.elit.outildedecision.util.FormProgressStatus;
+import com.elit.outildedecision.util.ProjectState;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;

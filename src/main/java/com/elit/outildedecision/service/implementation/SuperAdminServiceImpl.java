@@ -8,7 +8,7 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.SuperAdminService;
-import com.elit.outildedecision.enumeration.ProjectConfirmationState;
+import com.elit.outildedecision.util.ProjectConfirmationState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;

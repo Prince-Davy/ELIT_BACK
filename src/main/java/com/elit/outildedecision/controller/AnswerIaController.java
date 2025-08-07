@@ -5,7 +5,7 @@ import com.elit.outildedecision.entity.AnswerIa;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.service.AnswerIaService;
 import com.elit.outildedecision.service.ProjectService;
-import com.elit.outildedecision.enumeration.FormProgressStatus;
+import com.elit.outildedecision.util.FormProgressStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

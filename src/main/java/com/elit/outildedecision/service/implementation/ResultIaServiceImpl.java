@@ -14,7 +14,7 @@ import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.service.RecommandationService;
 import com.elit.outildedecision.service.ResultIaService;
-import com.elit.outildedecision.enumeration.ProjectState;
+import com.elit.outildedecision.util.ProjectState;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

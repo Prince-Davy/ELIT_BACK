@@ -1,6 +1,6 @@
 package com.elit.outildedecision.exception;
 
-import com.elit.outildedecision.enumeration.MethodType;
+import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.model.ErrorMessage;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;

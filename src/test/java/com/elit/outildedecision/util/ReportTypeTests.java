@@ -3,7 +3,6 @@ package com.elit.outildedecision.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.elit.outildedecision.enumeration.ReportTypes;
 import org.junit.jupiter.api.Test;
 
  class ReportTypeTests {

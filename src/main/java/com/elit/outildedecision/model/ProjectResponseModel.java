@@ -1,7 +1,7 @@
 package com.elit.outildedecision.model;
 
-import com.elit.outildedecision.enumeration.FormProgressStatus;
-import com.elit.outildedecision.enumeration.ProjectState;
+import com.elit.outildedecision.util.FormProgressStatus;
+import com.elit.outildedecision.util.ProjectState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

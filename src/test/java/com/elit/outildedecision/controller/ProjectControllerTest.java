@@ -10,7 +10,7 @@ import com.elit.outildedecision.model.*;
 import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.ProjectService;
-import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

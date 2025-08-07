@@ -9,7 +9,7 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.UserNotFoundException;
-import com.elit.outildedecision.enumeration.FormProgressStatus;
+import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;

@@ -9,7 +9,7 @@ import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.implementation.AttachmentServiceImpl2;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
-import com.elit.outildedecision.enumeration.ProjectPermession;
+import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Assertions;
