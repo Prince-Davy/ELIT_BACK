@@ -1,6 +1,6 @@
 [
   {
-    "id": "ProjectComplexity",
+    "id": "Project Complexity",
     "questionText": "Quelle est la complexité du projet ?",
     "questionNumber": 1,
     "responses": [
@@ -79,7 +79,7 @@
     ]
   },
   {
-    "id": "ProjectDurationFlexibility",
+    "id": "Duration Change",
     "questionText": "Quelle flexibilité est permise sur la durée du projet ?",
     "questionNumber": 3,
     "responses": [
@@ -158,7 +158,7 @@
     ]
   },
   {
-    "id": "ProjectCostFlexibility",
+    "id": "Budget Change",
     "questionText": "Quelle est la flexibilité sur le respect du budget du projet ?",
     "questionNumber": 4,
     "responses": [
@@ -237,7 +237,7 @@
     ]
   },
   {
-    "id": "ProjectRequirementsFlexibility",
+    "id": "Requirement Change",
     "questionText": "Quelle flexibilité est permise sur le respect des besoins du client ?",
     "questionNumber": 7,
     "responses": [
@@ -340,7 +340,7 @@
     ]
   },
   {
-    "id": "ProjectTechnicalDifficulty",
+    "id": "Technological uncertainty",
     "questionText": "Quel est le défi technologique du projet ?",
     "questionNumber": 8,
     "responses": [
@@ -443,12 +443,12 @@
     ]
   },
   {
-    "id": "ProjectRiskRate",
+    "id": "Risk rate",
     "questionText": "Quel est le taux de risque dans le projet (risque stratégique, opérationnel, tactique) ?",
     "questionNumber": 9,
     "responses": [
       {
-        "id": "low",
+        "id": "<10%",
         "label": "Faible : moins de 10%",
         "recommandations": [
           {
@@ -472,7 +472,7 @@
         ]
       },
       {
-        "id": "medium",
+        "id": "10% to 50%",
         "label": "Moyen : de 10% à 50%",
         "recommandations": [
           {
@@ -496,7 +496,7 @@
         ]
       },
       {
-        "id": "high",
+        "id": "50% to 75%",
         "label": "Élevé : de 50% à 75%",
         "recommandations": [
           {
@@ -520,7 +520,7 @@
         ]
       },
       {
-        "id": "veryHigh",
+        "id": "75% to 100%",
         "label": "Très élevé : de 75% à 100%",
         "recommandations": [
           {
@@ -546,7 +546,7 @@
     ]
   },
   {
-    "id": "ProjectManagementInvolvement",
+    "id": "Management/sponsor engagement",
     "questionText": "Quel est le niveau d'engagement du management et de la direction (Disponibilité, décision, …) ?",
     "questionNumber": 10,
     "responses": [
@@ -575,7 +575,7 @@
         ]
       },
       {
-        "id": "medium",
+        "id": "moderate",
         "label": "Moyen",
         "recommandations": [
           {
@@ -625,7 +625,7 @@
     ]
   },
   {
-    "id": "ProjectClientInvolvement",
+    "id": "The role of the customer",
     "questionText": "Quel est le niveau d'implication et de participation du client ?",
     "questionNumber": 12,
     "responses": [
@@ -654,7 +654,7 @@
         ]
       },
       {
-        "id": "medium",
+        "id": "moderate",
         "label": "Moyen : participtaion du client pendant la création",
         "recommandations": [
           {
@@ -704,7 +704,7 @@
     ]
   },
   {
-    "id": "ProjectClientKnowledge",
+    "id": "Customer experience level",
     "questionText": "Quel est le niveau de connaissance du client sur ses besoins et sur le produit ?",
     "questionNumber": 14,
     "responses": [
@@ -733,7 +733,7 @@
         ]
       },
       {
-        "id": "medium",
+        "id": "moderate",
         "label": "Moyen",
         "recommandations": [
           {
@@ -783,7 +783,7 @@
     ]
   },
   {
-    "id": "ProjectTeamInvolvment",
+    "id": "Team's dedication",
     "questionText": "Quel est le niveau d'implication des participants ?",
     "questionNumber": 18,
     "responses": [

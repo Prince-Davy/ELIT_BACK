@@ -1,5 +1,6 @@
 package com.elit.outildedecision.service;
 
+import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
 import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.FeedbackIa;
 import com.elit.outildedecision.entity.FormStep;
@@ -19,7 +20,6 @@ import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
 import com.elit.outildedecision.model.ProjectModel;
 import com.elit.outildedecision.model.ProjectResponseModel;
-import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.FeedbackIaRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
@@ -76,7 +76,7 @@ class ProjectServiceImplTest {
   @Mock
   ResultIaRepository resultIaRepository;
   @Mock
-  AnswerIaRepository answerIaRepository;
+  AiAnswerRepository aiAnswerRepository;
   @Mock
   MultiCriteriaAnalysisService multiCriteriaService;
   @Mock

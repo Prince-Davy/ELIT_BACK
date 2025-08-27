@@ -10,7 +10,7 @@ import java.util.List;
  *  who give an note for making kiviat project model
  *
 
- * @see com.elit.outildedecision.entity.AnswerIa
+ * @see com.elit.outildedecision.ai.anwser.entity.AiAnswer
  * @see ResponseModelKiviat
  */
 @Data
@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class QuestionMappingModelKiviat {
 
-  private Integer questionNumber;
+  private String questionNumber;
   private String questionText;
   private ThemeModelKiviatId theme;
   private List<ResponseModelKiviat> responses;

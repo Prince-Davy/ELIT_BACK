@@ -1,13 +1,16 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.entity.AnswerIa;
-import com.elit.outildedecision.exception.AnswerIaNotFoundException;
+import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
+import com.elit.outildedecision.common.dto.SimpleMessageDto;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
+import com.elit.outildedecision.exception.ResultAlreadyExistsException;
 import com.elit.outildedecision.model.RecommandationItemModel;
 import com.elit.outildedecision.model.ResultAiModel;
 import com.elit.outildedecision.service.ResultIaService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -42,14 +46,18 @@ public class IaResultController {
    * Send data to Ai and get result to save it on BDD.
    *
    * @param projectId project id
-   * @param answers   list of answers IA
-   * @return ResponseEntity<Object>
+   * @param aiAnswerDTO   list of answers IA
+   * @return ResponseEntity<SimpletMessageDto>
    */
   @PostMapping("/{projectId}")
   @PreAuthorize("isProjectOwner(#projectId)")
-  public ResponseEntity<Object> saveAiResponse(@PathVariable final long projectId, @RequestBody final List<AnswerIa> answers) {
-    return resultIaService.generateAndSaveResult(projectId, answers);
+  public ResponseEntity<SimpleMessageDto> saveAiResponse(@PathVariable final long projectId,
+                                                 @RequestBody final AiAnswerDTO aiAnswerDTO) throws ResultAiNotFoundException, ProjectNotFoundException, ResultAlreadyExistsException {
+
+    String iaResponse = resultIaService.generateAndSaveResult(projectId, aiAnswerDTO);
+    return ResponseEntity.ok(new SimpleMessageDto("AI prediction" + "\n" + iaResponse, HttpStatus.OK.value(), LocalDateTime.now()));
   }
+
 
   /**
    * Get result of analyse AI for project.
@@ -89,7 +97,7 @@ public class IaResultController {
   @GetMapping("/mapping/{projectId}")
   @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<List<RecommandationItemModel>> getAnalysisIaResultMapping(@PathVariable final String projectId)
-    throws AnswerIaNotFoundException, ResultAiNotFoundException {
+    throws AiAnswerNotFoundException, ResultAiNotFoundException {
     return resultIaService.getMapping(projectId);
   }
 }

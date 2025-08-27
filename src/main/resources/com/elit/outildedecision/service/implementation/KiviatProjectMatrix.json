@@ -1,6 +1,6 @@
 [
   {
-    "questionNumber": 3,
+    "questionNumber": "Duration Change",
     "questionText": "Quelle flexibilité est permise sur la durée du projet ?",
     "theme" : "FlexibiliteGestion",
     "responses": [
@@ -22,7 +22,7 @@
     ]
   },
   {
-    "questionNumber": 4,
+    "questionNumber": "Budget Change",
     "questionText": "Quelle est la flexibilité sur le respect du budget du projet ?",
     "theme" : "FlexibiliteGestion",
     "responses": [
@@ -44,7 +44,7 @@
     ]
   },
   {
-    "questionNumber": 5,
+    "questionNumber": "Requirement description",
     "questionText": "Quels sont les objectifs et besoins clients ?",
     "theme" : "FlexibiliteSolution",
     "responses": [
@@ -61,7 +61,7 @@
     ]
   },
   {
-    "questionNumber": 6,
+    "questionNumber": "Requirement Change",
     "questionText": "Quelle flexibilité est permise sur le respect des besoins du client ?",
     "theme" : "FlexibiliteSolution",
     "responses": [
@@ -88,7 +88,7 @@
     ]
   },
   {
-    "questionNumber": 8,
+    "questionNumber": "Risk rate",
     "questionText": "Quel est le taux de risque dans le projet (risque stratégique, opérationnel, tactique) ?",
     "theme" : "FlexibiliteGestion",
     "responses": [
@@ -115,7 +115,7 @@
     ]
   },
   {
-    "questionNumber": 9,
+    "questionNumber": "Management/sponsor engagement",
     "questionText": "Quel est le niveau d'engagement du management et de la direction (Disponibilité, décision, …) ?",
     "theme" : "Coordination",
     "responses": [
@@ -137,7 +137,7 @@
     ]
   },
   {
-    "questionNumber": 11,
+    "questionNumber": "The role of the customer",
     "questionText": "Quel est le niveau d'implication et de participation du client ?",
     "theme" : "ConfianceEtDelegation",
     "responses": [
@@ -159,7 +159,7 @@
     ]
   },
   {
-    "questionNumber": 12,
+    "questionNumber": "Communication with the customer",
     "questionText": "Quelle est la fréquence des échanges avec le client ?",
     "theme" : "ConfianceEtDelegation",
     "responses": [
@@ -176,7 +176,7 @@
     ]
   },
   {
-    "questionNumber": 13,
+    "questionNumber": "Customer experience level",
     "questionText": "Quel est le niveau de connaissance du client sur ses besoins et sur le produit ?",
     "theme" : "MaitrisePerimetre",
     "responses": [
@@ -198,7 +198,7 @@
     ]
   },
   {
-    "questionNumber": 14,
+    "questionNumber": "Engagement of the stakeholders (cutomer, suppliers)",
     "questionText": "Quel est le niveau d'engagement des parties prenantes (client, fournisseurs, …)",
     "theme" : "Coordination",
     "responses": [
@@ -220,7 +220,7 @@
     ]
   },
   {
-    "questionNumber": 16,
+    "questionNumber": "Team's dedication",
     "questionText": "Quel est le niveau d'implication des participants ?",
     "theme" : "Coordination",
     "responses": [

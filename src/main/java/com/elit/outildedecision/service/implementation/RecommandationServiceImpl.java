@@ -1,19 +1,26 @@
 package com.elit.outildedecision.service.implementation;
 
-import com.elit.outildedecision.entity.AnswerIa;
+import com.elit.outildedecision.ai.answer.entity.AiAnswer;
 import com.elit.outildedecision.entity.ResultAi;
-import com.elit.outildedecision.exception.MalformedDataException;
 import com.elit.outildedecision.model.QuestionMappingModel;
 import com.elit.outildedecision.model.RecommandationItemModel;
 import com.elit.outildedecision.model.RecommandationLevel;
-import com.elit.outildedecision.model.RecommandationModel;
-import com.elit.outildedecision.model.ResponseModel;
 import com.elit.outildedecision.service.RecommandationService;
 import com.elit.outildedecision.util.MethodologyType;
 import com.elit.outildedecision.util.RecommandationIaMethodologyDeserializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,47 +29,43 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * @inheritDoc .
+ * Service de recommandations basé sur les réponses de l'IA et un fichier de mapping JSON.
  */
 @Service
-public class RecommandationServiceImpl implements RecommandationService {
+public final class RecommandationServiceImpl implements RecommandationService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RecommandationServiceImpl.class);
-
-  public static final String NO_SUCH_QUESTION = "No such question in JSON matching : {0}";
-  public static final String NO_SUCH_RESPONSE = "No such response in JSON matching : {0}";
-  public static final String NO_SUCH_RECOMMANDATION = "No such recommandation in JSON matching : {0}";
 
   @Value("${file.recommandations-file}")
   private String recommandationsFile;
 
   private final ResourceLoader resourceLoader;
 
-  private List<QuestionMappingModel> questions;
+  // Données chargées depuis le JSON
+  private List<QuestionMappingModel> questionMappings = new ArrayList<>();
+
+  // Index pour accès direct par id de question
+  private Map<String, QuestionMappingModel> questionIndex = new HashMap<>();
 
   /**
-   * Constructor for RecommandationServiceImpl.
+   * Construit une instance du service de recommandations.
+   * <p>
+   * Ce constructeur injecte le {@code ResourceLoader} requis pour localiser et lire
+   * les ressources nécessaires (notamment le fichier JSON de mappage des recommandations).
+   * Le chargement effectif des données et la création de l’index sont réalisés lors
+   * de la phase d’initialisation du composant.
    *
-   * @param resourceLoader the resource loader
+   * @param resourceLoader le chargeur de ressources utilisé pour accéder aux fichiers applicatifs
    */
+
   public RecommandationServiceImpl(final ResourceLoader resourceLoader) {
     this.resourceLoader = resourceLoader;
   }
 
   /**
-   * Post bean construct init to load json file from disk.
-   * FIXME : This method is not meant to be visible / callable outside and thus is meant to be private,
-   * FIXME : but making this method private will fail pmd verification and thus CI build. To fix this we should
-   * FIXME : include a custom pmd rule. Since I can't make it work, the only solution I found is to make it
-   * FIXME : package-private. If you can fix it you're a hero :-)
+   * Charge le fichier JSON et prépare l'index des questions.
    */
   @PostConstruct
   void init() {
@@ -72,82 +75,60 @@ public class RecommandationServiceImpl implements RecommandationService {
       module.addDeserializer(MethodologyType.class, new RecommandationIaMethodologyDeserializer());
       mapper.registerModule(module);
 
-      TypeReference<List<QuestionMappingModel>> questionListTypeReference = new TypeReference<>() {
-        //
-      };
+      TypeReference<List<QuestionMappingModel>> questionListType = new TypeReference<>() { };
+      questionMappings = mapper.readValue(is, questionListType);
 
-      questions = mapper.readValue(is, questionListTypeReference);
+      questionIndex = questionMappings.stream()
+        .collect(Collectors.toMap(QuestionMappingModel::getId, Function.identity()));
+      LOGGER.info("Recommandation mappings loaded: {} questions indexed", questionIndex.size());
+
     } catch (Exception e) {
-      LOGGER.info("Tried to lookup file at : {}", recommandationsFile);
-      LOGGER.error("Startup error, cannot read json recommandation file: ", e);
-      LOGGER.error("Continuing without json recommandations, all subsequent call will result in no data");
-      questions = new ArrayList<>();
+      LOGGER.info("Tried to lookup file at: {}", recommandationsFile);
+      LOGGER.error("Startup error, cannot read json recommandation file", e);
+      LOGGER.error("Continuing without json recommandations, all subsequent calls will result in no data");
+      questionMappings = new ArrayList<>();
+      questionIndex = new HashMap<>();
     }
   }
 
-  /**
-   * @inheritDoc .
-   */
   @Override
-  public ResponseEntity<List<RecommandationItemModel>> getMappings(final List<AnswerIa> answers, final ResultAi resultAi) {
+  public ResponseEntity<List<RecommandationItemModel>> getMappings(final List<AiAnswer> answers, final ResultAi resultAi) {
+    if (answers == null || answers.isEmpty() || resultAi == null || resultAi.getPredictedMethod() == null) {
+      return ResponseEntity.ok(Collections.emptyList());
+    }
+
+    MethodologyType aiResultMethodology = MethodologyType.find(resultAi.getPredictedMethod());
     List<RecommandationItemModel> result = new ArrayList<>();
 
-    // Parse methodology type, fail-fast if doesn't exists
-    MethodologyType aiResultMethodology = MethodologyType.find(resultAi.getPredictedMethod());
+    for (AiAnswer answer : answers) {
+      if (answer == null) {
+        continue;
+      }
 
-    // First, list all question numbers in Json
-    List<Integer> questionNumbersInJson = questions.stream()
-      .map(QuestionMappingModel::getQuestionNumber)
-      .collect(Collectors.toList());
+      String questionId = answer.getQuestion();
+      String responseId = answer.getAnswer();
 
-    // Filter all AnswersIa accordings to numbers present in Json
-    List<AnswerIa> filteredAnswers = answers.stream()
-      // contains performance is ok regarding question number (as of commit date)
-      .filter(answer -> questionNumbersInJson.contains(Integer.valueOf(answer.getQuestion())))
-      .collect(Collectors.toList());
+      QuestionMappingModel question = questionIndex.get(questionId);
+      if (question == null) {
+        LOGGER.trace("No question found for id: {}", questionId);
+        continue;
+      }
 
-    // construct result list by iterating on filtered answers
-    filteredAnswers.forEach(answer -> {
+      question.getResponses().stream()
+        .filter(r -> Objects.equals(String.valueOf(r.getId()), responseId))
+        .findFirst()
+        .ifPresentOrElse(response -> {
+          response.getRecommandations().stream()
+            .filter(rec -> rec.getId().equals(aiResultMethodology))
+            .map(rec -> new RecommandationItemModel(
+              rec.getLevel().toString(),
+              rec.getTitle(),
+              rec.getDescription()))
+            .forEach(result::add);
+        }, () -> LOGGER.trace("No response found for id: {} in question: {}", responseId, questionId));
+    }
 
-      LOGGER.trace("Processing answer : {}", answer);
-
-      QuestionMappingModel questionMappingModel = questions.stream()
-        // Look for same question number
-        .filter(question -> question.getQuestionNumber().equals(Integer.valueOf(answer.getQuestion())))
-        // Fail-fast, should not happen
-        .findFirst().orElseThrow(() -> new MalformedDataException(MessageFormat.format(NO_SUCH_QUESTION, answer.getQuestion())));
-
-      LOGGER.trace("Found question mapping model : {}", questionMappingModel);
-
-      ResponseModel responseModel = questionMappingModel
-        .getResponses()
-        .stream()
-        // Look for label matching question -> need to harmonize labels ???
-        .filter(response -> response.getLabel().equals(answer.getAnswer()))
-        // Again, fail-fast, should not happen unless there is a mismatch in question labels. Need to store in DB?
-        .findFirst().orElseThrow(() -> new MalformedDataException(MessageFormat.format(NO_SUCH_RESPONSE, answer.getAnswer())));
-
-      LOGGER.trace("Found response model : {}", responseModel);
-
-      RecommandationModel recommandationModel = responseModel
-        .getRecommandations()
-        .stream()
-        // Look for recommandation matching AI result
-        .filter(recommandation -> recommandation.getId().equals(aiResultMethodology))
-        // Fail-fast (even at last ;p), should not happen
-        .findFirst().orElseThrow(() -> new MalformedDataException(MessageFormat.format(NO_SUCH_RECOMMANDATION, aiResultMethodology)));
-
-      LOGGER.trace("Found recommandationModel: {}", recommandationModel);
-
-      result.add(new RecommandationItemModel(recommandationModel.getLevel().toString(), recommandationModel.getTitle(),
-        recommandationModel.getDescription()));
-    });
-
-    result.sort(Comparator.comparing(
-      recommandationItemModel -> RecommandationLevel.valueOf(recommandationItemModel.getColor())));
-
-    return ResponseEntity.ok().body(result);
+    result.sort(Comparator.comparing(item -> RecommandationLevel.valueOf(item.getColor())));
+    return ResponseEntity.ok(result);
   }
-
-
 }

@@ -192,6 +192,10 @@
       <version>5.9.3</version> <!-- ou une version récente -->
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
     </dependencies>
 
 	<build>

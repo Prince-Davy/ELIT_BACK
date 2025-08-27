@@ -1,13 +1,13 @@
 package com.elit.outildedecision.service.implementation;
 
-import com.elit.outildedecision.entity.AnswerIa;
+import com.elit.outildedecision.ai.answer.entity.AiAnswer;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
+import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
 import com.elit.outildedecision.entity.ResultAi;
-import com.elit.outildedecision.exception.AnswerIaNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
 import com.elit.outildedecision.model.QuestionMappingModelKiviat;
 import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.model.ThemeModelKiviatId;
-import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.service.KiviatService;
 import com.elit.outildedecision.util.MethodologyType;
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @inheritDoc .
@@ -34,7 +35,7 @@ import java.util.Map;
 public class KiviatServiceImpl implements KiviatService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(KiviatServiceImpl.class);
-  private final AnswerIaRepository answerIaRepository;
+  private final AiAnswerRepository aiAnswerRepository;
   private final ResultIaRepository resultIaRepository;
 
   @Value("${file.kiviatProject-file}")
@@ -64,14 +65,14 @@ public class KiviatServiceImpl implements KiviatService {
 
   /**
    * Constructor for KiviatServiceImpl.
-   * @param answerIaRepository get answers from users
+   * @param aiAnswerRepository get answers from users
    * @param resultIaRepository get methodology choice from AI
    * @param resourceLoader the resource loader
    */
-  public KiviatServiceImpl(final AnswerIaRepository answerIaRepository,
+  public KiviatServiceImpl(final AiAnswerRepository aiAnswerRepository,
                            final ResultIaRepository resultIaRepository,
                            final ResourceLoader resourceLoader) {
-    this.answerIaRepository = answerIaRepository;
+    this.aiAnswerRepository = aiAnswerRepository;
     this.resultIaRepository = resultIaRepository;
     this.resourceLoader = resourceLoader;
   }
@@ -115,7 +116,7 @@ public class KiviatServiceImpl implements KiviatService {
    * @inheritDoc .
    */
   @Override
-  public ResponseEntity<RecommandationKiviatModel> getKiviatProjetValues(final Long projectId) throws  AnswerIaNotFoundException {
+  public ResponseEntity<RecommandationKiviatModel> getKiviatProjetValues(final Long projectId) throws  AiAnswerNotFoundException {
     RecommandationKiviatModel result = new RecommandationKiviatModel();
     // Créer une HashMap pour stocker les en-têtes et leurs valeurs
     Map<ThemeModelKiviatId, List<Integer>> table = new HashMap<>();
@@ -123,23 +124,21 @@ public class KiviatServiceImpl implements KiviatService {
     for (ThemeModelKiviatId theme : ThemeModelKiviatId.values()) {
       table.put(theme, new ArrayList<>());
     }
-    //Récuperation  des réponses du projet
-    List<AnswerIa> answersIas = answerIaRepository.findByProject_ProjectId(projectId);
+    //Récuperation des réponses du projet
+    List<AiAnswer> answersIas = aiAnswerRepository.findByProject_ProjectId(projectId);
     if (answersIas == null || answersIas.isEmpty()) {
       LOGGER.error("Answers IA not found: {}, projectID : {}", answersIas, projectId);
-      throw new AnswerIaNotFoundException("No answer ai found for this projectId");
+      throw new AiAnswerNotFoundException("No answer ai found for this projectId");
     }
 
     //Parcours le Json KiviatProjectMatrix
     questions.forEach(q ->
       answersIas.stream()
-        .filter(a -> q.getQuestionNumber().toString().trim().equals(a.getQuestion().trim()))
+        .filter(a -> Objects.equals(String.valueOf(q.getQuestionNumber()), a.getQuestion()))
         .forEach(a ->
           q.getResponses().stream()
-            .filter(resp -> resp.getLabel().trim().equalsIgnoreCase(a.getAnswer().trim()))
-            .forEach(r -> {
-              table.get(q.getTheme()).add(r.getNote());
-            })
+            .filter(resp -> Objects.equals(String.valueOf(resp.getId()), a.getAnswer()))
+            .forEach(r -> table.get(q.getTheme()).add(r.getNote()))
         )
     );
 

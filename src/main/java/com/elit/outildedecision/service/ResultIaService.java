@@ -1,10 +1,11 @@
 package com.elit.outildedecision.service;
 
-import com.elit.outildedecision.entity.AnswerIa;
-import com.elit.outildedecision.exception.AnswerIaNotFoundException;
+import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
+import com.elit.outildedecision.exception.ResultAlreadyExistsException;
 import com.elit.outildedecision.model.RecommandationItemModel;
 import com.elit.outildedecision.model.ResultAiModel;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,12 @@ public interface ResultIaService {
   /**
    * Send data to Ai and get result to save it on BDD.
    *
-   * @param projectId project ID
-   * @param answers answers IA
-   * @return  ResponseEntity<Object>
+   * @param projectId   project ID
+   * @param aiAnswerDTO answers IA
+   * @return String result
    */
-  ResponseEntity<Object> generateAndSaveResult(long projectId, List<AnswerIa> answers);
+  String generateAndSaveResult(long projectId, AiAnswerDTO aiAnswerDTO) throws ProjectNotFoundException, ResultAlreadyExistsException, ResultAiNotFoundException;
+
 
   /**
    * Get result analyse IA for project id.
@@ -49,5 +51,5 @@ public interface ResultIaService {
    * @return the mapping
    */
   ResponseEntity<List<RecommandationItemModel>> getMapping(String projectId)
-    throws AnswerIaNotFoundException, ResultAiNotFoundException;
+    throws AiAnswerNotFoundException, ResultAiNotFoundException;
 }

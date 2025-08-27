@@ -1,7 +1,7 @@
 package com.elit.outildedecision.service;
 
 
-import com.elit.outildedecision.exception.AnswerIaNotFoundException;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
 import com.elit.outildedecision.model.RecommandationKiviatModel;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +29,6 @@ public interface KiviatService {
    * @return recommandation kiviat model by project
    */
   ResponseEntity<RecommandationKiviatModel> getKiviatProjetValues(Long projectId)
-    throws AnswerIaNotFoundException;
+    throws AiAnswerNotFoundException;
 
 }

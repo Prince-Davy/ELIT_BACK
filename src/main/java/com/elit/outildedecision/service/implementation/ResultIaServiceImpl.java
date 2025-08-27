@@ -1,171 +1,128 @@
 package com.elit.outildedecision.service.implementation;
 
-import com.elit.outildedecision.entity.AnswerIa;
+import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
+import com.elit.outildedecision.ai.answer.entity.AiAnswer;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
+import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
+import com.elit.outildedecision.common.service.AiPredictionApiClientService;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ResultAi;
-import com.elit.outildedecision.exception.AnswerIaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
+import com.elit.outildedecision.exception.ResultAlreadyExistsException;
 import com.elit.outildedecision.model.RecommandationItemModel;
 import com.elit.outildedecision.model.ResultAiModel;
-import com.elit.outildedecision.repository.AnswerIaRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.service.RecommandationService;
 import com.elit.outildedecision.service.ResultIaService;
 import com.elit.outildedecision.util.ProjectState;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+
 import javax.transaction.Transactional;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.elit.outildedecision.service.implementation.ProjectServiceImpl.PROJECT_NOT_FOUND;
 
 @Service
+@Slf4j
 public class ResultIaServiceImpl implements ResultIaService {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ResultIaServiceImpl.class);
 
   private final ResultIaRepository resultIaRepository;
   private final ProjectRepository projectRepository;
   private final RecommandationService recommandationService;
-  private final AnswerIaRepository answerIaRepository;
+  private final AiAnswerRepository aiAnswerRepository;
+  private final AiPredictionApiClientService aiPredictionApiClientService;
 
   @Value("${iaApi.value-url}")
   private String urlApiAI;
 
+  @Value("${ia.prediction.service.endpoint}")
+  private String iaPredictionServiceEndpoint;
+
   /**
    * ResultIa service implements.
-   *
+   * @param aiPredictionApiClientService aiPredictionApiClientService
    * @param resultIaRepository resultIaRepository
    * @param projectRepository  projectRepository
    * @param recommandationService reccommandationService
-   * @param answerIaRepository answerIaRepository
+   * @param aiAnswerRepository answerIaRepository
    */
-  public ResultIaServiceImpl(final ResultIaRepository resultIaRepository, final ProjectRepository projectRepository,
-                             final RecommandationService recommandationService, final AnswerIaRepository answerIaRepository) {
+  public ResultIaServiceImpl(final AiPredictionApiClientService aiPredictionApiClientService, final ResultIaRepository resultIaRepository, final ProjectRepository projectRepository,
+                             final RecommandationService recommandationService, final AiAnswerRepository aiAnswerRepository) {
+    this.aiPredictionApiClientService = aiPredictionApiClientService;
     this.resultIaRepository = resultIaRepository;
     this.projectRepository = projectRepository;
     this.recommandationService = recommandationService;
-    this.answerIaRepository = answerIaRepository;
+    this.aiAnswerRepository = aiAnswerRepository;
   }
 
   /**
-   * Send data to ia keep the result and then save response ia on DB.
+   * Send data to AI and get prediction result to save it in the database.
    *
-   * @param projectId project id
-   * @param answers   all answers
-   * @return ResponseEntity<Object>
+   * @param projectId   ID of the project
+   * @param aiAnswerDTO AI answers to be sent
+   * @return
+   * @throws ProjectNotFoundException     if the project does not exist
+   * @throws ResultAlreadyExistsException if a result already exists for the project
+   * @throws ResultAiNotFoundException    if the AI service returns no response
    */
   @Override
   @Transactional
-  public ResponseEntity<Object> generateAndSaveResult(final long projectId, final List<AnswerIa> answers) {
-    String iaResponse;
-    try {
-      // TODO : this will disable all SSL validation rendering HTTPS totally useless !
-      // This was done to short-circuit bad certificate problem  when communicating with
-      // pod elit-pmm-pred-integ and while logs weren't available
-      TrustManager[] trustManagers = new TrustManager[]{
-        new X509TrustManager() {
-          @Override
-          public void checkClientTrusted(final X509Certificate[] chain, final String authType) {
-          }
-          @Override
-          public void checkServerTrusted(final X509Certificate[] chain, final String authType) {
-          }
-          @Override
-          public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-          }
-        }
-      };
+  public String generateAndSaveResult(final long projectId, final AiAnswerDTO aiAnswerDTO)
+    throws ProjectNotFoundException, ResultAlreadyExistsException, ResultAiNotFoundException {
 
-      // Initialiser le contexte SSL pour le certificat https
-      SSLContext sslContext = SSLContext.getInstance("TLS");
-      sslContext.init(null, trustManagers, null);
+    log.info("Starting AI analysis for project ID: {}", projectId);
 
-      // Configurer HttpsURLConnection pour utiliser le contexte SSL
-      URL url = new URL(urlApiAI);
-      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-      connection.setSSLSocketFactory(sslContext.getSocketFactory());
-      // Configurer la requête
-      connection.setRequestMethod("POST");
-      connection.setRequestProperty("Content-Type", "application/json");
-      connection.setRequestProperty("Accept", "application/json");
-      connection.setDoOutput(true);
-      // Convertir en JSON
-      Gson gson = new Gson();
-      String jsonPayload = gson.toJson(answers);
-      // Envoyer les données à l'api de l'IA
-      try (OutputStream os = connection.getOutputStream()) {
-        byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
-        os.write(input, 0, input.length);
-      } catch (Exception e) {
-        return ResponseEntity.internalServerError().body("Error occurred while sending payload to AI Api : " + e.getMessage());
-      }
-      // Lire la réponse
-      int responseCode = connection.getResponseCode();
-      if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-        try (var reader = new java.io.BufferedReader(
-          new java.io.InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-          StringBuilder response = new StringBuilder();
-          String line;
-          while ((line = reader.readLine()) != null) {
-            response.append(line.trim());
-          }
-          // Récuperer la réponse de l'IA en JSON pour l'exploiter dans ResultAi
-          JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
-          String predictedMethod = jsonObject.get("predicted_method").getAsString();
-          double predictedProba = jsonObject.get("predicted_proba").getAsDouble();
+    Project project = projectRepository.findById(projectId)
+      .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
 
-          // Créer une instance de ResultAi et définir les valeurs
-          Project project = projectRepository.getById(projectId);
-          ResultAi resultAi = new ResultAi();
-          resultAi.setProject(project);
-          resultAi.setPredictedMethod(predictedMethod);
-          resultAi.setPredictedProba(predictedProba);
-
-          // Vérifier si le résultat existe déjà pour ce projet avant de save
-          Optional<ResultAi> existingResultIa = resultIaRepository.findByProject(project);
-          if (existingResultIa.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Le résultat de l'analyse IA existe déjà pour ce projet.");
-          } else {
-            resultIaRepository.save(resultAi);
-
-            //mise à jour du statut du projet
-            project.setProjectState(ProjectState.COMPLETED);
-            projectRepository.save(project);
-          }
-          iaResponse = response.toString();
-        }
-      } else {
-        return ResponseEntity.internalServerError().body("IA Api Request failed with response code: " + responseCode);
-      }
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-      return ResponseEntity.badRequest().body("An unexpected error occurred: " + e.getMessage());
+    if (resultIaRepository.findByProject(project).isPresent()) {
+      log.warn("AI result already exists for project ID: {}", projectId);
+      throw new ResultAlreadyExistsException("AI analysis result already exists for this project.");
     }
-    return ResponseEntity.ok("AI prediction" + "\n" + iaResponse);
+
+    Map<String, Object> payload = Map.of("data", aiAnswerDTO.getData());
+    log.debug("Payload sent to AI service: {}", payload);
+
+    String response = aiPredictionApiClientService
+      .sendPostRequest(iaPredictionServiceEndpoint, payload)
+      .block();
+
+    if (response == null) {
+      log.error("No response received from AI service for project ID: {}", projectId);
+      throw new ResultAiNotFoundException("Unable to contact AI service or received empty response.");
+    }
+
+    log.debug("Raw response from AI service: {}", response);
+
+    JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
+    String predictedMethod = jsonObject.get("predicted_method").getAsString();
+    double predictedProba = jsonObject.get("predicted_proba").getAsDouble();
+
+    ResultAi resultAi = new ResultAi();
+    resultAi.setProject(project);
+    resultAi.setPredictedMethod(predictedMethod);
+    resultAi.setPredictedProba(predictedProba);
+    resultIaRepository.save(resultAi);
+
+    project.setProjectState(ProjectState.COMPLETED);
+    projectRepository.save(project);
+
+    log.info("AI result successfully saved for project ID: {}", projectId);
+
+    return response;
   }
+
 
   /**
    * Get result analysis AI from project.
@@ -218,12 +175,12 @@ public class ResultIaServiceImpl implements ResultIaService {
    */
   @Override
   public ResponseEntity<List<RecommandationItemModel>> getMapping(final String projectId)
-    throws AnswerIaNotFoundException, ResultAiNotFoundException {
+    throws AiAnswerNotFoundException, ResultAiNotFoundException {
     Long projectID = Long.valueOf(projectId);
 
-    List<AnswerIa> answerIas = answerIaRepository.findByProject_ProjectId(projectID);
+    List<AiAnswer> answerIas = aiAnswerRepository.findByProject_ProjectId(projectID);
     if (answerIas == null || answerIas.isEmpty()) {
-      throw new AnswerIaNotFoundException("No answer ai found for this projectId");
+      throw new AiAnswerNotFoundException("No answer ai found for this projectId");
     }
     ResultAi resultAi = resultIaRepository.findByProject_ProjectId(projectID)
       .orElseThrow(() -> new ResultAiNotFoundException("No result ai found for this projectId"));

@@ -6,6 +6,7 @@ package com.elit.outildedecision.model;
 public enum ResponseModelId {
   low,
   medium,
+  moderate,
   high,
   veryHigh
 }

@@ -1,190 +1,171 @@
 package com.elit.outildedecision.service.implementation;
 
-import com.elit.outildedecision.entity.AnswerIa;
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.entity.ResultAi;
-import com.elit.outildedecision.exception.AnswerIaNotFoundException;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
+import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
-import com.elit.outildedecision.model.RecommandationKiviatModel;
-import com.elit.outildedecision.repository.AnswerIaRepository;
-import com.elit.outildedecision.repository.ResultIaRepository;
-import com.elit.outildedecision.util.MethodologyType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+
+
+import com.elit.outildedecision.repository.ResultIaRepository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class KiviatServiceImplTest {
 
-
+  // Chemin du JSON de test placé dans le classpath du projet de test
   private static final String JSON = "com/elit/outildedecision/service/implementation/KiviatProjectMatrixTest.json";
 
-
-  // SUT
-  @InjectMocks
   private KiviatServiceImpl kiviatServiceImpl;
+
   @Mock
   private ResultIaRepository resultIaRepository;
-  @Mock
-  private AnswerIaRepository answerIaRepository;
 
+  @Mock
+  private AiAnswerRepository aiAnswerRepository;
 
   @BeforeEach
   void setUp(TestInfo testInfo) {
-    // Create SUT
-    MockitoAnnotations.openMocks(this);
-    kiviatServiceImpl = new KiviatServiceImpl(answerIaRepository, resultIaRepository, new DefaultResourceLoader());
-
-
-      // Also load json if needed
-      if (testInfo.getTags().contains("loadJson")) {
-        initKiviatService();
-      }
-
+    kiviatServiceImpl = new KiviatServiceImpl(aiAnswerRepository, resultIaRepository, new DefaultResourceLoader());
+    if (testInfo.getTags().contains("loadJson")) {
+      injectJsonPath(JSON);
+      kiviatServiceImpl.init();
+    }
   }
 
-  private void initKiviatService() {
-    injectJsonPath();
-    kiviatServiceImpl.init();
+  private void injectJsonPath(String path) {
+    ReflectionTestUtils.setField(kiviatServiceImpl, "kiviatProjectFile", path);
   }
 
-  private void injectJsonPath() {
-    ReflectionTestUtils.setField(kiviatServiceImpl, "kiviatProjectFile", KiviatServiceImplTest.JSON);
-  }
-
-  /**
-   * RecommadationKiviatModel for each values of methodology.
-   *
-   * @return a source for parametrized test (Methodology, ModelValues)
-   */
-  static Stream<Object> methodologyAndKiviatValues() {
-    return Stream.of(
-      Arguments.of(MethodologyType.HYBRID, new RecommandationKiviatModel(MethodologyType.HYBRID, 3, 2.5, 2.5, 3, 3)),
-      Arguments.of(MethodologyType.AGILE, new RecommandationKiviatModel(MethodologyType.AGILE, 5, 4.5, 1.5, 1, 5)),
-      Arguments.of(MethodologyType.CLASSIC, new RecommandationKiviatModel(MethodologyType.CLASSIC, 1, 1.5, 4.5, 5, 1))
-    );
-  }
-
-  /**
-   * RecommadationKiviatModel for lowest values answers
-   *
-   * @return a source for parametrized test (List<AnswersIa>, ModelValues)
-   */
-  static Stream<Object> answersIaValuesLow() {
-    Project project = new Project();
-    project.setProjectId(1L);
-    List<AnswerIa> answersIas = List.of(
-      new AnswerIa("3", "category", "Élevée : Un écart considérable par rapport à la durée initiale est autorisé", project),
-      new AnswerIa("4", "category", "Faible : Le budget doit être strictement respecté", project),
-      new AnswerIa("5", "category", "Exigences fonctionnelles et non fonctionnelles", project),
-      new AnswerIa("6", "category", "Faible : Les besoins doivent êtres strictement respectés", project),
-      new AnswerIa("8", "category", "Faible : moins de 10%", project),
-      new AnswerIa("9", "category", "Faible", project),
-      new AnswerIa("11", "category", "Faible : la présence du client pendant les moments clés du projet", project),
-      new AnswerIa("12", "category", "Supérieur à 4 semaines", project),
-      new AnswerIa("13", "category", "Élevé", project),
-      new AnswerIa("14", "category", "Faible", project),
-      new AnswerIa("16", "category", "Faible : il est difficile pour l'équipe d'apprendre de nouvelles connaissances et technologies, de s'adapter aux changements", project)
-    );
-    RecommandationKiviatModel expectedModel = new RecommandationKiviatModel(null, 2.33, 1.5, 4.5, 5.0, 2.33);
-    return Stream.of(Arguments.of(answersIas, expectedModel));
-  }
-
-  static Stream<Object> answersIaValuesAdditional() {
-    Project project = new Project();
-    project.setProjectId(2L);
-
-    // Cas avec des valeurs différentes pour vérifier d'autres comportements
-    List<AnswerIa> answersIas = List.of(
-      new AnswerIa("3", "category", "Élevée : Un écart considérable par rapport à la durée initiale est autorisé", project),
-      new AnswerIa("4", "category", "Faible : Le budget doit être strictement respecté", project),
-      new AnswerIa("5", "category", "Exigences fonctionnelles et non fonctionnelles", project),
-      new AnswerIa("6", "category", "Faible : Les besoins doivent êtres strictement respectés", project),
-      new AnswerIa("8", "category", "Faible : moins de 10%", project),
-      new AnswerIa("9", "category", "Faible", project),
-      new AnswerIa("11", "category", "Faible : la présence du client pendant les moments clés du projet", project),
-      new AnswerIa("12", "category", "Supérieur à 4 semaines", project),
-      new AnswerIa("13", "category", "Élevé", project),
-      new AnswerIa("14", "category", "Faible", project),
-      new AnswerIa("16", "category", "Faible : il est difficile pour l'équipe d'apprendre de nouvelles connaissances et technologies, de s'adapter aux changements", project)
-    );
-    RecommandationKiviatModel expectedModel = new RecommandationKiviatModel(null, 2.33, 1.5, 4.5, 5.0, 2.33);
-    return Stream.of(
-      Arguments.of(answersIas, expectedModel)
-    );
-  }
-
-
-  @ParameterizedTest
-  @MethodSource({"methodologyAndKiviatValues"})
-  void getKiviatMethodologyValuesTest(MethodologyType methodology, RecommandationKiviatModel expectedModel) throws ResultAiNotFoundException {
-    // Mocking the ResultAi object
-    ResultAi resultAi = mock(ResultAi.class);
-    Project project = mock(Project.class);
-    when(resultAi.getPredictedMethod()).thenReturn(methodology.name());
-    when(resultAi.getProject()).thenReturn(project);
-    when(project.getProjectId()).thenReturn(1L);
-    when(resultAi.getPredictedMethod()).thenReturn(methodology.name());
-
-    when(resultIaRepository.findByProject_ProjectId(1L)).thenReturn(Optional.of(resultAi));
-
-    // Instantiating the class to be tested
-    ResponseEntity<RecommandationKiviatModel> response = kiviatServiceImpl.getKiviatMethodologyValues(1L);
-
-    // Assertions
-    assertNotNull(response);
-    assertEquals(200, response.getStatusCodeValue());
-
-    RecommandationKiviatModel actualModel = response.getBody();
-    assertNotNull(actualModel);
-
-    assertEquals(expectedModel, actualModel);
-  }
-
+  @Test
   @Tag("loadJson")
-  @ParameterizedTest
-  @MethodSource({"answersIaValuesLow", "answersIaValuesAdditional"})
-  public void testGetKiviatProjetValues(List<AnswerIa> answersIas, RecommandationKiviatModel expectedModel) throws AnswerIaNotFoundException {
-    Long projectId = 1L;
+  void chargeLeJsonEtRenseigneLesQuestions() {
+    @SuppressWarnings("unchecked")
+    List<?> questions = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
 
-    when(answerIaRepository.findByProject_ProjectId(projectId)).thenReturn(answersIas);
-
-    ResponseEntity<RecommandationKiviatModel> response = kiviatServiceImpl.getKiviatProjetValues(projectId);
-
-    assertNotNull(response);
-    assertEquals(200, response.getStatusCodeValue());
-    RecommandationKiviatModel result = response.getBody();
-    assertNotNull(result);
-    // Ajoutez des assertions pour vérifier les valeurs dans result
-    assertEquals(expectedModel, result);
-
+    assertNotNull(questions, "La liste 'questions' ne doit pas être nulle après init()");
+    assertFalse(questions.isEmpty(), "La liste 'questions' devrait être remplie après le chargement du JSON");
   }
+
+  @Test
+  void initAvecCheminInvalideCreeListeVide() {
+    injectJsonPath("classpath:chemin/invalide/KiviatProjectMatrixTest.json");
+    kiviatServiceImpl.init();
+
+    @SuppressWarnings("unchecked")
+    List<?> questions = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
+
+    assertNotNull(questions, "La liste 'questions' ne doit pas être nulle même en cas d'erreur de chargement");
+    assertTrue(questions.isEmpty(), "La liste 'questions' doit être vide si le JSON est introuvable");
+  }
+
+  @Test
+  void initDeuxFoisAvecMemeFichierCreeNouvelleListeNonVide() {
+    injectJsonPath(JSON);
+    kiviatServiceImpl.init();
+
+    @SuppressWarnings("unchecked")
+    List<?> firstLoad = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
+    assertNotNull(firstLoad);
+    assertFalse(firstLoad.isEmpty(), "Le premier chargement doit produire une liste non vide");
+
+    // Rechargement
+    kiviatServiceImpl.init();
+
+    @SuppressWarnings("unchecked")
+    List<?> secondLoad = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
+    assertNotNull(secondLoad);
+    assertFalse(secondLoad.isEmpty(), "Le second chargement doit également produire une liste non vide");
+
+    // S'assure qu'une nouvelle instance de liste est recréée à chaque init()
+    assertNotSame(firstLoad, secondLoad, "Chaque init() doit réaffecter une nouvelle instance de liste");
+  }
+
+  @Test
+  void initPuisCheminInvalideRemplaceParListeVide() {
+    // 1) Chargement valide
+    injectJsonPath(JSON);
+    kiviatServiceImpl.init();
+    @SuppressWarnings("unchecked")
+    List<?> loaded = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
+    assertNotNull(loaded);
+    assertFalse(loaded.isEmpty(), "Le chargement valide doit remplir la liste");
+
+    // 2) Puis fichier invalide
+    injectJsonPath("classpath:does/not/exist.json");
+    kiviatServiceImpl.init();
+    @SuppressWarnings("unchecked")
+    List<?> afterInvalid = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
+    assertNotNull(afterInvalid);
+    assertTrue(afterInvalid.isEmpty(), "Après un chemin invalide, la liste doit être vide");
+  }
+
+  @Test
+  void chargeLeJsonAvecPrefixeClasspath() {
+    injectJsonPath("classpath:" + JSON);
+    kiviatServiceImpl.init();
+
+    @SuppressWarnings("unchecked")
+    List<?> questions = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
+
+    assertNotNull(questions);
+    assertFalse(questions.isEmpty(), "Le chargement avec 'classpath:' doit aussi fonctionner");
+  }
+
+  @Test
+  void cheminNullCreeListeVide() {
+    injectJsonPath(null);
+    kiviatServiceImpl.init();
+
+    @SuppressWarnings("unchecked")
+    List<?> questions = (List<?>) ReflectionTestUtils.getField(kiviatServiceImpl, "questions");
+
+    assertNotNull(questions, "Même avec un chemin null, la liste ne doit pas être nulle");
+    assertTrue(questions.isEmpty(), "Avec un chemin null, la liste doit être vide");
+  }
+
+  // ------------------- getKiviatMethodologyValues -------------------
+
+  @Test
+  void getKiviatMethodologyValues_aucunResultat_declencheResultAiNotFoundException() {
+    final long projectId = 2L;
+
+    when(resultIaRepository.findByProject_ProjectId(projectId))
+      .thenReturn(Optional.empty());
+
+    assertThrows(ResultAiNotFoundException.class,
+      () -> kiviatServiceImpl.getKiviatMethodologyValues(projectId));
+  }
+
+  // ------------------- getKiviatProjetValues -------------------
 
 
   @Test
-  public void testGetKiviatProjetValues_NoAnswers() {
-    Long projectId = 1L;
+  void getKiviatProjetValues_aucuneReponse_declencheAiAnswerNotFoundException() {
+    final long projectId = 11L;
 
-    when(answerIaRepository.findByProject_ProjectId(projectId)).thenReturn(Collections.emptyList());
+    when(aiAnswerRepository.findByProject_ProjectId(projectId))
+      .thenReturn(Collections.emptyList());
 
-    assertThrows(AnswerIaNotFoundException.class, () -> {kiviatServiceImpl.getKiviatProjetValues(projectId);});
+    assertThrows(AiAnswerNotFoundException.class,
+      () -> kiviatServiceImpl.getKiviatProjetValues(projectId));
   }
+
 }

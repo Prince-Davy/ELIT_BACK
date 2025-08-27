@@ -1,6 +1,5 @@
 package com.elit.outildedecision.util;
 
-import com.elit.outildedecision.util.MethodologyType;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;

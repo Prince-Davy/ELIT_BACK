@@ -112,7 +112,7 @@ public class AuditServiceImpl implements AuditService {
    * @throws UserNotFoundException    if user not found
    */
   @Override
-  public ResponseEntity<AuditResponseModel> updateAudit(AuditRequestModel auditRequest, String userEmail)
+  public ResponseEntity<AuditResponseModel> updateAudit(final AuditRequestModel auditRequest, final String userEmail)
           throws UserNotFoundException {
     User user = userRepository.findByUserEmail(userEmail);
     if (user == null) {

@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ResponseModel {
 
-  private ResponseModelId id;
+  private String id;
   private String label;
   private List<RecommandationModel> recommandations;
 

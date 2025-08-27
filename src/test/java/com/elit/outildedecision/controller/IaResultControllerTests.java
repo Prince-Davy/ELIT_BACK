@@ -1,164 +1,158 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.entity.*;
-
+import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.ResultAiModel;
-import com.elit.outildedecision.repository.ProjectRepository;
-import com.elit.outildedecision.repository.ResultIaRepository;
-import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
 import com.elit.outildedecision.service.ResultIaService;
-import com.elit.outildedecision.util.ProjectPermession;
-import org.junit.jupiter.api.Assertions;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-@ActiveProfiles("Test")
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class IaResultControllerTests {
+
+  private static final String BASE_URI = "/result/ai";
+  private static final long PROJECT_ID = 1L;
+  private static final long RESULT_ID = 2L;
 
   @Mock
   private ResultIaService resultIaService;
 
-  @Mock
-  private ResultIaRepository resultIaRepository;
-  @Mock
-  private ProjectRepository projectRepository;
   @InjectMocks
-  private IaResultController IaResultController;
-  MockMvc mockMvc;
-  private ResultAiModel resultAiModel ;
-  private Project project;
-  private ProjectUserPermission permission;
-  private User user;
-  @Mock
-  CustomMethodSecurityExpressionRoot customMethodSecurity;
+  private IaResultController iaResultController;
 
+  private MockMvc mockMvc;
+  private ObjectMapper objectMapper;
+
+  private ResultAiModel resultAiModel;
 
   @BeforeEach
   void setUp() {
-    MockitoAnnotations.initMocks(this);
-    mockMvc = standaloneSetup(IaResultController).setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
-    project = new Project();
-    project.setProjectId(1L);
-    user = new User();
-    user.setUserEmail("user@user.com");
-    user.setUsername("user@user.com");
-    permission = new ProjectUserPermission();
-    permission.setProject(project);
-    permission.setUser(user);
-    permission.setPermission(ProjectPermession.CDP.toString());
-    user.setUserProjectPermissions(List.of(permission));
+    mockMvc = standaloneSetup(iaResultController)
+      .setControllerAdvice(new RestResponseEntityExceptionHandler())
+      .build();
+
+    objectMapper = new ObjectMapper();
+
     resultAiModel = new ResultAiModel();
-    resultAiModel.setId(2L);
+    resultAiModel.setId(RESULT_ID);
     resultAiModel.setPredictedMethod("Traditionnelle");
-    resultAiModel.setProjectId(1L);
+    resultAiModel.setProjectId(PROJECT_ID);
     resultAiModel.setPredictedProba(82.34);
   }
 
   @Test
-  @WithMockUser(authorities = {"USER"})
-  void saveAiResponse() throws Exception {
-    // Given
-    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
-    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+  void saveAiResponse_shouldReturnOk_andDelegateToService_withCapturedDto() throws Exception {
+    // Arrange
+    Map<String, String> data = new HashMap<>();
+    data.put("Question", "Response");
+    AiAnswerDTO dto = new AiAnswerDTO();
+    dto.setData(data);
 
-    List<AnswerIa> answerIa = List.of(new AnswerIa("Question", "Category", "Response", project));
+    String json = objectMapper.writeValueAsString(dto);
 
-    // When
-    mockMvc.perform(post("/result/ai/" + project.getProjectId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .content("  [\n" +
-          "            {\n" +
-          "              \"question\": \"Question\",\n" +
-          "              \"category\": \"Category\",\n" +
-          "              \"answer\": \"Response\",\n" +
-          "              \"project\": {\n" +
-          "                \"projectId\": 1\n" +
-          "              }\n" +
-          "            }\n" +
-          "          ]")).andExpect(status().is(200));
+    // Act
+    mockMvc.perform(post(BASE_URI + "/" + PROJECT_ID)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json))
+      .andExpect(status().isOk());
 
-    // then
-    Mockito.verify(resultIaService).generateAndSaveResult(project.getProjectId(),answerIa);
+    // Assert - délégation et contenu du DTO
+    ArgumentCaptor<AiAnswerDTO> captor = ArgumentCaptor.forClass(AiAnswerDTO.class);
+    verify(resultIaService, times(1)).generateAndSaveResult(eq(PROJECT_ID), captor.capture());
+    verifyNoMoreInteractions(resultIaService);
 
+    AiAnswerDTO captured = captor.getValue();
+    assertNotNull(captured, "Le DTO capturé ne doit pas être null");
+    org.assertj.core.api.Assertions.assertThat(captured.getData())
+      .as("Le contenu du map doit être transmis tel quel au service")
+      .isEqualTo(data);
+  }
+
+
+  @Test
+  void saveAiResponse_shouldReturnNotFound_whenProjectNotFound() throws Exception {
+    // Arrange
+    AiAnswerDTO dto = new AiAnswerDTO();
+    dto.setData(new HashMap<>());
+    String json = objectMapper.writeValueAsString(dto);
+
+    doThrow(new ProjectNotFoundException("project not found"))
+      .when(resultIaService).generateAndSaveResult(eq(PROJECT_ID), any(AiAnswerDTO.class));
+
+    // Act + Assert
+    mockMvc.perform(post(BASE_URI + "/" + PROJECT_ID)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json))
+      .andExpect(status().isNotFound());
+    verify(resultIaService).generateAndSaveResult(eq(PROJECT_ID), any(AiAnswerDTO.class));
   }
 
   @Test
-  @WithMockUser(authorities = {"USER"})
-  void shouldSavesaveAiResponseWhenIsAlreadyExist() throws Exception {
-    // Given
-    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
-    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+  void getAnalyseIAResult_shouldReturnOkAndBody_whenServiceReturnsModel() throws Exception {
+    when(resultIaService.getResultIa(PROJECT_ID)).thenReturn(resultAiModel);
 
-    Optional<ResultAi> existingResultIa = Optional.of(new ResultAi());
-    when(projectRepository.getById(project.getProjectId())).thenReturn(project);
-    when(resultIaRepository.findByProject(project)).thenReturn(existingResultIa);
+    mockMvc.perform(get(BASE_URI + "/" + PROJECT_ID)
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().isOk())
+      .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$.id").value((int) RESULT_ID))
+      .andExpect(jsonPath("$.projectId").value((int) PROJECT_ID))
+      .andExpect(jsonPath("$.predictedMethod").value("Traditionnelle"))
+      .andExpect(jsonPath("$.predictedProba").value(82.34));
 
-    List<AnswerIa> answerIa = List.of(new AnswerIa("Question", "Category", "Response", project));
-
-    // When
-    mockMvc.perform(post("/result/ai/" + project.getProjectId())
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .content("  [\n" +
-        "            {\n" +
-        "              \"question\": \"Question\",\n" +
-        "              \"category\": \"Category\",\n" +
-        "              \"answer\": \"Response\",\n" +
-        "              \"project\": {\n" +
-        "                \"projectId\": 1\n" +
-        "              }\n" +
-        "            }\n" +
-        "          ]")).andExpect(status().isOk());
-
-    // then
-    Mockito.verify(resultIaService).generateAndSaveResult(project.getProjectId(),answerIa);
-
+    verify(resultIaService).getResultIa(PROJECT_ID);
   }
 
   @Test
-  @WithMockUser(authorities = {"USER"})
-  void getAnalyseIAResult() throws Exception {
-    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
-    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+  void getAnalyseIAResult_shouldReturnNotFound_whenResponseNotFound() throws Exception {
+    when(resultIaService.getResultIa(PROJECT_ID)).thenThrow(new ResponseNotFoundException("not found"));
 
-    // When
-    mockMvc.perform(get("/result/ai/" + project.getProjectId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE))
-      .andExpect(MockMvcResultMatchers.status().isOk()).andReturn().getResponse();
-    // then
-    Mockito.verify(resultIaService).getResultIa(project.getProjectId());
+    mockMvc.perform(get(BASE_URI + "/" + PROJECT_ID)
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockUser(authorities = {"USER"})
-  void deleteAnalysisIaResult() throws Exception {
-    when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());
-    when(customMethodSecurity.isProjectOwner(project.getProjectId())).thenReturn(true);
+  void getAnalyseIAResult_shouldReturnNotFound_whenProjectNotFound() throws Exception {
+    when(resultIaService.getResultIa(PROJECT_ID)).thenThrow(new ProjectNotFoundException("project not found"));
 
-    MockHttpServletResponse response = mockMvc.perform(delete("/result/ai/" + project.getProjectId()+"/"+resultAiModel.getId())).andDo(print()).andReturn().getResponse();
-    Assertions.assertEquals(200, response.getStatus());
+    mockMvc.perform(get(BASE_URI + "/" + PROJECT_ID)
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().isNotFound());
   }
 
+  @Test
+  void deleteAnalysisIaResult_shouldReturnOk() throws Exception {
+    mockMvc.perform(delete(BASE_URI + "/" + PROJECT_ID + "/" + RESULT_ID))
+      .andExpect(status().isOk());
+  }
 }

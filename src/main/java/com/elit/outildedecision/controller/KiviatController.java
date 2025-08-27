@@ -1,6 +1,6 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.exception.AnswerIaNotFoundException;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
 import com.elit.outildedecision.model.RecommandationKiviatModel;
 import com.elit.outildedecision.service.KiviatService;
@@ -49,7 +49,7 @@ public class KiviatController {
   @GetMapping("/project/{projectId}")
   @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<RecommandationKiviatModel> getKiviatProjectValues(@PathVariable final Long projectId)
-    throws AnswerIaNotFoundException {
+    throws AiAnswerNotFoundException {
     return kiviatService.getKiviatProjetValues(projectId);
   }
 }
