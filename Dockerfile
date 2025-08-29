@@ -34,6 +34,19 @@ RUN apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+# --- Add: import the certificate into a dedicated truststore and configure the JVM ---
+RUN mkdir -p /opt/certs
+
+COPY cert/integ-elit-pmm-pred.crt /opt/certs/
+
+RUN keytool -importcert -noprompt -trustcacerts \
+  -alias sogetilabcert \
+  -file /opt/certs/integ-elit-pmm-pred.crt \
+  -keystore $JAVA_HOME/lib/security/cacerts \
+  -storepass 
+
+
+
 WORKDIR /app
 RUN mkdir -p /app/template
 RUN mkdir -p /app/logs
