@@ -88,34 +88,8 @@ public class QuestionResponseModel {
   private Boolean isAnswered;
 
   /**
-   * Helper method to set category and automatically populate display name.
-   * Following DRY principle - avoid repetitive display name setting.
-   *
-   * @param category the question category
+   * Indicate whether Yes or No is the more valuable answer in a mutliple-choice question.
    */
-  public void setCategory(final QuestionCategory category) {
-    this.category = category;
-    this.categoryDisplayName = category != null ? category.getDisplayName() : null;
-  }
+  private ScoringType scoringType;
 
-  /**
-   * Helper method to calculate and set all score-related fields.
-   * Following DRY principle - centralized score calculation logic.
-   */
-  public void calculateScoreMetrics() {
-    if (currentScore != null && weight != null) {
-      this.weightedScore = currentScore * weight;
-      this.maxPossibleScore = 2 * weight;
-
-      if (maxPossibleScore > 0) {
-        this.scorePercentage = weightedScore / maxPossibleScore * 100.0;
-      } else {
-        this.scorePercentage = 0.0;
-      }
-    } else {
-      this.weightedScore = 0;
-      this.maxPossibleScore = weight != null ? 2 * weight : 0;
-      this.scorePercentage = 0.0;
-    }
-  }
 }

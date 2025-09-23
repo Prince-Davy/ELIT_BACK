@@ -1,5 +1,6 @@
 package com.elit.outildedecision.audit.entity;
 
+import com.elit.outildedecision.audit.model.ScoringType;
 import com.elit.outildedecision.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
@@ -99,53 +100,12 @@ public class Question implements Serializable {
 
   /**
    * Current calculated score based on answer and answer type.
-   * Automatically computed and cached for performance optimization.
    */
-  @Column(name = "current_score", nullable = false)
-  @NotNull(message = "Current score is required")
+  @Column(name = "current_score")
   private Integer currentScore;
-  /**
-   * Determines if this question has been answered.
-   * @return true if the question has a current answer
-   */
-  public boolean isAnswered() {
-    return auditAnswerLabel != null && !auditAnswerLabel.isEmpty();
-  }
 
-  /**
-   * Gets the weighted score (score * weight) for audit calculations.
-   * Useful for total audit scoring.
-   *
-   * @return the weighted score
-   */
-  public Integer getWeightedScore() {
-    return auditAnswerValue * weight;
-  }
-
-  /**
-   * Gets the maximum possible score for this question.
-   * Based on the answer type and weight.
-   *
-   * @return the maximum possible weighted score
-   */
-  public Integer getMaxPossibleScore() {
-    if (auditAnswerValue == null) {
-      return 0;
-    }
-    // Maximum score is always 2 regardless of answer type
-    return auditAnswerValue * weight;
-  }
-
-  /**
-   * Calculates and sets the score based on current answer and answer type.
-   * Following Single Responsibility Principle - handles only score calculation.
-   */
-  public void calculateAndSetScore() {
-    if (auditAnswerValue != null) {
-      this.currentScore = auditAnswerValue;
-    } else {
-      this.currentScore = 0;
-    }
-  }
+  @Enumerated(EnumType.STRING)
+  @Column(name = "scoring_type", nullable = false)
+  private ScoringType scoringType;
 
 }

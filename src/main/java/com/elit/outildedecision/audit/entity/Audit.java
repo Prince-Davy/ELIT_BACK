@@ -11,20 +11,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.CascadeType;
+import javax.persistence.GenerationType;
+import javax.persistence.FetchType;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -86,4 +86,11 @@ public class Audit implements Serializable {
   @JsonManagedReference("audit_questions")
   @Builder.Default
   private List<Question> questions = new ArrayList<>();
+
+  /**
+   * Audit Score associated with this audit.
+   */
+  @OneToOne(mappedBy = "audit", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference("audit_auditScore")
+  private AuditScore auditScore;
 }

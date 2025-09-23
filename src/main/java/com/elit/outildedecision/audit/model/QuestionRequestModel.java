@@ -61,4 +61,7 @@ public class QuestionRequestModel {
   @NotNull(message = "La valeur de réponse est obligatoire")
   private Integer auditAnswerValue;
 
+  @NotNull(message = "Le type de réponse est obligatoire")
+  private ScoringType scoringType;
+
 }

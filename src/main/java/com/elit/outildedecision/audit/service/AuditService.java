@@ -2,6 +2,8 @@ package com.elit.outildedecision.audit.service;
 
 import com.elit.outildedecision.audit.model.AuditRequestModel;
 import com.elit.outildedecision.audit.model.AuditResponseModel;
+import com.elit.outildedecision.audit.model.AuditScoreDTO;
+import com.elit.outildedecision.exception.AuditNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
@@ -55,5 +57,13 @@ public interface AuditService {
    * @return the created audit response
    * @throws UserNotFoundException    if user not found
    */
-  ResponseEntity<AuditResponseModel> updateAudit(AuditRequestModel auditRequest, String userEmail) throws UserNotFoundException;
+  ResponseEntity<AuditResponseModel> updateAudit(AuditRequestModel auditRequest, String userEmail) throws UserNotFoundException, AuditNotFoundException;
+
+  /**
+   * calculate the scoring of the Audit entry.
+   *
+   * @param auditId the audit ID
+   * @return the audit Scoring
+   */
+  AuditScoreDTO calculateScoringOfAudit(Long auditId) throws AuditNotFoundException;
 }

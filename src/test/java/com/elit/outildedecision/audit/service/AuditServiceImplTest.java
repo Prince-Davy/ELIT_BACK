@@ -1,45 +1,41 @@
 package com.elit.outildedecision.audit.service;
 
 import com.elit.outildedecision.audit.entity.Audit;
+import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.Question;
-import com.elit.outildedecision.audit.model.AuditRequestModel;
-import com.elit.outildedecision.audit.model.AuditResponseModel;
-import com.elit.outildedecision.audit.model.QuestionRequestModel;
+import com.elit.outildedecision.audit.entity.QuestionResponseScore;
+import com.elit.outildedecision.audit.mapper.AuditMapper;
+import com.elit.outildedecision.audit.model.*;
 import com.elit.outildedecision.audit.repository.AuditRepository;
+import com.elit.outildedecision.audit.repository.AuditScoreRepository;
 import com.elit.outildedecision.audit.repository.QuestionRepository;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.AuditNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.UserRepository;
+import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.util.QuestionCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -49,62 +45,77 @@ class AuditServiceImplTest {
   @Mock private ProjectRepository projectRepository;
   @Mock private UserRepository userRepository;
   @Mock private QuestionRepository questionRepository;
+  @Mock private AuditMapper auditMapper;
 
   @InjectMocks
   private AuditServiceImpl auditService;
 
+  private static final Long COMMON_ID = 1L;
+  private static final String PROJECT_NAME = "Projet A";
+  private static final String USER_EMAIL = "user@example.com";
+  private static final String USER_FIRST_NAME = "Alice";
+  private static final String USER_LAST_NAME = "Martin";
+
   private Project project;
   private User user;
+  private Audit audit;
+  private Question question;
 
   @BeforeEach
   void setUp() {
     project = new Project();
-    // use setters to avoid depending on builder here
-    // assuming setters exist via Lombok; otherwise adjust accordingly
-    try {
-      project.getClass().getMethod("setProjectId", Long.class).invoke(project, 100L);
-      project.getClass().getMethod("setName", String.class).invoke(project, "Projet A");
-    } catch (Exception ignored) { /* If no setters, will be populated via reflection fallback not needed for tests that only read getters */ }
+
+    ReflectionTestUtils.setField(project, "projectId", COMMON_ID);
+    ReflectionTestUtils.setField(project, "name", PROJECT_NAME);
 
     user = new User();
-    try {
-      user.getClass().getMethod("setUserId", Long.class).invoke(user, 200L);
-      user.getClass().getMethod("setUserFirstName", String.class).invoke(user, "Alice");
-      user.getClass().getMethod("setUserLastName", String.class).invoke(user, "Martin");
-      user.getClass().getMethod("setUserEmail", String.class).invoke(user, "alice@example.com");
-    } catch (Exception ignored) { }
+    ReflectionTestUtils.setField(user, "userId", COMMON_ID);
+    ReflectionTestUtils.setField(user, "userFirstName", USER_FIRST_NAME);
+    ReflectionTestUtils.setField(user, "userLastName", USER_LAST_NAME);
+    ReflectionTestUtils.setField(user, "userEmail", USER_EMAIL);
+
+    question = Question.builder()
+      .questionId(COMMON_ID)
+      .questionRef("Q1")
+      .category(QuestionCategory.ORGANISATIONS)
+      .weight(2)
+      .audit(audit)
+      .auditAnswerLabel("NON")
+      .auditAnswerValue(2)
+      .scoringType(ScoringType.DIRECT)
+      .build();
+
+    audit = Audit.builder()
+      .auditId(COMMON_ID)
+      .project(project)
+      .method(MethodType.SCRUM)
+      .user(user)
+      .auditLaunchDate(new Timestamp(System.currentTimeMillis()))
+      .questions(List.of(question))
+      .build();
+
   }
 
   @Test
   void createAudit_success_withQuestions() throws Exception {
     // Arrange
-    Long projectId = 100L;
-    when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-    when(userRepository.findByUserEmail("alice@example.com")).thenReturn(user);
+    when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
+    when(userRepository.findByUserEmail(any())).thenReturn(user);
+    when(auditRepository.save(any(Audit.class))).thenReturn(audit);
+    when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(1L);
 
-    Audit savedAudit = Audit.builder()
-      .auditId(1L)
-      .project(project)
-      .user(user)
-      .auditLaunchDate(new Timestamp(System.currentTimeMillis()))
-      .questions(new ArrayList<>())
-      .build();
-
-    when(auditRepository.save(any(Audit.class))).thenReturn(savedAudit);
-    when(auditRepository.countAuditsByProjectId(projectId)).thenReturn(1L);
-
-    // Mock AuditRequestModel and QuestionRequestModel
     AuditRequestModel request = mock(AuditRequestModel.class);
-    when(request.getProjectId()).thenReturn(projectId);
+    when(request.getProjectId()).thenReturn(COMMON_ID);
 
-    QuestionRequestModel q1 = mock(QuestionRequestModel.class);
-    when(q1.getCategory()).thenReturn(QuestionCategory.ORGANISATIONS);
-    when(q1.getQuestionRef()).thenReturn("Q-001");
-    when(q1.getWeight()).thenReturn((int) 1.0);
-    when(q1.getAuditAnswerLabel()).thenReturn("OUI");
-    when(q1.getAuditAnswerValue()).thenReturn((int) 5.0);
+    QuestionResponseModel questionResponse = QuestionResponseModel.builder()
+      .category(QuestionCategory.ORGANISATIONS)
+      .questionRef(question.getQuestionRef())
+      .weight(question.getWeight())
+      .auditId(question.getQuestionId())
+      .auditAnswerLabel(question.getAuditAnswerLabel())
+      .auditAnswerValue(question.getAuditAnswerValue()).build();
 
-    when(request.getQuestions()).thenReturn(List.of(q1));
+    when(auditMapper.mapToQuestionResponseModel(any())).thenReturn(questionResponse);
 
     // Act
     ResponseEntity<AuditResponseModel> response = auditService.createAudit(request, "alice@example.com");
@@ -112,41 +123,35 @@ class AuditServiceImplTest {
     // Assert
     assertNotNull(response);
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
-    assertNotNull(response.getBody());
-    assertEquals(1L, response.getBody().getTotalAuditCount());
-    assertEquals(projectId, response.getBody().getProjectId());
-    assertEquals("Projet A", response.getBody().getProjectName());
-    assertEquals(user.getUserId(), response.getBody().getUserId());
-    assertEquals(1, response.getBody().getQuestions().size());
 
-    // Verify interactions
-    verify(projectRepository).findById(projectId);
+    AuditResponseModel responseBody = response.getBody();
+    assertNotNull(responseBody);
+    assertEquals(1L, responseBody.getTotalAuditCount());
+    assertEquals(COMMON_ID, responseBody.getProjectId());
+    assertEquals("Projet A", responseBody.getProjectName());
+    assertEquals(user.getUserId(), responseBody.getUserId());
+    assertEquals(1, responseBody.getQuestions().size());
+
+    // Verify repository interactions
+    verify(projectRepository).findById(anyLong());
     verify(userRepository).findByUserEmail("alice@example.com");
     verify(auditRepository).save(any(Audit.class));
-    verify(questionRepository).saveAll(anyList());
-    verify(auditRepository).countAuditsByProjectId(projectId);
-
-    // Capture saved questions to ensure they are linked to savedAudit
-    ArgumentCaptor<List<Question>> captor = ArgumentCaptor.forClass(List.class);
-    verify(questionRepository).saveAll(captor.capture());
-    List<Question> savedQuestions = captor.getValue();
-    assertEquals(1, savedQuestions.size());
-    assertEquals("Q-001", savedQuestions.get(0).getQuestionRef());
-    assertEquals(savedAudit.getAuditId(), savedQuestions.get(0).getAudit().getAuditId());
+    verify(auditRepository).countAuditsByProjectId(anyLong());
   }
+
 
   @Test
   void createAudit_projectNotFound_throws() {
     // Arrange
     AuditRequestModel request = mock(AuditRequestModel.class);
-    when(request.getProjectId()).thenReturn(999L);
-    when(projectRepository.findById(999L)).thenReturn(Optional.empty());
+    when(request.getProjectId()).thenReturn(COMMON_ID);
+    when(projectRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     // Act + Assert
     assertThrows(ProjectNotFoundException.class,
       () -> auditService.createAudit(request, "user@example.com"));
 
-    verify(projectRepository).findById(999L);
+    verify(projectRepository).findById(COMMON_ID);
     verifyNoInteractions(userRepository);
     verifyNoInteractions(questionRepository);
   }
@@ -169,70 +174,112 @@ class AuditServiceImplTest {
 
   @Test
   void getAuditsByProject_success() throws Exception {
-    // Arrange
-    Long projectId = 100L;
-    when(projectRepository.existsById(projectId)).thenReturn(true);
 
-    Audit audit = Audit.builder()
-      .auditId(1L)
-      .project(project)
-      .user(user)
-      .auditLaunchDate(new Timestamp(System.currentTimeMillis()))
-      .questions(Collections.emptyList())
-      .build();
+    when(projectRepository.existsById(COMMON_ID)).thenReturn(true);
 
-    when(auditRepository.findByProjectProjectIdOrderByCreatedAtDesc(projectId))
+    when(auditRepository.findByProjectProjectIdOrderByCreatedAtDesc(COMMON_ID))
       .thenReturn(Collections.singletonList(audit));
-    when(auditRepository.countAuditsByProjectId(projectId)).thenReturn(1L);
+    when(auditRepository.countAuditsByProjectId(COMMON_ID)).thenReturn(1L);
 
     // Act
-    List<AuditResponseModel> responses = auditService.getAuditsByProject(projectId);
+    List<AuditResponseModel> responses = auditService.getAuditsByProject(COMMON_ID);
 
     // Assert
     assertNotNull(responses);
     assertEquals(1, responses.size());
-    assertEquals(projectId, responses.get(0).getProjectId());
-    verify(auditRepository).findByProjectProjectIdOrderByCreatedAtDesc(projectId);
+    assertEquals(COMMON_ID, responses.get(0).getProjectId());
+    verify(auditRepository).findByProjectProjectIdOrderByCreatedAtDesc(COMMON_ID);
   }
 
   @Test
   void getAuditsByProject_projectNotFound_throws() {
     // Arrange
-    when(projectRepository.existsById(555L)).thenReturn(false);
+    when(projectRepository.existsById(anyLong())).thenReturn(false);
 
     // Act + Assert
     assertThrows(ProjectNotFoundException.class,
-      () -> auditService.getAuditsByProject(555L));
-    verify(projectRepository).existsById(555L);
+      () -> auditService.getAuditsByProject(anyLong()));
+    verify(projectRepository).existsById(anyLong());
     verifyNoInteractions(auditRepository);
   }
 
   @Test
   void getAuditsByProjectPaginated_success() throws Exception {
-    // Arrange
-    Long projectId = 100L;
-    when(projectRepository.existsById(projectId)).thenReturn(true);
-
-    Audit audit = Audit.builder()
-      .auditId(2L)
-      .project(project)
-      .user(user)
-      .questions(Collections.emptyList())
-      .build();
+    when(projectRepository.existsById(anyLong())).thenReturn(true);
 
     Pageable pageable = PageRequest.of(0, 5);
     Page<Audit> page = new PageImpl<>(Collections.singletonList(audit), pageable, 1);
-    when(auditRepository.findByProjectProjectIdOrderByCreatedAtDesc(projectId, pageable))
+    when(auditRepository.findByProjectProjectIdOrderByCreatedAtDesc(anyLong(), any()))
       .thenReturn(page);
-    when(auditRepository.countAuditsByProjectId(projectId)).thenReturn(1L);
+    when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(COMMON_ID);
 
     // Act
-    Page<AuditResponseModel> result = auditService.getAuditsByProjectPaginated(projectId, 0, 5);
+    Page<AuditResponseModel> result = auditService.getAuditsByProjectPaginated(anyLong(), 0, 5);
 
     // Assert
     assertEquals(1, result.getTotalElements());
     assertEquals(1, result.getContent().size());
-    assertEquals(projectId, result.getContent().get(0).getProjectId());
-    verify(auditRepository).findByProjectProjectIdOrderByCreatedAtDesc(projectId, pageable);
+    assertEquals(COMMON_ID, result.getContent().get(0).getProjectId());
+    verify(auditRepository).findByProjectProjectIdOrderByCreatedAtDesc(anyLong(), any());
   }
-}
+
+  @Test
+  void calculateScoringOfAudit_shouldSuccess() throws AuditNotFoundException {
+
+    QuestionResponseModel questionResponseModel = QuestionResponseModel.builder()
+      .questionRef(question.getQuestionRef())
+      .weight(question.getWeight())
+      .auditAnswerLabel(question.getAuditAnswerLabel())
+      .auditAnswerValue(question.getAuditAnswerValue())
+      .category(question.getCategory())
+      .scoringType(question.getScoringType())
+      .build();
+
+    Map<QuestionCategory,Double> category = new HashMap<>();
+    category.put(question.getCategory(), 100.0);
+
+    QuestionResponseScore questionResponseScore = QuestionResponseScore.builder().build();
+
+    AuditScore auditScore = AuditScore.builder()
+      .audit(audit)
+      .user(user)
+      .globalScorePercentage(100.0)
+      .submissionDate(audit.getAuditLaunchDate())
+      .categoryScores(category)
+      .questionResponses(List.of(questionResponseScore))
+      .build();
+
+    QuestionResponseScoreDTO questionResponseScoreDTO = QuestionResponseScoreDTO.builder()
+      .score(10).category(question.getCategory()).build();
+    AuditScoreDTO auditScoreDTO = AuditScoreDTO.builder()
+      .auditScoreId(COMMON_ID)
+      .auditId(audit.getAuditId())
+      .globalScorePercentage(100.0)
+      .questionResponses(List.of(questionResponseScoreDTO))
+      .build();
+
+    when(auditRepository.findById(anyLong())).thenReturn(Optional.ofNullable(audit));
+    when(auditMapper.responseModeltoAuditScore(any(),any())).thenReturn(auditScore);
+    when(auditMapper.auditScoretoAuditScoreDto(any())).thenReturn(auditScoreDTO);
+    when(auditMapper.mapToQuestionResponseModel(any())).thenReturn(questionResponseModel);
+    when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(COMMON_ID);
+    when(auditRepository.save(any())).thenReturn(audit);
+
+
+    AuditScoreDTO auditScoreResponse = auditService.calculateScoringOfAudit(anyLong());
+
+    assertNotNull(auditScoreResponse);
+    assertEquals(auditScore.getGlobalScorePercentage(), auditScoreResponse.getGlobalScorePercentage());
+
+  }
+
+  @Test
+  void calculateScoringOfAudit_shouldThrowsException() throws Exception {
+    when(auditRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+    // Act + Assert
+    assertThrows(AuditNotFoundException.class,
+      () -> auditService.calculateScoringOfAudit(anyLong()));
+
+  }
+  }

@@ -1,20 +1,24 @@
 package com.elit.outildedecision.audit.service;
 
+import com.elit.outildedecision.audit.calculate.MethodsScoringStrategy;
+import com.elit.outildedecision.audit.calculate.ScoringStrategyFactory;
 import com.elit.outildedecision.audit.entity.Audit;
+import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.Question;
+import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.AuditRequestModel;
 import com.elit.outildedecision.audit.model.AuditResponseModel;
 import com.elit.outildedecision.audit.model.QuestionRequestModel;
 import com.elit.outildedecision.audit.model.QuestionResponseModel;
+import com.elit.outildedecision.audit.model.AuditScoreDTO;
 import com.elit.outildedecision.audit.repository.AuditRepository;
-import com.elit.outildedecision.audit.repository.QuestionRepository;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.exception.AuditNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.UserRepository;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +26,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -35,25 +42,25 @@ public class AuditServiceImpl implements AuditService {
   private final AuditRepository auditRepository;
   private final ProjectRepository projectRepository;
   private final UserRepository userRepository;
-  private final QuestionRepository questionRepository;
+  private final AuditMapper  auditMapper;
 
   /**
    * Constructor for AuditServiceImpl.
    * Following Dependency Inversion Principle - depends on abstractions.
    *
-   * @param auditRepository    the audit repository
-   * @param projectRepository  the project repository
-   * @param userRepository     the user repository
-   * @param questionRepository the question repository
+   * @param auditRepository the audit repository
+   * @param projectRepository the project repository
+   * @param userRepository the user repository
+   * @param auditMapper the audit mapper
    */
   public AuditServiceImpl(final AuditRepository auditRepository,
-      final ProjectRepository projectRepository,
-      final UserRepository userRepository,
-      final QuestionRepository questionRepository) {
+                          final ProjectRepository projectRepository,
+                          final UserRepository userRepository,
+                          final AuditMapper auditMapper) {
     this.auditRepository = auditRepository;
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
-    this.questionRepository = questionRepository;
+    this.auditMapper = auditMapper;
   }
   /**
    * Create a new audit.
@@ -64,6 +71,7 @@ public class AuditServiceImpl implements AuditService {
    * @throws UserNotFoundException    if user not found
    */
   @Override
+  @Transactional
   public ResponseEntity<AuditResponseModel> createAudit(final AuditRequestModel auditRequest,
                                                         final String userEmail)
       throws ProjectNotFoundException, UserNotFoundException {
@@ -77,7 +85,6 @@ public class AuditServiceImpl implements AuditService {
     if (user == null) {
       throw new UserNotFoundException("Utilisateur non trouvé");
     }
-
     // Create audit entity
     Audit audit = Audit.builder()
         .method(auditRequest.getMethod())
@@ -85,22 +92,8 @@ public class AuditServiceImpl implements AuditService {
         .user(user)
         .build();
 
-    // Save audit first to get the ID for questions
-    Audit savedAudit = auditRepository.save(audit);
-
-    // Create and save questions if provided
-    if (auditRequest.getQuestions() != null && !auditRequest.getQuestions().isEmpty()) {
-      List<Question> questions = auditRequest.getQuestions().stream()
-          .map(questionRequest -> mapToQuestionEntity(questionRequest, savedAudit))
-          .collect(Collectors.toList());
-
-      questionRepository.saveAll(questions);
-      savedAudit.getQuestions().addAll(questions);
-    }
-
-    // Build response
-    AuditResponseModel response = mapToResponseModel(savedAudit);
-
+    final Audit saved = auditRepository.save(audit);
+    final AuditResponseModel response = mapToResponseModel(saved);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
@@ -111,28 +104,34 @@ public class AuditServiceImpl implements AuditService {
    * @return the created audit response
    * @throws UserNotFoundException    if user not found
    */
+
   @Override
-  public ResponseEntity<AuditResponseModel> updateAudit(final AuditRequestModel auditRequest, final String userEmail)
-          throws UserNotFoundException {
-    User user = userRepository.findByUserEmail(userEmail);
+  @Transactional
+  public ResponseEntity<AuditResponseModel> updateAudit(@Valid final AuditRequestModel auditRequest, final String userEmail)
+    throws UserNotFoundException, AuditNotFoundException {
+
+    final User user = userRepository.findByUserEmail(userEmail);
     if (user == null) {
       throw new UserNotFoundException("Utilisateur non trouvé");
     }
-    Audit audit = auditRepository.getById(auditRequest.getAuditId());
-    // Create and save questions if provided
+
+    final Long auditId = Objects.requireNonNull(auditRequest.getAuditId(), "auditId est obligatoire");
+    final Audit audit = auditRepository.findById(auditId)
+      .orElseThrow(() -> new AuditNotFoundException("Audit non trouvé: " + auditId));
+
     if (auditRequest.getQuestions() != null && !auditRequest.getQuestions().isEmpty()) {
-      List<Question> questions = auditRequest.getQuestions().stream()
-              .map(questionRequest -> mapToQuestionEntity(questionRequest, audit))
-              .collect(Collectors.toList());
-      questionRepository.deleteByAuditAuditId(auditRequest.getAuditId());
-      questionRepository.saveAll(questions);
-      audit.getQuestions().addAll(questions);
+      audit.getQuestions().clear();
+
+      for (QuestionRequestModel qr : auditRequest.getQuestions()) {
+        final Question q = auditMapper.questionRequestModelToQuestion(qr, audit);
+        audit.getQuestions().add(q);
+      }
     }
 
-    // Build response
-    AuditResponseModel response = mapToResponseModel(audit);
+    final Audit saved = auditRepository.save(audit);
+    final AuditResponseModel response = mapToResponseModel(saved);
+    return ResponseEntity.ok(response);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
   /**
    * Get audit by project.
@@ -180,6 +179,34 @@ public class AuditServiceImpl implements AuditService {
     return auditPage.map(this::mapToResponseModel);
   }
 
+
+  /**
+   * Calculates the scoring for a given audit based on its method type.
+   * This method retrieves the audit by its ID, maps it to a response model,
+   * resolves the appropriate scoring strategy using the {@link ScoringStrategyFactory},
+   * performs the scoring calculation, and persists the resulting {@link AuditScore}.
+   *
+   * @param auditId The ID of the audit to score.
+   * @return The {@link AuditScoreDTO} containing the calculated score details.
+   * @throws AuditNotFoundException if the audit with the given ID is not found.
+   */
+  @Override
+  public AuditScoreDTO calculateScoringOfAudit(final Long auditId) throws AuditNotFoundException {
+    Audit audit = auditRepository.findById(auditId)
+      .orElseThrow(() -> new AuditNotFoundException("Audit Not Found"));
+
+    AuditResponseModel auditResponseModel = this.mapToResponseModel(audit);
+    MethodsScoringStrategy methodsScoringStrategy = new ScoringStrategyFactory().resolveStrategyByMethodType(auditResponseModel.getMethod());
+    methodsScoringStrategy.calculateScoring(auditResponseModel);
+
+    AuditScore auditScore = this.auditMapper.responseModeltoAuditScore(auditResponseModel, audit);
+    auditScore.getQuestionResponses().forEach(q -> q.setAuditScore(auditScore));
+    audit.setAuditScore(auditScore);
+
+    auditRepository.save(audit);
+    return auditMapper.auditScoretoAuditScoreDto(auditScore);
+  }
+
   /**
    * Map Audit entity to AuditResponseModel.
    * Following Single Responsibility Principle - handles only audit mapping.
@@ -199,11 +226,11 @@ public class AuditServiceImpl implements AuditService {
     List<QuestionResponseModel> questionResponses = new ArrayList<>();
     if (audit.getQuestions() != null) {
       questionResponses = audit.getQuestions().stream()
-          .map(question -> mapToQuestionResponseModel(question))
+          .map(auditMapper::mapToQuestionResponseModel)
           .collect(Collectors.toList());
     }
 
-    AuditResponseModel response = AuditResponseModel.builder()
+    return AuditResponseModel.builder()
         .totalAuditCount(auditRepository.countAuditsByProjectId(audit.getProject().getProjectId()))
         .auditId(audit.getAuditId())
         .method(audit.getMethod())
@@ -216,66 +243,6 @@ public class AuditServiceImpl implements AuditService {
         .userRole(userRole)
         .questions(questionResponses)
         .build();
-
-    // Calculate question metrics
-    response.calculateQuestionMetrics();
-
-    return response;
-  }
-
-  /**
-   * Map QuestionRequestModel to Question entity.
-   * Following Single Responsibility Principle - handles only question request
-   * mapping.
-   * Includes automatic score calculation and history creation.
-   *
-   * @param questionRequest the question request model
-   * @param audit           the associated audit entity
-   * @return the question entity
-   */
-  private Question mapToQuestionEntity(final QuestionRequestModel questionRequest, final Audit audit) {
-    Question question = Question.builder()
-        .category(questionRequest.getCategory())
-        .questionRef(questionRequest.getQuestionRef())
-        .weight(questionRequest.getWeight())
-        .auditAnswerLabel(questionRequest.getAuditAnswerLabel())
-        .auditAnswerValue(questionRequest.getAuditAnswerValue())
-        .audit(audit)
-        .build();
-
-    // Calculate score automatically based on answer and type
-    question.calculateAndSetScore();
-
-    return question;
-  }
-
-  /**
-   * Map Question entity to QuestionResponseModel.
-   * Following Single Responsibility Principle - handles only question response
-   * mapping.
-   * Includes complete scoring metrics and answer history.
-   *
-   * @param question the question entity
-   * @return the question response model
-   */
-  private QuestionResponseModel mapToQuestionResponseModel(final Question question) {
-    QuestionResponseModel response = QuestionResponseModel.builder()
-        .questionRef(question.getQuestionRef())
-        .weight(question.getWeight())
-        .auditAnswerLabel(question.getAuditAnswerLabel())
-        .auditAnswerValue(question.getAuditAnswerValue())
-        .currentScore(question.getCurrentScore())
-        .isAnswered(question.isAnswered())
-        .build();
-
-    // Set category with automatic display name population
-    response.setCategory(question.getCategory()); // Set answer type with automatic display name population
-
-    // Calculate all score metrics automatically
-    response.calculateScoreMetrics();
-
-
-    return response;
   }
 
 }

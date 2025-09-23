@@ -1,6 +1,7 @@
 package com.elit.outildedecision.audit.model;
 
 import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,8 +9,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Model for audit response.
@@ -61,18 +64,14 @@ public class AuditResponseModel {
   private Long totalAuditCount;
 
   /**
-   * Helper method to calculate and set computed fields.
-   * Following DRY principle - centralized calculation logic.
+   * computed field : global percentage.
    */
-  public void calculateQuestionMetrics() {
-    if (questions != null) {
-      this.totalQuestions = questions.size();
-      this.totalWeight = questions.stream()
-          .mapToInt(QuestionResponseModel::getWeight)
-          .sum();
-    } else {
-      this.totalQuestions = 0;
-      this.totalWeight = 0;
-    }
-  }
+  private double globalScorePercentage;
+
+  /**
+   * Score percentage per category.
+   */
+  @Builder.Default
+  private Map<QuestionCategory, Double> categoryScores = new HashMap<>();
+
 }

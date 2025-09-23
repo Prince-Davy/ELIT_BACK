@@ -134,6 +134,7 @@ class MultiCriteriaAnalysisControllerTests {
     verify(multiCriteriaAnalysisService, times(1)).createMulticriteriaAnalysisForm(project.getProjectId());
   }
 
+
   @Test
   void shouldUpdateMultiCriteriaAnalysis_Success() throws Exception {
     when(customMethodSecurity.getPrincipal()).thenReturn(user.getUserEmail());

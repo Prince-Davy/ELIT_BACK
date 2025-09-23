@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * CustomMethodSecurityExpressionRoot is an implementation of Spring Security's MethodSecurityExpressionOperations
@@ -67,6 +68,28 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
 
     return permissions.contains(ProjectPermession.CDP.name());
   }
+
+  /**
+   * Checks if the authenticated user is the owner of the audit and project with the given auditId.
+   *
+   * @param auditId the ID of the audit to check ownership for
+   * @return true if the authenticated user is the owner of the project and audit, false otherwise
+   */
+  public boolean isProjectOwnerByAuditId(final Long auditId) {
+    try {
+      final UserDetails userDetails = (UserDetails) this.getPrincipal();
+      User user = userService.findByEmail(userDetails.getUsername());
+
+      return user.getUserProjectPermissions().stream()
+        .filter(p -> p.getProject().getAudits().stream()
+          .anyMatch(audit -> Objects.equals(audit.getAuditId(), auditId)))
+        .anyMatch(p -> ProjectPermession.CDP.name().equals(p.getPermission()));
+
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
 
   /**
    * Checks if the authenticated user has contributor permissions for the project with the given ID.

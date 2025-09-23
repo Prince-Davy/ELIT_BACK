@@ -1,6 +1,7 @@
 package com.elit.outildedecision.audit.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +20,7 @@ import com.elit.outildedecision.util.MethodType;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AuditRequestModel {
 
   @NotNull(message = "L'ID du projet est obligatoire")
