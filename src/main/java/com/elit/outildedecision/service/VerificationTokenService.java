@@ -55,14 +55,14 @@ public interface VerificationTokenService {
     String token, PasswordChangeModel changePasswordModel);
 
   /**
-   * Sends a forgot password email to the user with the specified email address.
+   * Sends a reset password email to the user with the specified email address.
    *
-   * @param email a String representing the email address of the user to send the forgot password email to
+   * @param email a String representing the email address of the user to send the reset password email to
    * @return a ResponseEntity indicating the success or failure of the email send operation
    * @throws JsonProcessingException if an error occurs while processing the JSON data for the email
    * @throws UserNotVerifiedException if the specified user account has not been verified
    */
-  ResponseEntity<String> sendForgotPasswordEmail(String email)
+  ResponseEntity<String> sendResetPasswordEmail(String email)
     throws JsonProcessingException, UserNotVerifiedException;
 }
 

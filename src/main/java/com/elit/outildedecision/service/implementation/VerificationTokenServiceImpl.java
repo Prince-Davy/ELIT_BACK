@@ -197,7 +197,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
      * it updates the user's password.
      *
      * @param token               The token that is used to reinstate a forgotten password
-     * @param changePasswordModel The model that contains the new password and the confirm password
+     * @param changePasswordModel The model that contains the new password and the confirmed one
      * @return A response entity with a message indicating whether the password update was successful or not
      */
     @Override
@@ -226,20 +226,20 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
     /**
-     * This method is used to initiate a forgot password request. It reads the user email from the JSON
-     * string, retrieves the user from the database, and creates a verification token. It then sends an
-     * email to the user with a link to reset their password.
+     * This method is used to initiate and send a reset password email request.
+     * It reads the user email from the JSON string, retrieves the user from the database, and creates a verification token.
+     * It then sends an email to the user email address with a link to reset his password.
      *
-     * @param email The JSON string containing the user email
+     * @param jsonRequestBody The JSON string containing the user email
      * @return A response entity with a message indicating whether the forgot password request was successful or not
      * @throws JsonProcessingException  If the JSON string cannot be processed
      * @throws UserNotVerifiedException If the user has not verified their email address
      */
     @SuppressWarnings("checkstyle:LocalVariableName")
     @Override
-    public ResponseEntity<String> sendForgotPasswordEmail(final String email)
+    public ResponseEntity<String> sendResetPasswordEmail(final String jsonRequestBody)
             throws JsonProcessingException, UserNotVerifiedException {
-        JsonNode emailNode = new ObjectMapper().readTree(email);
+        JsonNode emailNode = new ObjectMapper().readTree(jsonRequestBody);
         String userEmail = emailNode.path("email").asText();
         User user = userRepository.findByUserEmail(userEmail);
         if (Objects.isNull(user)) {

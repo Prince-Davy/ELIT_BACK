@@ -4,7 +4,6 @@ import com.elit.outildedecision.exception.UserNotVerifiedException;
 import com.elit.outildedecision.model.PasswordChangeModel;
 import com.elit.outildedecision.service.VerificationTokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,9 +43,9 @@ public class VerificationController {
     return verificationTokenService.confirmUser(token);
   }
   /**
-   * method used to reset password.
+   * Reset the user password.
    * @param token the token used to reset password.
-   *              the token is sent to user email.
+   *              the token is sent to user email address.
    * @param changePasswordModel the new password.
    * @return ResponseEntity<String> the response of reset password.
    */
@@ -55,30 +54,16 @@ public class VerificationController {
       @RequestParam("token")final String token, @RequestBody final PasswordChangeModel changePasswordModel) {
     return verificationTokenService.reinstateForgotPassword(token, changePasswordModel);
   }
-  /**
-   * method used to send email to user to reset password.
-   * @param email the email of user.
-   * @return ResponseEntity<String> the response of sending email.
-   * @throws JsonProcessingException when there is an error in parsing json.
-   * @throws UserNotVerifiedException when user could not be verified.
-   */
-  @GetMapping(value = "/reset-password", consumes = "application/json")
-  public ResponseEntity<String> forgotPassword(final HttpEntity<String> email)
-      throws JsonProcessingException, UserNotVerifiedException {
-    return verificationTokenService.sendForgotPasswordEmail(email.getBody());
-  }
 
   /**
-   * method used to send email to user to forget password.
-   * @param email the email of user.
-   * @return ResponseEntity<String> the response of sending email.
-   * @throws JsonProcessingException when there is an error in parsing json.
-   * @throws UserNotVerifiedException when user could not be verified.
+   * Send a reset password email to the concerned user email address.
+   * @param jsonRequestBody the json request body containing the user email address.
+   * @return ResponseEntity<String> the response of sending the reset email.
    */
-  @PostMapping("/")
-  public ResponseEntity<String> forgotPassword(@RequestBody final String email) {
+  @PostMapping("/send-reset-password-email")
+  public ResponseEntity<String> sendResetPasswordEmail(@RequestBody final String jsonRequestBody) {
     try {
-      return verificationTokenService.sendForgotPasswordEmail(email);
+      return verificationTokenService.sendResetPasswordEmail(jsonRequestBody);
     } catch (JsonProcessingException e) {
       return ResponseEntity.badRequest().body("JSON processing error: " + e.getMessage());
     } catch (UserNotVerifiedException e) {

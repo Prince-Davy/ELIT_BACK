@@ -48,7 +48,7 @@ class VerificationTokenServiceImplTest {
   private VerificationToken verificationToken;
   private static final Long TOKEN_EXPIRATION_TIME = 30 * 60 * 1000L;
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     token = "token";
     user = new User();
     user.setUserId(1L);
@@ -173,20 +173,20 @@ class VerificationTokenServiceImplTest {
   }
 
   @Test
-  void sendForgotPasswordEmail_UserNotFound() throws UserNotVerifiedException, JsonProcessingException {
+  void sendResetPasswordEmail_UserNotFound() throws UserNotVerifiedException, JsonProcessingException {
     // Given
     VerificationTokenServiceImpl verificationTokenService = new VerificationTokenServiceImpl(passwordEncoder,verificationTokenRepository,userRepository,emailClientMock);
     String userEmail = "test@example.com";
     when(userRepository.findByUserEmail(userEmail)).thenReturn(null);
     // When
-    ResponseEntity<String> response = verificationTokenService.sendForgotPasswordEmail("{\"email\":\"" + userEmail + "\"}");
+    ResponseEntity<String> response = verificationTokenService.sendResetPasswordEmail("{\"email\":\"" + userEmail + "\"}");
     // Then
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals("Aucun compte n'a été trouvé pour l'e-mail " + userEmail + ", Veuillez réessayer.", response.getBody());
   }
 
   @Test
-  void sendForgotPasswordEmail_UserNotVerified() {
+  void sendResetPasswordEmail_UserNotVerified() {
     // Given
     VerificationTokenServiceImpl verificationTokenService = new VerificationTokenServiceImpl(passwordEncoder, verificationTokenRepository, userRepository, emailClientMock);
     String userEmail = "test@example.com";
@@ -195,7 +195,7 @@ class VerificationTokenServiceImplTest {
     user.setIsEmailVerified(false);
     when(userRepository.findByUserEmail(userEmail)).thenReturn(user);
     // When et Then
-    assertThrows(UserNotVerifiedException.class, () -> verificationTokenService.sendForgotPasswordEmail("{\"email\":\"" + userEmail + "\"}"));
+    assertThrows(UserNotVerifiedException.class, () -> verificationTokenService.sendResetPasswordEmail("{\"email\":\"" + userEmail + "\"}"));
   }
   /* @Test
   void forgotPassword() throws UserNotVerifiedException, JsonProcessingException {
