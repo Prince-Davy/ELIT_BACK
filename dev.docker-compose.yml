@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   db:
     container_name: 'elit_database'
@@ -32,6 +30,8 @@ services:
       context: "."
       dockerfile: Dockerfile
     env_file: .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
     ports:
       - "8080:8080"
     volumes:

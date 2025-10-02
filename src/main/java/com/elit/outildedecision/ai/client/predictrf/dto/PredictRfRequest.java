@@ -1,0 +1,21 @@
+package com.elit.outildedecision.ai.client.predictrf.dto;
+
+import com.elit.outildedecision.ai.methodology.evaluation.service.ModelType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Map;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PredictRfRequest {
+  private Map<String, String> data;
+
+  @JsonProperty("model_type")
+  private ModelType modelType;
+}

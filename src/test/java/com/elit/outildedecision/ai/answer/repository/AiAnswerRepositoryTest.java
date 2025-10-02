@@ -3,8 +3,8 @@ package com.elit.outildedecision.ai.answer.repository;
 import com.elit.outildedecision.ai.answer.entity.AiAnswer;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.repository.ProjectRepository;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,8 +32,20 @@ public class AiAnswerRepositoryTest {
     project.setName("Test Project");
     project = projectRepository.save(project);
 
-    AiAnswer answer1 = new AiAnswer("Q1", "Category1", "A1", project);
-    AiAnswer answer2 = new AiAnswer("Q2", "Category2", "A2", project);
+    AiAnswer answer1 = AiAnswer.builder()
+      .question("Q1")
+      .category("Category1")
+      .answer("A1")
+      .project(project)
+      .build();
+
+    AiAnswer answer2 = AiAnswer.builder()
+      .question("Q2")
+      .category("Category2")
+      .answer("A2")
+      .project(project)
+      .build();
+
     aiAnswerRepository.save(answer1);
     aiAnswerRepository.save(answer2);
   }

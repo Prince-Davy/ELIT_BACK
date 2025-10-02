@@ -45,14 +45,14 @@ public class IaResultController {
   /**
    * Send data to Ai and get result to save it on BDD.
    *
-   * @param projectId project id
-   * @param aiAnswerDTO   list of answers IA
+   * @param projectId   project id
+   * @param aiAnswerDTO list of answers IA
    * @return ResponseEntity<SimpletMessageDto>
    */
   @PostMapping("/{projectId}")
   @PreAuthorize("isProjectOwner(#projectId)")
   public ResponseEntity<SimpleMessageDto> saveAiResponse(@PathVariable final long projectId,
-                                                 @RequestBody final AiAnswerDTO aiAnswerDTO) throws ResultAiNotFoundException, ProjectNotFoundException, ResultAlreadyExistsException {
+                                                         @RequestBody final AiAnswerDTO aiAnswerDTO) throws ResultAiNotFoundException, ProjectNotFoundException, ResultAlreadyExistsException {
 
     String iaResponse = resultIaService.generateAndSaveResult(projectId, aiAnswerDTO);
     return ResponseEntity.ok(new SimpleMessageDto("AI prediction" + "\n" + iaResponse, HttpStatus.OK.value(), LocalDateTime.now()));
