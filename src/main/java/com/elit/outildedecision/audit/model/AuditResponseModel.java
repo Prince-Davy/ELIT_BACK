@@ -1,7 +1,6 @@
 package com.elit.outildedecision.audit.model;
 
 import com.elit.outildedecision.util.MethodType;
-import com.elit.outildedecision.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Model for audit response.
@@ -24,15 +21,50 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class AuditResponseModel {
+
+  /**
+   * The unique identifier of the audit.
+   */
   private Long auditId;
+
+  /**
+   * The methodology type used in the audit.
+   */
   private MethodType method;
+
+  /**
+   * The ID of the associated project.
+   */
   private Long projectId;
+
+  /**
+   * The name of the associated project.
+   */
   private String projectName;
+
+  /**
+   * The ID of the user linked to the audit.
+   */
   private Long userId;
+
+  /**
+   * The first name of the user.
+   */
   private String userFirstName;
+
+  /**
+   * The last name of the user.
+   */
   private String userLastName;
+
+  /**
+   * The role of the user in the audit or project.
+   */
   private String userRole;
 
+  /**
+   * the date of the audit creation.
+   */
   @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss", timezone = "Europe/Paris")
   private Timestamp auditLaunchDate;
 
@@ -72,6 +104,6 @@ public class AuditResponseModel {
    * Score percentage per category.
    */
   @Builder.Default
-  private Map<QuestionCategory, Double> categoryScores = new HashMap<>();
+  private List<AuditCategoryResultDTO> categoryResults = new ArrayList<>();
 
 }

@@ -1,13 +1,12 @@
 package com.elit.outildedecision.audit.service;
 
-import com.elit.outildedecision.audit.entity.Audit;
-import com.elit.outildedecision.audit.entity.AuditScore;
-import com.elit.outildedecision.audit.entity.Question;
-import com.elit.outildedecision.audit.entity.QuestionResponseScore;
+import com.elit.outildedecision.audit.calculate.AuditCategoryResultEnricher;
+import com.elit.outildedecision.audit.calculate.ScoringStrategyFactory;
+import com.elit.outildedecision.audit.calculate.ScrumScoringStrategy;
+import com.elit.outildedecision.audit.entity.*;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.*;
 import com.elit.outildedecision.audit.repository.AuditRepository;
-import com.elit.outildedecision.audit.repository.AuditScoreRepository;
 import com.elit.outildedecision.audit.repository.QuestionRepository;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
@@ -46,6 +45,11 @@ class AuditServiceImplTest {
   @Mock private UserRepository userRepository;
   @Mock private QuestionRepository questionRepository;
   @Mock private AuditMapper auditMapper;
+  @Mock private ScoringStrategyFactory scoringStrategyFactory;
+  @Mock private AuditCategoryResultEnricher auditCategoryResultEnricher;
+  @Mock private CategoryCommentService categoryCommentService;
+  @Mock private GlobalCommentService globalCommentService;
+
 
   @InjectMocks
   private AuditServiceImpl auditService;
@@ -55,7 +59,7 @@ class AuditServiceImplTest {
   private static final String USER_EMAIL = "user@example.com";
   private static final String USER_FIRST_NAME = "Alice";
   private static final String USER_LAST_NAME = "Martin";
-
+  private ScrumScoringStrategy scrumScoringStrategy;
   private Project project;
   private User user;
   private Audit audit;
@@ -93,6 +97,8 @@ class AuditServiceImplTest {
       .auditLaunchDate(new Timestamp(System.currentTimeMillis()))
       .questions(List.of(question))
       .build();
+
+    scrumScoringStrategy = new ScrumScoringStrategy(auditCategoryResultEnricher);
 
   }
 
@@ -235,8 +241,13 @@ class AuditServiceImplTest {
       .scoringType(question.getScoringType())
       .build();
 
-    Map<QuestionCategory,Double> category = new HashMap<>();
-    category.put(question.getCategory(), 100.0);
+  AuditCategoryResult category = AuditCategoryResult.builder()
+    .level(LevelScore.BON)
+    .categoryComment(CategoryComment.builder().build())
+    .scorePercentageCategory(100.0)
+    .category(question.getCategory())
+    .build();
+
 
     QuestionResponseScore questionResponseScore = QuestionResponseScore.builder().build();
 
@@ -245,7 +256,7 @@ class AuditServiceImplTest {
       .user(user)
       .globalScorePercentage(100.0)
       .submissionDate(audit.getAuditLaunchDate())
-      .categoryScores(category)
+      .auditCategoryResults(List.of(category))
       .questionResponses(List.of(questionResponseScore))
       .build();
 
@@ -258,12 +269,18 @@ class AuditServiceImplTest {
       .questionResponses(List.of(questionResponseScoreDTO))
       .build();
 
+    CategoryComment organisationsComment = CategoryComment.builder().id(COMMON_ID).category(QuestionCategory.ORGANISATIONS).text("text1").level(LevelScore.BON).build();
+    CategoryComment outilsDocumentationComment = CategoryComment.builder().id(2L).category(QuestionCategory.OUTILS_ET_DOCUMENTATION).text("text2").level(LevelScore.MAUVAIS).build();
+
     when(auditRepository.findById(anyLong())).thenReturn(Optional.ofNullable(audit));
-    when(auditMapper.responseModeltoAuditScore(any(),any())).thenReturn(auditScore);
+    when(auditMapper.responseModeltoAuditScore(any(),any(),any())).thenReturn(auditScore);
     when(auditMapper.auditScoretoAuditScoreDto(any())).thenReturn(auditScoreDTO);
     when(auditMapper.mapToQuestionResponseModel(any())).thenReturn(questionResponseModel);
     when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(COMMON_ID);
     when(auditRepository.save(any())).thenReturn(audit);
+    when(scoringStrategyFactory.resolveStrategyByMethodType(any())).thenReturn(scrumScoringStrategy);
+    when(categoryCommentService.findAll()).thenReturn(List.of(organisationsComment, outilsDocumentationComment));
+    when(globalCommentService.findByMethodAndLevel(any(), any())).thenReturn(GlobalComment.builder().build());
 
 
     AuditScoreDTO auditScoreResponse = auditService.calculateScoringOfAudit(anyLong());
@@ -274,7 +291,7 @@ class AuditServiceImplTest {
   }
 
   @Test
-  void calculateScoringOfAudit_shouldThrowsException() throws Exception {
+  void calculateScoringOfAudit_shouldThrowsException() {
     when(auditRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     // Act + Assert

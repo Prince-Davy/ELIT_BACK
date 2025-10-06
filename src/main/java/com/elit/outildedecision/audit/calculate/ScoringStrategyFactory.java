@@ -1,6 +1,8 @@
 package com.elit.outildedecision.audit.calculate;
 
 import com.elit.outildedecision.util.MethodType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,19 +12,10 @@ import java.util.Objects;
 import java.util.EnumMap;
 import java.util.stream.Collectors;
 
-
+@Component
 public final class ScoringStrategyFactory {
 
   private final Map<MethodType, MethodsScoringStrategy> registry;
-
-
-  /**
-   * Default constructor that initializes the factory with known scoring strategies.
-   * Currently, it registers the default strategies such as {@link ScrumScoringStrategy}.
-   */
-  public ScoringStrategyFactory() {
-    this.registry = createDefaultRegistry();
-  }
 
 
   /**
@@ -32,7 +25,8 @@ public final class ScoringStrategyFactory {
    *                   Must not be {@code null}.
    * @throws NullPointerException if {@code strategies} is {@code null}.
    */
-  public ScoringStrategyFactory(final Collection<? extends MethodsScoringStrategy> strategies) {
+  @Autowired
+  public ScoringStrategyFactory(final List<MethodsScoringStrategy> strategies) {
     Objects.requireNonNull(strategies, "strategies must not be null");
     this.registry = buildRegistry(strategies);
   }
@@ -60,20 +54,6 @@ public final class ScoringStrategyFactory {
   }
 
   // ----------------- Méthodes privées -----------------
-
-
-  /**
-   * Creates and returns the default registry of scoring strategies.
-   * This includes predefined strategies such as {@link ScrumScoringStrategy}.
-   *
-   * @return An unmodifiable map of {@link MethodType} to {@link MethodsScoringStrategy}.
-   */
-  private static Map<MethodType, MethodsScoringStrategy> createDefaultRegistry() {
-    return buildRegistry(List.of(
-      new ScrumScoringStrategy()
-    ));
-  }
-
 
   /**
    * Builds a registry map from the provided collection of scoring strategies.

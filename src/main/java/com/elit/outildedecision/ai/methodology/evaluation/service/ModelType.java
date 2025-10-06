@@ -14,9 +14,9 @@ public enum ModelType {
   /**
    * convert methodology type for AI API conventions.
    *
-   * @param predictedMethodology
+   * @param predictedMethodology the method
    * @return Model Type
-   * @throws UnsupportedModelTypeException
+   * @throws UnsupportedModelTypeException exception UnsupportedModelTypeException
    */
   public static ModelType fromPredictedMethod(final String predictedMethodology) throws UnsupportedModelTypeException {
     if (predictedMethodology == null) {
@@ -24,9 +24,9 @@ public enum ModelType {
     }
     switch (predictedMethodology) {
       case "Agile":
-        return ModelType.AGILE;
+        return AGILE;
       case "Traditionnelle":
-        return ModelType.TRADITIONAL;
+        return TRADITIONAL;
       case "Hybride":
         throw new UnsupportedModelTypeException("Hybride is not supported yet");
       default:

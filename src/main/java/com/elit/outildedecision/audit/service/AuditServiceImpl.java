@@ -2,8 +2,12 @@ package com.elit.outildedecision.audit.service;
 
 import com.elit.outildedecision.audit.calculate.MethodsScoringStrategy;
 import com.elit.outildedecision.audit.calculate.ScoringStrategyFactory;
+
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.audit.entity.AuditScore;
+import com.elit.outildedecision.audit.entity.CategoryComment;
+import com.elit.outildedecision.audit.entity.LevelScore;
+import com.elit.outildedecision.audit.entity.GlobalComment;
 import com.elit.outildedecision.audit.entity.Question;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.AuditRequestModel;
@@ -30,7 +34,9 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -42,25 +48,35 @@ public class AuditServiceImpl implements AuditService {
   private final AuditRepository auditRepository;
   private final ProjectRepository projectRepository;
   private final UserRepository userRepository;
+  private final ScoringStrategyFactory scoringStrategyFactory;
   private final AuditMapper  auditMapper;
+  private final CategoryCommentService categoryCommentService;
+  private final GlobalCommentService globalCommentService;
+
 
   /**
    * Constructor for AuditServiceImpl.
-   * Following Dependency Inversion Principle - depends on abstractions.
+   * Follows the Dependency Inversion Principle by depending on abstractions.
    *
-   * @param auditRepository the audit repository
-   * @param projectRepository the project repository
-   * @param userRepository the user repository
-   * @param auditMapper the audit mapper
+   * @param auditRepository the repository for managing audit entities
+   * @param projectRepository the repository for managing project entities
+   * @param userRepository the repository for managing user entities
+   * @param scoringStrategyFactory the factory for creating scoring strategies
+   * @param auditMapper the mapper for converting between audit models and entities
+   * @param categoryCommentService the service for retrieving category comments
+   * @param globalCommentService the service for retreiving global comments
    */
   public AuditServiceImpl(final AuditRepository auditRepository,
                           final ProjectRepository projectRepository,
-                          final UserRepository userRepository,
-                          final AuditMapper auditMapper) {
+                          final UserRepository userRepository, final ScoringStrategyFactory scoringStrategyFactory,
+                          final AuditMapper auditMapper, final CategoryCommentService categoryCommentService, final GlobalCommentService globalCommentService) {
     this.auditRepository = auditRepository;
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
+    this.scoringStrategyFactory = scoringStrategyFactory;
     this.auditMapper = auditMapper;
+    this.categoryCommentService = categoryCommentService;
+    this.globalCommentService = globalCommentService;
   }
   /**
    * Create a new audit.
@@ -196,11 +212,20 @@ public class AuditServiceImpl implements AuditService {
       .orElseThrow(() -> new AuditNotFoundException("Audit Not Found"));
 
     AuditResponseModel auditResponseModel = this.mapToResponseModel(audit);
-    MethodsScoringStrategy methodsScoringStrategy = new ScoringStrategyFactory().resolveStrategyByMethodType(auditResponseModel.getMethod());
+    MethodsScoringStrategy methodsScoringStrategy = scoringStrategyFactory.resolveStrategyByMethodType(auditResponseModel.getMethod());
     methodsScoringStrategy.calculateScoring(auditResponseModel);
 
-    AuditScore auditScore = this.auditMapper.responseModeltoAuditScore(auditResponseModel, audit);
+    Map<Long, CategoryComment> commentById = categoryCommentService.findAll().stream()
+      .collect(Collectors.toMap(CategoryComment::getId, Function.identity()));
+
+    AuditScore auditScore = this.auditMapper.responseModeltoAuditScore(auditResponseModel, audit, commentById);
     auditScore.getQuestionResponses().forEach(q -> q.setAuditScore(auditScore));
+    auditScore.getAuditCategoryResults().forEach(categoryResult -> categoryResult.setAuditScore(auditScore));
+    auditScore.getQuestionResponses().forEach(q -> q.setAuditScore(auditScore));
+
+    GlobalComment globalComment = globalCommentService.findByMethodAndLevel(auditScore.getAudit().getMethod(), LevelScore.fromPercentage(auditScore.getGlobalScorePercentage()));
+    auditScore.setGlobalComment(globalComment);
+
     audit.setAuditScore(auditScore);
 
     auditRepository.save(audit);

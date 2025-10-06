@@ -5,25 +5,37 @@ import com.elit.outildedecision.audit.model.QuestionResponseModel;
 import com.elit.outildedecision.audit.model.ScoringType;
 import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.util.QuestionCategory;
-import org.junit.Before;
-import org.junit.Test;
+
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 
 import java.util.List;
 
+
+@ExtendWith(MockitoExtension.class)
 public class ScrumScoringStrategyTest {
 
   private ScrumScoringStrategy strategy;
+
+  @Mock
+  private AuditCategoryResultEnricher auditCategoryResultEnricher;
 
   private final static double HUNDRED_PERCENT= 100.0;
   private final static int YES= 2;
   private final static int NO= 0;
   private final static QuestionCategory OUTILS_DOCUMENTATION_CATEGORY = QuestionCategory.OUTILS_ET_DOCUMENTATION;
 
-  @Before
+
+  @BeforeEach
   public void setup() {
-    strategy = new ScrumScoringStrategy();
+    strategy = new ScrumScoringStrategy(auditCategoryResultEnricher);
   }
+
 
   @Test
   public void shouldCalculateCorrectlyScoresForDirectAndReversedQuestions(){
@@ -57,9 +69,9 @@ public class ScrumScoringStrategyTest {
     AuditResponseModel auditResponseModel = AuditResponseModel.builder().method(MethodType.SCRUM).questions(questions).build();
     strategy.calculateScoring(auditResponseModel);
 
-    Assertions.assertEquals(HUNDRED_PERCENT,auditResponseModel.getGlobalScorePercentage());
-    Assertions.assertEquals(1,auditResponseModel.getCategoryScores().size());
-    Assertions.assertEquals(HUNDRED_PERCENT,auditResponseModel.getCategoryScores().get(OUTILS_DOCUMENTATION_CATEGORY));
+    Assertions.assertEquals(HUNDRED_PERCENT, auditResponseModel.getGlobalScorePercentage());
+    Assertions.assertEquals(HUNDRED_PERCENT, auditResponseModel.getCategoryResults().get(0).getScorePercentageCategory());
+    Assertions.assertEquals(OUTILS_DOCUMENTATION_CATEGORY.getDisplayName(), auditResponseModel.getCategoryResults().get(0).getCategory());
   }
 
 

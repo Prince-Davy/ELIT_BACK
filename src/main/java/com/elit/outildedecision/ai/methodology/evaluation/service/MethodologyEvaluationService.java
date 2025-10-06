@@ -13,21 +13,21 @@ public interface MethodologyEvaluationService {
   /**
    * createEvaluation.
    *
-   * @param aiAnswerDTO
-   * @param projectId
+   * @param aiAnswerDTO the answer dto
+   * @param projectId the project id
    * @return evaluations
-   * @throws ResultAiNotFoundException
-   * @throws UnsupportedModelTypeException
+   * @throws ResultAiNotFoundException exception  ResultAiNotFoundException
+   * @throws UnsupportedModelTypeException exception UnsupportedModelTypeException
    */
   List<MethodologyEvaluation> createEvaluation(AiAnswerDTO aiAnswerDTO, long projectId) throws ResultAiNotFoundException, UnsupportedModelTypeException;
 
   /**
    * getMethodologyEvaluations.
    *
-   * @param projectId
-   * @param maxFactors
+   * @param projectId the project id
+   * @param maxFactors the max factors
    * @return evaluations.
-   * @throws UnsupportedModelTypeException
+   * @throws UnsupportedModelTypeException exception UnsupportedModelTypeException
    */
   List<MethodologyEvaluationDto> getMethodologyEvaluations(Long projectId, int maxFactors) throws UnsupportedModelTypeException;
 }

@@ -1,9 +1,11 @@
 package com.elit.outildedecision.audit.calculate;
 
+import com.elit.outildedecision.audit.model.AuditCategoryResultDTO;
 import com.elit.outildedecision.audit.model.AuditResponseModel;
 import com.elit.outildedecision.audit.model.QuestionResponseModel;
 import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.util.QuestionCategory;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,8 +13,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
+/**
+ * Component responsible for compute the score of the AuditScore with Scrum strategy.
+ */
+@Component
 public final class ScrumScoringStrategy implements MethodsScoringStrategy {
+
+  private final AuditCategoryResultEnricher auditCategoryResultEnricher;
+
+  /**
+   * Constructor for ScrumScoringStrategy .
+   * @param auditCategoryResultEnricher a service that use for enrich  {@link AuditCategoryResultDTO} objects
+   */
+  public ScrumScoringStrategy(final AuditCategoryResultEnricher auditCategoryResultEnricher) {
+    this.auditCategoryResultEnricher = auditCategoryResultEnricher;
+  }
 
   @Override
   public MethodType supportedType() {
@@ -72,32 +89,38 @@ public final class ScrumScoringStrategy implements MethodsScoringStrategy {
         Collectors.toList()
       ));
 
-    Map<QuestionCategory, Double> categoryScores = new LinkedHashMap<>();
+    List<AuditCategoryResultDTO> categoryScores = new ArrayList<>();
     int totalWeightedScores = 0;
     int totalMaxPossibleScore = 0;
 
     for (Map.Entry<QuestionCategory, List<QuestionResponseModel>> entry : questionsByCategory.entrySet()) {
       final QuestionCategory category = entry.getKey();
-      final List<QuestionResponseModel> questionResponseModels = entry.getValue();
+      final List<QuestionResponseModel> questionResponseValue = entry.getValue();
 
       int categoryScore  = 0;
       int categoryScoreMax = 0;
 
-      for (QuestionResponseModel questionResponseModel : questionResponseModels) {
+      for (QuestionResponseModel questionResponseModel : questionResponseValue) {
         categoryScore += questionResponseModel.getWeightedScore();
         categoryScoreMax += questionResponseModel.getMaxPossibleScore();
       }
 
       double pourcentageCategorie = percent(categoryScore, categoryScoreMax);
-      categoryScores.put(category, round(pourcentageCategorie, 1));
+      AuditCategoryResultDTO auditCategoryResultDTO = AuditCategoryResultDTO.builder()
+        .category(category.getDisplayName())
+        .scorePercentageCategory(round(pourcentageCategorie, 1))
+        .build();
+
+      auditCategoryResultEnricher.enrichAuditCategoryResult(auditResponseModel.getMethod(), auditCategoryResultDTO);
+      categoryScores.add(auditCategoryResultDTO);
 
       totalWeightedScores += categoryScore;
       totalMaxPossibleScore += categoryScoreMax;
     }
 
-    double scoreGlobal = percent(totalWeightedScores, totalMaxPossibleScore);
-    auditResponseModel.setCategoryScores(categoryScores);
-    auditResponseModel.setGlobalScorePercentage(round(scoreGlobal, 1));
+    double scoreGlobalPercentage = round(percent(totalWeightedScores, totalMaxPossibleScore), 1);
+    auditResponseModel.setCategoryResults(categoryScores);
+    auditResponseModel.setGlobalScorePercentage(scoreGlobalPercentage);
   }
 
   /**

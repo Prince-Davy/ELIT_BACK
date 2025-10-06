@@ -14,8 +14,14 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class PredictRfRequest {
+  /**
+   * the data .
+   */
   private Map<String, String> data;
 
+  /**
+   * the model type .
+   */
   @JsonProperty("model_type")
   private ModelType modelType;
 }

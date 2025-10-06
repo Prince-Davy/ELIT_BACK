@@ -47,6 +47,8 @@ public class OutildedecisionApplication {
     extracted("method");
     extracted("execution_plan_question");
     extracted("survey_question");
+    extracted("category_comment");
+    extracted("global_comment");
   }
 
   /**

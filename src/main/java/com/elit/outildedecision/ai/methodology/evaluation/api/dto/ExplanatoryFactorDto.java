@@ -12,10 +12,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ExplanatoryFactorDto {
 
+  /**
+   * question.
+   */
   private String question;
 
+  /**
+   * answer .
+   */
   private String answer;
 
+  /**
+   * the score of the question .
+   */
   @JsonProperty("question_score")
   private Double questionScore;
 }

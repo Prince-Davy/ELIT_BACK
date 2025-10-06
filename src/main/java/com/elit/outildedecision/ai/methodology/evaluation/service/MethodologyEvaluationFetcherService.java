@@ -10,11 +10,11 @@ public interface MethodologyEvaluationFetcherService {
   /**
    * fetchEvaluations.
    *
-   * @param aiAnswerDTO
-   * @param project
+   * @param aiAnswerDTO the answer dto
+   * @param project the project id
    * @return response
-   * @throws ResultAiNotFoundException
-   * @throws UnsupportedModelTypeException
+   * @throws ResultAiNotFoundException exception ResultAiNotFoundException
+   * @throws UnsupportedModelTypeException exception UnsupportedModelTypeException
    */
   PredictRfResponse fetchEvaluations(AiAnswerDTO aiAnswerDTO, Project project) throws ResultAiNotFoundException, UnsupportedModelTypeException;
 }

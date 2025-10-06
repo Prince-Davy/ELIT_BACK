@@ -13,9 +13,19 @@ import java.util.List;
 import com.elit.outildedecision.util.MethodType;
 
 /**
- * Model for audit creation request.
- * Allows methodology-specific question sets while maintaining backward
- * compatibility.
+ * Data Transfer Object representing a request to perform an audit.
+ * Lombok annotations used:
+ * - @Data: Generates getters, setters, equals, hashCode, and toString methods.
+ * - @Builder: Enables the builder pattern for object creation.
+ * - @AllArgsConstructor: Generates a constructor with all fields.
+ * - @NoArgsConstructor: Generates a no-argument constructor.
+ * Fields:
+ * - projectId: The ID of the project to audit. This field is required.
+ * - method: The methodology type used for the audit.
+ * - auditId: Optional ID of an existing audit.
+ * - questions: Optional list of questions for the audit questionnaire.
+ *   Can be null for audits without custom questions.
+ *   Supports methodology-agnostic question management.
  */
 @Data
 @NoArgsConstructor
@@ -23,17 +33,26 @@ import com.elit.outildedecision.util.MethodType;
 @Builder
 public class AuditRequestModel {
 
+  /**
+   * The ID of the project to audit.
+   * This field is required.
+   */
   @NotNull(message = "L'ID du projet est obligatoire")
   private Long projectId;
 
+  /**
+   * The methodology type used for the audit.
+   */
   private MethodType method;
 
+  /**
+   * Optional ID of an existing audit.
+   */
   private Long auditId;
 
   /**
    * Optional list of questions for the audit questionnaire.
-   * can be null for audits without
-   * custom questions.
+   * Can be null for audits without custom questions.
    * Supports methodology-agnostic question management.
    */
   @Valid

@@ -1,14 +1,13 @@
 package com.elit.outildedecision.audit.model;
 
-import com.elit.outildedecision.util.QuestionCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Builder
@@ -39,11 +38,13 @@ public class AuditScoreDTO {
    */
   private Double globalScorePercentage;
 
+  private CommentDTO globalComment;
   /**
    * A map of score percentages grouped by question category.
    * Allows analysis of performance per category.
    */
-  private Map<QuestionCategory, Double> categoryScores;
+  @Builder.Default
+  private List<AuditCategoryResultDTO> auditCategoryResults = new ArrayList<>();
 
   /**
    * List of individual question response scores.

@@ -5,7 +5,10 @@ import com.elit.outildedecision.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -31,10 +34,12 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "question")
-@Data
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Question implements Serializable {
 
   /**
@@ -42,6 +47,8 @@ public class Question implements Serializable {
    */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @EqualsAndHashCode.Include
+  @ToString.Include
   private Long questionId;
 
   // ajouter un champs questionRef pour la référence de la question de type String
@@ -53,6 +60,7 @@ public class Question implements Serializable {
    */
   @Column(name = "question_ref", nullable = false)
   @NotBlank(message = "Question reference is required")
+  @ToString.Include
   private String questionRef;
 
   /**
@@ -62,6 +70,7 @@ public class Question implements Serializable {
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   @NotNull(message = "Question category is required")
+  @ToString.Include
   private QuestionCategory category;
 
   /**
@@ -70,6 +79,7 @@ public class Question implements Serializable {
    */
   @Column(nullable = false)
   @Positive(message = "Question weight must be positive")
+  @ToString.Include
   private Integer weight;
 
   /**
@@ -79,6 +89,8 @@ public class Question implements Serializable {
   @JoinColumn(name = "audit_id", referencedColumnName = "auditId")
   @JsonBackReference("audit_questions")
   @NotNull(message = "Audit reference is required")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private Audit audit;
 
   /**
@@ -87,6 +99,7 @@ public class Question implements Serializable {
    */
   @Column(name = "audit_answer_label", nullable = false)
   @NotNull(message = "Audit answer label is required")
+  @ToString.Include
   private String auditAnswerLabel;
 
   /**
@@ -96,16 +109,22 @@ public class Question implements Serializable {
    */
   @Column(name = "audit_answer_value", nullable = false)
   @NotNull(message = "Audit answer value is required")
+  @ToString.Include
   private Integer auditAnswerValue;
 
   /**
    * Current calculated score based on answer and answer type.
    */
   @Column(name = "current_score")
+  @ToString.Include
   private Integer currentScore;
 
+  /**
+   * the type of the question .
+   */
   @Enumerated(EnumType.STRING)
   @Column(name = "scoring_type", nullable = false)
+  @ToString.Include
   private ScoringType scoringType;
 
 }

@@ -1,7 +1,6 @@
 package com.elit.outildedecision.audit.entity;
 
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -15,24 +14,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
-import javax.persistence.EnumType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
-import javax.persistence.CollectionTable;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.MapKeyEnumerated;
 import javax.persistence.GenerationType;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "audit_score")
@@ -82,26 +77,29 @@ public class AuditScore implements Serializable {
   @Column(name = "global_score_percentage", nullable = false)
   private Double globalScorePercentage;
 
+  /**
+   * Référence au template global utilisé (FK informative).
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "global_comment_id")
+  private GlobalComment globalComment;
 
   /**
-   * A map of score percentages grouped by question category.
-   * Useful for analyzing performance across different audit dimensions.
+   * List of the scores by audit category.
    */
-  @ElementCollection
-  @CollectionTable(name = "category_scores", joinColumns = @JoinColumn(name = "audit_score_id"))
-  @MapKeyColumn(name = "category")
-  @MapKeyEnumerated(EnumType.STRING)
-  @Column(name = "score_percentage")
-  private Map<QuestionCategory, Double> categoryScores;
-
+  @Builder.Default
+  @OneToMany(mappedBy = "auditScore", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference("auditScore_categoryResults")
+  private List<AuditCategoryResult> auditCategoryResults = new ArrayList<>();
 
   /**
    * List of individual question response scores associated with this audit score.
    * Each entry represents the score for a specific question answered during the audit.
    */
+  @Builder.Default
   @OneToMany(mappedBy = "auditScore", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("auditScore_questionResponses")
-  private List<QuestionResponseScore> questionResponses;
+  private List<QuestionResponseScore> questionResponses = new ArrayList<>();
 
   /**
    * The date and time when the audit score was submitted or calculated.

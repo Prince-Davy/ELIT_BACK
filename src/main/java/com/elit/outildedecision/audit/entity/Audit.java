@@ -8,7 +8,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.Entity;
@@ -35,13 +38,19 @@ import java.util.ArrayList;
  */
 @Entity
 @Table(name = "audit")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+
 public class Audit implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @EqualsAndHashCode.Include
+  @ToString.Include
   private Long auditId;
   /**
    * Methodology used for the audit.
@@ -49,6 +58,7 @@ public class Audit implements Serializable {
    */
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
+  @ToString.Include
   private MethodType method;
 
   /**
@@ -57,6 +67,7 @@ public class Audit implements Serializable {
    */
   @CreationTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss", timezone = "Europe/Paris")
+  @ToString.Include
   private Timestamp auditLaunchDate;
 
   /**
@@ -66,6 +77,8 @@ public class Audit implements Serializable {
   @ManyToOne(optional = false)
   @JoinColumn(name = "project_id", referencedColumnName = "projectId")
   @JsonBackReference("audit_project")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private Project project;
 
   /**
@@ -75,6 +88,8 @@ public class Audit implements Serializable {
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", referencedColumnName = "userId")
   @JsonBackReference("audit_user")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private User user;
 
   /**
@@ -85,6 +100,8 @@ public class Audit implements Serializable {
   @OneToMany(mappedBy = "audit", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_questions")
   @Builder.Default
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<Question> questions = new ArrayList<>();
 
   /**
@@ -92,5 +109,7 @@ public class Audit implements Serializable {
    */
   @OneToOne(mappedBy = "audit", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("audit_auditScore")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private AuditScore auditScore;
 }

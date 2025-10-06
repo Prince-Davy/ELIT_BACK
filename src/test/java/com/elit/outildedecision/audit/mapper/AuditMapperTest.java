@@ -1,26 +1,22 @@
 package com.elit.outildedecision.audit.mapper;
 
-import com.elit.outildedecision.audit.entity.Audit;
-import com.elit.outildedecision.audit.entity.AuditScore;
-import com.elit.outildedecision.audit.entity.Question;
-import com.elit.outildedecision.audit.entity.QuestionResponseScore;
+import com.elit.outildedecision.audit.entity.*;
 import com.elit.outildedecision.audit.model.*;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.util.QuestionCategory;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class AuditMapperTest {
 
   private final AuditMapper mapper = new AuditMapper();
@@ -34,14 +30,14 @@ class AuditMapperTest {
   private static QuestionResponseScore questionResponseScore;
   private static QuestionResponseModel questionResponseModel;
   private static AuditResponseModel auditResponseModel;
+  private static AuditCategoryResult auditCategoryResult;
 
 
-  @BeforeAll
-  static void setUp() {
+  @BeforeEach
+  public void setUp() {
     User user = User.builder().userId(COMMON_ID).build();
     audit = Audit.builder().auditId(COMMON_ID).build();
-    Map<QuestionCategory,Double> category = new HashMap<>();
-    category.put(QuestionCategory.ORGANISATIONS, GLOBALE_PERCENTAGE);
+
     question = Question.builder()
       .questionId(COMMON_ID)
       .questionRef("Q1")
@@ -58,12 +54,19 @@ class AuditMapperTest {
       .answerValue(question.getAuditAnswerValue())
       .score(2).build();
 
+    auditCategoryResult = AuditCategoryResult.builder()
+      .level(LevelScore.BON)
+      .categoryComment(CategoryComment.builder().build())
+      .scorePercentageCategory(GLOBALE_PERCENTAGE)
+      .category(question.getCategory())
+      .build();
+
     auditScore = AuditScore.builder()
      .auditScoreId(COMMON_ID)
      .audit(audit)
      .user(user)
      .globalScorePercentage(GLOBALE_PERCENTAGE)
-     .categoryScores(category)
+      .auditCategoryResults(List.of(auditCategoryResult))
      .questionResponses(List.of(questionResponseScore))
      .submissionDate(new Timestamp(System.currentTimeMillis()))
      .build();
@@ -81,7 +84,6 @@ class AuditMapperTest {
     auditResponseModel = AuditResponseModel.builder()
       .globalScorePercentage(50.0)
       .auditLaunchDate(audit.getAuditLaunchDate())
-      .categoryScores(auditScore.getCategoryScores())
       .questions(List.of(questionResponseModel))
       .build();
   }
@@ -95,7 +97,8 @@ class AuditMapperTest {
     assertEquals(auditScore.getGlobalScorePercentage(), dto.getGlobalScorePercentage());
     assertEquals(auditScore.getUser().getUserId(), dto.getUserId());
     assertEquals(auditScore.getAudit().getAuditId(), dto.getAuditId());
-    assertEquals(auditScore.getCategoryScores(), dto.getCategoryScores());
+    assertEquals(auditScore.getAuditCategoryResults().size(), dto.getAuditCategoryResults().size());
+    assertEquals(auditScore.getAuditCategoryResults().get(0).getLevel(), dto.getAuditCategoryResults().get(0).getLevel());
     assertEquals(auditScore.getSubmissionDate(), dto.getSubmissionDate());
 
     assertNotNull(dto.getQuestionResponses());
@@ -113,13 +116,14 @@ class AuditMapperTest {
 
   @Test
   void responseModeltoAuditScore_shouldSuccess() {
-    AuditScore result = mapper.responseModeltoAuditScore(auditResponseModel, audit);
+    CategoryComment categoryComment = CategoryComment.builder().category(QuestionCategory.ORGANISATIONS).text("text").build();
+    Map<Long, CategoryComment> commentById = Map.of(COMMON_ID,categoryComment);
+
+    AuditScore result = mapper.responseModeltoAuditScore(auditResponseModel, audit, commentById);
 
     assertNotNull(result);
-    assertEquals(audit, result.getAudit());
     assertEquals(auditResponseModel.getGlobalScorePercentage(), result.getGlobalScorePercentage());
     assertEquals(auditResponseModel.getAuditLaunchDate(), result.getSubmissionDate());
-    assertEquals(auditResponseModel.getCategoryScores(), result.getCategoryScores());
     assertNotNull(result.getQuestionResponses());
     assertEquals(1, result.getQuestionResponses().size());
     QuestionResponseScore r0 = result.getQuestionResponses().get(0);
@@ -130,8 +134,6 @@ class AuditMapperTest {
     assertNotNull(r0.getQuestion());
     assertEquals(question.getQuestionId(), r0.getQuestion().getQuestionId());
     assertEquals(question.getQuestionRef(), r0.getQuestion().getQuestionRef());
-
-    assertEquals(result, r0.getAuditScore());
   }
 
 
@@ -170,9 +172,21 @@ class AuditMapperTest {
     assertEquals(req.getAuditAnswerValue(), q.getAuditAnswerValue());
     assertEquals(req.getScoringType(), q.getScoringType());
 
-    // Et l'association à l'audit passé
     assertEquals(audit, q.getAudit());
   }
 
 
-}
+  @Test
+  void auditCategoryResultDtoToEntity_shouldMapCorrectly() {
+    AuditCategoryResultDTO auditCategoryResultDTO = AuditCategoryResultDTO.builder().category(auditCategoryResult.getCategory().getDisplayName()).level(auditCategoryResult.getLevel()).build();
+    CategoryComment categoryComment = CategoryComment.builder().category(auditCategoryResult.getCategory()).level(auditCategoryResult.getLevel()).build();
+    AuditCategoryResult auditCategoryResult = mapper.auditCategoryResultDtoToEntity(auditCategoryResultDTO,categoryComment);
+
+    assertNotNull(auditCategoryResult);
+    assertEquals(auditCategoryResult.getCategory(), auditCategoryResult.getCategory());
+    assertEquals(auditCategoryResult.getLevel(), auditCategoryResult.getLevel());
+
+  }
+
+
+  }

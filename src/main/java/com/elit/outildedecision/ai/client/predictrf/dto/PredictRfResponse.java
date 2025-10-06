@@ -12,5 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PredictRfResponse {
+  /**
+   * list of  predictions .
+   */
   private List<MethodologyEvaluationExternalDto> predictions;
 }

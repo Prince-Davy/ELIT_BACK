@@ -59,6 +59,10 @@ public enum MethodologyType {
         + " cannot be converted to known methodologies. Please contact your local administrator");
   }
 
+  /**
+   * get the methodology type .
+   * @return the methodology type
+   */
   private Pattern getMethodologyTypesPattern() {
     return methodologyTypesPattern;
   }

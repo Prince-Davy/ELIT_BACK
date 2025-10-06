@@ -57,4 +57,18 @@ public enum QuestionCategory {
   public String getDisplayName() {
     return displayName;
   }
+
+  /**
+   * get the question Category .
+   * @param category cateogry name
+   * @return the Question Category
+   */
+  public static QuestionCategory getQuestionCategory(final String category) {
+    for (QuestionCategory questionCategory : values()) {
+      if (questionCategory.getDisplayName().equalsIgnoreCase(category)) {
+        return questionCategory;
+      }
+    }
+    throw new IllegalArgumentException("Invalid category: " + category);
+  }
 }
