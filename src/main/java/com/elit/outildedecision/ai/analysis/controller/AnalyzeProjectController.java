@@ -1,6 +1,6 @@
 package com.elit.outildedecision.ai.analysis.controller;
 
-import com.elit.outildedecision.ai.analysis.service.AnalyzeProjectServiceImpl;
+import com.elit.outildedecision.ai.analysis.service.AnalyzeProjectService;
 import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
 import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedModelTypeException;
 import com.elit.outildedecision.common.dto.SimpleMessageDto;
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/projects/{projectId}/ai-analysis")
 public class AnalyzeProjectController {
-  private final AnalyzeProjectServiceImpl analyzeProjectServiceImpl;
+  private final AnalyzeProjectService analyzeProjectService;
 
   /**
    * Launch AI project analysis.
@@ -41,7 +41,7 @@ public class AnalyzeProjectController {
 
     String analysisState;
     try {
-      analysisState = analyzeProjectServiceImpl.analyzeProject(aiAnswerDTO, projectId);
+      analysisState = analyzeProjectService.analyzeProject(aiAnswerDTO, projectId);
     } catch (UnsupportedModelTypeException e) {
       return ResponseEntity.ok(new SimpleMessageDto("Project analyzed with AI. No methodology evaluations were completed due to the nature of the project : " + e.getMessage(), HttpStatus.OK.value(), LocalDateTime.now()));
     } catch (ResultAlreadyExistsException | ProjectNotFoundException | ResultAiNotFoundException e) {

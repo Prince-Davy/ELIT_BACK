@@ -10,6 +10,7 @@ import com.elit.outildedecision.ai.client.predictrf.mapper.MethodologyEvaluation
 import com.elit.outildedecision.ai.methodology.evaluation.api.dto.MethodologyEvaluationDto;
 import com.elit.outildedecision.ai.methodology.evaluation.api.mapper.MethodologyEvaluationMapper;
 import com.elit.outildedecision.ai.methodology.evaluation.entity.MethodologyEvaluation;
+import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedModelTypeException;
 import com.elit.outildedecision.ai.methodology.evaluation.repository.MethodologyEvaluationRepository;
 import com.elit.outildedecision.ai.methodology.evaluation.service.impl.MethodologyEvaluationServiceImpl;
 import com.elit.outildedecision.entity.Project;
@@ -31,7 +32,10 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
@@ -214,5 +218,21 @@ public class MethodologyEvaluationServiceImplTest {
     // Assert
     assertNotNull(result);
     assertTrue(result.isEmpty());
+  }
+
+  @SneakyThrows
+  @Test
+  void throwsWhenHybride() {
+    // Arrange
+    long projectId = 3L;
+    Project project = Project.builder().projectId(projectId).name("P3").build();
+    ResultAi resultAi = new ResultAi(1L, "Hybride", 1.0, project);
+
+    when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+    when(resultIaRepository.findByProject(project)).thenReturn(Optional.of(resultAi));
+
+    // Act
+    assertThrows(UnsupportedModelTypeException.class, () ->
+      service.getMethodologyEvaluations(projectId, 5));
   }
 }

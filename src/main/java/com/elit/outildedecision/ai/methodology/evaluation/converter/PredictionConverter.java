@@ -1,20 +1,19 @@
 package com.elit.outildedecision.ai.methodology.evaluation.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Converter
 public class PredictionConverter implements AttributeConverter<Map<String, Double>, String> {
-  private final ObjectMapper objectMapper = new ObjectMapper();
+
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
   /**
    * convertToDatabaseColumn.
@@ -22,16 +21,10 @@ public class PredictionConverter implements AttributeConverter<Map<String, Doubl
    * @param prediction prediction
    * @return json
    */
+  @SneakyThrows
   @Override
   public String convertToDatabaseColumn(final Map<String, Double> prediction) {
-    String predictionJson = null;
-    try {
-      predictionJson = objectMapper.writeValueAsString(prediction);
-    } catch (final JsonProcessingException e) {
-      log.error("JSON writing error", e);
-      throw new IllegalArgumentException("Could not convert map to JSON", e);
-    }
-    return predictionJson;
+    return objectMapper.writeValueAsString(prediction);
   }
 
   /**
@@ -42,14 +35,14 @@ public class PredictionConverter implements AttributeConverter<Map<String, Doubl
    */
   @Override
   public Map<String, Double> convertToEntityAttribute(final String predictionJson) {
-    Map<String, Double> prediction = null;
     try {
-      prediction = objectMapper.readValue(predictionJson, new TypeReference<HashMap<String, Double>>() {
-      });
+      return objectMapper.readValue(
+        predictionJson,
+        objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Double.class)
+      );
     } catch (final IOException e) {
       log.error("JSON reading error", e);
-      throw new IllegalArgumentException("Could not convert map to JSON", e);
+      throw new IllegalArgumentException("Could not convert JSON to map", e);
     }
-    return prediction;
   }
 }
