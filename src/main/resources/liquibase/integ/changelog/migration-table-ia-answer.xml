@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="001-create-ia-answer-new" author="tom.marini">
+    <createTable tableName="ia_answer_new">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="question" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="category" type="VARCHAR(255)"/>
+      <column name="answer" type="VARCHAR(1000)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="project_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseTableName="ia_answer_new"
+      baseColumnNames="project_id"
+      referencedTableName="project"
+      referencedColumnNames="project_id"
+      constraintName="fk_ia_answer_project"/>
+
+    <rollback>
+      <dropTable tableName="ia_answer_new"/>
+    </rollback>
+  </changeSet>
+
+  <changeSet id="002-copy-data" author="tom.marini" runOnChange="false" runAlways="false">
+    <sql>
+      INSERT INTO ia_answer_new (question, category, answer, project_id)
+      SELECT question, category, answer, project_id FROM ia_answer;
+    </sql>
+    <rollback>
+      <sql>
+        DELETE FROM ia_answer_new;
+      </sql>
+    </rollback>
+  </changeSet>
+
+  <changeSet id="003-rename-tables" author="tom.marini">
+    <renameTable oldTableName="ia_answer" newTableName="ia_answer_backup"/>
+    <renameTable oldTableName="ia_answer_new" newTableName="ia_answer"/>
+    <rollback>
+      <renameTable oldTableName="ia_answer" newTableName="ia_answer_new"/>
+      <renameTable oldTableName="ia_answer_backup" newTableName="ia_answer"/>
+    </rollback>
+  </changeSet>
+
+  <changeSet id="004-drop-old-table" author="tom.marini" runAlways="false">
+    <preConditions onFail="MARK_RAN">
+      <tableExists tableName="ia_answer_backup"/>
+    </preConditions>
+    <dropTable tableName="ia_answer_backup"/>
+    <rollback>
+      <createTable tableName="ia_answer_backup">
+        <column name="question" type="VARCHAR(255)">
+          <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="category" type="VARCHAR(255)"/>
+        <column name="answer" type="VARCHAR(1000)">
+          <constraints nullable="false"/>
+        </column>
+        <column name="project_id" type="BIGINT">
+          <constraints nullable="false"/>
+        </column>
+      </createTable>
+      <addForeignKeyConstraint
+        baseTableName="ia_answer_backup"
+        baseColumnNames="project_id"
+        referencedTableName="project"
+        referencedColumnNames="id"
+        constraintName="fk_ia_answer_backup_project"/>
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>
