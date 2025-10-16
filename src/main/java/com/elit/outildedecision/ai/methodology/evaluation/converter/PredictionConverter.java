@@ -13,7 +13,7 @@ import java.util.Map;
 @Converter
 public class PredictionConverter implements AttributeConverter<Map<String, Double>, String> {
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   /**
    * convertToDatabaseColumn.

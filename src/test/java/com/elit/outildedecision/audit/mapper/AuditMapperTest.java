@@ -1,8 +1,13 @@
 package com.elit.outildedecision.audit.mapper;
 
 import com.elit.outildedecision.audit.entity.*;
+import com.elit.outildedecision.audit.entity.comment.CategoryComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
+import com.elit.outildedecision.audit.entity.comment.ScrumCategoryComment;
+import com.elit.outildedecision.audit.entity.comment.ScrumGlobalComment;
 import com.elit.outildedecision.audit.model.*;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.util.QuestionCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +18,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuditMapperTest {
@@ -28,8 +32,6 @@ class AuditMapperTest {
   private static Audit audit;
   private static Question question;
   private static QuestionResponseScore questionResponseScore;
-  private static QuestionResponseModel questionResponseModel;
-  private static AuditResponseModel auditResponseModel;
   private static AuditCategoryResult auditCategoryResult;
 
 
@@ -52,17 +54,16 @@ class AuditMapperTest {
     questionResponseScore = QuestionResponseScore.builder().question(question)
       .answerLabel(question.getAuditAnswerLabel())
       .answerValue(question.getAuditAnswerValue())
-      .score(2).build();
+      .score(10.0).build();
 
     auditCategoryResult = AuditCategoryResult.builder()
       .level(LevelScore.BON)
-      .categoryComment(CategoryComment.builder().build())
+      .categoryComment(ScrumCategoryComment.builder().build())
       .scorePercentageCategory(GLOBALE_PERCENTAGE)
       .category(question.getCategory())
       .build();
 
     auditScore = AuditScore.builder()
-     .auditScoreId(COMMON_ID)
      .audit(audit)
      .user(user)
      .globalScorePercentage(GLOBALE_PERCENTAGE)
@@ -70,22 +71,6 @@ class AuditMapperTest {
      .questionResponses(List.of(questionResponseScore))
      .submissionDate(new Timestamp(System.currentTimeMillis()))
      .build();
-
-    questionResponseModel = QuestionResponseModel.builder()
-      .questionRef(question.getQuestionRef())
-      .weight(question.getWeight())
-      .auditAnswerLabel(question.getAuditAnswerLabel())
-      .auditAnswerValue(question.getAuditAnswerValue())
-      .currentScore(questionResponseScore.getScore())
-      .category(question.getCategory())
-      .scoringType(question.getScoringType())
-      .build();
-
-    auditResponseModel = AuditResponseModel.builder()
-      .globalScorePercentage(50.0)
-      .auditLaunchDate(audit.getAuditLaunchDate())
-      .questions(List.of(questionResponseModel))
-      .build();
   }
 
   @Test
@@ -93,7 +78,6 @@ class AuditMapperTest {
     AuditScoreDTO dto = mapper.auditScoretoAuditScoreDto(auditScore);
 
     assertNotNull(dto);
-    assertEquals(auditScore.getAuditScoreId(), dto.getAuditScoreId());
     assertEquals(auditScore.getGlobalScorePercentage(), dto.getGlobalScorePercentage());
     assertEquals(auditScore.getUser().getUserId(), dto.getUserId());
     assertEquals(auditScore.getAudit().getAuditId(), dto.getAuditId());
@@ -114,27 +98,6 @@ class AuditMapperTest {
 
 
 
-  @Test
-  void responseModeltoAuditScore_shouldSuccess() {
-    CategoryComment categoryComment = CategoryComment.builder().category(QuestionCategory.ORGANISATIONS).text("text").build();
-    Map<Long, CategoryComment> commentById = Map.of(COMMON_ID,categoryComment);
-
-    AuditScore result = mapper.responseModeltoAuditScore(auditResponseModel, audit, commentById);
-
-    assertNotNull(result);
-    assertEquals(auditResponseModel.getGlobalScorePercentage(), result.getGlobalScorePercentage());
-    assertEquals(auditResponseModel.getAuditLaunchDate(), result.getSubmissionDate());
-    assertNotNull(result.getQuestionResponses());
-    assertEquals(1, result.getQuestionResponses().size());
-    QuestionResponseScore r0 = result.getQuestionResponses().get(0);
-    assertEquals(questionResponseModel.getAuditAnswerLabel(), r0.getAnswerLabel());
-    assertEquals(questionResponseModel.getAuditAnswerValue(), r0.getAnswerValue());
-    assertEquals(questionResponseModel.getCurrentScore(), r0.getScore());
-
-    assertNotNull(r0.getQuestion());
-    assertEquals(question.getQuestionId(), r0.getQuestion().getQuestionId());
-    assertEquals(question.getQuestionRef(), r0.getQuestion().getQuestionRef());
-  }
 
 
   @Test
@@ -146,7 +109,6 @@ class AuditMapperTest {
     assertEquals(question.getWeight(), model.getWeight());
     assertEquals(question.getAuditAnswerLabel(), model.getAuditAnswerLabel());
     assertEquals(question.getAuditAnswerValue(), model.getAuditAnswerValue());
-    assertEquals(question.getCurrentScore(), model.getCurrentScore());
     assertEquals(question.getCategory(), model.getCategory());
     assertEquals(question.getScoringType(), model.getScoringType());
   }
@@ -179,7 +141,7 @@ class AuditMapperTest {
   @Test
   void auditCategoryResultDtoToEntity_shouldMapCorrectly() {
     AuditCategoryResultDTO auditCategoryResultDTO = AuditCategoryResultDTO.builder().category(auditCategoryResult.getCategory().getDisplayName()).level(auditCategoryResult.getLevel()).build();
-    CategoryComment categoryComment = CategoryComment.builder().category(auditCategoryResult.getCategory()).level(auditCategoryResult.getLevel()).build();
+    CategoryComment categoryComment = ScrumCategoryComment.builder().category(auditCategoryResult.getCategory()).level(auditCategoryResult.getLevel()).build();
     AuditCategoryResult auditCategoryResult = mapper.auditCategoryResultDtoToEntity(auditCategoryResultDTO,categoryComment);
 
     assertNotNull(auditCategoryResult);
@@ -188,5 +150,31 @@ class AuditMapperTest {
 
   }
 
-
+  @Test
+  void testGlobalCommentToCommentDTO_NullInput() {
+    CommentDTO result = mapper.globalCommentToCommentDTO(null);
+    assertNull(result, "Expected result to be null when input is null");
   }
+
+  @Test
+  void testGlobalCommentToCommentDTO_ValidInput() {
+    GlobalComment globalComment = ScrumGlobalComment.builder()
+      .method(MethodType.SCRUM)
+      .level(LevelScore.BON)
+      .title("title")
+      .text("text")
+      .build();
+
+    CommentDTO result = mapper.globalCommentToCommentDTO(globalComment);
+
+    assertNotNull(result);
+    assertEquals(LevelScore.BON, result.getLevel());
+    assertEquals(MethodType.SCRUM, result.getMethod());
+    assertEquals("text", result.getText());
+    assertEquals("title", result.getTitle());
+  }
+
+
+
+
+}

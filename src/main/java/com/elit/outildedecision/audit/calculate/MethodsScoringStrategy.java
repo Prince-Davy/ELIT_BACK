@@ -1,19 +1,23 @@
 package com.elit.outildedecision.audit.calculate;
 
-import com.elit.outildedecision.audit.model.AuditResponseModel;
+import com.elit.outildedecision.audit.entity.Audit;
+import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.util.MethodType;
+
+import java.util.Set;
 
 public interface MethodsScoringStrategy {
 
   /**
    * @return the Method Type of the Audit (Scrum , Safe ...).
    */
-  MethodType supportedType();
+  Set<MethodType> supportedTypes();
 
   /**
    * Calculate the Audit Score.
-   * @param auditResponseModel : the Audit Response Model
+   * @param audit : the audit
+   * @return audit score with different scores computed
    */
-  void calculateScoring(AuditResponseModel auditResponseModel);
+  AuditScore calculateScoring(Audit audit);
 
 }

@@ -51,8 +51,6 @@ public class Question implements Serializable {
   @ToString.Include
   private Long questionId;
 
-  // ajouter un champs questionRef pour la référence de la question de type String
-
   /**
    * Reference identifier for the question.
    * Can be used to link to external standards or frameworks.
@@ -111,13 +109,6 @@ public class Question implements Serializable {
   @NotNull(message = "Audit answer value is required")
   @ToString.Include
   private Integer auditAnswerValue;
-
-  /**
-   * Current calculated score based on answer and answer type.
-   */
-  @Column(name = "current_score")
-  @ToString.Include
-  private Integer currentScore;
 
   /**
    * the type of the question .

@@ -10,10 +10,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Column;
+import javax.persistence.GenerationType;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
-import javax.persistence.GenerationType;
+import javax.persistence.FetchType;
+import javax.persistence.Column;
 import java.io.Serializable;
 
 @Entity
@@ -30,15 +31,15 @@ public class QuestionResponseScore implements Serializable {
    */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long questionResponseScoreId;
+  private Long id;
 
   /**
    * The audit score to which this question response belongs.
    * Represents the parent audit scoring context.
    */
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "audit_score_id", referencedColumnName = "auditScoreId")
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "audit_score_id", referencedColumnName = "id")
   @JsonBackReference("auditScore_questionResponses")
   private AuditScore auditScore;
 
@@ -46,7 +47,7 @@ public class QuestionResponseScore implements Serializable {
    * The question associated with this response.
    * Links the response to the specific audit question.
    */
-  @ManyToOne(optional = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "question_id", referencedColumnName = "questionId")
   private Question question;
 
@@ -69,6 +70,5 @@ public class QuestionResponseScore implements Serializable {
    * Represents the effective score based on the answer and question weight.
    */
   @Column(name = "score", nullable = false)
-  private Integer score;
+  private Double score;
 }
-

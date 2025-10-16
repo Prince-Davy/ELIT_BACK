@@ -45,6 +45,6 @@ public class QuestionResponseScoreDTO {
    * The calculated score for this specific question response.
    * Represents the effective score based on the answer and question weight.
    */
-  private Integer score;
+  private Double score;
 }
 

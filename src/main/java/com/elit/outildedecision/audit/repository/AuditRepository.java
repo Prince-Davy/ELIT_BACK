@@ -36,14 +36,6 @@ public interface AuditRepository extends JpaRepository<Audit, Long> {
   Page<Audit> findByProjectProjectIdOrderByCreatedAtDesc(@Param("projectId") Long projectId,
       @Param("pageable") Pageable pageable);
 
-  /**
-   * Find audits by user email following Liskov Substitution Principle.
-   * Can substitute different user identification methods.
-   * @param userEmail the user email
-   * @return list of user's audits
-   */
-  @Query("SELECT a FROM Audit a WHERE a.user.userEmail = :userEmail ORDER BY a.auditLaunchDate DESC")
-  List<Audit> findByUserEmailOrderByCreatedAtDesc(@Param("userEmail") String userEmail);
 
   /**
    * Count audits by project following Dependency Inversion Principle.

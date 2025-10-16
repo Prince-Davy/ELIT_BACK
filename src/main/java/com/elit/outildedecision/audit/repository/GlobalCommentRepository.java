@@ -1,6 +1,6 @@
 package com.elit.outildedecision.audit.repository;
 
-import com.elit.outildedecision.audit.entity.GlobalComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.entity.LevelScore;
 import com.elit.outildedecision.util.MethodType;
 import org.springframework.data.jpa.repository.JpaRepository;

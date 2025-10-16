@@ -1,13 +1,14 @@
-package com.elit.outildedecision.audit.entity;
+package com.elit.outildedecision.audit.entity.comment;
 
 
+import com.elit.outildedecision.audit.entity.LevelScore;
 import com.elit.outildedecision.util.MethodType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.experimental.SuperBuilder;
-
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
@@ -20,9 +21,9 @@ import javax.persistence.EnumType;
 @MappedSuperclass
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public abstract class AbstractComment {
 
   /**

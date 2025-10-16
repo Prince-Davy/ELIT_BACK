@@ -3,11 +3,10 @@ package com.elit.outildedecision.audit.mapper;
 import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.audit.entity.AuditCategoryResult;
-import com.elit.outildedecision.audit.entity.CategoryComment;
-import com.elit.outildedecision.audit.entity.GlobalComment;
+import com.elit.outildedecision.audit.entity.comment.CategoryComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.entity.Question;
 import com.elit.outildedecision.audit.entity.QuestionResponseScore;
-import com.elit.outildedecision.audit.model.AuditResponseModel;
 import com.elit.outildedecision.audit.model.AuditCategoryResultDTO;
 import com.elit.outildedecision.audit.model.QuestionResponseScoreDTO;
 import com.elit.outildedecision.audit.model.CommentDTO;
@@ -17,9 +16,6 @@ import com.elit.outildedecision.audit.model.QuestionResponseModel;
 import com.elit.outildedecision.util.QuestionCategory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -38,7 +34,7 @@ public class AuditMapper {
    */
   public AuditScoreDTO auditScoretoAuditScoreDto(final AuditScore auditScore) {
     return AuditScoreDTO.builder()
-      .auditScoreId(auditScore.getAuditScoreId())
+      .auditScoreId(auditScore.getId())
       .auditId(auditScore.getAudit().getAuditId())
       .userId(auditScore.getUser().getUserId())
       .globalScorePercentage(auditScore.getGlobalScorePercentage())
@@ -57,58 +53,6 @@ public class AuditMapper {
       .build();
   }
 
-
-  /**
-   * Converts an AuditResponseModel and its associated Audit entity.
-   * into an AuditScore domain model.
-   *
-   * @param model the response model containing audit data from the scoring process
-   * @param audit the audit entity to associate with the score
-   * @param commentById a map of category comment IDs to CategoryComment objects
-   * @return a fully constructed AuditScore entity with linked question responses
-   */
-  public AuditScore responseModeltoAuditScore(final AuditResponseModel model, final Audit audit, final Map<Long, CategoryComment> commentById) {
-    return AuditScore.builder()
-      .audit(audit)
-      .user(audit.getUser())
-      .globalScorePercentage(model.getGlobalScorePercentage())
-      .submissionDate(model.getAuditLaunchDate())
-      .auditCategoryResults(
-        model.getCategoryResults().stream()
-          .map(categoryResultDTO -> {
-            CategoryComment comment = commentById.get(categoryResultDTO.getCategoryCommentId());
-            return auditCategoryResultDtoToEntity(categoryResultDTO, comment);
-          })
-          .collect(Collectors.toList())
-      )
-      .questionResponses(convertQuestionResponses(model.getQuestions(), audit))
-      .build();
-  }
-
-  /**
-   * Converts a list of {@link QuestionResponseModel} objects into a list of
-   * {@link QuestionResponseScore} entities, linking them to the corresponding audit questions.
-   *
-   * @param questions The list of question responses from the audit.
-   * @param audit     The audit entity containing the reference questions.
-   * @return A list of {@link QuestionResponseScore} entities.
-   * @throws IllegalArgumentException if a question reference cannot be matched to an audit question.
-   */
-  private List<QuestionResponseScore> convertQuestionResponses(final List<QuestionResponseModel> questions, final Audit audit) {
-    return questions.stream().map(q -> QuestionResponseScore.builder()
-      .answerLabel(q.getAuditAnswerLabel())
-      .answerValue(q.getAuditAnswerValue())
-      .score(q.getCurrentScore())
-      .question(
-        audit.getQuestions().stream()
-          .filter(questionAudit -> Objects.equals(questionAudit.getQuestionRef(), q.getQuestionRef()))
-          .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException("Question not found for ref: " + q.getQuestionRef()))
-      )
-
-      .build()).collect(Collectors.toList());
-  }
-
   /**
    * Map Question entity to QuestionResponseModel.
    * Following Single Responsibility Principle - handles only question response
@@ -124,7 +68,6 @@ public class AuditMapper {
       .weight(question.getWeight())
       .auditAnswerLabel(question.getAuditAnswerLabel())
       .auditAnswerValue(question.getAuditAnswerValue())
-      .currentScore(question.getCurrentScore())
       .category(question.getCategory())
       .scoringType(question.getScoringType())
       .build();

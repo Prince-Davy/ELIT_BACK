@@ -5,6 +5,7 @@ import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.AuditScoreDTO;
 import com.elit.outildedecision.audit.repository.AuditScoreRepository;
+import com.elit.outildedecision.audit.service.impl.AuditScoreServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

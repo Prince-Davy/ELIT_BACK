@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class QuestionResponseModel {
 
+  private Long id;
   /**
    * Unique identifier for the question.
    */
@@ -56,12 +57,6 @@ public class QuestionResponseModel {
    * Value of the answer type for user interface.
    */
   private Integer auditAnswerValue;
-
-  /**
-   * Current calculated score based on answer and answer type.
-   * Automatically computed for display and analytics.
-   */
-  private Integer currentScore;
 
   /**
    * Weighted score (currentScore * weight) for audit calculations.

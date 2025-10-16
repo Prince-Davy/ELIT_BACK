@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.EnumMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -64,25 +65,39 @@ public final class ScoringStrategyFactory {
   private static Map<MethodType, MethodsScoringStrategy> buildRegistry(final Collection<? extends MethodsScoringStrategy> strategies) {
     EnumMap<MethodType, MethodsScoringStrategy> map = new EnumMap<>(MethodType.class);
     for (MethodsScoringStrategy strategy : strategies) {
-      register(map, strategy);
+      Set<MethodType> types = Objects.requireNonNull(strategy.supportedTypes(), "supportedTypes is null");
+
+      if (types.isEmpty()) {
+        throw new IllegalStateException(
+          "Strategy " + strategy.getClass().getSimpleName() + " supports no MethodType");
+      }
+
+      for (MethodType type : types) {
+        register(map, type, strategy);
+      }
     }
     return Collections.unmodifiableMap(map);
   }
 
 
+
   /**
    * Registers a single scoring strategy into the provided map.
    *
-   * @param map The map where the strategy should be registered.
+   * @param map  The map where the strategy should be registered.
+   * @param type the type supported by the strategy
    * @param strategy The {@link MethodsScoringStrategy} to register. Must not be {@code null}.
-   * @throws NullPointerException if {@code strategy} or its supported type is {@code null}.
+   * @throws NullPointerException  if {@code strategy} or its supported type is {@code null}.
    * @throws IllegalStateException if a strategy for the same method type is already registered.
    */
-  private static void register(final Map<MethodType, MethodsScoringStrategy> map, final MethodsScoringStrategy strategy) {
-    Objects.requireNonNull(strategy, "strategy must not be null");
-    MethodType type = Objects.requireNonNull(strategy.supportedType(), "supportedType is null");
-    if (map.putIfAbsent(type, strategy) != null) {
-      throw new IllegalStateException("Duplicate strategy for " + type);
+  private static void register(final Map<MethodType, MethodsScoringStrategy> map, final MethodType type, final MethodsScoringStrategy strategy) {
+    Objects.requireNonNull(type, "type must not be null");
+    MethodsScoringStrategy existing = map.putIfAbsent(type, strategy);
+    if (existing != null && existing != strategy) {
+      throw new IllegalStateException(
+        "Duplicate strategy for " + type + ": "
+          + existing.getClass().getSimpleName() + " vs " + strategy.getClass().getSimpleName()
+      );
     }
   }
 }

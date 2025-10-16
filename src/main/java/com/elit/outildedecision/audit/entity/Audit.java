@@ -45,7 +45,6 @@ import java.util.ArrayList;
 @Builder
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-
 public class Audit implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -107,7 +106,7 @@ public class Audit implements Serializable {
   /**
    * Audit Score associated with this audit.
    */
-  @OneToOne(mappedBy = "audit", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(mappedBy = "audit", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_auditScore")
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

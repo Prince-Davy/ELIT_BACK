@@ -1,5 +1,6 @@
 package com.elit.outildedecision.audit.entity;
 
+import com.elit.outildedecision.audit.entity.comment.CategoryComment;
 import com.elit.outildedecision.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;

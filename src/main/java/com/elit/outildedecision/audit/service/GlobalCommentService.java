@@ -1,6 +1,6 @@
 package com.elit.outildedecision.audit.service;
 
-import com.elit.outildedecision.audit.entity.GlobalComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.entity.LevelScore;
 import com.elit.outildedecision.util.MethodType;
 

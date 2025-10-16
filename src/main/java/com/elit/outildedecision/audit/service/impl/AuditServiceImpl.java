@@ -1,21 +1,22 @@
-package com.elit.outildedecision.audit.service;
+package com.elit.outildedecision.audit.service.impl;
 
 import com.elit.outildedecision.audit.calculate.MethodsScoringStrategy;
 import com.elit.outildedecision.audit.calculate.ScoringStrategyFactory;
 
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.audit.entity.AuditScore;
-import com.elit.outildedecision.audit.entity.CategoryComment;
 import com.elit.outildedecision.audit.entity.LevelScore;
-import com.elit.outildedecision.audit.entity.GlobalComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.entity.Question;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.AuditRequestModel;
 import com.elit.outildedecision.audit.model.AuditResponseModel;
-import com.elit.outildedecision.audit.model.QuestionRequestModel;
-import com.elit.outildedecision.audit.model.QuestionResponseModel;
 import com.elit.outildedecision.audit.model.AuditScoreDTO;
+import com.elit.outildedecision.audit.model.QuestionResponseModel;
+import com.elit.outildedecision.audit.model.QuestionRequestModel;
 import com.elit.outildedecision.audit.repository.AuditRepository;
+import com.elit.outildedecision.audit.service.AuditService;
+import com.elit.outildedecision.audit.service.GlobalCommentService;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.AuditNotFoundException;
@@ -34,9 +35,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -50,7 +49,6 @@ public class AuditServiceImpl implements AuditService {
   private final UserRepository userRepository;
   private final ScoringStrategyFactory scoringStrategyFactory;
   private final AuditMapper  auditMapper;
-  private final CategoryCommentService categoryCommentService;
   private final GlobalCommentService globalCommentService;
 
 
@@ -63,19 +61,17 @@ public class AuditServiceImpl implements AuditService {
    * @param userRepository the repository for managing user entities
    * @param scoringStrategyFactory the factory for creating scoring strategies
    * @param auditMapper the mapper for converting between audit models and entities
-   * @param categoryCommentService the service for retrieving category comments
-   * @param globalCommentService the service for retreiving global comments
+   * @param globalCommentService the globalCommentService for fetching the global comment
    */
   public AuditServiceImpl(final AuditRepository auditRepository,
                           final ProjectRepository projectRepository,
                           final UserRepository userRepository, final ScoringStrategyFactory scoringStrategyFactory,
-                          final AuditMapper auditMapper, final CategoryCommentService categoryCommentService, final GlobalCommentService globalCommentService) {
+                          final AuditMapper auditMapper, final GlobalCommentService globalCommentService) {
     this.auditRepository = auditRepository;
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
     this.scoringStrategyFactory = scoringStrategyFactory;
     this.auditMapper = auditMapper;
-    this.categoryCommentService = categoryCommentService;
     this.globalCommentService = globalCommentService;
   }
   /**
@@ -211,25 +207,16 @@ public class AuditServiceImpl implements AuditService {
     Audit audit = auditRepository.findById(auditId)
       .orElseThrow(() -> new AuditNotFoundException("Audit Not Found"));
 
-    AuditResponseModel auditResponseModel = this.mapToResponseModel(audit);
-    MethodsScoringStrategy methodsScoringStrategy = scoringStrategyFactory.resolveStrategyByMethodType(auditResponseModel.getMethod());
-    methodsScoringStrategy.calculateScoring(auditResponseModel);
+    MethodsScoringStrategy methodsScoringStrategy = scoringStrategyFactory.resolveStrategyByMethodType(audit.getMethod());
+    AuditScore auditScore = methodsScoringStrategy.calculateScoring(audit);
 
-    Map<Long, CategoryComment> commentById = categoryCommentService.findAll().stream()
-      .collect(Collectors.toMap(CategoryComment::getId, Function.identity()));
-
-    AuditScore auditScore = this.auditMapper.responseModeltoAuditScore(auditResponseModel, audit, commentById);
-    auditScore.getQuestionResponses().forEach(q -> q.setAuditScore(auditScore));
-    auditScore.getAuditCategoryResults().forEach(categoryResult -> categoryResult.setAuditScore(auditScore));
-    auditScore.getQuestionResponses().forEach(q -> q.setAuditScore(auditScore));
-
-    GlobalComment globalComment = globalCommentService.findByMethodAndLevel(auditScore.getAudit().getMethod(), LevelScore.fromPercentage(auditScore.getGlobalScorePercentage()));
+    GlobalComment globalComment = globalCommentService.findByMethodAndLevel(audit.getMethod(), LevelScore.fromPercentage(auditScore.getGlobalScorePercentage()));
     auditScore.setGlobalComment(globalComment);
 
     audit.setAuditScore(auditScore);
 
-    auditRepository.save(audit);
-    return auditMapper.auditScoretoAuditScoreDto(auditScore);
+    final Audit auditPersisted = auditRepository.save(audit);
+    return auditMapper.auditScoretoAuditScoreDto(auditPersisted.getAuditScore());
   }
 
   /**

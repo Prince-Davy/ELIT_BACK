@@ -24,11 +24,14 @@ public enum MethodType {
    * Waterfall methodology.
    */
   WATERFALL("waterfall", Pattern.compile("waterfall", Pattern.CASE_INSENSITIVE)),
-
+  /**
+   * V model methodology .
+   */
+  VMODEL("vmodel", Pattern.compile("vmodel", Pattern.CASE_INSENSITIVE)),
   /**
    * Scaled Agility methodology.
    */
-  SCALED_AGILITY("scaledAgility", Pattern.compile("scaledAgility", Pattern.CASE_INSENSITIVE));
+  SCALED_AGILITY("SCALED_AGILITY", Pattern.compile("scaledAgility", Pattern.CASE_INSENSITIVE));
 
 
   private final String methodTypeName;

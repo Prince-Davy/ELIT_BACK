@@ -1,10 +1,11 @@
-package com.elit.outildedecision.audit.entity;
+package com.elit.outildedecision.audit.entity.comment;
 
 import com.elit.outildedecision.util.QuestionCategory;
 import lombok.AllArgsConstructor;
-import lombok.Setter;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import lombok.experimental.SuperBuilder;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -23,9 +24,9 @@ import javax.persistence.DiscriminatorType;
 @DiscriminatorColumn(name = "method_type", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class CategoryComment extends AbstractComment {
 
   /**
@@ -35,7 +36,6 @@ public class CategoryComment extends AbstractComment {
   @Enumerated(EnumType.STRING)
   @Column(name = "category", nullable = false)
   private QuestionCategory category;
-
 }
 
 

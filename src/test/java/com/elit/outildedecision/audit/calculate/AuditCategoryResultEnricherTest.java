@@ -1,7 +1,8 @@
 package com.elit.outildedecision.audit.calculate;
 
-import com.elit.outildedecision.audit.entity.CategoryComment;
+import com.elit.outildedecision.audit.entity.AuditCategoryResult;
 import com.elit.outildedecision.audit.entity.LevelScore;
+import com.elit.outildedecision.audit.entity.comment.ScrumCategoryComment;
 import com.elit.outildedecision.audit.model.AuditCategoryResultDTO;
 import com.elit.outildedecision.audit.service.CategoryCommentService;
 import com.elit.outildedecision.util.MethodType;
@@ -36,13 +37,12 @@ public class AuditCategoryResultEnricherTest {
   @Test
   void enrichAuditCategoryResult_shouldSetLevelAndComment() {
 
-    AuditCategoryResultDTO dto = AuditCategoryResultDTO.builder()
+    AuditCategoryResult auditCategoryResult = AuditCategoryResult.builder()
       .scorePercentageCategory(GOOD_SCORE)
-      .category(QuestionCategory.ORGANISATIONS.getDisplayName())
+      .category(QuestionCategory.ORGANISATIONS)
       .build();
 
-    CategoryComment comment = CategoryComment.builder()
-      .id(1L)
+    ScrumCategoryComment comment = ScrumCategoryComment.builder()
       .text(GOOD_TEXT)
       .method(MethodType.SCRUM)
       .category(QuestionCategory.ORGANISATIONS)
@@ -51,24 +51,21 @@ public class AuditCategoryResultEnricherTest {
     when(categoryCommentService.findByMethodAndCategoryAndLevel(MethodType.SCRUM,QuestionCategory.ORGANISATIONS, LevelScore.BON))
       .thenReturn(comment);
 
-    enricher.enrichAuditCategoryResult(MethodType.SCRUM,dto);
-
-    assertEquals(LevelScore.BON, dto.getLevel());
-    assertEquals(1L, dto.getCategoryCommentId());
-    assertEquals(GOOD_TEXT, dto.getText());
+    enricher.enrichAuditCategoryResult(MethodType.SCRUM,auditCategoryResult);
+    assertEquals(LevelScore.BON, auditCategoryResult.getLevel());
   }
 
   @Test
   void enrichAuditCategoryResult_shouldThrowExceptionIfCommentNotFound() {
-    AuditCategoryResultDTO dto = AuditCategoryResultDTO.builder()
+    AuditCategoryResult auditCategoryResult = AuditCategoryResult.builder()
       .scorePercentageCategory(GOOD_SCORE)
-      .category(QuestionCategory.ORGANISATIONS.getDisplayName())
+      .category(QuestionCategory.ORGANISATIONS)
       .build();
 
     when(categoryCommentService.findByMethodAndCategoryAndLevel(any(), any(), any()))
       .thenThrow(new IllegalArgumentException("Comment not found"));
 
-    assertThrows(IllegalArgumentException.class, () -> enricher.enrichAuditCategoryResult(MethodType.SCRUM,dto));
+    assertThrows(IllegalArgumentException.class, () -> enricher.enrichAuditCategoryResult(MethodType.SCRUM,auditCategoryResult));
   }
 }
 

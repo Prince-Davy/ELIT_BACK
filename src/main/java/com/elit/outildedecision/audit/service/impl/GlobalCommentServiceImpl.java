@@ -1,8 +1,9 @@
-package com.elit.outildedecision.audit.service;
+package com.elit.outildedecision.audit.service.impl;
 
-import com.elit.outildedecision.audit.entity.GlobalComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.entity.LevelScore;
 import com.elit.outildedecision.audit.repository.GlobalCommentRepository;
+import com.elit.outildedecision.audit.service.GlobalCommentService;
 import com.elit.outildedecision.util.MethodType;
 import org.springframework.stereotype.Service;
 

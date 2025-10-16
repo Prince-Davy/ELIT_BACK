@@ -143,7 +143,7 @@ public class AuditController {
    * @param auditId the Audit ID
    * @return the score of the audit
    */
-  @GetMapping("/{auditId}/calculate")
+  @PostMapping("/{auditId}/calculate")
   @PreAuthorize("hasAnyAuthority('USER') and (isProjectOwnerByAuditId(#auditId))")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Score calculated and saved successfully"),

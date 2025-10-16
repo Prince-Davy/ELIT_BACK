@@ -4,10 +4,15 @@ import com.elit.outildedecision.audit.calculate.AuditCategoryResultEnricher;
 import com.elit.outildedecision.audit.calculate.ScoringStrategyFactory;
 import com.elit.outildedecision.audit.calculate.ScrumScoringStrategy;
 import com.elit.outildedecision.audit.entity.*;
+import com.elit.outildedecision.audit.entity.comment.CategoryComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
+import com.elit.outildedecision.audit.entity.comment.ScrumCategoryComment;
+import com.elit.outildedecision.audit.entity.comment.ScrumGlobalComment;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.*;
 import com.elit.outildedecision.audit.repository.AuditRepository;
 import com.elit.outildedecision.audit.repository.QuestionRepository;
+import com.elit.outildedecision.audit.service.impl.AuditServiceImpl;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.AuditNotFoundException;
@@ -28,6 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -232,6 +238,21 @@ class AuditServiceImplTest {
   @Test
   void calculateScoringOfAudit_shouldSuccess() throws AuditNotFoundException {
 
+
+    Audit audit = Audit.builder()
+      .auditId(COMMON_ID)
+      .method(MethodType.SCRUM)
+      .build();
+
+    Question question = Question.builder()
+      .questionRef("Q1")
+      .weight(1)
+      .auditAnswerLabel("Oui")
+      .auditAnswerValue(10)
+      .category(QuestionCategory.ORGANISATIONS)
+      .scoringType(ScoringType.DIRECT)
+      .audit(audit).build();
+    audit.setQuestions(List.of(question));
     QuestionResponseModel questionResponseModel = QuestionResponseModel.builder()
       .questionRef(question.getQuestionRef())
       .weight(question.getWeight())
@@ -241,54 +262,72 @@ class AuditServiceImplTest {
       .scoringType(question.getScoringType())
       .build();
 
-  AuditCategoryResult category = AuditCategoryResult.builder()
-    .level(LevelScore.BON)
-    .categoryComment(CategoryComment.builder().build())
-    .scorePercentageCategory(100.0)
-    .category(question.getCategory())
-    .build();
+    CategoryComment organisationsComment = ScrumCategoryComment.builder()
+      .id(COMMON_ID)
+      .category(QuestionCategory.ORGANISATIONS)
+      .text("text1")
+      .level(LevelScore.BON)
+      .build();
 
+    AuditCategoryResult categoryResult = AuditCategoryResult.builder()
+      .level(LevelScore.BON)
+      .categoryComment(organisationsComment)
+      .scorePercentageCategory(100.0)
+      .category(question.getCategory())
+      .build();
 
-    QuestionResponseScore questionResponseScore = QuestionResponseScore.builder().build();
+    QuestionResponseScore questionResponseScore = QuestionResponseScore.builder()
+      .score(10.0)
+      .build();
 
     AuditScore auditScore = AuditScore.builder()
       .audit(audit)
       .user(user)
       .globalScorePercentage(100.0)
       .submissionDate(audit.getAuditLaunchDate())
-      .auditCategoryResults(List.of(category))
+      .auditCategoryResults(List.of(categoryResult))
       .questionResponses(List.of(questionResponseScore))
       .build();
 
-    QuestionResponseScoreDTO questionResponseScoreDTO = QuestionResponseScoreDTO.builder()
-      .score(10).category(question.getCategory()).build();
     AuditScoreDTO auditScoreDTO = AuditScoreDTO.builder()
       .auditScoreId(COMMON_ID)
       .auditId(audit.getAuditId())
       .globalScorePercentage(100.0)
-      .questionResponses(List.of(questionResponseScoreDTO))
+      .questionResponses(List.of(
+        QuestionResponseScoreDTO.builder()
+          .score(10.0)
+          .category(question.getCategory())
+          .build()))
       .build();
 
-    CategoryComment organisationsComment = CategoryComment.builder().id(COMMON_ID).category(QuestionCategory.ORGANISATIONS).text("text1").level(LevelScore.BON).build();
-    CategoryComment outilsDocumentationComment = CategoryComment.builder().id(2L).category(QuestionCategory.OUTILS_ET_DOCUMENTATION).text("text2").level(LevelScore.MAUVAIS).build();
+    GlobalComment globalComment = ScrumGlobalComment.builder()
+      .id(99L)
+      .method(MethodType.SCRUM)
+      .level(LevelScore.BON)
+      .text("Global comment")
+      .build();
 
-    when(auditRepository.findById(anyLong())).thenReturn(Optional.ofNullable(audit));
-    when(auditMapper.responseModeltoAuditScore(any(),any(),any())).thenReturn(auditScore);
-    when(auditMapper.auditScoretoAuditScoreDto(any())).thenReturn(auditScoreDTO);
-    when(auditMapper.mapToQuestionResponseModel(any())).thenReturn(questionResponseModel);
-    when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(COMMON_ID);
-    when(auditRepository.save(any())).thenReturn(audit);
+    // Mocking
+    when(auditRepository.findById(anyLong())).thenReturn(Optional.of(audit));
     when(scoringStrategyFactory.resolveStrategyByMethodType(any())).thenReturn(scrumScoringStrategy);
-    when(categoryCommentService.findAll()).thenReturn(List.of(organisationsComment, outilsDocumentationComment));
-    when(globalCommentService.findByMethodAndLevel(any(), any())).thenReturn(GlobalComment.builder().build());
+    when(globalCommentService.findByMethodAndLevel(any(), any())).thenReturn(globalComment);
+    when(auditRepository.save(any())).thenReturn(audit);
+    when(auditMapper.auditScoretoAuditScoreDto(any())).thenReturn(auditScoreDTO);
 
+    // Act
+    AuditScoreDTO result = auditService.calculateScoringOfAudit(COMMON_ID);
 
-    AuditScoreDTO auditScoreResponse = auditService.calculateScoringOfAudit(anyLong());
+    // Assert
+    assertNotNull(result);
+    assertEquals(100.0, result.getGlobalScorePercentage());
+    assertEquals(COMMON_ID, result.getAuditId());
+    verify(auditRepository).findById(COMMON_ID);
+    verify(scoringStrategyFactory).resolveStrategyByMethodType(MethodType.SCRUM);
+    verify(globalCommentService).findByMethodAndLevel(MethodType.SCRUM, LevelScore.BON);
+    verify(auditRepository).save(any());
+    verify(auditMapper).auditScoretoAuditScoreDto(any());
 
-    assertNotNull(auditScoreResponse);
-    assertEquals(auditScore.getGlobalScorePercentage(), auditScoreResponse.getGlobalScorePercentage());
-
-  }
+}
 
   @Test
   void calculateScoringOfAudit_shouldThrowsException() {

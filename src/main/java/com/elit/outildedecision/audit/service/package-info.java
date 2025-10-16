@@ -1,14 +1,8 @@
 /**
  * Audit services.
- *
- * This package contains service interfaces and implementations for the audit domain.
- * Services encapsulate business use cases, orchestrate repository calls, and expose
- * operations to web/controllers.
- *
+ * This package contains service interfaces for the audit domain.
  * Guidelines:
  * - Keep services stateless when possible.
  * - Validate inputs and throw domain-specific exceptions.
- * - Do not include persistence logic; delegate to repositories.
- * - Keep transaction boundaries clear and focused.
  */
 package com.elit.outildedecision.audit.service;

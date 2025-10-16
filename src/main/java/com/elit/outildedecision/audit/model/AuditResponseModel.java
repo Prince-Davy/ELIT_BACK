@@ -96,11 +96,6 @@ public class AuditResponseModel {
   private Long totalAuditCount;
 
   /**
-   * computed field : global percentage.
-   */
-  private double globalScorePercentage;
-
-  /**
    * Score percentage per category.
    */
   @Builder.Default

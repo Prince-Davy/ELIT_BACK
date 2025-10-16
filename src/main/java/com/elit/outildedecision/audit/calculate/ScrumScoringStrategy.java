@@ -1,19 +1,26 @@
 package com.elit.outildedecision.audit.calculate;
 
-import com.elit.outildedecision.audit.model.AuditCategoryResultDTO;
-import com.elit.outildedecision.audit.model.AuditResponseModel;
-import com.elit.outildedecision.audit.model.QuestionResponseModel;
+
+
+import com.elit.outildedecision.audit.entity.Audit;
+import com.elit.outildedecision.audit.entity.AuditScore;
+import com.elit.outildedecision.audit.entity.AuditCategoryResult;
+import com.elit.outildedecision.audit.entity.Question;
+import com.elit.outildedecision.audit.entity.QuestionResponseScore;
 import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.util.QuestionCategory;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.EnumSet;
 import java.util.Objects;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Set;
+import java.util.List;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Component responsible for compute the score of the AuditScore with Scrum strategy.
@@ -25,102 +32,127 @@ public final class ScrumScoringStrategy implements MethodsScoringStrategy {
 
   /**
    * Constructor for ScrumScoringStrategy .
-   * @param auditCategoryResultEnricher a service that use for enrich  {@link AuditCategoryResultDTO} objects
+   * @param auditCategoryResultEnricher a service that use for enrich  {@link AuditCategoryResult} objects
    */
   public ScrumScoringStrategy(final AuditCategoryResultEnricher auditCategoryResultEnricher) {
     this.auditCategoryResultEnricher = auditCategoryResultEnricher;
   }
 
   @Override
-  public MethodType supportedType() {
-    return MethodType.SCRUM;
+  public Set<MethodType> supportedTypes() {
+    return EnumSet.of(MethodType.SCRUM, MethodType.SCALED_AGILITY, MethodType.VMODEL);
   }
 
   @Override
-  public void calculateScoring(final AuditResponseModel auditResponseModel) {
-    Objects.requireNonNull(auditResponseModel, "AuditResponseModel is null");
-    List<QuestionResponseModel> questionResponseModels = auditResponseModel.getQuestions();
+  public AuditScore calculateScoring(final Audit audit) {
+    Objects.requireNonNull(audit, "audit is null");
 
-    this.calculateScoringByQuestion(questionResponseModels);
-    this.calculateScoringByCategory(questionResponseModels, auditResponseModel);
+    final List<Question> questions = Optional.ofNullable(audit.getQuestions())
+      .orElseGet(Collections::emptyList);
+
+    List<QuestionResponseScore> questionResponseScores = this.calculateScoringByQuestion(questions);
+    return this.calculateScoringByCategory(questionResponseScores, audit);
   }
 
   /**
    * compute the score by question.
-   *
-   * @param questionResponseModels all questions
+   * @param auditQuestions all questions
+   * @return a list of questionResponseScore with score
    */
-  private void calculateScoringByQuestion(final List<QuestionResponseModel> questionResponseModels) {
-    Objects.requireNonNull(questionResponseModels, "questionResponseModels is null");
+  private List<QuestionResponseScore> calculateScoringByQuestion(final List<Question> auditQuestions) {
+    Objects.requireNonNull(auditQuestions, "auditQuestions is null");
 
-    questionResponseModels.stream()
+    return auditQuestions.stream()
       .filter(Objects::nonNull)
-      .forEach(q -> {
-        int answerValue = q.getAuditAnswerValue() != null ? q.getAuditAnswerValue() : 0;
-        int weight = q.getWeight() != null ? Math.max(0, q.getWeight()) : 0;
+      .map(question -> {
 
-        int effectiveValue = q.getScoringType().computeEffectiveValue(answerValue);
-        int weightedScore = effectiveValue * weight;
-        int maxPossibleScore = 2 * weight;
-        double scorePercentage = maxPossibleScore == 0 ? 0.0 : (double) weightedScore / maxPossibleScore * 100;
+        final int weight = safeWeight(question);
+        final int effectiveValue = effectiveValue(question);
+        final int maxPossible = maxPossibleScore(weight);
+        final double percentage = (maxPossible == 0) ? 0d : effectiveValue * (double) weight * 100d / (double) maxPossible;
 
-        q.setCurrentScore(effectiveValue);
-        q.setWeightedScore(weightedScore);
-        q.setMaxPossibleScore(maxPossibleScore);
-        q.setScorePercentage(scorePercentage);
-      });
+        return QuestionResponseScore.builder()
+          .answerLabel(question.getAuditAnswerLabel())
+          .answerValue(question.getAuditAnswerValue())
+          .score(round(percentage, 1))
+          .question(question)
+          .build();
+      }).collect(Collectors.toList());
   }
 
   /**
    * compute score by category.
-   * @param questions all questions
-   * @param auditResponseModel all responses of questions
+   * @param questionResponseScores all questionResponseScores
+   * @param audit audit
+   * @return an auditScore with score cumputed
    */
-  private void calculateScoringByCategory(final List<QuestionResponseModel> questions, final AuditResponseModel auditResponseModel) {
-    Objects.requireNonNull(auditResponseModel, "AuditResponseModel (model) ne doit pas être null");
+  private AuditScore calculateScoringByCategory(final List<QuestionResponseScore> questionResponseScores, final Audit audit) {
+    Objects.requireNonNull(audit, "audit must not be null");
+    Objects.requireNonNull(questionResponseScores, "questionResponseScores must not be null");
 
-    final List<QuestionResponseModel> safeQuestions =
-      (questions == null) ? Collections.emptyList() : questions;
-
-    Map<QuestionCategory, List<QuestionResponseModel>> questionsByCategory = safeQuestions.stream()
+    // regroupement par catégorie
+    final Map<QuestionCategory, List<QuestionResponseScore>> scoresByCategory = questionResponseScores.stream()
+      .filter(questionResponseScore -> Objects.nonNull(questionResponseScore.getQuestion()))
       .collect(Collectors.groupingBy(
-        QuestionResponseModel::getCategory,
-        LinkedHashMap::new,
+        questionResponseScore -> questionResponseScore.getQuestion().getCategory(),
+        () -> new EnumMap<>(QuestionCategory.class),
         Collectors.toList()
       ));
 
-    List<AuditCategoryResultDTO> categoryScores = new ArrayList<>();
+    final List<AuditCategoryResult> categoryScores = new ArrayList<>();
     int totalWeightedScores = 0;
     int totalMaxPossibleScore = 0;
 
-    for (Map.Entry<QuestionCategory, List<QuestionResponseModel>> entry : questionsByCategory.entrySet()) {
+    for (Map.Entry<QuestionCategory, List<QuestionResponseScore>> entry : scoresByCategory.entrySet()) {
       final QuestionCategory category = entry.getKey();
-      final List<QuestionResponseModel> questionResponseValue = entry.getValue();
+      final List<QuestionResponseScore> scores  = entry.getValue();
 
-      int categoryScore  = 0;
-      int categoryScoreMax = 0;
 
-      for (QuestionResponseModel questionResponseModel : questionResponseValue) {
-        categoryScore += questionResponseModel.getWeightedScore();
-        categoryScoreMax += questionResponseModel.getMaxPossibleScore();
-      }
+      final int categoryWeighted = scores.stream()
+        .map(QuestionResponseScore::getQuestion)
+        .filter(Objects::nonNull)
+        .mapToInt(q -> effectiveValue(q) * safeWeight(q))
+        .sum();
 
-      double pourcentageCategorie = percent(categoryScore, categoryScoreMax);
-      AuditCategoryResultDTO auditCategoryResultDTO = AuditCategoryResultDTO.builder()
-        .category(category.getDisplayName())
-        .scorePercentageCategory(round(pourcentageCategorie, 1))
+      final int categoryMax = scores.stream()
+        .map(QuestionResponseScore::getQuestion)
+        .filter(Objects::nonNull)
+        .mapToInt(q -> maxPossibleScore(safeWeight(q)))
+        .sum();
+
+      final double percentageCategory = percent(categoryWeighted, categoryMax);
+
+      final AuditCategoryResult categoryResult = AuditCategoryResult.builder()
+        .category(category)
+        .scorePercentageCategory(round(percentageCategory, 1))
         .build();
 
-      auditCategoryResultEnricher.enrichAuditCategoryResult(auditResponseModel.getMethod(), auditCategoryResultDTO);
-      categoryScores.add(auditCategoryResultDTO);
 
-      totalWeightedScores += categoryScore;
-      totalMaxPossibleScore += categoryScoreMax;
+      auditCategoryResultEnricher.enrichAuditCategoryResult(audit.getMethod(), categoryResult);
+      categoryScores.add(categoryResult);
+
+      totalWeightedScores += categoryWeighted;
+      totalMaxPossibleScore += categoryMax;
     }
 
-    double scoreGlobalPercentage = round(percent(totalWeightedScores, totalMaxPossibleScore), 1);
-    auditResponseModel.setCategoryResults(categoryScores);
-    auditResponseModel.setGlobalScorePercentage(scoreGlobalPercentage);
+    final double scoreGlobalPercentage = round(percent(totalWeightedScores, totalMaxPossibleScore), 1);
+
+    final AuditScore auditScore = AuditScore.builder()
+      .audit(audit)
+      .globalScorePercentage(scoreGlobalPercentage)
+      .auditCategoryResults(categoryScores)
+      .questionResponses(questionResponseScores)
+      .submissionDate(new Timestamp(System.currentTimeMillis()))
+      .user(audit.getUser())
+      .build();
+
+    questionResponseScores.forEach(questionResponseScore -> questionResponseScore.setAuditScore(auditScore));
+    categoryScores.forEach(categoryResult -> categoryResult.setAuditScore(auditScore));
+
+    auditScore.setQuestionResponses(questionResponseScores);
+    auditScore.setQuestionResponses(questionResponseScores);
+    return auditScore;
+
   }
 
   /**
@@ -147,5 +179,22 @@ public final class ScrumScoringStrategy implements MethodsScoringStrategy {
       return Math.round(value * factor) / factor;
     }
   }
+private static int safeWeight(final Question q) {
+  final Integer w = q.getWeight();
+  return (w == null) ? 0 : Math.max(0, w);
+}
+
+private static int safeAnswerValue(final Question q) {
+  final Integer v = q.getAuditAnswerValue();
+  return (v == null) ? 0 : v;
+}
+
+private static int effectiveValue(final Question q) {
+  return q.getScoringType().computeEffectiveValue(safeAnswerValue(q));
+}
+
+private static int maxPossibleScore(final int weight) {
+  return 2 * Math.max(0, weight);
+}
 
 }

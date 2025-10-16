@@ -1,9 +1,10 @@
-package com.elit.outildedecision.audit.service;
+package com.elit.outildedecision.audit.service.impl;
 
 import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.AuditScoreDTO;
 import com.elit.outildedecision.audit.repository.AuditScoreRepository;
+import com.elit.outildedecision.audit.service.AuditScoreService;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
