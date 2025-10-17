@@ -14,7 +14,7 @@ image:
   repository: sogetilabsfrance.azurecr.io/lge-elit/lge-elit-back
   # This sets the pull policy for images.
   # pullPolicy: IfNotPresent
-  tag: "latest-integ"
+  tag: "latest-test"
 
 # This is to override the chart name. It can usually be left empty.
 nameOverride: ""
@@ -27,7 +27,7 @@ fullnameOverride: ""
 serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "lge-elit-sa"
+  name: "lge-elit-recette-sa"
   # Specifies whether a service account should be created
   create: false
   # Automatically mount a ServiceAccount's API credentials?
@@ -58,14 +58,14 @@ ingress:
   # more_set_headers "X-Forwarded-Host $host";
   # more_set_headers "Forwarded $proxy_add_forwarded";
   hosts:
-    - host: integ.lge-elit.innovation-factory.io
+    - host: recette.lge-elit.innovation-factory.io
       paths:
         - path: /api
           pathType: Prefix
   tls:
-    - secretName: integ.lge-elit.innovation-factory.io-secret
+    - secretName: recette.lge-elit.innovation-factory.io-secret
       hosts:
-        - integ.lge-elit.innovation-factory.io
+        - recette.lge-elit.innovation-factory.io
 
 # Setup your application's resources here.
 # m = milliCPU, 1000m = 1.
@@ -95,47 +95,29 @@ env:
 # you can define the `vaultKey` value separately, otherwise, it defaults to the `key` value.
 secrets:
   enabled: true
-  roleName: lge-elit-integ
-  secretPath: secret/data/lge/elit/integ
+  roleName: lge-elit-recette-role
+  secretPath: secret/data/lge/elit/recette
   data:
-    - vaultKey: MYSQL_ROOT_PASSWORD
-      key: MYSQL_ROOT_PASSWORD
-    - vaultKey: MYSQL_USER
-      key: MYSQL_USER
-    - vaultKey: MYSQL_PASSWORD
-      key: MYSQL_PASSWORD
-    - vaultKey: MYSQL_DATABASE
-      key: MYSQL_DATABASE
-    - vaultKey: DB_SERVER
-      key: DB_SERVER
-    - vaultKey: SPRING_BACK_USERNAME
-      key: SPRING_BACK_USERNAME
-    - vaultKey: SPRING_BACK_PASSWORD
-      key: SPRING_BACK_PASSWORD
-    - vaultKey: JWT_SECRET_BACK
-      key: JWT_SECRET_BACK
-    - vaultKey: FILE_UPLOAD_DIR
-      key: FILE_UPLOAD_DIR
-    - vaultKey: AVATAR_UPLOAD_DIR
-      key: AVATAR_UPLOAD_DIR
-    - vaultKey: FILE_QUESTIONS
-      key: FILE_QUESTIONS
-    - vaultKey: SPRING_MAIL_USERNAME
-      key: SPRING_MAIL_USERNAME
-    - vaultKey: SPRING_MAIL_PASSWORD
-      key: SPRING_MAIL_PASSWORD
-    - vaultKey: REACT_APP_BACKEND_API
-      key: REACT_APP_BACKEND_API
-    - vaultKey: FRONTEND_URL
-      key: FRONTEND_URL
-    - vaultKey: FILE_RECOMMANDATIONS
-      key: FILE_RECOMMANDATIONS
-    - vaultKey: PORT
-      key: PORT
+    - key: MYSQL_ROOT_PASSWORD
+    - key: MYSQL_USER
+    - key: MYSQL_PASSWORD
+    - key: MYSQL_DATABASE
+    - key: DB_SERVER
+    - key: SPRING_BACK_USERNAME
+    - key: SPRING_BACK_PASSWORD
+    - key: JWT_SECRET_BACK
+    - key: FILE_UPLOAD_DIR
+    - key: AVATAR_UPLOAD_DIR
+    - key: FILE_QUESTIONS
+    - key: SPRING_MAIL_USERNAME
+    - key: SPRING_MAIL_PASSWORD
+    - key: REACT_APP_BACKEND_API
+    - key: FRONTEND_URL
+    - key: FILE_RECOMMANDATIONS
 
 
-  # --- THIS SECTION IS FOR MORE COMPLEX CONFIGURATION --- #
-  # --- You may not need to edit it --- #
+# --- THIS SECTION IS FOR MORE COMPLEX CONFIGURATION --- #
+# --- You may not need to edit it --- #
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -150,16 +132,16 @@ autoscaling:
 
 # Additional volumes on the output Deployment definition.
 volumes: []
-  # - name: foo
-  #   secret:
-  #     secretName: mysecret
-  #     optional: false
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
 
 nodeSelector: {}
 
@@ -167,15 +149,15 @@ tolerations: []
 
 affinity: {}
 
-  # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  # livenessProbe:
-  #   httpGet:
-  #     path: /
-  #     port: http
-  # readinessProbe:
-  #   httpGet:
-  #     path: /
-  #     port: http
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
 
 # This is for setting Kubernetes Annotations to a Pod.
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -185,7 +167,7 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext: {}
   # capabilities:
