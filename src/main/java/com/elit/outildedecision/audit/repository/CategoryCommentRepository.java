@@ -7,6 +7,7 @@ import com.elit.outildedecision.util.QuestionCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Optional;
 public interface CategoryCommentRepository extends JpaRepository<CategoryComment, Long> {
 
   /**
-   * finds a catagory comment by its associated categoty and evaluation level and method type.
+   * finds a catagory comment by its associated category and evaluation level and method type.
    * @param methodType the method type
    * @param category the question category
    * @param level he evaluation level (BON, MOYEN, MAUVAIS)
@@ -25,4 +26,10 @@ public interface CategoryCommentRepository extends JpaRepository<CategoryComment
    */
   Optional<CategoryComment> findByMethodAndCategoryAndLevel(MethodType methodType, QuestionCategory category, LevelScore level);
 
+  /**
+   * find a list of categoryComment by its method type.
+   * @param methodType the method type
+   * @return list of category comment
+   */
+  List<CategoryComment> findAllByMethod(MethodType methodType);
 }

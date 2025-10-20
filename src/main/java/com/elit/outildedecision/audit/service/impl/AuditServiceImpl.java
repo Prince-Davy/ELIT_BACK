@@ -1,12 +1,11 @@
 package com.elit.outildedecision.audit.service.impl;
 
+import com.elit.outildedecision.audit.calculate.AuditCategoryResultEnricher;
 import com.elit.outildedecision.audit.calculate.MethodsScoringStrategy;
 import com.elit.outildedecision.audit.calculate.ScoringStrategyFactory;
 
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.audit.entity.AuditScore;
-import com.elit.outildedecision.audit.entity.LevelScore;
-import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.entity.Question;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
 import com.elit.outildedecision.audit.model.AuditRequestModel;
@@ -16,7 +15,6 @@ import com.elit.outildedecision.audit.model.QuestionResponseModel;
 import com.elit.outildedecision.audit.model.QuestionRequestModel;
 import com.elit.outildedecision.audit.repository.AuditRepository;
 import com.elit.outildedecision.audit.service.AuditService;
-import com.elit.outildedecision.audit.service.GlobalCommentService;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.AuditNotFoundException;
@@ -49,7 +47,7 @@ public class AuditServiceImpl implements AuditService {
   private final UserRepository userRepository;
   private final ScoringStrategyFactory scoringStrategyFactory;
   private final AuditMapper  auditMapper;
-  private final GlobalCommentService globalCommentService;
+  private final AuditCategoryResultEnricher auditCategoryResultEnricher;
 
 
   /**
@@ -61,18 +59,18 @@ public class AuditServiceImpl implements AuditService {
    * @param userRepository the repository for managing user entities
    * @param scoringStrategyFactory the factory for creating scoring strategies
    * @param auditMapper the mapper for converting between audit models and entities
-   * @param globalCommentService the globalCommentService for fetching the global comment
+   * @param auditCategoryResultEnricher the service used for retrieve the comment of audit score
    */
   public AuditServiceImpl(final AuditRepository auditRepository,
                           final ProjectRepository projectRepository,
                           final UserRepository userRepository, final ScoringStrategyFactory scoringStrategyFactory,
-                          final AuditMapper auditMapper, final GlobalCommentService globalCommentService) {
+                          final AuditMapper auditMapper, final AuditCategoryResultEnricher auditCategoryResultEnricher) {
     this.auditRepository = auditRepository;
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
     this.scoringStrategyFactory = scoringStrategyFactory;
     this.auditMapper = auditMapper;
-    this.globalCommentService = globalCommentService;
+    this.auditCategoryResultEnricher = auditCategoryResultEnricher;
   }
   /**
    * Create a new audit.
@@ -210,8 +208,7 @@ public class AuditServiceImpl implements AuditService {
     MethodsScoringStrategy methodsScoringStrategy = scoringStrategyFactory.resolveStrategyByMethodType(audit.getMethod());
     AuditScore auditScore = methodsScoringStrategy.calculateScoring(audit);
 
-    GlobalComment globalComment = globalCommentService.findByMethodAndLevel(audit.getMethod(), LevelScore.fromPercentage(auditScore.getGlobalScorePercentage()));
-    auditScore.setGlobalComment(globalComment);
+    auditCategoryResultEnricher.enrichAuditComment(auditScore, audit.getMethod(), auditScore.getAuditCategoryResults());
 
     audit.setAuditScore(auditScore);
 

@@ -26,4 +26,11 @@ public interface CategoryCommentService {
    * @return a list of all CategoryComment instances
    */
   List<CategoryComment> findAll();
+
+  /**
+   * find a list of categoryComment by its method type.
+   * @param methodType the method type
+   * @return list of category comment
+   */
+  List<CategoryComment> findAllByMethod(MethodType methodType);
 }

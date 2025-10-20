@@ -5,25 +5,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class ScoringStrategyFactoryTest {
 
-  @Mock
-  private AuditCategoryResultEnricher auditCategoryResultEnricher;
 
-  private ScrumScoringStrategy scrumScoringStrategy;
+  private AgilityScoringStrategy scrumScoringStrategy;
   private ScoringStrategyFactory scoringStrategyFactory;
 
   @BeforeEach
   public void setUp() {
-    scrumScoringStrategy = new ScrumScoringStrategy(auditCategoryResultEnricher);
+    scrumScoringStrategy = new AgilityScoringStrategy();
     scoringStrategyFactory = new ScoringStrategyFactory(List.of(scrumScoringStrategy));
   }
 

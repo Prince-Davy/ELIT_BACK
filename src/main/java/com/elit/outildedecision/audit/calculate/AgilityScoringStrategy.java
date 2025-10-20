@@ -23,24 +23,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Component responsible for compute the score of the AuditScore with Scrum strategy.
+ * Component responsible for compute the score of the AuditScore with Agility strategy.
  */
 @Component
-public final class ScrumScoringStrategy implements MethodsScoringStrategy {
-
-  private final AuditCategoryResultEnricher auditCategoryResultEnricher;
-
-  /**
-   * Constructor for ScrumScoringStrategy .
-   * @param auditCategoryResultEnricher a service that use for enrich  {@link AuditCategoryResult} objects
-   */
-  public ScrumScoringStrategy(final AuditCategoryResultEnricher auditCategoryResultEnricher) {
-    this.auditCategoryResultEnricher = auditCategoryResultEnricher;
-  }
+public final class AgilityScoringStrategy implements MethodsScoringStrategy {
 
   @Override
   public Set<MethodType> supportedTypes() {
-    return EnumSet.of(MethodType.SCRUM, MethodType.SCALED_AGILITY, MethodType.VMODEL);
+    return EnumSet.of(MethodType.SCRUM, MethodType.SCALED_AGILITY, MethodType.VMODEL, MethodType.WATERFALL);
   }
 
   @Override
@@ -74,7 +64,7 @@ public final class ScrumScoringStrategy implements MethodsScoringStrategy {
         return QuestionResponseScore.builder()
           .answerLabel(question.getAuditAnswerLabel())
           .answerValue(question.getAuditAnswerValue())
-          .score(round(percentage, 1))
+          .score(round(percentage))
           .question(question)
           .build();
       }).collect(Collectors.toList());
@@ -124,18 +114,15 @@ public final class ScrumScoringStrategy implements MethodsScoringStrategy {
 
       final AuditCategoryResult categoryResult = AuditCategoryResult.builder()
         .category(category)
-        .scorePercentageCategory(round(percentageCategory, 1))
+        .scorePercentageCategory(round(percentageCategory))
         .build();
-
-
-      auditCategoryResultEnricher.enrichAuditCategoryResult(audit.getMethod(), categoryResult);
       categoryScores.add(categoryResult);
 
       totalWeightedScores += categoryWeighted;
       totalMaxPossibleScore += categoryMax;
     }
 
-    final double scoreGlobalPercentage = round(percent(totalWeightedScores, totalMaxPossibleScore), 1);
+    final double scoreGlobalPercentage = round(percent(totalWeightedScores, totalMaxPossibleScore));
 
     final AuditScore auditScore = AuditScore.builder()
       .audit(audit)
@@ -167,17 +154,13 @@ public final class ScrumScoringStrategy implements MethodsScoringStrategy {
 
   /**
    * compute the round.
+   *
    * @param value the value
-   * @param decimals the decimal
    * @return the round
    */
-  private static double round(final double value, final int decimals) {
-    if (decimals < 0) {
-      return value;
-    } else {
-      double factor = Math.pow(10, decimals);
-      return Math.round(value * factor) / factor;
-    }
+  private static double round(final double value) {
+    double factor = Math.pow(10, 1);
+    return Math.round(value * factor) / factor;
   }
 private static int safeWeight(final Question q) {
   final Integer w = q.getWeight();
