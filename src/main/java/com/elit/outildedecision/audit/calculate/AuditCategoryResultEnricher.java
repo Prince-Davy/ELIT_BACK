@@ -1,11 +1,17 @@
 package com.elit.outildedecision.audit.calculate;
 
 import com.elit.outildedecision.audit.entity.AuditCategoryResult;
+import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.LevelScore;
 import com.elit.outildedecision.audit.entity.comment.CategoryComment;
+import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.service.CategoryCommentService;
+import com.elit.outildedecision.audit.service.GlobalCommentService;
 import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.util.QuestionCategory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 /**
@@ -19,15 +25,32 @@ import org.springframework.stereotype.Component;
 public class AuditCategoryResultEnricher {
 
   private final CategoryCommentService categoryCommentService;
+  private final GlobalCommentService globalCommentService;
 
   /**
    * Constructs an instance of {@code AuditCategoryResultEnricher}.
    *
    * @param categoryCommentService the service used to retrieve category comments
    *                                based on category and level
+   * @param globalCommentService the service used to retrieve global comment
    */
-  public AuditCategoryResultEnricher(final CategoryCommentService categoryCommentService) {
+  public AuditCategoryResultEnricher(final CategoryCommentService categoryCommentService, final GlobalCommentService globalCommentService) {
     this.categoryCommentService = categoryCommentService;
+    this.globalCommentService = globalCommentService;
+  }
+
+  /**
+   * Enriches the AuditScore object with a global comment and detailed audit category results.
+   *
+   * @param auditScore the AuditScore object to be enriched
+   * @param methodType the MethodType used to retrieve the global comment and enrich category results
+   * @param auditCategoryResults the list of AuditCategoryResult to be enriched and set
+   */
+  public void enrichAuditComment(final AuditScore auditScore, final MethodType methodType,  final List<AuditCategoryResult> auditCategoryResults) {
+    GlobalComment globalComment = globalCommentService.findByMethodAndLevel(methodType, LevelScore.fromPercentage(auditScore.getGlobalScorePercentage()));
+    enrichAuditCategoryResult(methodType, auditCategoryResults);
+    auditScore.setGlobalComment(globalComment);
+    auditScore.setAuditCategoryResults(auditCategoryResults);
   }
 
 
@@ -37,16 +60,22 @@ public class AuditCategoryResultEnricher {
    * Fetching the corresponding {@link CategoryComment}
    * Setting the level, comment ID, and comment text into the DTO
    *
-   * @param auditCategoryResult the category result to enrich
+   * @param auditCategoryResults the list of AuditCategoryResult to be enriched and set
    * @param methodType the methodType
-   * @throws IllegalArgumentException if no comment is found for the given category and level
    */
-  public void enrichAuditCategoryResult(final MethodType methodType, final AuditCategoryResult auditCategoryResult) {
-    LevelScore levelScore = resolveLevelFromScore(auditCategoryResult.getScorePercentageCategory());
-
-    CategoryComment categoryComment = categoryCommentService.findByMethodAndCategoryAndLevel(methodType, auditCategoryResult.getCategory(), levelScore);
-    auditCategoryResult.setLevel(levelScore);
-    auditCategoryResult.setCategoryComment(categoryComment);
+  public void enrichAuditCategoryResult(final MethodType methodType, final List<AuditCategoryResult> auditCategoryResults) {
+    List<CategoryComment> allCategoryComment = categoryCommentService.findAllByMethod(methodType);
+    auditCategoryResults.forEach(auditCategoryResult -> {
+      LevelScore levelScore = resolveLevelFromScore(auditCategoryResult.getScorePercentageCategory());
+      QuestionCategory questionCategory = auditCategoryResult.getCategory();
+      CategoryComment matchingComment = allCategoryComment.stream()
+        .filter(categoryComment -> categoryComment.getCategory().equals(questionCategory)
+          && categoryComment.getLevel().equals(levelScore))
+        .findFirst()
+        .orElse(null);
+      auditCategoryResult.setCategoryComment(matchingComment);
+      auditCategoryResult.setLevel(levelScore);
+    });
   }
 
 

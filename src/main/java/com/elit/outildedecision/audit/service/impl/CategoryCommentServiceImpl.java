@@ -50,4 +50,14 @@ public class CategoryCommentServiceImpl implements CategoryCommentService {
   public List<CategoryComment> findAll() {
     return categoryCommentRepository.findAll();
   }
+
+  /**
+   * return the list of category comment by method type .
+   * @param methodType the method type
+   * @return the list of categoryComment find by method type
+   */
+  @Override
+  public List<CategoryComment> findAllByMethod(final MethodType methodType) {
+    return categoryCommentRepository.findAllByMethod(methodType);
+  }
 }
