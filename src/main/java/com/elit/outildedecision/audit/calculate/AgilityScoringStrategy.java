@@ -152,7 +152,7 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
     if (total <= 0L) {
       return 0.0;
     } else {
-      return (part * 100.0) / total;
+      return part * 100.0 / total;
     }
   }
 
