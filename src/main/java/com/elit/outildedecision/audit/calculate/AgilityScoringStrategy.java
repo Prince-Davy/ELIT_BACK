@@ -7,6 +7,7 @@ import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.AuditCategoryResult;
 import com.elit.outildedecision.audit.entity.Question;
 import com.elit.outildedecision.audit.entity.QuestionResponseScore;
+import com.elit.outildedecision.audit.model.ScoringType;
 import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.util.QuestionCategory;
 import org.springframework.stereotype.Component;
@@ -137,7 +138,6 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
     categoryScores.forEach(categoryResult -> categoryResult.setAuditScore(auditScore));
 
     auditScore.setQuestionResponses(questionResponseScores);
-    auditScore.setQuestionResponses(questionResponseScores);
     return auditScore;
 
   }
@@ -149,7 +149,11 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
    * @return the percent compute with the part and the total
    */
   private static double percent(final int part, final int total) {
-    return total <= 0 ? 0.0 : part * 100.0 / total;
+    if (total <= 0L) {
+      return 0.0;
+    } else {
+      return part * 100.0 / total;
+    }
   }
 
   /**
@@ -159,25 +163,52 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
    * @return the round
    */
   private static double round(final double value) {
-    double factor = Math.pow(10, 1);
+    double factor = Math.pow(10, 0);
     return Math.round(value * factor) / factor;
   }
-private static int safeWeight(final Question q) {
-  final Integer w = q.getWeight();
-  return (w == null) ? 0 : Math.max(0, w);
-}
 
-private static int safeAnswerValue(final Question q) {
-  final Integer v = q.getAuditAnswerValue();
-  return (v == null) ? 0 : v;
-}
+  /**
+   * Returns the weight of the question, ensuring it is non-negative and not null.
+   *
+   * @param q the question object
+   * @return the weight value, or 0 if null or negative
+   */
+  private static int safeWeight(final Question q) {
+    final Integer w = q.getWeight();
+    return (w == null) ? 0 : Math.max(0, w);
+  }
 
-private static int effectiveValue(final Question q) {
-  return q.getScoringType().computeEffectiveValue(safeAnswerValue(q));
-}
+  /**
+   * Returns the audit answer value of the question, defaulting to 0 if null.
+   *
+   * @param q the question object
+   * @return the audit answer value, or 0 if null
+   */
+  private static int safeAnswerValue(final Question q) {
+    final Integer v = q.getAuditAnswerValue();
+    return (v == null) ? 0 : v;
+  }
 
-private static int maxPossibleScore(final int weight) {
-  return 2 * Math.max(0, weight);
-}
+  /**
+   * Computes the effective value of the question's answer using its scoring type.
+   *
+   * @param q the question object
+   * @return the effective value computed from the answer value
+   */
+  private static int effectiveValue(final Question q) {
+    final ScoringType scoringType = q.getScoringType();
+    return (scoringType == null) ? 0 : scoringType.computeEffectiveValue(safeAnswerValue(q));
+  }
+
+  /**
+   * Calculates the maximum possible score for a given weight.
+   * The score is twice the weight, but never negative.
+   *
+   * @param weight the weight value
+   * @return the maximum possible score
+   */
+  private static int maxPossibleScore(final int weight) {
+    return 2 * Math.max(0, weight);
+  }
 
 }
