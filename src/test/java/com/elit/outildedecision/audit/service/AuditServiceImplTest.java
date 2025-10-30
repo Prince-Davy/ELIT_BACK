@@ -190,6 +190,22 @@ class AuditServiceImplTest {
       .thenReturn(Collections.singletonList(audit));
     when(auditRepository.countAuditsByProjectId(COMMON_ID)).thenReturn(1L);
 
+// Mock du mapper pour chaque question
+    for (Question q : audit.getQuestions()) {
+      when(auditMapper.mapToQuestionResponseModel(q)).thenReturn(
+        QuestionResponseModel.builder()
+          .id(q.getQuestionId())
+          .questionRef(q.getQuestionRef())
+          .category(q.getCategory())
+          .weight(q.getWeight())
+          .auditId(q.getAudit() != null ? q.getAudit().getAuditId() : null)
+          .auditAnswerLabel(q.getAuditAnswerLabel())
+          .auditAnswerValue(q.getAuditAnswerValue())
+          .scoringType(q.getScoringType())
+          .build()
+      );
+    }
+
     // Act
     List<AuditResponseModel> responses = auditService.getAuditsByProject(COMMON_ID);
 
@@ -221,6 +237,23 @@ class AuditServiceImplTest {
     when(auditRepository.findByProjectProjectIdOrderByCreatedAtDesc(anyLong(), any()))
       .thenReturn(page);
     when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(COMMON_ID);
+
+// Mock du mapper pour chaque question
+    for (Question q : audit.getQuestions()) {
+      when(auditMapper.mapToQuestionResponseModel(q)).thenReturn(
+        QuestionResponseModel.builder()
+          .id(q.getQuestionId())
+          .questionRef(q.getQuestionRef())
+          .category(q.getCategory())
+          .weight(q.getWeight())
+          .auditId(q.getAudit() != null ? q.getAudit().getAuditId() : null)
+          .auditAnswerLabel(q.getAuditAnswerLabel())
+          .auditAnswerValue(q.getAuditAnswerValue())
+          .scoringType(q.getScoringType())
+          .build()
+      );
+    }
+
 
     // Act
     Page<AuditResponseModel> result = auditService.getAuditsByProjectPaginated(anyLong(), 0, 5);

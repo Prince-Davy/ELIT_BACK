@@ -11,6 +11,7 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -151,8 +152,13 @@ public class AuditController {
     @ApiResponse(responseCode = "403", description = "Access denied")
   })
   public ResponseEntity<AuditScoreDTO> calculateScoreOfTheAudit(@PathVariable final Long auditId) throws AuditNotFoundException {
-    AuditScoreDTO auditScoreDTO = this.auditService.calculateScoringOfAudit(auditId);
-    return ResponseEntity.ok(auditScoreDTO);
+    try {
+      AuditScoreDTO auditScoreDTO = this.auditService.calculateScoringOfAudit(auditId);
+      return ResponseEntity.ok(auditScoreDTO);
+    }
+    catch (AuditNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   /**
@@ -169,8 +175,12 @@ public class AuditController {
     @ApiResponse(responseCode = "403", description = "Access denied")
   })
   public ResponseEntity<AuditScoreDTO> findAuditScoreByAuditId(@PathVariable final Long auditId) throws EntityNotFoundException {
-    AuditScoreDTO auditScoreDTO = this.auditScoreService.findAuditScoreByAuditId(auditId);
-    return ResponseEntity.ok(auditScoreDTO);
+    try {
+      AuditScoreDTO auditScoreDTO = this.auditScoreService.findAuditScoreByAuditId(auditId);
+      return ResponseEntity.ok(auditScoreDTO);
+    }
+    catch (EntityNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
-
 }

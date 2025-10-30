@@ -22,7 +22,9 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,15 +42,20 @@ import java.util.Map;
 /**
  * this is used to implement the attachment service, it contains all the methods
  * that are used to manage the attachments of a project.
- *
  */
 @Service
-public class AttachmentServiceImpl2 implements AttachmentService {
-  /** The Project repository.*/
+public class AttachmentServiceImpl implements AttachmentService {
+  /**
+   * The Project repository.
+   */
   private final ProjectRepository projectRepository;
-  /** The Attachment repository.*/
+  /**
+   * The Attachment repository.
+   */
   private final AttachmentRepository attachmentRepository;
-  /** The User repository.*/
+  /**
+   * The User repository.
+   */
   private final UserRepository userRepository;
   /**
    * The Storing directory.
@@ -56,9 +63,13 @@ public class AttachmentServiceImpl2 implements AttachmentService {
    */
   @Value("${file.upload-dir}")
   private String storingDirectory;
-  /** The Logger.*/
+  /**
+   * The Logger.
+   */
   private final Logger logger;
-  /** The constant FILE_NOT_FOUND.*/
+  /**
+   * The constant FILE_NOT_FOUND.
+   */
   private static final String FILE_NOT_FOUND = "Fichier introuvable !";
 
   /**
@@ -67,33 +78,33 @@ public class AttachmentServiceImpl2 implements AttachmentService {
    *
    * @param projectRepository    the project repository
    * @param attachmentRepository the attachment repository
-   * @param userRepository the user repository
+   * @param userRepository       the user repository
    */
-  public AttachmentServiceImpl2(
+  public AttachmentServiceImpl(
     final ProjectRepository projectRepository, final AttachmentRepository attachmentRepository, final UserRepository userRepository) {
     this.projectRepository = projectRepository;
     this.attachmentRepository = attachmentRepository;
     this.userRepository = userRepository;
-    this.logger = LoggerFactory.getLogger(AttachmentServiceImpl2.class);
+    this.logger = LoggerFactory.getLogger(AttachmentServiceImpl.class);
   }
 
- /**
-    * this method is used to upload attachments of a project.
-    *
-    * @param files the files to upload
-    * @param projectId the project id to which the files will be attached
-    * @param userEmail user email
-    * @return the response entity
-    * @throws ProjectNotFoundException the project not found exception if the project does not exist
-    * @throws FileCouldNotBeSaved the file could not be saved exception if the file could not be saved
-    */
+  /**
+   * this method is used to upload attachments of a project.
+   *
+   * @param files     the files to upload
+   * @param projectId the project id to which the files will be attached
+   * @param userEmail user email
+   * @return the response entity
+   * @throws ProjectNotFoundException the project not found exception if the project does not exist
+   * @throws FileCouldNotBeSaved      the file could not be saved exception if the file could not be saved
+   */
   @Override
   public ResponseEntity<Object> uploadAttachment(final List<MultipartFile> files, final Long projectId, final String userEmail)
     throws ProjectNotFoundException, FileCouldNotBeSaved {
     Project project =
-        projectRepository
-            .findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas !"));
+      projectRepository
+        .findById(projectId)
+        .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas !"));
     String folderPath = StringUtils.cleanPath(storingDirectory + project.getFolderPath());
 
 
@@ -103,15 +114,15 @@ public class AttachmentServiceImpl2 implements AttachmentService {
         Files.copy(file.getInputStream(), Path.of(filePath), StandardCopyOption.REPLACE_EXISTING);
         User user = userRepository.findByUserEmail(userEmail);
         Attachment attachment =
-            Attachment.builder()
-                .filePath(filePath)
-                .fileName(file.getOriginalFilename())
-                .contentType(file.getContentType())
-                .project(project)
-                .createdAt(project.getCreatedAt())
-                .updatedAt(project.getUpdatedAt())
-                .creator(user)
-                .build();
+          Attachment.builder()
+            .filePath(filePath)
+            .fileName(file.getOriginalFilename())
+            .contentType(file.getContentType())
+            .project(project)
+            .createdAt(project.getCreatedAt())
+            .updatedAt(project.getUpdatedAt())
+            .creator(user)
+            .build();
         attachmentRepository.save(attachment);
       } catch (IOException e) {
         throw new FileCouldNotBeSaved("Erreur lors de l'enregistrement du fichier : " + file.getOriginalFilename());
@@ -119,13 +130,14 @@ public class AttachmentServiceImpl2 implements AttachmentService {
     }
     return ResponseEntity.ok().body("Fichiers enregistrés avec succés");
   }
+
   /**
    * this method is used to delete an attachment of a project.
    *
    * @param attachmentId the attachment id to delete
    * @return the response entity
    * @throws AttachmentNotFoundException the attachment not found exception if the attachment does
-   *     not exist
+   *                                     not exist
    */
   @Override
   public ResponseEntity<String> deleteAttachment(final Long attachmentId)
@@ -144,22 +156,56 @@ public class AttachmentServiceImpl2 implements AttachmentService {
   }
 
   /**
+   * Deletes all attachments of the project with the given ID.
+   *
+   * @param projectId the ID of the project whose attachments are to be deleted
+   * @throws ProjectNotFoundException    if the project with the given ID does not exist
+   * @throws AttachmentNotFoundException if no attachments are found for the project
+   */
+  @Transactional
+  @Override
+  public void deleteAllAttachmentsOfProject(final Long projectId) throws ProjectNotFoundException, AttachmentNotFoundException {
+    Project project = projectRepository.findById(projectId)
+      .orElseThrow(() -> new ProjectNotFoundException("Ce Projet n'existe pas !"));
+
+    List<Attachment> attachments = attachmentRepository.findAllByProject(project);
+
+    if (attachments.isEmpty()) {
+      throw new AttachmentNotFoundException("Aucun fichier trouvé pour ce projet !");
+    }
+
+    for (Attachment attachment : attachments) {
+      File fileToDelete = new File(attachment.getFilePath());
+      try {
+        if (FileSystemUtils.deleteRecursively(fileToDelete)) {
+          attachmentRepository.deleteById(attachment.getAttachmentId());
+          logger.info("Fichier supprimé : " + attachment.getFileName());
+        } else {
+          logger.warn("Échec de suppression du fichier : " + attachment.getFileName());
+        }
+      } catch (Exception e) {
+        logger.error("Erreur lors de la suppression du fichier : " + attachment.getFileName(), e);
+      }
+    }
+  }
+
+  /**
    * this method is used to Visualize an attachment of a project on the browser.
    *
    * @param attachmentId the attachment id to open
-   * @param response the response
+   * @param response     the response
    * @throws AttachmentNotFoundException the attachment not found exception if the attachment does
-   *     not exist
-   * @throws IOException the io exception if there is an error while opening the file
+   *                                     not exist
+   * @throws IOException                 the io exception if there is an error while opening the file
    */
   @Override
   public void openAttachment(final Long attachmentId, final HttpServletResponse response)
-      throws AttachmentNotFoundException, IOException {
+    throws AttachmentNotFoundException, IOException {
 
     Attachment attachment =
-        attachmentRepository
-            .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
+      attachmentRepository
+        .findById(attachmentId)
+        .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
 
     File file = new File(attachment.getFilePath());
     if (file.exists()) {
@@ -173,7 +219,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       response.setContentType(mimeType);
       // Here we have mentioned it to show inline
       response.setHeader(
-          "Content-Disposition", String.format("inline; filename=\"%s\"", file.getName()));
+        "Content-Disposition", String.format("inline; filename=\"%s\"", file.getName()));
 
       response.setContentLength((int) file.length());
 
@@ -184,22 +230,23 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       logger.error(FILE_NOT_FOUND);
     }
   }
+
   /**
    * this method is used to download an attachment of a project.
    *
    * @param attachmentId the attachment id to download
-   * @param response the response
+   * @param response     the response
    * @throws AttachmentNotFoundException the attachment not found exception if the attachment does
-   *     not exist
-   * @throws IOException the io exception if there is an error while downloading the file
+   *                                     not exist
+   * @throws IOException                 the io exception if there is an error while downloading the file
    */
   @Override
   public void downloadAttachment(final Long attachmentId, final HttpServletResponse response)
-      throws AttachmentNotFoundException, IOException {
+    throws AttachmentNotFoundException, IOException {
     Attachment attachment =
-        attachmentRepository
-            .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
+      attachmentRepository
+        .findById(attachmentId)
+        .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
 
     File file = new File(attachment.getFilePath());
     if (file.exists()) {
@@ -214,7 +261,7 @@ public class AttachmentServiceImpl2 implements AttachmentService {
 
       // Here we have mentioned it to show as attachment
       response.setHeader(
-          "Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
+        "Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
 
       response.setContentLength((int) file.length());
 
@@ -225,27 +272,57 @@ public class AttachmentServiceImpl2 implements AttachmentService {
       logger.error(FILE_NOT_FOUND);
     }
   }
+
+  /**
+   * this method is used to delete attachments of a project.
+   * @param project the project whose attachments are to be deleted
+   * @throws ProjectNotFoundException the project not found exception if the project does not exist
+   * @throws AttachmentNotFoundException the attachment not found exception if no attachments are found for the project
+   */
+  @Override
+  public void deleteAttachments(Project project) throws ProjectNotFoundException, AttachmentNotFoundException {
+    List<Attachment> attachments = attachmentRepository.findAllByProject(project);
+
+    if (attachments.isEmpty()) {
+      throw new AttachmentNotFoundException("Aucun fichier trouvé pour ce projet !");
+    }
+
+    for (Attachment attachment : attachments) {
+      File fileToDelete = new File(attachment.getFilePath());
+      try {
+        if (FileSystemUtils.deleteRecursively(fileToDelete)) {
+          attachmentRepository.deleteById(attachment.getAttachmentId());
+          logger.info("Fichier supprimé : " + attachment.getFileName());
+        } else {
+          logger.warn("Échec de suppression du fichier : " + attachment.getFileName());
+        }
+      } catch (Exception e) {
+        logger.error("Erreur lors de la suppression du fichier : " + attachment.getFileName(), e);
+      }
+    }
+  }
+
   /**
    * this method is used to rename an attachment of a project.
    *
-   * @param attachmentId the attachment id to rename
+   * @param attachmentId       the attachment id to rename
    * @param attachmentNameJson the attachment name json containing the new name
    * @return the response entity
    * @throws AttachmentNotFoundException the attachment not found exception if the attachment does
-   *     not exist
-   * @throws IOException the io exception if there is an error while renaming the file
+   *                                     not exist
+   * @throws IOException                 the io exception if there is an error while renaming the file
    */
   @Override
   public ResponseEntity<String> renameAttachment(
-      final Long attachmentId, final HttpEntity<String> attachmentNameJson)
-      throws AttachmentNotFoundException, IOException {
+    final Long attachmentId, final HttpEntity<String> attachmentNameJson)
+    throws AttachmentNotFoundException, IOException {
     Attachment attachmentFromDB =
-        attachmentRepository
-            .findById(attachmentId)
-            .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
+      attachmentRepository
+        .findById(attachmentId)
+        .orElseThrow(() -> new AttachmentNotFoundException(FILE_NOT_FOUND));
 
     Map<String, String> newName =
-        new ObjectMapper().readValue(attachmentNameJson.getBody(), HashMap.class);
+      new ObjectMapper().readValue(attachmentNameJson.getBody(), HashMap.class);
 
     attachmentFromDB.setFileName(newName.get("newAttachmentName"));
     Path oldFile = Paths.get(attachmentFromDB.getFilePath());

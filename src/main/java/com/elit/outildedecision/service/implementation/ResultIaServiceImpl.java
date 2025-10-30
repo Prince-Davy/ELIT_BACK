@@ -167,6 +167,22 @@ public class ResultIaServiceImpl implements ResultIaService {
   }
 
   /**
+   * Delete result of analysis AI by project id.
+   * @param projectId project id
+   * @return ResponseEntity<String>
+   * @throws ResponseNotFoundException if analyse AI result not found
+   */
+  @Override
+  public ResponseEntity<String> deleteResultAnalysisAIByProjectId(long projectId) throws ResponseNotFoundException {
+    Project project = projectRepository.findById(projectId)
+      .orElseThrow(() -> new ResponseNotFoundException("Project not found for ID: " + projectId));
+    ResultAi resultAi = resultIaRepository.findByProject(project)
+      .orElseThrow(() -> new ResponseNotFoundException("Analyse AI result not found for project ID: " + projectId));
+    resultIaRepository.delete(resultAi);
+    return ResponseEntity.ok().body("Le résultat de l'analyse IA pour ce projet a bien été supprimé");
+  }
+
+  /**
    * Gets the mapping for the given projectid, assuming the user has completed AI anlysis survey and AI responded
    * successfully.
    *

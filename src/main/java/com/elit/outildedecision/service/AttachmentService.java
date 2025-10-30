@@ -1,6 +1,6 @@
-
 package com.elit.outildedecision.service;
 
+import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
@@ -26,6 +26,16 @@ public interface AttachmentService {
    */
   ResponseEntity<String> deleteAttachment(Long attachmentId)
     throws AttachmentNotFoundException, ProjectNotFoundException;
+
+  /**
+   * Deletes all attachments of the project with the given ID.
+   *
+   * @param projectId the ID of the project whose attachments are to be deleted
+   * @throws ProjectNotFoundException if the project with the given ID does not exist
+   * @throws AttachmentNotFoundException if no attachments are found for the project
+   */
+  void deleteAllAttachmentsOfProject(Long projectId)
+    throws ProjectNotFoundException, AttachmentNotFoundException;
 
   /**
    * Uploads one or more attachments to the project with the given ID.
@@ -73,5 +83,13 @@ public interface AttachmentService {
    */
   void downloadAttachment(Long attachmentId, HttpServletResponse response)
     throws AttachmentNotFoundException, IOException;
-}
 
+  /**
+   * Deletes the attachments of the given project.
+   *
+   * @param project the project whose attachments are to be deleted
+   * @throws ProjectNotFoundException if the project does not exist
+   * @throws AttachmentNotFoundException if no attachments are found for the project
+   */
+  void deleteAttachments(Project project) throws ProjectNotFoundException, AttachmentNotFoundException;
+}

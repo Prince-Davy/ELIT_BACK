@@ -141,8 +141,8 @@ public class AuditServiceImpl implements AuditService {
     final Audit saved = auditRepository.save(audit);
     final AuditResponseModel response = mapToResponseModel(saved);
     return ResponseEntity.ok(response);
-
   }
+
   /**
    * Get audit by project.
    * @param projectId project ID
@@ -224,8 +224,7 @@ public class AuditServiceImpl implements AuditService {
    * @return the audit response model
    */
   private AuditResponseModel mapToResponseModel(final Audit audit) {
-    // Get user role from project permissions (simplified - takes first permission
-    // found)
+    // rôle utilisateur (inchangé)
     String userRole = "Unknown";
     if (audit.getUser().getUserProjectPermissions() != null && !audit.getUser().getUserProjectPermissions().isEmpty()) {
       userRole = audit.getUser().getUserProjectPermissions().get(0).getPermission();
@@ -235,23 +234,30 @@ public class AuditServiceImpl implements AuditService {
     List<QuestionResponseModel> questionResponses = new ArrayList<>();
     if (audit.getQuestions() != null) {
       questionResponses = audit.getQuestions().stream()
-          .map(auditMapper::mapToQuestionResponseModel)
-          .collect(Collectors.toList());
+        .map(auditMapper::mapToQuestionResponseModel)
+        .collect(Collectors.toList());
     }
 
-    return AuditResponseModel.builder()
-        .totalAuditCount(auditRepository.countAuditsByProjectId(audit.getProject().getProjectId()))
-        .auditId(audit.getAuditId())
-        .method(audit.getMethod())
-        .auditLaunchDate(audit.getAuditLaunchDate())
-        .projectId(audit.getProject().getProjectId())
-        .projectName(audit.getProject().getName())
-        .userId(audit.getUser().getUserId())
-        .userFirstName(audit.getUser().getUserFirstName())
-        .userLastName(audit.getUser().getUserLastName())
-        .userRole(userRole)
-        .questions(questionResponses)
-        .build();
-  }
+    // Calculs agrégés
+    Integer totalQuestions = questionResponses.size();
+    Integer totalWeight = questionResponses.stream()
+      .map(q -> q.getWeight() != null ? q.getWeight() : 0)
+      .reduce(0, Integer::sum);
 
+    return AuditResponseModel.builder()
+      .totalAuditCount(auditRepository.countAuditsByProjectId(audit.getProject().getProjectId()))
+      .auditId(audit.getAuditId())
+      .method(audit.getMethod())
+      .auditLaunchDate(audit.getAuditLaunchDate())
+      .projectId(audit.getProject().getProjectId())
+      .projectName(audit.getProject().getName())
+      .userId(audit.getUser().getUserId())
+      .userFirstName(audit.getUser().getUserFirstName())
+      .userLastName(audit.getUser().getUserLastName())
+      .userRole(userRole)
+      .questions(questionResponses)
+      .totalQuestions(totalQuestions)
+      .totalWeight(totalWeight)
+      .build();
+  }
 }

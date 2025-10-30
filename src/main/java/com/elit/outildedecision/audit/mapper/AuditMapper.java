@@ -63,12 +63,43 @@ public class AuditMapper {
    * @return the question response model
    */
   public QuestionResponseModel mapToQuestionResponseModel(final Question question) {
+    if (question == null) {
+      return null;
+    }
+
+    Integer weight = question.getWeight();
+    Integer answerValue = question.getAuditAnswerValue();
+    Integer weightedScore = null;
+    Integer maxPossibleScore = null;
+    Double scorePercentage = null;
+    Boolean isAnswered = null;
+
+    if (weight != null) {
+      maxPossibleScore = 2 * weight;
+    }
+    if (answerValue != null && weight != null) {
+      weightedScore = answerValue * weight;
+      isAnswered = true;
+      if (maxPossibleScore > 0) {
+        scorePercentage = (weightedScore.doubleValue() / maxPossibleScore) * 100.0;
+      }
+    } else {
+      isAnswered = false;
+    }
+
     return QuestionResponseModel.builder()
+      .id(question.getQuestionId())
       .questionRef(question.getQuestionRef())
-      .weight(question.getWeight())
-      .auditAnswerLabel(question.getAuditAnswerLabel())
-      .auditAnswerValue(question.getAuditAnswerValue())
       .category(question.getCategory())
+      .categoryDisplayName(question.getCategory() != null ? question.getCategory().getDisplayName() : null)
+      .weight(weight)
+      .auditId(question.getAudit() != null ? question.getAudit().getAuditId() : null)
+      .auditAnswerLabel(question.getAuditAnswerLabel())
+      .auditAnswerValue(answerValue)
+      .weightedScore(weightedScore)
+      .maxPossibleScore(maxPossibleScore)
+      .scorePercentage(scorePercentage)
+      .isAnswered(isAnswered)
       .scoringType(question.getScoringType())
       .build();
   }

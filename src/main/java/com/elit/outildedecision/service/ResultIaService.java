@@ -44,6 +44,14 @@ public interface ResultIaService {
   ResponseEntity<String> deleteResultAnalysisAI(long resultIaId) throws ResponseNotFoundException;
 
   /**
+   * Delete result of analysis AI by project id.
+   * @param projectId project id
+   * @return ResponseEntity<String>
+   * @throws ResponseNotFoundException if exception
+   */
+  ResponseEntity<String> deleteResultAnalysisAIByProjectId(long projectId) throws ResponseNotFoundException;
+
+  /**
    * Lookup the recommandation mapping for the project ID, assuming the user has completed AI anlysis survey and
    * PMM responded successfully.
    *
