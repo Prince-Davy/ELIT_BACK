@@ -5,7 +5,6 @@ import com.elit.outildedecision.config.View;
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.util.ProjectState;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -93,10 +92,6 @@ public class Project implements Serializable {
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_project")
   private List<Audit> audits;
-
-  @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  @JsonManagedReference("methodology_evaluations_project")
-  private List<MethodologyEvaluation> methodologyEvaluations;
 
   /**
    * list of methodology evaluations associated with the project.

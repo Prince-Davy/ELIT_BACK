@@ -19,7 +19,7 @@ import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
 import com.elit.outildedecision.exception.ResponseNotFoundException;
-import com.elit.outildedecision.service.AttachmentService;;
+import com.elit.outildedecision.service.AttachmentService;
 import com.elit.outildedecision.service.ExecutionPlanService;
 import com.elit.outildedecision.service.FileSystemService;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;

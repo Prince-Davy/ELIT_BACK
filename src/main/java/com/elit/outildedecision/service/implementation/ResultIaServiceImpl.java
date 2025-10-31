@@ -43,9 +43,6 @@ public class ResultIaServiceImpl implements ResultIaService {
   private final AiAnswerRepository aiAnswerRepository;
   private final AiPredictionApiClientService aiPredictionApiClientService;
 
-  @Value("${iaApi.value-url}")
-  private String urlApiAI;
-
   @Value("${ia.prediction.service.endpoint}")
   private String iaPredictionServiceEndpoint;
 

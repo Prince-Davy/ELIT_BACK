@@ -81,7 +81,7 @@ public class AuditMapper {
       weightedScore = answerValue * weight;
       isAnswered = true;
       if (maxPossibleScore > 0) {
-        scorePercentage = (weightedScore.doubleValue() / maxPossibleScore) * 100.0;
+        scorePercentage = weightedScore.doubleValue() / maxPossibleScore * 100.0;
       }
     } else {
       isAnswered = false;

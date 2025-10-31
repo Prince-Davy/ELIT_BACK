@@ -3,7 +3,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.exception.AttachmentNotFoundException;
-import com.elit.outildedecision.exception.FileCouldNotBeSaved;;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
