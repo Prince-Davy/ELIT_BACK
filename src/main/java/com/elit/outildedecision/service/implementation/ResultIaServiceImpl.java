@@ -173,7 +173,7 @@ public class ResultIaServiceImpl implements ResultIaService {
    * @throws ResponseNotFoundException if analyse AI result not found
    */
   @Override
-  public ResponseEntity<String> deleteResultAnalysisAIByProjectId(long projectId) throws ResponseNotFoundException {
+  public ResponseEntity<String> deleteResultAnalysisAIByProjectId(final long projectId) throws ResponseNotFoundException {
     Project project = projectRepository.findById(projectId)
       .orElseThrow(() -> new ResponseNotFoundException("Project not found for ID: " + projectId));
     ResultAi resultAi = resultIaRepository.findByProject(project)

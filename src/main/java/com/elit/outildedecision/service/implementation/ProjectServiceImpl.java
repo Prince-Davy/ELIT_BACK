@@ -1,7 +1,6 @@
 package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
-import com.elit.outildedecision.entity.FeedbackIa;
 import com.elit.outildedecision.entity.ResultAi;
 import com.elit.outildedecision.entity.Attachment;
 import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
@@ -11,8 +10,23 @@ import com.elit.outildedecision.entity.ProjectPropertyKey;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.entity.ExecutionPlanVote;
-import com.elit.outildedecision.exception.*;
-import com.elit.outildedecision.service.*;
+import com.elit.outildedecision.exception.FileCouldNotBeSaved;
+import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
+import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.UserNotFoundException;
+import com.elit.outildedecision.exception.AttachmentNotFoundException;
+import com.elit.outildedecision.exception.ProjectOwnerException;
+import com.elit.outildedecision.exception.ResponseNotFoundException;
+import com.elit.outildedecision.service.AttachmentService;;
+import com.elit.outildedecision.service.ExecutionPlanService;
+import com.elit.outildedecision.service.FileSystemService;
+import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
+import com.elit.outildedecision.service.PermissionService;
+import com.elit.outildedecision.service.ProjectService;
+import com.elit.outildedecision.service.FeedbackIaService;
+import com.elit.outildedecision.service.ResultIaService;
 import com.elit.outildedecision.util.FormProgressStatus;
 import com.elit.outildedecision.util.ProjectAnalysisState;
 import com.elit.outildedecision.util.ProjectConfirmationState;
@@ -29,7 +43,6 @@ import com.elit.outildedecision.model.ProjectResponseModel;
 import com.elit.outildedecision.model.ResponsePageProject;
 import com.elit.outildedecision.model.ResultAiModel;
 import com.elit.outildedecision.model.TriModel;
-import com.elit.outildedecision.repository.FeedbackIaRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import com.elit.outildedecision.repository.VoteRepository;
 import com.elit.outildedecision.repository.BrainstormingRepository;
@@ -42,7 +55,6 @@ import com.elit.outildedecision.repository.ExecutionPlanRepository;
 import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.repository.ExecutionPlanVoteRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -97,21 +109,20 @@ public class ProjectServiceImpl implements ProjectService {
   private final ExecutionPlanService executionPlanService;
 
   /**
-   * The multiCriteriaService for managing the multi criteria analysis of the
-   * projects.
+   * The multiCriteriaService for managing the multi criteria analysis of the projects.
    */
   private final MultiCriteriaAnalysisService multiCriteriaService;
 
   /**
-   * The feedbackIaRepository for accessing the feedback IA objects in the
+   * The feedbackIaRepository for accessing the feedback IA objects.
    */
   private final PermissionService permissionService;
   /**
-   * The feedbackIaRepository for accessing the feedback IA objects in the
+   * The feedbackIaRepository for accessing the feedback IA objects.
    */
   private final FeedbackIaService feedbackIaService;
   /**
-   * The resultIaService for accessing the result IA objects in the
+   * The resultIaService for accessing the result IA objects.
    */
   private final ResultIaService resultIaService;
 
@@ -192,6 +203,8 @@ public class ProjectServiceImpl implements ProjectService {
    * @param attachmentService                The attachmentService for managing
    *                                         the
    *                                         attachments of the projects.
+   * @param fileSystemService                 The fileSystemService for managing the file
+   *                                          system operations.
    * @param projectUserPermissionRepository  The projectUserPermissionRepository
    *                                         for accessing the project user
    *                                         permission objects in the database.
@@ -222,8 +235,13 @@ public class ProjectServiceImpl implements ProjectService {
    * @param voteRepository                   The voteRepository for accessing
    *                                         the vote objects in the database.
    * @param executionPlanVoteRepo            to access executionPlanVoteRepo
-   * @param aiAnswerRepository               the answerIaRepository for managing
-   *                                         answers of the ia path
+   * @param aiAnswerRepository               the answerIaRepository for managing answers of the ia path.
+   * @param permissionService                The permissionService for managing
+   *                                         the permissions.
+   * @param feedbackIaService                The feedbackIaService for managing
+   *                                         the feedback IA.
+   * @param resultIaService                  The resultIaService for managing the
+   *                                         result IA.
    */
   public ProjectServiceImpl(final ProjectRepository projectRepository, final UserRepository userRepository,
                             final ExecutionPlanService executionPlanService, final AttachmentService attachmentService,

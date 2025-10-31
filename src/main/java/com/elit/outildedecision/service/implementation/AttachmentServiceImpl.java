@@ -276,11 +276,10 @@ public class AttachmentServiceImpl implements AttachmentService {
   /**
    * this method is used to delete attachments of a project.
    * @param project the project whose attachments are to be deleted
-   * @throws ProjectNotFoundException the project not found exception if the project does not exist
    * @throws AttachmentNotFoundException the attachment not found exception if no attachments are found for the project
    */
   @Override
-  public void deleteAttachments(Project project) throws ProjectNotFoundException, AttachmentNotFoundException {
+  public void deleteAttachments(final Project project) throws AttachmentNotFoundException {
     List<Attachment> attachments = attachmentRepository.findAllByProject(project);
 
     if (attachments.isEmpty()) {
