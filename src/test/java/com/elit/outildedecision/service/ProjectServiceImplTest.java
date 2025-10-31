@@ -8,13 +8,7 @@ import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
-import com.elit.outildedecision.exception.FileCouldNotBeSaved;
-import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.ProjectOwnerException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
-import com.elit.outildedecision.exception.UserNotFoundException;
+import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.AttachmentResponseModel;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
@@ -81,6 +75,14 @@ class ProjectServiceImplTest {
   MultiCriteriaAnalysisService multiCriteriaService;
   @Mock
   ProjectUserPermissionRepository projectUserPermissionRepository;
+  @Mock
+  PermissionService permissionService;
+  @Mock
+  ResultIaService resultIaService;
+  @Mock
+  FeedbackIaService feedbackIaService;
+  @Mock
+  FileSystemService fileSystemService;
   User user;
   Project projectToSave;
   ProjectUserPermission projectUserPermission;
@@ -483,7 +485,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void deleteProject() throws ProjectNotFoundException {
+  void deleteProject() throws ProjectNotFoundException, AttachmentNotFoundException, IOException, ResponseNotFoundException {
     Long projectId = 1L;
     Project projectToDelete = new Project();
     List<ProjectUserPermission> projectUserPermissionList = new ArrayList<>();
@@ -495,9 +497,6 @@ class ProjectServiceImplTest {
     List<MultiCriteriaAnalysis> multiCriteriaAnalysisList = new ArrayList<>();
     multiCriteriaAnalysisList.add(multiCriteriaAnalysis);
     projectToDelete.setMultiCriteriaAnalysisList(multiCriteriaAnalysisList);
-    List<FeedbackIa> feedbacksOfProject = new ArrayList<>();
-    when(feedbackIaRepository.findByProject_ProjectId(projectId)).thenReturn(feedbacksOfProject);
-    when(resultIaRepository.findByProject(projectToDelete)).thenReturn(Optional.empty());
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectToDelete));
     Assertions.assertEquals(ResponseEntity.ok().body("Le projet a été bien supprimé"), projectServiceImpl.deleteProject(projectId));
   }
@@ -508,6 +507,6 @@ class ProjectServiceImplTest {
     Long projectId = 1L;
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
     ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.deleteProject(projectId));
-    Assertions.assertEquals("Ce project n'existe pas !", exception.getMessage());
+    Assertions.assertEquals("Le projet n'existe pas.", exception.getMessage());
   }
 }

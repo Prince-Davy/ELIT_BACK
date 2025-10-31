@@ -150,10 +150,15 @@ public class AuditController {
     @ApiResponse(responseCode = "404", description = "Audit not found"),
     @ApiResponse(responseCode = "403", description = "Access denied")
   })
-  public ResponseEntity<AuditScoreDTO> calculateScoreOfTheAudit(@PathVariable final Long auditId) throws AuditNotFoundException {
-    AuditScoreDTO auditScoreDTO = this.auditService.calculateScoringOfAudit(auditId);
-    return ResponseEntity.ok(auditScoreDTO);
+  public ResponseEntity<AuditScoreDTO> calculateScoreOfTheAudit(@PathVariable final Long auditId) {
+    try {
+      AuditScoreDTO auditScoreDTO = this.auditService.calculateScoringOfAudit(auditId);
+      return ResponseEntity.ok(auditScoreDTO);
+    } catch (AuditNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
+
 
   /**
    * find the Audit score.
@@ -169,8 +174,11 @@ public class AuditController {
     @ApiResponse(responseCode = "403", description = "Access denied")
   })
   public ResponseEntity<AuditScoreDTO> findAuditScoreByAuditId(@PathVariable final Long auditId) throws EntityNotFoundException {
-    AuditScoreDTO auditScoreDTO = this.auditScoreService.findAuditScoreByAuditId(auditId);
-    return ResponseEntity.ok(auditScoreDTO);
+    try {
+      AuditScoreDTO auditScoreDTO = this.auditScoreService.findAuditScoreByAuditId(auditId);
+      return ResponseEntity.ok(auditScoreDTO);
+    } catch (EntityNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
-
 }

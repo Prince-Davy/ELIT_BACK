@@ -2,11 +2,13 @@
 package com.elit.outildedecision.service;
 
 import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.exception.AttachmentNotFoundException;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
+import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.util.FormProgressStatus;
@@ -73,7 +75,7 @@ public interface ProjectService {
      * @throws IOException              if an I/O error occurs while deleting the
      *                                  project data
      */
-    ResponseEntity<String> deleteProject(Long id) throws ProjectNotFoundException, IOException;
+    ResponseEntity<String> deleteProject(Long id) throws ProjectNotFoundException, IOException, AttachmentNotFoundException, ResponseNotFoundException;
 
     /**
      * Retrieves a list of projects for the specified user that match the specified

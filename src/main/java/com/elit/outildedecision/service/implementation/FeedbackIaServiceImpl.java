@@ -12,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +26,6 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
   public static final String FEEDBACK_NOT_FOUND = "Ce Feedback n'existe pas !";
   private final FeedbackIaRepository feedbackIaRepository;
   private final ProjectRepository projectRepository;
-  @PersistenceContext
-  private EntityManager entityManager;
 
   /**
    * @param feedbackIaRepository feedbackIaRepository

@@ -2,6 +2,7 @@ package com.elit.outildedecision.ai.methodology.evaluation.entity;
 
 import com.elit.outildedecision.ai.methodology.evaluation.converter.PredictionConverter;
 import com.elit.outildedecision.entity.Project;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -65,6 +66,7 @@ public class MethodologyEvaluation {
    */
   @ManyToOne
   @JoinColumn(nullable = false)
+  @JsonBackReference("methodology_evaluations_project")
   private Project project;
 
   /**

@@ -31,7 +31,7 @@ public enum MethodType {
   /**
    * Scaled Agility methodology.
    */
-  SCALED_AGILITY("SCALED_AGILITY", Pattern.compile("scaledAgility", Pattern.CASE_INSENSITIVE));
+  SCALED_AGILITY("SCALED_AGILITY", Pattern.compile("scaled_agility", Pattern.CASE_INSENSITIVE));
 
 
   private final String methodTypeName;

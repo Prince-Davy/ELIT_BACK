@@ -87,7 +87,7 @@ class SuperAdminControllerTests {
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.status").value("NOT_FOUND"))
-      .andExpect(jsonPath("$.message").value("Cet utilisateur n'existe pas!"));;
+      .andExpect(jsonPath("$.message").value("Cet utilisateur n'existe pas!"));
   }
 
   @Test

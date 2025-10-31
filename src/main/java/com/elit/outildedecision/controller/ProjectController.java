@@ -2,11 +2,13 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.exception.AttachmentNotFoundException;
 import com.elit.outildedecision.exception.FileCouldNotBeSaved;
+import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ProjectOwnerException;
+import com.elit.outildedecision.exception.ResponseNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.model.ContributerModel;
@@ -182,7 +184,7 @@ public class ProjectController {
     @DeleteMapping("/user/projects/{id}")
     @PreAuthorize("hasAnyAuthority('USER') and isProjectOwner(#id)")
     public ResponseEntity<String> deleteProject(@PathVariable final Long id)
-            throws ProjectNotFoundException, IOException {
+      throws ProjectNotFoundException, IOException, AttachmentNotFoundException, ResponseNotFoundException {
         return projectService.deleteProject(id);
     }
 
@@ -272,7 +274,7 @@ public class ProjectController {
     @DeleteMapping("/admin/projects/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<String> deleteProjectAdmin(@PathVariable final Long id)
-            throws ProjectNotFoundException, IOException {
+      throws ProjectNotFoundException, IOException, AttachmentNotFoundException, ResponseNotFoundException {
         return projectService.deleteProject(id);
     }
 }

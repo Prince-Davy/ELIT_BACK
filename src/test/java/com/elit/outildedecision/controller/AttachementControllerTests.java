@@ -7,7 +7,7 @@ import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.repository.AttachmentRepository;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;
-import com.elit.outildedecision.service.implementation.AttachmentServiceImpl2;
+import com.elit.outildedecision.service.implementation.AttachmentServiceImpl;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.elit.outildedecision.util.ProjectPermession;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,7 +54,7 @@ class AttachementControllerTests {
   @Autowired
   private MockMvc mockMvc;
   @MockBean
-  private AttachmentServiceImpl2 attachmentService;
+  private AttachmentServiceImpl attachmentService;
 
   @MockBean
   private UserServiceImpl userService;

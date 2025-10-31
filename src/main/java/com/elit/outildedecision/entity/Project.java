@@ -1,5 +1,6 @@
 package com.elit.outildedecision.entity;
 
+import com.elit.outildedecision.ai.methodology.evaluation.entity.MethodologyEvaluation;
 import com.elit.outildedecision.config.View;
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.util.FormProgressStatus;
@@ -91,6 +92,13 @@ public class Project implements Serializable {
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_project")
   private List<Audit> audits;
+
+  /**
+   * list of methodology evaluations associated with the project.
+   */
+  @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JsonManagedReference("methodology_evaluations_project")
+  private List<MethodologyEvaluation> methodologyEvaluations;
 
   /**
    * get the list of attachments of the project.

@@ -43,9 +43,6 @@ public class ResultIaServiceImpl implements ResultIaService {
   private final AiAnswerRepository aiAnswerRepository;
   private final AiPredictionApiClientService aiPredictionApiClientService;
 
-  @Value("${iaApi.value-url}")
-  private String urlApiAI;
-
   @Value("${ia.prediction.service.endpoint}")
   private String iaPredictionServiceEndpoint;
 
@@ -163,6 +160,22 @@ public class ResultIaServiceImpl implements ResultIaService {
     if (result.isPresent()) {
       resultIaRepository.deleteById(resultIaId);
     }
+    return ResponseEntity.ok().body("Le résultat de l'analyse IA pour ce projet a bien été supprimé");
+  }
+
+  /**
+   * Delete result of analysis AI by project id.
+   * @param projectId project id
+   * @return ResponseEntity<String>
+   * @throws ResponseNotFoundException if analyse AI result not found
+   */
+  @Override
+  public ResponseEntity<String> deleteResultAnalysisAIByProjectId(final long projectId) throws ResponseNotFoundException {
+    Project project = projectRepository.findById(projectId)
+      .orElseThrow(() -> new ResponseNotFoundException("Project not found for ID: " + projectId));
+    ResultAi resultAi = resultIaRepository.findByProject(project)
+      .orElseThrow(() -> new ResponseNotFoundException("Analyse AI result not found for project ID: " + projectId));
+    resultIaRepository.delete(resultAi);
     return ResponseEntity.ok().body("Le résultat de l'analyse IA pour ce projet a bien été supprimé");
   }
 

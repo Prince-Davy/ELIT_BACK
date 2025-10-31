@@ -36,8 +36,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
@@ -75,7 +73,6 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
    * The value of a half.
    */
   private static final float HALF = 0.5f;
-  private static final Logger LOGGER = LoggerFactory.getLogger(MultiCriteriaServiceImpl.class);
   /**
    * Repository for accessing multi-criteria analysis data.
    */
