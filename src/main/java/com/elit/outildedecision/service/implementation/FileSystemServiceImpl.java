@@ -10,7 +10,7 @@ import java.io.IOException;
  * Implementation of file system operations used by the application.
  */
 @Service
-public final class FileSystemServiceImpl implements FileSystemService {
+public class FileSystemServiceImpl implements FileSystemService {
     /**
      * Deletes a project folder and its content. Wraps IOExceptions into a
      * RuntimeException to avoid changing the service signature.

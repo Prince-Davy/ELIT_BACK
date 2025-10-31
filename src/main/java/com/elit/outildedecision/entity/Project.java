@@ -99,6 +99,13 @@ public class Project implements Serializable {
   private List<MethodologyEvaluation> methodologyEvaluations;
 
   /**
+   * list of methodology evaluations associated with the project.
+   */
+  @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JsonManagedReference("methodology_evaluations_project")
+  private List<MethodologyEvaluation> methodologyEvaluations;
+
+  /**
    * get the list of attachments of the project.
    * @return list of attachments
    */
