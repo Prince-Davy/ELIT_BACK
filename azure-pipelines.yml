@@ -15,7 +15,7 @@ resources:
       type: git
       endpoint: SogetiLabsFranceRepository
       name: LGE_Templates/LGE_Templates
-      ref: wip-experimental-helm-vaultPath
+      ref: wip-experimental-helm-VaultPath
 
 pool: labs-pool
 
