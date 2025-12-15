@@ -2,7 +2,7 @@ package com.elit.outildedecision.audit.service;
 
 import com.elit.outildedecision.audit.model.AuditScoreDTO;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 
 /**
  * Service interface for managing audit scores.
