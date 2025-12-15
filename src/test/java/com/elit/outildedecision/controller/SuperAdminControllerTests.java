@@ -5,6 +5,7 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.UserNotFoundException;
 import com.elit.outildedecision.service.SuperAdminService;
 import com.elit.outildedecision.util.ModelSamples;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,13 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,6 +39,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SuperAdminControllerTests {
   @Autowired
   private MockMvc mockMvc;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @MockBean
   private SuperAdminService superAdminService;
@@ -119,7 +126,7 @@ class SuperAdminControllerTests {
     mockMvc.perform(get("/projects/notConfirmed/"+ pageNumber))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(content().json(ModelSamples.toJson(page)));
+      .andExpect(content().json(objectMapper.writeValueAsString(page)));
   }
 
   @Test
@@ -130,7 +137,7 @@ class SuperAdminControllerTests {
     mockMvc.perform(get("/projects/notConfirmed/"+ pageNumber +"/orderByDate").param("order", notConfirmedProjectDateOrderType))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(content().json(ModelSamples.toJson(page)));
+      .andExpect(content().json(objectMapper.writeValueAsString(page)));
   }
 
   @Test
@@ -152,7 +159,7 @@ class SuperAdminControllerTests {
     mockMvc.perform(get("/projects/notConfirmed/"+pageNumber+"/search").param("keyword", searchKeyWord))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(content().json(ModelSamples.toJson(page)));
+      .andExpect(content().json(objectMapper.writeValueAsString(page)));
   }
 
 }
