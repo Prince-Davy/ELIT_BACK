@@ -4,130 +4,183 @@ package com.elit.outildedecision.security;
 import com.elit.outildedecision.config.JwtProperties;
 import com.elit.outildedecision.filters.JwtAuthenticationFilter;
 import com.elit.outildedecision.filters.JwtAuthorizationFilter;
+import com.elit.outildedecision.service.UserService;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
-/**
- * Configuration class for Spring Security.
- */
+
 @Configuration
 @EnableWebSecurity
-public class SpringConfig extends WebSecurityConfigurerAdapter {
-  /**
-   * The custom user details service used for authentication.
-   */
+@EnableMethodSecurity(prePostEnabled = true)
+public class SpringConfig {
+
   private final UserServiceImpl customUserDetailsService;
-  /**
-   * The JWT properties.
-   */
-  @Autowired
-  private JwtProperties jwtProperties;
-  /**
-   * PasswordEncoder instance to encode and decode passwords.
-   */
   private final PasswordEncoder passwordEncoder;
-  /**
-   * The value of Backend url.
-   */
+  private final JwtProperties jwtProperties;
+
   @Value("${frontend.value-url}")
   private String frontEndUrl;
 
+
   /**
-   * Constructor for SpringConfig.
+   * Construit la configuration Spring Security de l'application.
    *
-   * @param customUserDetailsService the custom user details service used for authentication.
-   * @param passwordEncoder the encoder password
+   * @param customUserDetailsService le {@link UserServiceImpl} utilisé comme UserDetailsService applicatif.
+   * @param passwordEncoder l'encodeur de mots de passe.
+   * @param jwtProperties les propriétés de configuration JWT.
    */
-  public SpringConfig(final UserServiceImpl customUserDetailsService, final PasswordEncoder passwordEncoder) {
+  public SpringConfig(
+    final UserServiceImpl customUserDetailsService,
+    final PasswordEncoder passwordEncoder,
+    final JwtProperties jwtProperties) {
+
     this.customUserDetailsService = customUserDetailsService;
     this.passwordEncoder = passwordEncoder;
+    this.jwtProperties = jwtProperties;
   }
 
   /**
-   * Configures the authentication manager with the custom user details service.
-   * @param auth the AuthenticationManagerBuilder to configure.
-   * @throws Exception if there is an error configuring the authentication manager.
-   */
-  @Override
-  protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(customUserDetailsService)
-      .passwordEncoder(passwordEncoder);
-  }
-
-  /**
-   * Configures the HttpSecurity for the application.
-   * @param http the HttpSecurity object to configure.
-   * @throws Exception if there is an error configuring the HttpSecurity object.
-   */
-  @Override
-  protected void configure(final HttpSecurity http) throws Exception {
-    http.csrf().disable();
-    // enable frames for H2
-    http.headers().frameOptions().disable();
-    http.cors().configurationSource(corsConfigurationSource());
-    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    http.authorizeRequests()
-      .antMatchers("/", "/login", "/refreshToken", "/swagger-ui.html", "/v3/api-docs", "/v3/api-docs.yaml").permitAll()
-      .anyRequest().permitAll();
-    JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProperties, authenticationManagerBean(), customUserDetailsService);
-    jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
-    http.addFilter(jwtAuthenticationFilter);
-    http.addFilterBefore(new JwtAuthorizationFilter(jwtProperties, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
-  }
-
-  /**
-   * Overrides the default authentication manager bean to allow for dependency injection.
-   * @return the AuthenticationManager bean.
-   * @throws Exception if there is an error creating the AuthenticationManager.
+   * Expose un {@link MethodSecurityExpressionHandler} personnalisé pour
+   * permettre l'utilisation d'expressions métier dans les annotations
+   * de sécurité method-level (ex: {@code @PreAuthorize}).
+   *
+   * @param userService le service métier injecté dans la root d'expressions
+   * @return un {@link MethodSecurityExpressionHandler} basé sur
+   *         {@link CustomMethodSecurityExpressionHandler}
    */
   @Bean
-  @Override
-  public AuthenticationManager authenticationManagerBean() throws Exception {
-    return super.authenticationManagerBean();
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+    final UserService userService) {
+    return new CustomMethodSecurityExpressionHandler(userService);
   }
 
   /**
-   * Creates and configures the CORS configuration for the application.
-   * @return the CorsConfigurationSource object with the configured CORS settings.
+   * Provider d’authentification DAO configuré.
+   *
+   * @return un {@link AuthenticationProvider} prêt à l'emploi
+   */
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    final DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(customUserDetailsService);
+    provider.setPasswordEncoder(passwordEncoder);
+    return provider;
+  }
+
+  /**
+   * Expose l'{@link AuthenticationManager} (remplace {@code authenticationManagerBean()}).
+   * Utilise la configuration globale basée sur les beans {@link AuthenticationProvider}
+   * déclarés dans le contexte Spring.
+   *
+   * @param config la configuration d'authentification globale fournie par Spring
+   * @return l'{@link AuthenticationManager} dérivé de la configuration
+   * @throws Exception en cas d'erreur lors de la résolution du manager
+   */
+  @Bean
+  public AuthenticationManager authenticationManager(
+    final AuthenticationConfiguration config) throws Exception {
+
+    return config.getAuthenticationManager();
+  }
+
+  /**
+   * Chaîne de filtres de sécurité HTTP (stateless JWT).
+   *
+   * @param http l'objet de configuration HTTP Security
+   * @param authenticationManager le gestionnaire d'authentification à utiliser
+   * @return la {@link SecurityFilterChain} construite
+   * @throws Exception en cas de problème de configuration
+   */
+  @Bean
+  public SecurityFilterChain securityFilterChain(
+    final org.springframework.security.config.annotation.web.builders.HttpSecurity http,
+    final AuthenticationManager authenticationManager) throws Exception {
+
+    // Filtre d’authentification JWT (login)
+    final JwtAuthenticationFilter jwtAuthenticationFilter =
+      new JwtAuthenticationFilter(jwtProperties, authenticationManager, customUserDetailsService);
+    jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(
+      new AntPathRequestMatcher("/login", "POST")
+    );
+
+    http
+      // CSRF désactivé. Pour cibler seulement quelques endpoints :
+      // .csrf(csrf -> csrf.ignoringRequestMatchers(...))
+      .csrf(csrf -> csrf.disable())
+
+      // Autoriser les frames (H2 console)
+      .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+
+      // CORS
+      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+      // Stateless (JWT)
+      .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+      // Autorisations : requestMatchers() remplace antMatchers() en Boot 3
+      .authorizeHttpRequests(auth -> auth
+        // H2 console (optionnel)
+        .requestMatchers("/h2-console/**").permitAll()
+        // Swagger (springdoc 2.x avec Boot 3)
+        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+        // Endpoints publics
+        .requestMatchers("/", "/login", "/refreshToken").permitAll()
+        // Le reste
+        .anyRequest().permitAll()
+      )
+
+      // Brancher le provider d'authentification
+      .authenticationProvider(authenticationProvider())
+
+      // Filtres :
+      // - Filtre d’authentification (login JWT)
+      .addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+      // - Filtre d’autorisation (vérification du token)
+      .addFilterBefore(new JwtAuthorizationFilter(jwtProperties, customUserDetailsService),
+        UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+  }
+
+  /**
+   * Crée et configure la source CORS de l'application.
+   *
+   * @return la {@link CorsConfigurationSource} contenant la configuration CORS
    */
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOriginPatterns(List.of(frontEndUrl, "*"));
-    configuration.setAllowedMethods(
-      List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-    // setAllowCredentials(true) is important, otherwise
-    // The value of the 'Access-Control-Allow-Origin' header in the response must
-    // not be the wildcard '*' when the request's credentials mode is 'include'.
+    configuration.setAllowedMethods(List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     configuration.setAllowCredentials(true);
-    // setAllowedHeaders is important! Without it, OPTIONS preflight request
-    // will fail with 403 Invalid CORS request
-    configuration.setAllowedHeaders(
-      List.of(
-        "Authorization",
-        "Content-Type",
-        "X-Requested-With",
-        "accept",
-        "Origin",
-        "Access-Control-Request-Method",
-        "Access-Control-Request-Headers",
-        "Access-Control-Allow-Origin"));
+    configuration.setAllowedHeaders(List.of(
+      "Authorization",
+      "Content-Type",
+      "X-Requested-With",
+      "accept",
+      "Origin",
+      "Access-Control-Request-Method",
+      "Access-Control-Request-Headers",
+      "Access-Control-Allow-Origin"
+    ));
     final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;

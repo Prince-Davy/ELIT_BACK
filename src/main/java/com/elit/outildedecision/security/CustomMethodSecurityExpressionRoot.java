@@ -14,38 +14,38 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * CustomMethodSecurityExpressionRoot is an implementation of Spring Security's MethodSecurityExpressionOperations
- * interface that provides custom security expressions for checking project ownership and contributor permissions.
+ * Root d'expressions personnalisées utilisée par Spring Security pour évaluer
+ * {@code @PreAuthorize}/{@code @PostAuthorize} dans les services/contrôleurs.
+ * <p>
+ * Cette implémentation expose des méthodes SpEL comme
+ * {@code isProjectOwner(#projectId)}, {@code isContributer(#projectId)} ou
+ * {@code isObserver(#projectId)}.
+ * </p>
+ *
+ * <h2>Extension</h2>
+ * Cette classe n'est pas conçue pour être étendue; elle est déclarée {@code final}
+ * afin de satisfaire la règle Checkstyle {@code DesignForExtension}.
  */
-public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
-  /**
-   * The object that was the filter object being processed when the method was invoked.
-   */
+public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot
+  implements MethodSecurityExpressionOperations {
+
   private Object filterObject;
-
-  /**
-   * The object that the secured method returned (or null if void).
-   */
   private Object returnObject;
-
-  /**
-   * The object that represents the class or instance being invoked.
-   */
   private Object target;
 
-  /**
-   * The service used to retrieve information about the user.
-   */
   private UserService userService;
+
+
   /**
-   * Constructs a new CustomMethodSecurityExpressionRoot instance with the given authentication object.
+   * Construit une root d'expressions custom basée sur l'authentication courante.
    *
-   * @param authentication the authentication object to use
+   * @param authentication le contexte d'authentification Spring Security
    */
   public CustomMethodSecurityExpressionRoot(final Authentication authentication) {
     super(authentication);
   }
+
 
   /**
    * Checks if the authenticated user is the owner of the project with the given ID.
@@ -61,11 +61,9 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
       user.getUserProjectPermissions().stream()
         .filter(p -> p.getProject().getProjectId().equals(projectId))
         .forEach(p -> permissions.add(p.getPermission()));
-
     } catch (Exception e) {
       return false;
     }
-
     return permissions.contains(ProjectPermession.CDP.name());
   }
 
@@ -89,7 +87,6 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
       return false;
     }
   }
-
 
   /**
    * Checks if the authenticated user has contributor permissions for the project with the given ID.
@@ -132,6 +129,7 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     }
     return permissions.contains(ProjectPermession.OBSERVER.toString());
   }
+
   /**
    * Returns the object that was the filter object being processed when the method was invoked.
    *
