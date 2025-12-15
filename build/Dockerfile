@@ -1,17 +1,18 @@
-FROM maven:3.8.6-jdk-11
+FROM maven:3.9.9-eclipse-temurin-17
 
 LABEL description="This image is used for quality build"
 
-# Install System dependencies
-RUN apt-get update -qq && apt-get install -y \
-locales \
-python3 \
-python3-pip \
-bc
-RUN apt-get clean
-# Install anybadge for coverage
-# RUN pip3 install --upgrade pip
-RUN pip3 install anybadge
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends bc \
+      python3-pip python3-venv pipx && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install anybadge via pipx (dans un venv dédié)
+RUN pipx install anybadge
+
+# Assurer que le binaire pipx (~/.local/bin) est dans le PATH
+ENV PATH="/root/.local/bin:${PATH}"
+
 
 RUN mkdir -p /var/workspace
 WORKDIR /var/workspace

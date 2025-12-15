@@ -7,7 +7,6 @@ trigger:
       - develop
       - devops
       - main
-      - recette
       - release/*
 
 resources:
@@ -31,29 +30,27 @@ variables:
     value: SogetiLabsFranceRegistry
   - name: dockerfilePath
     value: $(Build.SourcesDirectory)/Dockerfile
+  - name: kubernetesNamespace
+    value: "lge-elit"
   - name: kubernetesNamespaceInteg
     value: "lge-elit"
-  - name: kubernetesNamespaceTest
-    value: "lge-elit-recette"
-  - name: kubernetesNamespace
-    value: "lge-elit-recette"
-  - template: templates-general/variables.yml@templates
-  - name: deployOnTestNamespace
-    value: $[eq(variables['Build.SourceBranchName'], 'recette')]
-    # Include specific variables of Quality and Security
+  # Include specific variables of Quality and Security
   - name: SKIP_DOXYGEN
     value: false
   - name: SKIP_QUALITY
     value: false
   - name: SKIP_SECURITY
     value: false
+  # Include template variables
+  - template: templates-general/variables.yml@templates
+  - group: elit_back_library
 
 extends:
   template: templates-general/azure-general-java-tpl.yml@templates
   parameters:
-    DEPLOY_INTEG: false
+    DEPLOY_INTEG: true
     DEPLOY_PROD: false
-    DEPLOY_TEST: true
+    DEPLOY_TEST: false
     NO_DOXYGEN_FAIL: true
     NO_QUALITY_FAIL: true
     NO_SECURITY_FAIL: true
