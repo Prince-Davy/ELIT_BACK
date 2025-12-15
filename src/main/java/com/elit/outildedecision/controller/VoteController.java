@@ -63,7 +63,7 @@ public class VoteController {
    * @return ResponseEntity<String>
    * @throws VoteAlreadyExistException when the vote already exist in database for the same user and predictibility analysis id combination.
    */
-  @PostMapping("/{projectId}/vote")
+  @PostMapping(path = {"/{projectId}/vote", "/{projectId}/vote/"})
   @PreAuthorize("isContributer(#projectId)")
   public ResponseEntity<String> createVote(@PathVariable final Long projectId, @Valid @RequestBody final VoteModelRequest voteModelRequest)
     throws VoteAlreadyExistException, ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
