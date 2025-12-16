@@ -143,7 +143,7 @@ public class SpringConfig {
         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
         // Endpoints publics
         .requestMatchers("/", "/login", "/refreshToken").permitAll()
-        // Le reste
+        // Code herité, recommandé : .anyRequest().authenticated());
         .anyRequest().permitAll()
       )
 

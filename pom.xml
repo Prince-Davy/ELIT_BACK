@@ -75,6 +75,7 @@
 
 
     <dependency>
+      <!-- Legacy Check if this dépendancy is mandatory, Recommandation utilisation de springBoot -->
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <version>6.0.0</version> <!-- ou la version gérée par ton BOM -->
