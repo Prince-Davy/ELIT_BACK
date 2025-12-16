@@ -7,7 +7,7 @@ import com.elit.outildedecision.audit.repository.AuditScoreRepository;
 import com.elit.outildedecision.audit.service.AuditScoreService;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 
 /**
  * Implementation of the {@link AuditScoreService} interface.

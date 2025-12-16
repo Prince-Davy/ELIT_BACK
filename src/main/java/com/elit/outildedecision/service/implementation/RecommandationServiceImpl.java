@@ -28,7 +28,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Service de recommandations basé sur les réponses de l'IA et un fichier de mapping JSON.

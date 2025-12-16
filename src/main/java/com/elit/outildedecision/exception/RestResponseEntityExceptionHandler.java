@@ -1,12 +1,13 @@
 package com.elit.outildedecision.exception;
 
-import com.elit.outildedecision.util.MethodType;
 import com.elit.outildedecision.model.ErrorMessage;
+import com.elit.outildedecision.util.MethodType;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
@@ -59,7 +60,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
       final MethodArgumentNotValidException ex,
       final HttpHeaders headers,
-      final HttpStatus status,
+      final HttpStatusCode status,
       final WebRequest request) {
     Map<String, String> details = new HashMap<>();
     BindingResult result = ex.getBindingResult();
@@ -265,7 +266,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   protected ResponseEntity<Object> handleHttpMessageNotReadable(
       final HttpMessageNotReadableException ex,
       final HttpHeaders headers,
-      final HttpStatus status,
+      final HttpStatusCode status,
       final WebRequest request) {
 
     Throwable cause = ex.getCause();

@@ -1,7 +1,6 @@
 package com.elit.outildedecision.service.implementation;
 
 import com.azure.communication.email.EmailClient;
-
 import com.azure.communication.email.models.EmailMessage;
 import com.azure.communication.email.models.EmailSendResult;
 import com.azure.communication.email.models.EmailSendStatus;
@@ -28,12 +27,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Objects;
 
@@ -258,7 +257,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
       String base64Image = "";
       try {
         byte[] bytes = Files.readAllBytes(Path.of(logoFile.getURI()));
-        base64Image = Base64Utils.encodeToString(bytes);
+        base64Image = Base64.getEncoder().encodeToString(bytes);
       } catch (IOException e) {
         throw new RuntimeException("Erreur lors de la lecture du fichier image", e);
       }

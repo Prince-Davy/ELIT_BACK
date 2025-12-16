@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 /**
  * class used to root API calls for vote management. Contains methods to call to create
@@ -63,7 +63,7 @@ public class VoteController {
    * @return ResponseEntity<String>
    * @throws VoteAlreadyExistException when the vote already exist in database for the same user and predictibility analysis id combination.
    */
-  @PostMapping("/{projectId}/vote")
+  @PostMapping(path = {"/{projectId}/vote", "/{projectId}/vote/"})
   @PreAuthorize("isContributer(#projectId)")
   public ResponseEntity<String> createVote(@PathVariable final Long projectId, @Valid @RequestBody final VoteModelRequest voteModelRequest)
     throws VoteAlreadyExistException, ProjectNotFoundException, PredictibilityAnalysisNotFoundException {
