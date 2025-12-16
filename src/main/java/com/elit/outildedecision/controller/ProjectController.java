@@ -172,7 +172,7 @@ public class ProjectController {
     }
 
     /**
-     * update a project.
+     * delete a project.
      *
      * @param id the id of the project
      * @throws ProjectNotFoundException ProjectNotFoundException if the project is
