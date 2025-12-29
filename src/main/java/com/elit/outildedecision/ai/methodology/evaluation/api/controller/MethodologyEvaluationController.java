@@ -3,6 +3,7 @@ package com.elit.outildedecision.ai.methodology.evaluation.api.controller;
 import com.elit.outildedecision.ai.methodology.evaluation.api.dto.MethodologyEvaluationDto;
 import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedModelTypeException;
 import com.elit.outildedecision.ai.methodology.evaluation.service.MethodologyEvaluationService;
+import com.elit.outildedecision.exception.ResponseNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

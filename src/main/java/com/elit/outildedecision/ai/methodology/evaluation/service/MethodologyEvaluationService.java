@@ -6,6 +6,7 @@ import com.elit.outildedecision.ai.methodology.evaluation.api.dto.MethodologyEva
 import com.elit.outildedecision.ai.methodology.evaluation.entity.MethodologyEvaluation;
 import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedModelTypeException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -29,5 +30,5 @@ public interface MethodologyEvaluationService {
    * @return evaluations.
    * @throws UnsupportedModelTypeException exception UnsupportedModelTypeException
    */
-  List<MethodologyEvaluationDto> getMethodologyEvaluations(Long projectId, int maxFactors) throws UnsupportedModelTypeException;
+  List<MethodologyEvaluationDto> getMethodologyEvaluations(Long projectId, int maxFactors) throws UnsupportedModelTypeException, ResponseStatusException;
 }

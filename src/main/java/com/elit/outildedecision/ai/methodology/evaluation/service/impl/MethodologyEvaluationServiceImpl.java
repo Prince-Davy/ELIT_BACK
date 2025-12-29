@@ -2,6 +2,7 @@ package com.elit.outildedecision.ai.methodology.evaluation.service.impl;
 
 import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
 import com.elit.outildedecision.ai.answer.entity.AiAnswer;
+import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
 import com.elit.outildedecision.ai.answer.service.AiAnswerService;
 import com.elit.outildedecision.ai.client.predictrf.dto.PredictRfResponse;
 import com.elit.outildedecision.ai.client.predictrf.mapper.MethodologyEvaluationExternalMapper;
@@ -20,7 +21,9 @@ import com.elit.outildedecision.repository.ProjectRepository;
 import com.elit.outildedecision.repository.ResultIaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
 import java.util.List;
@@ -78,14 +81,15 @@ public class MethodologyEvaluationServiceImpl implements MethodologyEvaluationSe
    * @param maxFactors max number of factors in an evaluation
    */
   @Override
-  public List<MethodologyEvaluationDto> getMethodologyEvaluations(final Long projectId, final int maxFactors) throws UnsupportedModelTypeException {
+  public List<MethodologyEvaluationDto> getMethodologyEvaluations(final Long projectId, final int maxFactors)
+    throws UnsupportedModelTypeException,ResponseStatusException {
     log.info("Service get Methodology evalutations for project ID: {}", projectId);
 
     Project project = projectRepository.findById(projectId)
-      .orElseThrow(() -> new IllegalArgumentException("Project not found with ID: " + projectId));
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with ID: " + projectId));
 
     ResultAi resultAi = resultIaRepository.findByProject(project)
-      .orElseThrow(() -> new IllegalArgumentException("Result AI not found for project id :" + project.getProjectId()));
+      .orElseThrow(() -> new AiAnswerNotFoundException("Result AI not found for project id :" + project.getProjectId()));
 
     if ("Hybride".equals(resultAi.getPredictedMethod())) {
       throw new UnsupportedModelTypeException("Hybride projects do not have this functionality enabled yet");
