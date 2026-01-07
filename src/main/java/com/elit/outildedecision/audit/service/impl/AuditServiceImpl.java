@@ -276,7 +276,7 @@ public class AuditServiceImpl implements AuditService {
   }
 
   /**
-   * Récupère un audit par son identifiant et vérifie qu’il appartient au projet
+   * Récupère un audit par son identifiant et vérifie qu’il appartient au projet.
    *
    * @param projectId l’identifiant unique du projet auquel l’audit est censé appartenir (non null)
    * @param auditId   l’identifiant unique de l’audit à récupérer (non null)
