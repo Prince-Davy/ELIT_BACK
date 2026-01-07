@@ -260,4 +260,33 @@ public class AuditServiceImpl implements AuditService {
       .totalWeight(totalWeight)
       .build();
   }
+
+  @Override
+  public boolean projectExists(final Long projectId) {
+    return projectRepository.existsById(projectId);
+  }
+
+  @Override
+  public AuditResponseModel getAuditByProjectAndAuditId(final Long projectId, final Long auditId)
+      throws ProjectNotFoundException, AuditNotFoundException {
+    // Vérifier que le projet existe
+    if (!projectRepository.existsById(projectId)) {
+      throw new ProjectNotFoundException("This project does not exist: " + projectId);
+    }
+    // Récupérer l'audit et vérifier qu'il appartient bien au projet
+    Audit audit = auditRepository.findById(auditId)
+      .orElseThrow(() -> new AuditNotFoundException("Audit non trouvé: " + auditId));
+    if (!audit.getProject().getProjectId().equals(projectId)) {
+      throw new AuditNotFoundException("Cet audit n'appartient pas au projet: " + projectId);
+    }
+    return mapToResponseModel(audit);
+  }
+
+  @Override
+  public boolean hasAuditForProject(final Long projectId) throws ProjectNotFoundException {
+    if (!projectRepository.existsById(projectId)) {
+      throw new ProjectNotFoundException("This project does not exist: " + projectId);
+    }
+    return auditRepository.countAuditsByProjectId(projectId) > 0;
+  }
 }

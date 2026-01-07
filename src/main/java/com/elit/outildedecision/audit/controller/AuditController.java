@@ -74,6 +74,31 @@ public class AuditController {
   }
 
   /**
+   * Get a specific audit by project ID and audit ID.
+   *
+   * @param projectId the project ID
+   * @param auditId the audit ID
+   * @return the audit response model
+   */
+  @GetMapping("/project/{projectId}/audit/{auditId}")
+  @PreAuthorize("hasAnyAuthority('USER', 'ADMIN') and (isProjectOwner(#projectId) or isContributer(#projectId) or isObserver(#projectId))")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Audit retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Project or Audit not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied")
+  })
+  public ResponseEntity<AuditResponseModel> getAuditByProjectAndAuditId(
+    @PathVariable final Long projectId,
+    @PathVariable final Long auditId) {
+    try {
+      AuditResponseModel audit = auditService.getAuditByProjectAndAuditId(projectId, auditId);
+      return ResponseEntity.ok(audit);
+    } catch (ProjectNotFoundException | AuditNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
    * Get audits by project ID.
    *
    * @param projectId the project ID
@@ -178,6 +203,26 @@ public class AuditController {
       AuditScoreDTO auditScoreDTO = this.auditScoreService.findAuditScoreByAuditId(auditId);
       return ResponseEntity.ok(auditScoreDTO);
     } catch (EntityNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
+   * Vérifie si un projet possède au moins un audit.
+   *
+   * @param projectId l'identifiant du projet
+   * @return true si le projet a au moins un audit, sinon false
+   */
+  @GetMapping("/project/{projectId}/has-audit")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Présence d'audit pour le projet renvoyée"),
+      @ApiResponse(responseCode = "404", description = "Projet non trouvé")
+  })
+  public ResponseEntity<Boolean> hasAuditForProject(@PathVariable final Long projectId) {
+    try {
+      boolean hasAudit = auditService.hasAuditForProject(projectId);
+      return ResponseEntity.ok(hasAudit);
+    } catch (ProjectNotFoundException e) {
       return ResponseEntity.notFound().build();
     }
   }

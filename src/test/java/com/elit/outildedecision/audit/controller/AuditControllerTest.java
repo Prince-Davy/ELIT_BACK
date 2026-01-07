@@ -178,4 +178,72 @@ class AuditControllerTest {
 
   }
 
+  @Test
+  void getAuditByProjectAndAuditId_shouldReturnAudit_whenFound() throws Exception {
+    // Arrange
+    AuditResponseModel expected = new AuditResponseModel();
+    when(auditService.getAuditByProjectAndAuditId(projectId, auditId)).thenReturn(expected);
+
+    // Act
+    ResponseEntity<AuditResponseModel> response = auditController.getAuditByProjectAndAuditId(projectId, auditId);
+
+    // Assert
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    Assertions.assertEquals(expected, response.getBody());
+    verify(auditService, times(1)).getAuditByProjectAndAuditId(projectId, auditId);
+  }
+
+  @Test
+  void getAuditByProjectAndAuditId_shouldReturn404_whenProjectNotFound() throws Exception {
+    // Arrange
+    when(auditService.getAuditByProjectAndAuditId(projectId, auditId))
+      .thenThrow(new ProjectNotFoundException("not found"));
+
+    // Act
+    ResponseEntity<AuditResponseModel> response = auditController.getAuditByProjectAndAuditId(projectId, auditId);
+
+    // Assert
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    verify(auditService, times(1)).getAuditByProjectAndAuditId(projectId, auditId);
+  }
+
+  @Test
+  void getAuditByProjectAndAuditId_shouldReturn404_whenAuditNotFound() throws Exception {
+    // Arrange
+    when(auditService.getAuditByProjectAndAuditId(projectId, auditId))
+      .thenThrow(new AuditNotFoundException("not found"));
+
+    // Act
+    ResponseEntity<AuditResponseModel> response = auditController.getAuditByProjectAndAuditId(projectId, auditId);
+
+    // Assert
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    verify(auditService, times(1)).getAuditByProjectAndAuditId(projectId, auditId);
+  }
+
+  @Test
+  void hasAuditForProject_shouldReturnTrue_whenProjectHasAudit() throws Exception {
+    when(auditService.hasAuditForProject(projectId)).thenReturn(true);
+    ResponseEntity<Boolean> response = auditController.hasAuditForProject(projectId);
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    Assertions.assertTrue(response.getBody());
+    verify(auditService, times(1)).hasAuditForProject(projectId);
+  }
+
+  @Test
+  void hasAuditForProject_shouldReturnFalse_whenProjectHasNoAudit() throws Exception {
+    when(auditService.hasAuditForProject(projectId)).thenReturn(false);
+    ResponseEntity<Boolean> response = auditController.hasAuditForProject(projectId);
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    Assertions.assertFalse(response.getBody());
+    verify(auditService, times(1)).hasAuditForProject(projectId);
+  }
+
+  @Test
+  void hasAuditForProject_shouldReturn404_whenProjectNotFound() throws Exception {
+    when(auditService.hasAuditForProject(projectId)).thenThrow(new ProjectNotFoundException("not found"));
+    ResponseEntity<Boolean> response = auditController.hasAuditForProject(projectId);
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    verify(auditService, times(1)).hasAuditForProject(projectId);
+  }
 }

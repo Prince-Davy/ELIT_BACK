@@ -336,4 +336,85 @@ class AuditServiceImplTest {
       () -> auditService.calculateScoringOfAudit(anyLong()));
 
   }
+
+  @Test
+  void getAuditByProjectAndAuditId_success() throws Exception {
+    // Arrange
+    when(projectRepository.existsById(COMMON_ID)).thenReturn(true);
+    when(auditRepository.findById(COMMON_ID))
+      .thenReturn(Optional.of(audit));
+
+    // Mock du mapper pour chaque question
+    for (Question q : audit.getQuestions()) {
+      when(auditMapper.mapToQuestionResponseModel(q)).thenReturn(
+        QuestionResponseModel.builder()
+          .id(q.getQuestionId())
+          .questionRef(q.getQuestionRef())
+          .category(q.getCategory())
+          .weight(q.getWeight())
+          .auditId(q.getAudit() != null ? q.getAudit().getAuditId() : null)
+          .auditAnswerLabel(q.getAuditAnswerLabel())
+          .auditAnswerValue(q.getAuditAnswerValue())
+          .scoringType(q.getScoringType())
+          .build()
+      );
+    }
+
+    // Act
+    AuditResponseModel response = auditService.getAuditByProjectAndAuditId(COMMON_ID, COMMON_ID);
+
+    // Assert
+    assertNotNull(response);
+    assertEquals(COMMON_ID, response.getAuditId());
+    assertEquals(COMMON_ID, response.getProjectId());
+    verify(projectRepository).existsById(COMMON_ID);
+    verify(auditRepository).findById(COMMON_ID);
   }
+
+  @Test
+  void getAuditByProjectAndAuditId_projectNotFound_throws() {
+    when(projectRepository.existsById(COMMON_ID)).thenReturn(false);
+    assertThrows(ProjectNotFoundException.class,
+      () -> auditService.getAuditByProjectAndAuditId(COMMON_ID, COMMON_ID));
+    verify(projectRepository).existsById(COMMON_ID);
+    verifyNoInteractions(auditRepository);
+  }
+
+  @Test
+  void getAuditByProjectAndAuditId_auditNotFound_throws() {
+    when(projectRepository.existsById(COMMON_ID)).thenReturn(true);
+    when(auditRepository.findById(COMMON_ID)).thenReturn(Optional.empty());
+    assertThrows(AuditNotFoundException.class,
+      () -> auditService.getAuditByProjectAndAuditId(COMMON_ID, COMMON_ID));
+    verify(projectRepository).existsById(COMMON_ID);
+    verify(auditRepository).findById(COMMON_ID);
+  }
+
+  @Test
+  void hasAuditForProject_shouldReturnTrue_whenProjectHasAudit() throws ProjectNotFoundException {
+    when(projectRepository.existsById(COMMON_ID)).thenReturn(true);
+    when(auditRepository.countAuditsByProjectId(COMMON_ID)).thenReturn(2L);
+    boolean result = auditService.hasAuditForProject(COMMON_ID);
+    assertTrue(result);
+    verify(projectRepository).existsById(COMMON_ID);
+    verify(auditRepository).countAuditsByProjectId(COMMON_ID);
+  }
+
+  @Test
+  void hasAuditForProject_shouldReturnFalse_whenProjectHasNoAudit() throws ProjectNotFoundException {
+    when(projectRepository.existsById(COMMON_ID)).thenReturn(true);
+    when(auditRepository.countAuditsByProjectId(COMMON_ID)).thenReturn(0L);
+    boolean result = auditService.hasAuditForProject(COMMON_ID);
+    assertFalse(result);
+    verify(projectRepository).existsById(COMMON_ID);
+    verify(auditRepository).countAuditsByProjectId(COMMON_ID);
+  }
+
+  @Test
+  void hasAuditForProject_shouldThrow_whenProjectNotFound() {
+    when(projectRepository.existsById(COMMON_ID)).thenReturn(false);
+    assertThrows(ProjectNotFoundException.class, () -> auditService.hasAuditForProject(COMMON_ID));
+    verify(projectRepository).existsById(COMMON_ID);
+    verifyNoInteractions(auditRepository);
+  }
+}

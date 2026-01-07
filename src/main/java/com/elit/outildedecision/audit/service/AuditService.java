@@ -66,4 +66,30 @@ public interface AuditService {
    * @return the audit Scoring
    */
   AuditScoreDTO calculateScoringOfAudit(Long auditId) throws AuditNotFoundException;
+
+  /**
+   * Get a specific audit by project ID and audit ID.
+   *
+   * @param projectId the project ID
+   * @param auditId the audit ID
+   * @return the audit response model
+   * @throws ProjectNotFoundException if project not found
+   * @throws AuditNotFoundException if audit not found
+   */
+  AuditResponseModel getAuditByProjectAndAuditId(Long projectId, Long auditId) throws ProjectNotFoundException, AuditNotFoundException;
+
+  /**
+   * Vérifie si un projet existe.
+   * @param projectId l'identifiant du projet
+   * @return true si le projet existe, sinon false
+   */
+  boolean projectExists(Long projectId);
+
+  /**
+   * Vérifie si un projet possède au moins un audit.
+   * @param projectId l'identifiant du projet
+   * @return true si le projet a au moins un audit, sinon false
+   * @throws ProjectNotFoundException si le projet n'existe pas
+   */
+  boolean hasAuditForProject(Long projectId) throws ProjectNotFoundException;
 }
