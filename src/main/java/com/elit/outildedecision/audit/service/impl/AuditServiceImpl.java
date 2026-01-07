@@ -261,11 +261,29 @@ public class AuditServiceImpl implements AuditService {
       .build();
   }
 
+  /**
+   * Vérifie si un projet existe à partir de son identifiant.
+   *
+   * <p>Cette méthode interroge le {@code projectRepository} pour déterminer si un projet
+   * avec l'identifiant fourni est présent en base.</p>
+   *
+   * @param projectId l'identifiant unique du projet (non null)
+   * @return {@code true} si le projet existe ; {@code false} sinon
+   */
   @Override
   public boolean projectExists(final Long projectId) {
     return projectRepository.existsById(projectId);
   }
 
+  /**
+   * Récupère un audit par son identifiant et vérifie qu’il appartient au projet
+   *
+   * @param projectId l’identifiant unique du projet auquel l’audit est censé appartenir (non null)
+   * @param auditId   l’identifiant unique de l’audit à récupérer (non null)
+   * @return le modèle de réponse représentant l’audit demandé
+   * @throws ProjectNotFoundException si le projet n’existe pas
+   * @throws AuditNotFoundException   si l’audit n’existe pas ou n’appartient pas au projet fourni
+   */
   @Override
   public AuditResponseModel getAuditByProjectAndAuditId(final Long projectId, final Long auditId)
       throws ProjectNotFoundException, AuditNotFoundException {
@@ -282,6 +300,15 @@ public class AuditServiceImpl implements AuditService {
     return mapToResponseModel(audit);
   }
 
+
+  /**
+   * Indique si au moins un audit existe pour un projet donné.
+   * Elle retourne {@code true} si le nombre est strictement supérieur à 0.
+   *
+   * @param projectId l’identifiant unique du projet (non null)
+   * @return {@code true} si au moins un audit est associé au projet ; {@code false} sinon
+   * @throws ProjectNotFoundException si le projet n’existe pas
+   */
   @Override
   public boolean hasAuditForProject(final Long projectId) throws ProjectNotFoundException {
     if (!projectRepository.existsById(projectId)) {
