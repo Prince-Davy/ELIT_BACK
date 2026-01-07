@@ -82,7 +82,7 @@ public class MethodologyEvaluationServiceImpl implements MethodologyEvaluationSe
    */
   @Override
   public List<MethodologyEvaluationDto> getMethodologyEvaluations(final Long projectId, final int maxFactors)
-    throws UnsupportedModelTypeException,ResponseStatusException {
+    throws UnsupportedModelTypeException, ResponseStatusException {
     log.info("Service get Methodology evalutations for project ID: {}", projectId);
 
     Project project = projectRepository.findById(projectId)
