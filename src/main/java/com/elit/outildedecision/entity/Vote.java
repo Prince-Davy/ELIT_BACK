@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -51,8 +50,8 @@ public class Vote implements Serializable {
   @JsonBackReference("predictibility_analysis_vote")
   private PredictibilityAnalysis predictibilityAnalysis;
 
-  @OneToOne
-  @JoinColumn(name = "userId", nullable = true)
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "userId")
   // @JsonManagedReference("user_vote")
   private User user;
 
