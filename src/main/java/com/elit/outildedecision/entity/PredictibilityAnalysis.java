@@ -3,6 +3,7 @@ package com.elit.outildedecision.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -75,7 +76,7 @@ public class PredictibilityAnalysis implements Serializable {
   @JsonManagedReference("previsibility_multi")
   private MultiCriteriaAnalysis multiCriteriaAnalysis;
 
-  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(referencedColumnName = "methodologyId", name = "methodology_id")
   private Methodology methodology;
 
