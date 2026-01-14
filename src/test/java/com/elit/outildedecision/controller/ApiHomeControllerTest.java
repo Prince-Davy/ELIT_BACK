@@ -1,11 +1,10 @@
 package com.elit.outildedecision.controller;
 
-import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
+import com.elit.outildedecision.exception.handler.RestResponseEntityExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.web.servlet.MockMvc;

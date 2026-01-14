@@ -4,6 +4,7 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.*;
+import com.elit.outildedecision.exception.handler.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.VoteModelRequest;
 import com.elit.outildedecision.model.VoteModelResponse;
 import com.elit.outildedecision.security.CustomMethodSecurityExpressionRoot;

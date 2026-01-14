@@ -7,7 +7,7 @@ import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
+import com.elit.outildedecision.exception.handler.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.FeedBackIaModel;
 import com.elit.outildedecision.service.FeedbackIaService;
 import com.elit.outildedecision.util.ProjectPermession;

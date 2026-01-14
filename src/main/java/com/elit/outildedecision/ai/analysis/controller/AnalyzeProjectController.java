@@ -2,7 +2,6 @@ package com.elit.outildedecision.ai.analysis.controller;
 
 import com.elit.outildedecision.ai.analysis.service.AnalyzeProjectService;
 import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
-import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedModelTypeException;
 import com.elit.outildedecision.common.dto.SimpleMessageDto;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.ResultAiNotFoundException;
@@ -36,17 +35,11 @@ public class AnalyzeProjectController {
    */
   @PostMapping
   @PreAuthorize("isProjectOwner(#projectId)")
-  public ResponseEntity<SimpleMessageDto> analyse(@PathVariable final long projectId, @RequestBody final AiAnswerDTO aiAnswerDTO) {
+  public ResponseEntity<SimpleMessageDto> analyse(@PathVariable final long projectId, @RequestBody final AiAnswerDTO aiAnswerDTO)
+    throws ResultAiNotFoundException, ProjectNotFoundException, ResultAlreadyExistsException {
     log.info("Received request to analyse project ID {} with AI.", projectId);
 
-    String analysisState;
-    try {
-      analysisState = analyzeProjectService.analyzeProject(aiAnswerDTO, projectId);
-    } catch (UnsupportedModelTypeException e) {
-      return ResponseEntity.ok(new SimpleMessageDto("Project analyzed with AI. No methodology evaluations were completed due to the nature of the project : " + e.getMessage(), HttpStatus.OK.value(), LocalDateTime.now()));
-    } catch (ResultAlreadyExistsException | ProjectNotFoundException | ResultAiNotFoundException e) {
-      return ResponseEntity.badRequest().body(new SimpleMessageDto(e.getMessage(), HttpStatus.BAD_REQUEST.value(), LocalDateTime.now()));
-    }
+    String analysisState = analyzeProjectService.analyzeProject(aiAnswerDTO, projectId);
     return ResponseEntity.ok(new SimpleMessageDto(analysisState, HttpStatus.OK.value(), LocalDateTime.now()));
   }
 }

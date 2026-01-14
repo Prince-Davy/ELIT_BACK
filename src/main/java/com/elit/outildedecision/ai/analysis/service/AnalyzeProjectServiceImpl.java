@@ -37,13 +37,22 @@ public class AnalyzeProjectServiceImpl implements AnalyzeProjectService {
    */
   @Transactional(rollbackFor = {ResultAiNotFoundException.class, ProjectNotFoundException.class, ResultAlreadyExistsException.class})
   @Override
-  public String analyzeProject(final AiAnswerDTO aiAnswerDTO, final long projectId) throws ResultAiNotFoundException, ProjectNotFoundException, ResultAlreadyExistsException, UnsupportedModelTypeException {
+  public String analyzeProject(final AiAnswerDTO aiAnswerDTO, final long projectId) throws ResultAiNotFoundException, ProjectNotFoundException, ResultAlreadyExistsException {
     log.info("Starting AI analysis for project ID: {}", projectId);
     aiAnswerService.saveAnswers(projectId, aiAnswerDTO.getData());
     log.info("AI answers successfully saved for project ID: {}", projectId);
     projectService.updateFormTypeStatus(projectId, FormProgressStatus.IA);
     resultIaService.generateAndSaveResult(projectId, aiAnswerDTO);
-    methodologyEvaluationService.createEvaluation(aiAnswerDTO, projectId);
+
+    // Call methodology evaluation but do NOT fail the whole AI analysis if methodology evaluation
+    // is not supported for the given model (e.g. Hybrid projects). The methodology service will
+    // return 422 if called directly; here we catch that case and continue the AI analysis flow.
+    try {
+      methodologyEvaluationService.createEvaluation(aiAnswerDTO, projectId);
+    } catch (UnsupportedModelTypeException e) {
+      // Log warning but do not rollback the transaction / fail the overall analysis.
+      log.warn("Methodology evaluation not supported for project {}: {}. Continuing AI analysis.", projectId, e.getMessage());
+    }
     log.info("Project successfully analyzed with AI service.");
     return "Project successfully analyzed with AI service.";
   }

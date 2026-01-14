@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 /**
- * This class represents an error message model containing information about an error that occurred during processing.
- * It is used to store and manage data associated with error messages, including the HTTP status and error message.
- * It uses Lombok annotations to generate constructors, getters, and setters, as well as a builder pattern.
+ * Standard error payload returned to clients.
+ * The `status` field contains the HTTP numeric status code (e.g. 404),
+ * the `message` field contains a plain human-readable message (no status prefix).
  */
 @Data
 @AllArgsConstructor
@@ -17,13 +17,23 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class ErrorMessage {
 
-    /**
-     * The HTTP status code associated with the error.
-     */
-    private HttpStatus status;
+  /**
+   * Numeric HTTP status code.
+   */
+  private int status;
 
-    /**
-     * A human-readable description of the error.
-     */
-    private String message;
+  /**
+   * Human readable message.
+   */
+  private String message;
+
+  /**
+   * Constructor with HttpStatus.
+   * @param status The HTTP status code
+   * @param message The error message
+   */
+  public ErrorMessage(final HttpStatus status, final String message) {
+    this.status = status != null ? status.value() : 500;
+    this.message = message;
+  }
 }

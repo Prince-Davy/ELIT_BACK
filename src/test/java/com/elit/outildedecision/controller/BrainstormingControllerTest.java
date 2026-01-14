@@ -2,6 +2,7 @@ package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.*;
 import com.elit.outildedecision.exception.*;
+import com.elit.outildedecision.exception.handler.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.model.BrainstormingModel;
 import com.elit.outildedecision.repository.BrainstormingRepository;
 import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;

@@ -4,7 +4,7 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
-import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
+import com.elit.outildedecision.exception.handler.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.model.ExecutionPlanAnswerModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;

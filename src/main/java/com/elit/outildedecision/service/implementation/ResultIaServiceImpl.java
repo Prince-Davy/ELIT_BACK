@@ -91,9 +91,15 @@ public class ResultIaServiceImpl implements ResultIaService {
     Map<String, Object> payload = Map.of("data", aiAnswerDTO.getData());
     log.debug("Payload sent to AI service: {}", payload);
 
-    String response = aiPredictionApiClientService
-      .sendPostRequest(iaPredictionServiceEndpoint, payload)
-      .block();
+    String response;
+    try {
+      response = aiPredictionApiClientService
+        .sendPostRequest(iaPredictionServiceEndpoint, payload)
+        .block();
+    } catch (Exception e) {
+      log.error("Error calling external AI service: {}", e.getMessage(), e);
+      throw new ResultAiNotFoundException("External AI service is unreachable at the moment. Please try again later.");
+    }
 
     if (response == null) {
       log.error("No response received from AI service for project ID: {}", projectId);

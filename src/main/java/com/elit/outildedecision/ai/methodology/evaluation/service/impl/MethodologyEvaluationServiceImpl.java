@@ -2,7 +2,6 @@ package com.elit.outildedecision.ai.methodology.evaluation.service.impl;
 
 import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
 import com.elit.outildedecision.ai.answer.entity.AiAnswer;
-import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
 import com.elit.outildedecision.ai.answer.service.AiAnswerService;
 import com.elit.outildedecision.ai.client.predictrf.dto.PredictRfResponse;
 import com.elit.outildedecision.ai.client.predictrf.mapper.MethodologyEvaluationExternalMapper;
@@ -53,7 +52,7 @@ public class MethodologyEvaluationServiceImpl implements MethodologyEvaluationSe
     log.info("Evaluate methodologies for project ID {}", projectId);
 
     Project project = projectRepository.findById(projectId)
-      .orElseThrow(() -> new IllegalArgumentException("Project not found with ID: " + projectId));
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with ID: " + projectId));
 
     PredictRfResponse response = methodologyEvaluationFetcherService.fetchEvaluations(aiAnswerDTO, project);
     log.debug("Methodologies evaluated by AI : {}", response);
@@ -89,7 +88,7 @@ public class MethodologyEvaluationServiceImpl implements MethodologyEvaluationSe
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with ID: " + projectId));
 
     ResultAi resultAi = resultIaRepository.findByProject(project)
-      .orElseThrow(() -> new AiAnswerNotFoundException("Result AI not found for project id :" + project.getProjectId()));
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Result AI not found for project id :" + project.getProjectId()));
 
     if ("Hybride".equals(resultAi.getPredictedMethod())) {
       throw new UnsupportedModelTypeException("Hybride projects do not have this functionality enabled yet");

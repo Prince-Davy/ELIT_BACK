@@ -6,7 +6,7 @@ import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.EscoreException;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.RestResponseEntityExceptionHandler;
+import com.elit.outildedecision.exception.handler.RestResponseEntityExceptionHandler;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
