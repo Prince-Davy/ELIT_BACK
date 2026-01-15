@@ -10,13 +10,13 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class ReportControllerTests {
 
-  @MockBean
+  @MockitoBean
   ReportService reportService;
   @InjectMocks
   ReportController reportController;
@@ -78,7 +78,7 @@ class ReportControllerTests {
     when(reportService.uploadReport(projectId, analysisId, type, fileMultipart)).thenThrow(new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas."));
     mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type).file((MockMultipartFile) fileMultipart))
       .andDo(print())
-      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));
     ;
   }
@@ -90,7 +90,7 @@ class ReportControllerTests {
     mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"));
+      .andExpect(jsonPath("$.status").value(404));
   }
 
   @Test
@@ -100,7 +100,7 @@ class ReportControllerTests {
     mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Ce projet n'existe pas."));
     ;
   }
@@ -112,7 +112,7 @@ class ReportControllerTests {
     mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(content().string(containsString("Fichier enregistr")));
+      .andExpect(content().string(containsString("Fichier enregistré")));
   }
 
   @Test
@@ -121,7 +121,7 @@ class ReportControllerTests {
     when(reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration)).thenThrow(new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas."));
     mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration).file((MockMultipartFile) fileMultipart))
       .andDo(print())
-      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));
     ;
   }
@@ -133,7 +133,7 @@ class ReportControllerTests {
     mockMvc.perform(multipart("/report/upload/" + projectId + "/" + analysisId + "/" + type + "/" + iteration).file((MockMultipartFile) fileMultipart))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"));
+      .andExpect(jsonPath("$.status").value(404));
   }
 
   @Test
@@ -144,7 +144,7 @@ class ReportControllerTests {
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Ce projet n'existe pas."));
   }
 
@@ -170,7 +170,7 @@ class ReportControllerTests {
         return request;
       }))
       .andDo(print())
-      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Cette analyse de prévisibilité n'existe pas."));
     ;
   }
@@ -185,7 +185,7 @@ class ReportControllerTests {
       }))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"));
+      .andExpect(jsonPath("$.status").value(404));
   }
 
   @Test
@@ -199,7 +199,7 @@ class ReportControllerTests {
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Ce projet n'existe pas."));
   }
 
@@ -241,7 +241,7 @@ class ReportControllerTests {
     mockMvc.perform(get("/report/" + projectId))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Ce projet n'existe pas."));
   }
 

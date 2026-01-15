@@ -72,7 +72,7 @@ class SuperAdminControllerTests {
     mockMvc.perform(put("/projects/"+ projectId))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Ce projet n'existe pas!"));
   }
 
@@ -93,7 +93,7 @@ class SuperAdminControllerTests {
     mockMvc.perform(put("/users/" +userId))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("Cet utilisateur n'existe pas!"));
   }
 
@@ -114,7 +114,7 @@ class SuperAdminControllerTests {
     mockMvc.perform(delete("/projects/"+ projectId))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value("404"))
       .andExpect(jsonPath("$.message").value("Ce projet n'existe pas!"));
   }
 

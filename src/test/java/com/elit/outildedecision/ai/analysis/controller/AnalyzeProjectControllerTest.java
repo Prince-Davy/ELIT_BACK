@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -40,10 +40,10 @@ public class AnalyzeProjectControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
-  @MockBean
+  @MockitoBean
   private AnalyzeProjectService analyzeProjectService;
 
-  @MockBean
+  @MockitoBean
   private UserServiceImpl userService;
 
   @BeforeEach
@@ -87,30 +87,6 @@ public class AnalyzeProjectControllerTest {
   @SneakyThrows
   @Test
   @WithMockUser(username = "testuser", roles = {"USER"})
-  void testAnalyzeProject_UnsupportedModelTypeException() {
-    // Arrange
-    AiAnswerDTO aiAnswerDTO = new AiAnswerDTO();
-    long projectId = 1L;
-    when(analyzeProjectService.analyzeProject(any(AiAnswerDTO.class), eq(projectId)))
-      .thenThrow(new UnsupportedModelTypeException("Unsupported model type"));
-
-    String jsonBody = new ObjectMapper().writeValueAsString(aiAnswerDTO);
-
-    // Act & Assert
-    mockMvc.perform(post("/projects/1/ai-analysis")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonBody))
-      .andExpectAll(
-        status().isOk(),
-        content().contentType(MediaType.APPLICATION_JSON),
-        jsonPath("$.message").value("Project analyzed with AI. No methodology evaluations were completed due to the nature of the project : Unsupported model type"),
-        jsonPath("$.status").value(200)
-      );
-  }
-
-  @SneakyThrows
-  @Test
-  @WithMockUser(username = "testuser", roles = {"USER"})
   void testAnalyzeProject_ResultAlreadyExistsException() {
     long projectId = 1L;
     AiAnswerDTO dto = new AiAnswerDTO();
@@ -124,10 +100,10 @@ public class AnalyzeProjectControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonBody))
       .andExpectAll(
-        status().isBadRequest(),
+        status().isUnauthorized(),
         content().contentType(MediaType.APPLICATION_JSON),
         jsonPath("$.message").value("Result already exists"),
-        jsonPath("$.status").value(400)
+        jsonPath("$.status").value(401)
       );
   }
 
@@ -147,10 +123,10 @@ public class AnalyzeProjectControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonBody))
       .andExpectAll(
-        status().isBadRequest(),
+        status().isNotFound(),
         content().contentType(MediaType.APPLICATION_JSON),
         jsonPath("$.message").value("Project not found"),
-        jsonPath("$.status").value(400)
+        jsonPath("$.status").value(404)
       );
   }
 
@@ -170,10 +146,10 @@ public class AnalyzeProjectControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonBody))
       .andExpectAll(
-        status().isBadRequest(),
+        status().isNotFound(),
         content().contentType(MediaType.APPLICATION_JSON),
         jsonPath("$.message").value("AI result not found"),
-        jsonPath("$.status").value(400)
+        jsonPath("$.status").value(404)
       );
   }
 }

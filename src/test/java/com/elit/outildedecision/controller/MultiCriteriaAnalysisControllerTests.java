@@ -320,7 +320,7 @@ class MultiCriteriaAnalysisControllerTests {
           .content(ModelSamples.toJson(multiCriteriaAnalysisStep)))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value("404"))
       .andExpect(jsonPath("$.message").value("Cette analyse multicritères n'existe pas."));
     ;
 

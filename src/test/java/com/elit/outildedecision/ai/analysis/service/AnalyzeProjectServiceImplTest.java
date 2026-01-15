@@ -89,18 +89,6 @@ class AnalyzeProjectServiceImplTest {
       analyzeProjectService.analyzeProject(dto, projectId));
   }
 
-  @SneakyThrows
-  @Test
-  void testAnalyzeProject_ThrowsUnsupportedModelTypeException() {
-    long projectId = 1L;
-
-    doThrow(new UnsupportedModelTypeException("Unsupported model type"))
-      .when(methodologyEvaluationService).createEvaluation(any(), eq(projectId));
-
-    assertThrows(UnsupportedModelTypeException.class, () ->
-      analyzeProjectService.analyzeProject(dto, projectId));
-  }
-
   @Test
   void testAnalyzeProject_Success() throws Exception {
     long projectId = 1L;

@@ -11,6 +11,8 @@ import com.elit.outildedecision.service.FeedbackIaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import com.elit.outildedecision.model.ErrorMessage;
 
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -150,7 +152,10 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
       }
       feedbackIaRepository.deleteByProject_ProjectIdAndUser_UserId(projectId, userId);
     } catch (FeedBackNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+      // If the exception is a ResponseStatusException (it is), prefer the reason
+      String reason = (e instanceof ResponseStatusException) ? ((ResponseStatusException) e).getReason() : e.getMessage();
+      ErrorMessage err = new ErrorMessage(HttpStatus.NOT_FOUND, reason);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     } catch (Exception e) {
       return ResponseEntity.internalServerError().body("Une erreur inattendue s'est produite : " + e.getMessage());
     }
@@ -173,7 +178,9 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
       }
       feedbackIaRepository.deleteAll(feedbacks);
     } catch (FeedBackNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+      String reason = (e instanceof ResponseStatusException) ? ((ResponseStatusException) e).getReason() : e.getMessage();
+      ErrorMessage err = new ErrorMessage(HttpStatus.NOT_FOUND, reason);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     } catch (Exception e) {
       return ResponseEntity.internalServerError().body("Une erreur inattendue s'est produite : " + e.getMessage());
     }

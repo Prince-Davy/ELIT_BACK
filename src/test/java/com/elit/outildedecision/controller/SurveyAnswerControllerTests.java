@@ -86,7 +86,7 @@ class SurveyAnswerControllerTests {
     mockMvc.perform(get("/survey/answer/" + UserSamples.getUser().getUserId()))
       .andDo(print())
       .andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+      .andExpect(jsonPath("$.status").value(404))
       .andExpect(jsonPath("$.message").value("UserNotFoundException"));
   }
 }

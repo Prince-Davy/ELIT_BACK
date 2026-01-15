@@ -398,17 +398,42 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   }
 
   // Remove HTTP status prefix if present (e.g. "404 NOT_FOUND \"No AI answers...\"")
-  private String sanitize(final String raw) {
+   private String sanitize(final String raw) {
     if (raw == null) {
       return "";
     }
-    // If contains a quoted part, extract it
-    int firstQuote = raw.indexOf('"');
-    int lastQuote = raw.lastIndexOf('"');
+    String s = raw.trim();
+
+    // Common pattern produced by ResponseStatusException or similar:
+    // 404 NOT_FOUND "Message here"
+    // 422 UNPROCESSABLE_ENTITY: Message here
+    // 400 "Message here"
+    // We want to extract only the readable message.
+
+    // If there's a quoted substring, prefer the quoted content (covers cases with double quotes).
+    int firstQuote = s.indexOf('"');
+    int lastQuote = s.lastIndexOf('"');
     if (firstQuote >= 0 && lastQuote > firstQuote) {
-      return raw.substring(firstQuote + 1, lastQuote);
+      return s.substring(firstQuote + 1, lastQuote).trim();
     }
-    // else, remove leading digits and status words
-    return raw.replaceAll("^\\d{3}_[A-Z_]+\\s*", "").replaceAll("^\\d{3}\\s*", "").trim();
+
+    // If the string starts with a 3-digit HTTP status code, remove the leading code and optional status name.
+    // This avoids stripping meaningful leading words like "AI" from messages.
+    if (s.matches("^\\s*\\d{3}.*")) {
+      // Regex explanation:
+      // ^\s*           - optional leading whitespace
+      // (?:\d{3})?     - optional 3-digit HTTP code (we already matched presence)
+      // [\s:_-]*       - separators (space, colon, underscore, dash)
+      // (?:[A-Z_]+)?    - optional status name in caps with underscores
+      // [\s:\-]*      - optional separators after status word
+      String cleaned = s.replaceFirst("^\\s*(?:\\d{3})?[\\s:_-]*(?:[A-Z_]+(?=[\\s:_-]))?[\\s:-]*", "").trim();
+      if (cleaned.isEmpty()) {
+        return s;
+      }
+      return cleaned;
+    }
+
+    // If it does not start with a numeric status, keep the string as-is (do not remove leading all-caps words like "AI").
+    return s;
   }
-}
+ }

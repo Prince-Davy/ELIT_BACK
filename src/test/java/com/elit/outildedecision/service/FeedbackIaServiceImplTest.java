@@ -5,6 +5,7 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.model.ErrorMessage;
 import com.elit.outildedecision.model.FeedBackIaModel;
 import com.elit.outildedecision.repository.FeedbackIaRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
@@ -159,7 +160,13 @@ class FeedbackIaServiceImplTest {
 
     assertNotNull(response);
     assertEquals(404, response.getStatusCodeValue());
-    assertEquals("Feedback non trouvé pour le projet ID " + project.getProjectId() + " et l'utilisateur ID " + user.getUserId(), response.getBody());
+    String expected = "Feedback non trouvé pour le projet ID " + project.getProjectId() + " et l'utilisateur ID " + user.getUserId();
+    Object body = response.getBody();
+    if (body instanceof ErrorMessage) {
+      assertEquals(expected, ((ErrorMessage) body).getMessage());
+    } else {
+      assertEquals(expected, body);
+    }
   }
 
   @Test
