@@ -1,12 +1,48 @@
-# **🚩 Documentation :** Connect to [ELIT SogetiLab's wiki](https://wiki.innovation-factory.io/en/home) where all useful documentation is centralized.
+# 🚩 Documentation :
 
-## Init project
+[Documentation complète](https://capgemini.sharepoint.com/:w:/r/sites/ELIThELponITprojectmanagement/Shared%20Documents/General/1%20-%20Dev%20Team%20area/Environnement%20de%20d%C3%A9veloppement/Guide%20d%27installation%20ELIT.docx?d=w6adc79bd058f4752ba25bf73a31cf7d9&csf=1&web=1&e=XgrhjU) 
 
-Open a terminal, navigate to the project directory, and run the command :
+## Lunch the application locally without Docker (Recommand for developement)
+
+1. Download JAVA and MAVEN
+2. Duplicate .ven.tpl and rename in .env
+3. Open a terminal, navigate to the project directory, and run the command :
 
 ```shell
   mvn clean install
 ```
+Only one time for get 'target' file
+
+2. Lunch application
+```shell
+mvn spring-boot:run
+```   
+
+3. Bonus : Before push on git excute this
+```shell
+checkstyle:check pmd:check verify site 
+``` 
+
+## Lunch the application locally with Docker (Recommand for ISO AzureDevOps)
+
+1. Open dev.docker-compose.yml
+2. In file "application.properties" and "application-test.properties" 
+   change spring.datasource.url with this value : jdbc:mysql://db:3306/${MYSQL_DATABASE}
+
+```shell
+  docker-compose -f dev.docker-compose.yml up --build --force-recreate --remove-orphans 
+```
+
+## Local user accounts
+
+| Id | First name | Last name | Login                | Password     |
+|:---|:-----------|:----------|:---------------------|:-------------|
+| 1  | John       | Doe       | user@user.com        | Azerty1234!? |
+| 2  | Nancy      | Michel    | admin@elite.fr       | Azerty1234!? |
+| 3  | Charles    | Baker     | contributer@elit.com | Azerty1234!? |
+| 4  | Rochelle   | Wright    | observer@elit.com    | Azerty1234!? |
+
+# Old Documentation
 
 ## Launch the application locally
 
@@ -20,13 +56,6 @@ Make sure :
 4. ***VERY IMPORTANT*** : use `local` as Spring profile. Feel free to ask your favorite AI how to add required information to the run configuration.
 5. Optional : save console output to a file on your local filesystem, in case there is a log that becomes inaccessible. The directory `logs/` in the project is an ideal candidate to store this file as it should be excluded from version control.
 
-### With Maven
-
-Open a terminal, navigate to the project directory, make sure the profile `local` is active in `pom.xml`, and run the command : 
-
-```shell
-  mvn spring-boot:run
-```
 
 ## Launch the application in development mode in the same way as in production mode
 
@@ -43,6 +72,8 @@ Open a terminal, navigate to the project directory, make sure the profile `local
       context: "."
       dockerfile: Dockerfile
     env_file: .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
     ports:
       - "8080:8080"
     volumes:
@@ -50,7 +81,7 @@ Open a terminal, navigate to the project directory, make sure the profile `local
     depends_on:
       - db
     networks:
-      - elit_network 
+      - elit_network
    ```
       
 4. Launch the following docker-compose command :
@@ -58,17 +89,10 @@ Open a terminal, navigate to the project directory, make sure the profile `local
 
 5. You'll have (2/3) Docker containers : database, phpMyAdmin and backend (depending on step 2).
 
-## Local user accounts
-
-| Id | First name | Last name | Login                | Password     |
-|:---|:-----------|:----------|:---------------------|:-------------|
-| 1  | John       | Doe       | user@user.com        | Azerty1234!? |
-| 2  | Nancy      | Michel    | admin@elite.fr       | Azerty1234!? |
-| 3  | Charles    | Baker     | contributer@elit.com | Azerty1234!? |
-| 4  | Rochelle   | Wright    | observer@elit.com    | Azerty1234!? |
 
 
-## Database
+
+## Database 
 
 The project uses `H2` (in-memory DB) for local environment (actual setup, please correct when local environment will be fully back on Docker).
 It uses a `MySQL` database managed by DevOps team in INTEG environment (please update this file when application will be deployed in production environment).

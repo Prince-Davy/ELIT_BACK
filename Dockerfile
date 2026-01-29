@@ -1,4 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
+FROM maven:3.9.12-eclipse-temurin-21 AS builder
 WORKDIR /app
 
 COPY pom.xml .
@@ -16,7 +16,7 @@ COPY ./src ./src
 RUN mvn clean package -DskipTests
 
 
-FROM amazoncorretto:17-alpine
+FROM eclipse-temurin:21-jre-jammy
 
 ENV TZ 'Europe/Paris'
 RUN echo $TZ > /etc/timezone
