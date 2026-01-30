@@ -10,15 +10,15 @@
     "Criterias": [
       {
         "name": "Clarté",
-        "description": "Dans quelle mesure la spécification qui répond à la ou aux questions déclenchées par l'attribut de découverte est-elle claire, c'est-à-dire bien définie et simple."
+        "description": "Dans quelle mesure les attentes du projet (concepts et idées) sont faciles à comprendre."
       },
       {
         "name": "Précision",
-        "description": "Dans quelle mesure la spécification qui répond à la ou aux questions déclenchées par l'attribut de découverte est-elle précise, c’est-à-dire exactement exprimée et formulée."
+        "description": "Dans quelle mesure les spécifications sont précises, c'est à dire exactement exprimées et formulées."
       },
       {
         "name": "Rigueur",
-        "description": "Dans quelle mesure la spécification qui répond à la ou aux questions déclenchées par l'attribut de découverte est-elle approfondie, c'est-à-dire exhaustive et suffisamment détaillée."
+        "description": "Dans quelle mesure les spécifications sont approfondies, c'est à dire exhaustives et suffisamment détaillées."
       }
     ]
   },
@@ -32,11 +32,11 @@
     "Criterias": [
       {
         "name": "Complétude",
-        "description": "Dans quelle mesure l'élément que l'attribut de découverte interrogé est-il exhaustif c’est-à-dire complet, offrant une vue d'ensemble holistique."
+        "description": "Dans quelle mesure les dépendances, liens ou impacts avec d’autres éléments sont‑ils identifiés."
       },
       {
         "name": "Clarté",
-        "description": "Dans quelle mesure la réponse à la ou aux questions qui déclenchent l'attribut de découverte est-elle claire, c'est-à-dire sans équivoque, non conflictuelle ou cohérente."
+        "description": "Dans quelle mesure les attentes du projet (concepts et idées) sont faciles à comprendre."
       }
     ]
   },
@@ -51,15 +51,15 @@
     "Criterias": [
       {
         "name": "Disponibilité",
-        "description": "Dans quelle mesure l'élément/l'individu que l'attribut de découverte interroge est-il disponible, c'est-à-dire accessible, récupérable ou prêt à rester impliqué."
+        "description": "Dans quelle mesure l’élément ou les membres du projet sont facilement accessibles."
       },
       {
         "name": "Adaptabilité",
-        "description": "Dans quelle mesure l'élément/l'individu que l'attribut de découverte interroge est-il adaptable, c’est-à-dire tolérant au changement."
+        "description": "Dans quelle mesure peut‑on facilement modifier, ajuster ou étendre ce qui a été fourni."
       },
       {
         "name": "Régularité",
-        "description": "Dans quelle mesure l'élément/l'individu que l'attribut de découverte interroge est-il régulier, c'est-à-dire récurrent et se produisant ou contribuant souvent."
+        "description": "Dans quelle mesure les contributions sont‑elles fréquentes et constantes."
       }
     ]
   }
