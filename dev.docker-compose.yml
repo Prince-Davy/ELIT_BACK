@@ -12,17 +12,17 @@ services:
     volumes:
       - elit-volume:/var/lib/mysql
     networks:
-      - elit_network
+      - elit_shared_network
 
   phpmyadmin:
     image: phpmyadmin
     restart: always
     ports:
-      - "8081:80"
+      - "8081:81"
     depends_on:
       - db
     networks:
-      - elit_network
+      - elit_shared_network
 
   back:
     container_name: 'elit_backend'
@@ -31,7 +31,7 @@ services:
       dockerfile: Dockerfile
     env_file: .env
     environment:
-      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_PROFILES_ACTIVE=docker
     ports:
       - "8080:8080"
     volumes:
@@ -39,10 +39,11 @@ services:
     depends_on:
       - db
     networks:
-      - elit_network
+      - elit_shared_network
 
 volumes:
   elit-volume:
 
 networks:
-  elit_network:
+    elit_shared_network:
+      external: true

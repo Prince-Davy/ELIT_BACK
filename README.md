@@ -25,9 +25,13 @@ checkstyle:check pmd:check verify site
 
 ## Lunch the application locally with Docker (Recommand for ISO AzureDevOps)
 
-1. Open dev.docker-compose.yml
-2. In file "application.properties" and "application-test.properties" 
-   change spring.datasource.url with this value : jdbc:mysql://db:3306/${MYSQL_DATABASE}
+1. Create the network : elit_shared_network
+
+```shell
+  docker network create elit_shared_network 
+```
+
+2. Open dev.docker-compose.yml
 
 ```shell
   docker-compose -f dev.docker-compose.yml up --build --force-recreate --remove-orphans 

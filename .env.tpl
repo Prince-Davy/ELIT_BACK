@@ -7,6 +7,7 @@ MYSQL_PASSWORD=test
 MYSQL_ROOT_PASSWORD=test
 MYSQL_DATABASE=outilprisedecision
 DB_SERVER=localhost:3306
+DB_SERVER_WITH_DOCKER=db:3306
 
 SPRING_BACK_USERNAME =
 SPRING_BACK_PASSWORD =
@@ -17,6 +18,9 @@ SPRING_MAIL_PASSWORD = sxcwmyfhazuhtzic
 
 REACT_APP_BACKEND_API=http://localhost:8080
 FRONTEND_URL=http://localhost:3000
-AI_API_URL=https://http://localhost:8000/api/process_predict
+#Local host if ppm_prediction running on your machine however use :
+AI_API_URL_INTEG=https://integ.elit-pmm-pred.innovation-factory.io/api/
+AI_API_URL_WITH_DOCKER=http://ppm_prediction:80/api/
+
 KEYSTORE_PWD=
 FILE_RECOMMANDATIONS=sharedresources/com/elit/outildedecision/util/RecommandationsIA.json
