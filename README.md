@@ -18,7 +18,7 @@ Only one time for get 'target' file
 mvn spring-boot:run
 ```   
 
-3. Bonus : Before push on git excute this
+3. Bonus : Before push on git excute this (if this command fail, your pipeline will faill)
 ```shell
 checkstyle:check pmd:check verify site 
 ``` 
