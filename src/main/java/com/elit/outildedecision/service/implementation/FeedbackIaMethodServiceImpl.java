@@ -44,6 +44,8 @@ public class FeedbackIaMethodServiceImpl implements FeedbackIaMethodService {
   /**
    * Enregistrer un feedback sur une méthode.
    * Modifiable sans endpoint update: POST fait un upsert sur le triplet (project,user,method).
+   *  @param dto DTO feedBack.
+   *  @throws ProjectNotFoundException Projet non retrouvé en base
    */
   @Override
   @Transactional
@@ -101,6 +103,9 @@ public class FeedbackIaMethodServiceImpl implements FeedbackIaMethodService {
     }
   }
 
+  /**
+   * Récuperer l'ensemble des feedbacks.
+   */
   @Override
   public List<FeedBackIaMethodModel> getAllFeedbacks() {
     List<FeedbackIaMethod> feedbacks = feedbackIaMethodRepository.findAll();
@@ -113,6 +118,10 @@ public class FeedbackIaMethodServiceImpl implements FeedbackIaMethodService {
     return models;
   }
 
+  /**
+   * Récupere les feedbacks d'un projet .
+   *  @param projectId ID du projet dans lequel on récupere les feedbacks.
+   */
   @Override
   public List<FeedBackIaMethodModel> getFeedbacksByProject(final Long projectId) {
     List<FeedbackIaMethod> feedbacks = feedbackIaMethodRepository.findByProject_ProjectId(projectId);
@@ -125,6 +134,12 @@ public class FeedbackIaMethodServiceImpl implements FeedbackIaMethodService {
     return models;
   }
 
+  /**
+   * Récupere un feedback précis selon les pararamètres.
+   *  @param projectId Filtre issu de l'ID du projet.
+   *  @param userId Filtre sur l'ID de l'utilisateur qu'on souhaite avoir le feedbacks.
+   *  @param methodName Filtre sur la methode du projet .
+   */
   @Override
   public FeedBackIaMethodModel getFeedbackByProjectIdAndUserIdAndMethodName(final Long projectId, final Long userId, final String methodName)
     throws FeedBackNotFoundException {
@@ -135,7 +150,12 @@ public class FeedbackIaMethodServiceImpl implements FeedbackIaMethodService {
 
     return toModel(feedback);
   }
-
+  /**
+   * Supprime un feedback précis selon les pararamètres.
+   *  @param projectId Filtre issu de l'ID du projet.
+   *  @param userId Filtre sur l'ID de l'utilisateur qu'on souhaite avoir le feedbacks.
+   *  @param methodName Filtre sur la methode du projet .
+   */
   @Override
   @Transactional
   public ResponseEntity<Object> deleteFeedbackByUserAndProjectAndMethodName(final Long projectId, final Long userId, final String methodName) {
@@ -154,6 +174,10 @@ public class FeedbackIaMethodServiceImpl implements FeedbackIaMethodService {
     return ResponseEntity.ok().body("Le FeedBack a bien été supprimé");
   }
 
+  /**
+   * Récupere les feedbacks selon l'ID du projet.
+   *  @param projectId Filtre issu de l'ID du projet.
+   */
   @Override
   @Transactional
   public ResponseEntity<Object> deleteFeedbacksByProjectId(final Long projectId) {
