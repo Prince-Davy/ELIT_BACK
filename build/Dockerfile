@@ -1,4 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-17
+FROM maven:3.9.12-eclipse-temurin-21
 
 LABEL description="This image is used for quality build"
 
