@@ -9,6 +9,15 @@ trigger:
       - main
       - release/*
 
+pr:
+  branches:
+    include:
+      - develop
+      - devops
+      - main
+      - release/*
+
+
 resources:
   repositories:
     - repository: templates
