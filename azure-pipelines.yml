@@ -15,8 +15,8 @@ pr:
       - develop
       - devops
       - main
+      - recette
       - release/*
-
 
 resources:
   repositories:
