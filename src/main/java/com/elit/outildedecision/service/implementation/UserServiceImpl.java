@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     /**
      * Directory to store user avatar files.
      */
-    @Value("${file.upload-dir}")
+    @Value("${avatar.upload-dir}")
     private String avatarUploadDir;
     /**
      * Email address to send emails from.
