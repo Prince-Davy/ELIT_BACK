@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
   <changeSet id="1742481471260-1" author="tpiotrow">
     <createTable tableName="answer_ia">
       <column name="question" type="VARCHAR(255)">
@@ -384,8 +383,7 @@
     </createTable>
   </changeSet>
   <changeSet id="1742481471260-30" author="tpiotrow">
-    <addUniqueConstraint columnNames="predictibility_analysis_id"
-                         constraintName="uc_execution_plan_predictibility_analysis" tableName="execution_plan"/>
+    <addUniqueConstraint columnNames="predictibility_analysis_id" constraintName="uc_execution_plan_predictibility_analysis" tableName="execution_plan"/>
   </changeSet>
   <changeSet id="1742481471260-31" author="tpiotrow">
     <addUniqueConstraint columnNames="project_id" constraintName="uc_feedback_ia_project" tableName="feedback_ia"/>
@@ -397,13 +395,10 @@
     <addUniqueConstraint columnNames="user_id" constraintName="uc_opinion_userid" tableName="opinion"/>
   </changeSet>
   <changeSet id="1742481471260-34" author="tpiotrow">
-    <addUniqueConstraint columnNames="methodology_id" constraintName="uc_predictibility_analysis_methodology"
-                         tableName="predictibility_analysis"/>
+    <addUniqueConstraint columnNames="methodology_id" constraintName="uc_predictibility_analysis_methodology" tableName="predictibility_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-35" author="tpiotrow">
-    <addUniqueConstraint columnNames="multi_criteria_analysis_id"
-                         constraintName="uc_predictibility_analysis_multi_criteria_analysis"
-                         tableName="predictibility_analysis"/>
+    <addUniqueConstraint columnNames="multi_criteria_analysis_id" constraintName="uc_predictibility_analysis_multi_criteria_analysis" tableName="predictibility_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-36" author="tpiotrow">
     <addUniqueConstraint columnNames="project_id" constraintName="uc_result_ia_project" tableName="result_ia"/>
@@ -412,184 +407,114 @@
     <addUniqueConstraint columnNames="user_id" constraintName="uc_vote_userid" tableName="vote"/>
   </changeSet>
   <changeSet id="1742481471260-38" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="answer_ia"
-                             constraintName="FK_ANSWER_IA_ON_PROJECT" referencedColumnNames="project_id"
-                             referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="answer_ia" constraintName="FK_ANSWER_IA_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-39" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="attachment"
-                             constraintName="FK_ATTACHMENT_ON_CREATOR" referencedColumnNames="user_id"
-                             referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="attachment" constraintName="FK_ATTACHMENT_ON_CREATOR" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-40" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="attachment"
-                             constraintName="FK_ATTACHMENT_ON_PROJECT" referencedColumnNames="project_id"
-                             referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="attachment" constraintName="FK_ATTACHMENT_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-41" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="brainstorming"
-                             constraintName="FK_BRAINSTORMING_ON_PREDICTIBILITYANALYSISID"
-                             referencedColumnNames="predictibility_analysis_id"
-                             referencedTableName="predictibility_analysis"/>
+    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="brainstorming" constraintName="FK_BRAINSTORMING_ON_PREDICTIBILITYANALYSISID" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-42" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="brainstorming"
-                             constraintName="FK_BRAINSTORMING_ON_QUESTIONID" referencedColumnNames="question_id"
-                             referencedTableName="form_question"/>
+    <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="brainstorming" constraintName="FK_BRAINSTORMING_ON_QUESTIONID" referencedColumnNames="question_id" referencedTableName="form_question"/>
   </changeSet>
   <changeSet id="1742481471260-43" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="brainstorming"
-                             constraintName="FK_BRAINSTORMING_ON_USERID" referencedColumnNames="user_id"
-                             referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="brainstorming" constraintName="FK_BRAINSTORMING_ON_USERID" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-44" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="criteria"
-                             constraintName="FK_CRITERIA_ON_QUESTION" referencedColumnNames="question_id"
-                             referencedTableName="form_question"/>
+    <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="criteria" constraintName="FK_CRITERIA_ON_QUESTION" referencedColumnNames="question_id" referencedTableName="form_question"/>
   </changeSet>
   <changeSet id="1742481471260-45" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="execution_plan_id" baseTableName="execution_plan_answer"
-                             constraintName="FK_EXECUTION_PLAN_ANSWER_ON_EXECUTION_PLAN"
-                             referencedColumnNames="execution_plan_id" referencedTableName="execution_plan"/>
+    <addForeignKeyConstraint baseColumnNames="execution_plan_id" baseTableName="execution_plan_answer" constraintName="FK_EXECUTION_PLAN_ANSWER_ON_EXECUTION_PLAN" referencedColumnNames="execution_plan_id" referencedTableName="execution_plan"/>
   </changeSet>
   <changeSet id="1742481471260-46" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="execution_plan_question_id" baseTableName="execution_plan_answer"
-                             constraintName="FK_EXECUTION_PLAN_ANSWER_ON_EXECUTION_PLAN_QUESTION"
-                             referencedColumnNames="execution_plan_question_id"
-                             referencedTableName="execution_plan_question"/>
+    <addForeignKeyConstraint baseColumnNames="execution_plan_question_id" baseTableName="execution_plan_answer" constraintName="FK_EXECUTION_PLAN_ANSWER_ON_EXECUTION_PLAN_QUESTION" referencedColumnNames="execution_plan_question_id" referencedTableName="execution_plan_question"/>
   </changeSet>
   <changeSet id="1742481471260-47" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="execution_plan"
-                             constraintName="FK_EXECUTION_PLAN_ON_PREDICTIBILITY_ANALYSIS"
-                             referencedColumnNames="predictibility_analysis_id"
-                             referencedTableName="predictibility_analysis"/>
+    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="execution_plan" constraintName="FK_EXECUTION_PLAN_ON_PREDICTIBILITY_ANALYSIS" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-48" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="execution_plan_id" baseTableName="execution_plan_vote"
-                             constraintName="FK_EXECUTION_PLAN_VOTE_ON_EXECUTION_PLAN"
-                             referencedColumnNames="execution_plan_id" referencedTableName="execution_plan"/>
+    <addForeignKeyConstraint baseColumnNames="execution_plan_id" baseTableName="execution_plan_vote" constraintName="FK_EXECUTION_PLAN_VOTE_ON_EXECUTION_PLAN" referencedColumnNames="execution_plan_id" referencedTableName="execution_plan"/>
   </changeSet>
   <changeSet id="1742481471260-49" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="method_id" baseTableName="execution_plan_vote"
-                             constraintName="FK_EXECUTION_PLAN_VOTE_ON_METHOD" referencedColumnNames="id"
-                             referencedTableName="method"/>
+    <addForeignKeyConstraint baseColumnNames="method_id" baseTableName="execution_plan_vote" constraintName="FK_EXECUTION_PLAN_VOTE_ON_METHOD" referencedColumnNames="id" referencedTableName="method"/>
   </changeSet>
   <changeSet id="1742481471260-50" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="execution_plan_vote"
-                             constraintName="FK_EXECUTION_PLAN_VOTE_ON_USER" referencedColumnNames="user_id"
-                             referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="execution_plan_vote" constraintName="FK_EXECUTION_PLAN_VOTE_ON_USER" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-51" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="feedback_ia"
-                             constraintName="FK_FEEDBACK_IA_ON_PROJECT" referencedColumnNames="project_id"
-                             referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="feedback_ia" constraintName="FK_FEEDBACK_IA_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-52" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="feedback_ia"
-                             constraintName="FK_FEEDBACK_IA_ON_USER" referencedColumnNames="user_id"
-                             referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="feedback_ia" constraintName="FK_FEEDBACK_IA_ON_USER" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-53" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="form_question"
-                             constraintName="FK_FORM_QUESTION_ON_STEP" referencedColumnNames="step_id"
-                             referencedTableName="form_step"/>
+    <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="form_question" constraintName="FK_FORM_QUESTION_ON_STEP" referencedColumnNames="step_id" referencedTableName="form_step"/>
   </changeSet>
   <changeSet id="1742481471260-54" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="multi_criteria_analysis_id" baseTableName="form_step"
-                             constraintName="FK_FORM_STEP_ON_MULTI_CRITERIA_ANALYSIS"
-                             referencedColumnNames="multi_criteria_analysis_id"
-                             referencedTableName="multi_criteria_analysis"/>
+    <addForeignKeyConstraint baseColumnNames="multi_criteria_analysis_id" baseTableName="form_step" constraintName="FK_FORM_STEP_ON_MULTI_CRITERIA_ANALYSIS" referencedColumnNames="multi_criteria_analysis_id" referencedTableName="multi_criteria_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-55" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="methodology_id" baseTableName="method"
-                             constraintName="FK_METHOD_ON_METHODOLOGY" referencedColumnNames="methodology_id"
-                             referencedTableName="methodology"/>
+    <addForeignKeyConstraint baseColumnNames="methodology_id" baseTableName="method" constraintName="FK_METHOD_ON_METHODOLOGY" referencedColumnNames="methodology_id" referencedTableName="methodology"/>
   </changeSet>
   <changeSet id="1742481471260-56" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="multi_criteria_analysis"
-                             constraintName="FK_MULTI_CRITERIA_ANALYSIS_ON_PROJECT"
-                             referencedColumnNames="project_id" referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="multi_criteria_analysis" constraintName="FK_MULTI_CRITERIA_ANALYSIS_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-57" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="notification"
-                             constraintName="FK_NOTIFICATION_ON_PROJECT" referencedColumnNames="project_id"
-                             referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="notification" constraintName="FK_NOTIFICATION_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-58" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="opinion" constraintName="FK_OPINION_ON_USERID"
-                             referencedColumnNames="user_id" referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="opinion" constraintName="FK_OPINION_ON_USERID" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-59" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="methodology_id" baseTableName="predictibility_analysis"
-                             constraintName="FK_PREDICTIBILITY_ANALYSIS_ON_METHODOLOGY"
-                             referencedColumnNames="methodology_id" referencedTableName="methodology"/>
+    <addForeignKeyConstraint baseColumnNames="methodology_id" baseTableName="predictibility_analysis" constraintName="FK_PREDICTIBILITY_ANALYSIS_ON_METHODOLOGY" referencedColumnNames="methodology_id" referencedTableName="methodology"/>
   </changeSet>
   <changeSet id="1742481471260-60" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="multi_criteria_analysis_id" baseTableName="predictibility_analysis"
-                             constraintName="FK_PREDICTIBILITY_ANALYSIS_ON_MULTI_CRITERIA_ANALYSIS"
-                             referencedColumnNames="multi_criteria_analysis_id"
-                             referencedTableName="multi_criteria_analysis"/>
+    <addForeignKeyConstraint baseColumnNames="multi_criteria_analysis_id" baseTableName="predictibility_analysis" constraintName="FK_PREDICTIBILITY_ANALYSIS_ON_MULTI_CRITERIA_ANALYSIS" referencedColumnNames="multi_criteria_analysis_id" referencedTableName="multi_criteria_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-61" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="predictibility_results"
-                             constraintName="FK_PREDICTIBILITY_RESULTS_ON_PREDICTIBILITYANALYSISID"
-                             referencedColumnNames="predictibility_analysis_id"
-                             referencedTableName="predictibility_analysis"/>
+    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="predictibility_results" constraintName="FK_PREDICTIBILITY_RESULTS_ON_PREDICTIBILITYANALYSISID" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-62" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_user_permission"
-                             constraintName="FK_PROJECT_USER_PERMISSION_ON_PROJECT"
-                             referencedColumnNames="project_id" referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_user_permission" constraintName="FK_PROJECT_USER_PERMISSION_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-63" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project_user_permission"
-                             constraintName="FK_PROJECT_USER_PERMISSION_ON_USER" referencedColumnNames="user_id"
-                             referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project_user_permission" constraintName="FK_PROJECT_USER_PERMISSION_ON_USER" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-64" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="report"
-                             constraintName="FK_REPORT_ON_PROJECT" referencedColumnNames="project_id"
-                             referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="report" constraintName="FK_REPORT_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-65" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="result_ia"
-                             constraintName="FK_RESULT_IA_ON_PROJECT" referencedColumnNames="project_id"
-                             referencedTableName="project"/>
+    <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="result_ia" constraintName="FK_RESULT_IA_ON_PROJECT" referencedColumnNames="project_id" referencedTableName="project"/>
   </changeSet>
   <changeSet id="1742481471260-66" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="step_score"
-                             constraintName="FK_STEP_SCORE_ON_STEP" referencedColumnNames="step_id"
-                             referencedTableName="form_step"/>
+    <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="step_score" constraintName="FK_STEP_SCORE_ON_STEP" referencedColumnNames="step_id" referencedTableName="form_step"/>
   </changeSet>
   <changeSet id="1742481471260-67" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="step_weight"
-                             constraintName="FK_STEP_WEIGHT_ON_STEPID" referencedColumnNames="step_id"
-                             referencedTableName="form_step"/>
+    <addForeignKeyConstraint baseColumnNames="step_id" baseTableName="step_weight" constraintName="FK_STEP_WEIGHT_ON_STEPID" referencedColumnNames="step_id" referencedTableName="form_step"/>
   </changeSet>
   <changeSet id="1742481471260-68" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="survey_answer"
-                             constraintName="FK_SURVEY_ANSWER_ON_QUESTION" referencedColumnNames="id"
-                             referencedTableName="survey_question"/>
+    <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="survey_answer" constraintName="FK_SURVEY_ANSWER_ON_QUESTION" referencedColumnNames="id" referencedTableName="survey_question"/>
   </changeSet>
   <changeSet id="1742481471260-69" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_user_id" baseTableName="survey_answer"
-                             constraintName="FK_SURVEY_ANSWER_ON_USER_USERID" referencedColumnNames="user_id"
-                             referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_user_id" baseTableName="survey_answer" constraintName="FK_SURVEY_ANSWER_ON_USER_USERID" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-70" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_user_id" baseTableName="verification_token"
-                             constraintName="FK_VERIFICATION_TOKEN_ON_USER_USERID" referencedColumnNames="user_id"
-                             referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_user_id" baseTableName="verification_token" constraintName="FK_VERIFICATION_TOKEN_ON_USER_USERID" referencedColumnNames="user_id" referencedTableName="user"/>
   </changeSet>
   <changeSet id="1742481471260-71" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="vote"
-                             constraintName="FK_VOTE_ON_PREDICTIBILITYANALYSISID"
-                             referencedColumnNames="predictibility_analysis_id"
-                             referencedTableName="predictibility_analysis"/>
+    <addForeignKeyConstraint baseColumnNames="predictibility_analysis_id" baseTableName="vote" constraintName="FK_VOTE_ON_PREDICTIBILITYANALYSISID" referencedColumnNames="predictibility_analysis_id" referencedTableName="predictibility_analysis"/>
   </changeSet>
   <changeSet id="1742481471260-72" author="tpiotrow">
-    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="vote" constraintName="FK_VOTE_ON_USERID"
-                             referencedColumnNames="user_id" referencedTableName="user"/>
+    <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="vote" constraintName="FK_VOTE_ON_USERID" referencedColumnNames="user_id" referencedTableName="user"/>
+  </changeSet>
+
+  <!-- US 64927 : Change project description field size from 255 to 800 characters -->
+  <changeSet id="20260312-augment-description-800" author="pleman">
+    <modifyDataType tableName="project" columnName="description" newDataType="VARCHAR(800)"/>
   </changeSet>
 
 </databaseChangeLog>
