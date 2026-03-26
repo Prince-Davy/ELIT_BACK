@@ -18,7 +18,7 @@ services:
     image: phpmyadmin
     restart: always
     ports:
-      - "8081:81"
+      - "8081:80"
     depends_on:
       - db
     networks:
