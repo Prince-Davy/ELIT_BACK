@@ -153,16 +153,64 @@ public interface ProjectUserPermissionRepository extends JpaRepository<ProjectUs
    * @return a list of all project user permissions for the given user ID
    */
   @Query("SELECT p FROM ProjectUserPermission p "
+    + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
+    + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
+    + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) AND "
+    + "size(p.project.audits) > 0 AND "
+    + "p.user.userEmail=:userEmail  and  p.project.chefId != p.user.userId "
+    + "GROUP BY p")
+  Page<ProjectUserPermission> findProjectWithAuditAffected(
+    @Param("keyword") String keyword,
+    @Param("typeAnalyse") String typeAnalyse,
+    @Param("status") String status,
+    @Param("userEmail") String userEmail,
+    Pageable pageable);
+
+  /**
+   * Finds all project user permissions for the given user ID.
+   *
+   * @param pageable the pagination information
+   * @param keyword the keyword to search for in project name or description
+   * @param status the project status to filter by
+   * @param typeAnalyse the project type analyse to filter by
+   * @param userEmail email user
+   * @return a list of all project user permissions for the given user ID
+   */
+  @Query("SELECT p FROM ProjectUserPermission p "
           + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
           + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
           + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) AND "
           + "(:typeAnalyse = 'ALL' OR :typeAnalyse IS NULL OR (LOWER(p.project.formProgressStatus) = LOWER(:typeAnalyse) OR (p.project.formProgressStatus='BOTH' AND :typeAnalyse!='AUDIT'))) AND "
           + "p.user.userEmail=:userEmail  and  p.project.chefId = p.user.userId "
           + "GROUP BY p")
-  Page<ProjectUserPermission> findProjectCeatedByUser(
+  Page<ProjectUserPermission> findProjectCreatedByUser(
           @Param("keyword") String keyword,
           @Param("typeAnalyse") String typeAnalyse,
           @Param("status") String status,
           @Param("userEmail") String userEmail,
           Pageable pageable);
+
+  /**
+   * Finds all project user permissions for the given user ID.
+   *
+   * @param pageable the pagination information
+   * @param keyword the keyword to search for in project name or description
+   * @param status the project status to filter by
+   * @param typeAnalyse the project type analyse to filter by
+   * @param userEmail email user
+   * @return a list of all project user permissions for the given user ID
+   */
+  @Query("SELECT p FROM ProjectUserPermission p "
+    + "WHERE (LOWER(p.project.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR "
+    + "LOWER(p.project.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
+    + "(:status = 'ALL' OR :status IS NULL OR LOWER(p.project.projectState) = LOWER(:status)) AND "
+    + "size(p.project.audits) > 0 AND "
+    + "p.user.userEmail=:userEmail  and  p.project.chefId = p.user.userId "
+    + "GROUP BY p")
+  Page<ProjectUserPermission> findProjectWithAuditCreatedByUser(
+    @Param("keyword") String keyword,
+    @Param("typeAnalyse") String typeAnalyse,
+    @Param("status") String status,
+    @Param("userEmail") String userEmail,
+    Pageable pageable);
 }
