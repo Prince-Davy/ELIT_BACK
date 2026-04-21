@@ -11,5 +11,6 @@ public final class Constants {
   public static final String CONFLICT = "CONFLICT";
   public static final String PROJECT_DOESNT_EXIST = "Ce projet n'existe pas";
   public static final String BRAINSTORMING_SAVED = "Le commentaire du brainstorming a bien été enregistré";
+  public static final String AUDIT = "AUDIT";
 
 }

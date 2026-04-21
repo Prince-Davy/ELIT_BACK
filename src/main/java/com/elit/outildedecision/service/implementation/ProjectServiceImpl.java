@@ -27,12 +27,7 @@ import com.elit.outildedecision.service.PermissionService;
 import com.elit.outildedecision.service.ProjectService;
 import com.elit.outildedecision.service.FeedbackIaService;
 import com.elit.outildedecision.service.ResultIaService;
-import com.elit.outildedecision.util.FormProgressStatus;
-import com.elit.outildedecision.util.ProjectAnalysisState;
-import com.elit.outildedecision.util.ProjectConfirmationState;
-import com.elit.outildedecision.util.ProjectPermession;
-import com.elit.outildedecision.util.ProjectState;
-import com.elit.outildedecision.util.TriType;
+import com.elit.outildedecision.util.*;
 import com.elit.outildedecision.model.AttachmentResponseModel;
 import com.elit.outildedecision.model.ContributerModel;
 import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
@@ -203,8 +198,8 @@ public class ProjectServiceImpl implements ProjectService {
    * @param attachmentService                The attachmentService for managing
    *                                         the
    *                                         attachments of the projects.
-   * @param fileSystemService                 The fileSystemService for managing the file
-   *                                          system operations.
+   * @param fileSystemService                The fileSystemService for managing the file
+   *                                         system operations.
    * @param projectUserPermissionRepository  The projectUserPermissionRepository
    *                                         for accessing the project user
    *                                         permission objects in the database.
@@ -501,13 +496,11 @@ public class ProjectServiceImpl implements ProjectService {
     ResponsePageProject responsePageProject = new ResponsePageProject();
     List<ProjectResponseModel> projects = new ArrayList<>();
     Pageable pageable = getPageableForSort(triModel);
-    Page<ProjectUserPermission> projectUserPermissionPagination = new PageImpl<>(new ArrayList<>());
+    Page<ProjectUserPermission> projectUserPermissionPagination;
     if (triModel.isActiveTab()) {
-      projectUserPermissionPagination = projectUserPermissionRepository
-        .findProjectCeatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+      projectUserPermissionPagination = getUserCreatedProject(triModel, userDetails, pageable);
     } else {
-      projectUserPermissionPagination = projectUserPermissionRepository
-        .findProjectAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+      projectUserPermissionPagination = getUserAffectedProject(triModel, userDetails, pageable);
     }
     List<ProjectUserPermission> projectUserPermissions = projectUserPermissionPagination.getContent();
 
@@ -615,6 +608,22 @@ public class ProjectServiceImpl implements ProjectService {
     responsePageProject.setTotalProjetCreated(projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername()));
     responsePageProject.setTotalProjetAffected(projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername()));
     return responsePageProject;
+  }
+
+  private Page<ProjectUserPermission> getUserAffectedProject(TriModel triModel, UserDetails userDetails, Pageable pageable) {
+    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
+      return projectUserPermissionRepository.findProjectWithAuditAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+    } else {
+      return projectUserPermissionRepository.findProjectAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+    }
+  }
+
+  private Page<ProjectUserPermission> getUserCreatedProject(TriModel triModel, UserDetails userDetails, Pageable pageable) {
+    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
+      return projectUserPermissionRepository.findProjectWithAuditCreatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+    } else {
+      return projectUserPermissionRepository.findProjectCreatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+    }
   }
 
   /**
