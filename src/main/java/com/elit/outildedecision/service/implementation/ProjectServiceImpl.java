@@ -1,62 +1,16 @@
 package com.elit.outildedecision.service.implementation;
 
 import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
-import com.elit.outildedecision.entity.ResultAi;
-import com.elit.outildedecision.entity.Attachment;
-import com.elit.outildedecision.entity.MultiCriteriaAnalysis;
-import com.elit.outildedecision.entity.PredictibilityAnalysis;
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.entity.ProjectPropertyKey;
-import com.elit.outildedecision.entity.ProjectUserPermission;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.entity.ExecutionPlanVote;
-import com.elit.outildedecision.exception.FileCouldNotBeSaved;
-import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.ExecutionPlanNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
-import com.elit.outildedecision.exception.UserNotFoundException;
-import com.elit.outildedecision.exception.AttachmentNotFoundException;
-import com.elit.outildedecision.exception.ProjectOwnerException;
-import com.elit.outildedecision.exception.ResponseNotFoundException;
-import com.elit.outildedecision.service.AttachmentService;
-import com.elit.outildedecision.service.ExecutionPlanService;
-import com.elit.outildedecision.service.FileSystemService;
-import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
-import com.elit.outildedecision.service.PermissionService;
-import com.elit.outildedecision.service.ProjectService;
-import com.elit.outildedecision.service.FeedbackIaService;
-import com.elit.outildedecision.service.ResultIaService;
+import com.elit.outildedecision.entity.*;
+import com.elit.outildedecision.exception.*;
+import com.elit.outildedecision.model.*;
+import com.elit.outildedecision.repository.*;
+import com.elit.outildedecision.service.*;
 import com.elit.outildedecision.util.*;
-import com.elit.outildedecision.model.AttachmentResponseModel;
-import com.elit.outildedecision.model.ContributerModel;
-import com.elit.outildedecision.model.ExecutionPlanScoreResponseModel;
-import com.elit.outildedecision.model.MulticriteriaAnalyseResponseModel;
-import com.elit.outildedecision.model.PredictibilityAnalyseResponseModel;
-import com.elit.outildedecision.model.ProjectModel;
-import com.elit.outildedecision.model.ProjectResponseModel;
-import com.elit.outildedecision.model.ResponsePageProject;
-import com.elit.outildedecision.model.ResultAiModel;
-import com.elit.outildedecision.model.TriModel;
-import com.elit.outildedecision.repository.ResultIaRepository;
-import com.elit.outildedecision.repository.VoteRepository;
-import com.elit.outildedecision.repository.BrainstormingRepository;
-import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
-import com.elit.outildedecision.repository.ProjectRepository;
-import com.elit.outildedecision.repository.PredictibilityResultsRepository;
-import com.elit.outildedecision.repository.UserRepository;
-import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
-import com.elit.outildedecision.repository.ExecutionPlanRepository;
-import com.elit.outildedecision.repository.ProjectUserPermissionRepository;
-import com.elit.outildedecision.repository.ExecutionPlanVoteRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,14 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * The ProjectServiceImpl class implements the ProjectService interface and
@@ -605,9 +553,25 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
     responsePageProject.setProjectsPage(new PageImpl<>(projects, pageable, projectUserPermissionPagination.getTotalElements()));
-    responsePageProject.setTotalProjetCreated(projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername()));
-    responsePageProject.setTotalProjetAffected(projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername()));
+    responsePageProject.setTotalProjetCreated(getTotalProjectCreatedUser(triModel, userDetails));
+    responsePageProject.setTotalProjetAffected(getTotalProjectAffectedUser(triModel, userDetails));
     return responsePageProject;
+  }
+
+  private long getTotalProjectCreatedUser(TriModel triModel, UserDetails userDetails) {
+    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
+      return projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+    } else {
+      return projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+    }
+  }
+
+  private long getTotalProjectAffectedUser(TriModel triModel, UserDetails userDetails) {
+    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
+      return projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+    } else {
+      return projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+    }
   }
 
   private Page<ProjectUserPermission> getUserAffectedProject(TriModel triModel, UserDetails userDetails, Pageable pageable) {
