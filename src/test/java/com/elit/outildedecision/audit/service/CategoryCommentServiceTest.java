@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
+import static com.elit.outildedecision.util.QuestionCategory.ORGANISATIONS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -73,5 +74,11 @@ public class CategoryCommentServiceTest {
     assertEquals(2, result.size());
     assertTrue(result.contains(comment1));
     assertTrue(result.contains(comment2));
+  }
+
+  @Test
+  void testGetQuestionCategory() {
+    assertEquals(ORGANISATIONS, QuestionCategory.getQuestionCategory("Organisations"));
+    assertThrows(IllegalArgumentException.class, () -> QuestionCategory.getQuestionCategory("dummy"));
   }
 }

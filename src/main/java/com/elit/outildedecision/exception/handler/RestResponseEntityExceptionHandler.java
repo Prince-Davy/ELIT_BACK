@@ -2,35 +2,7 @@ package com.elit.outildedecision.exception.handler;
 
 import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
 import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedModelTypeException;
-import com.elit.outildedecision.exception.AttachmentNotFoundException;
-import com.elit.outildedecision.exception.AvatarNotFoundException;
-import com.elit.outildedecision.exception.CouldNotSaveUserException;
-import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.ExecutionPlanException;
-import com.elit.outildedecision.exception.ExistingBrainstormingException;
-import com.elit.outildedecision.exception.FeedBackNotFoundException;
-import com.elit.outildedecision.exception.FormStepAlreadyExistsException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.exception.PredictibilityAnalysisAlreadyUpdated;
-import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.ProjectOwnerException;
-import com.elit.outildedecision.exception.ProjectFolderAlreadyExistsException;
-import com.elit.outildedecision.exception.QuestionFormatNotValidException;
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
-import com.elit.outildedecision.exception.ResponseNotFoundException;
-import com.elit.outildedecision.exception.ResponseNotValidException;
-import com.elit.outildedecision.exception.ResultAiNotFoundException;
-import com.elit.outildedecision.exception.StepFormNotFoundException;
-import com.elit.outildedecision.exception.StepWeightNotFoundException;
-import com.elit.outildedecision.exception.UserAlreadyExistsException;
-import com.elit.outildedecision.exception.UserNotVerifiedException;
-import com.elit.outildedecision.exception.UserNotFoundException;
-import com.elit.outildedecision.exception.VoteAlreadyExistException;
-import com.elit.outildedecision.exception.VoteNotFoundException;
-import com.elit.outildedecision.exception.OpinionAlreadyExistException;
-import com.elit.outildedecision.exception.UnsupportedMethodologyTypeException;
-import com.elit.outildedecision.exception.BrainstormingNotFoundException;
+import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.ErrorMessage;
 import com.elit.outildedecision.util.MethodType;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -163,7 +135,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
       PredictibilityAnalysisNotFoundException.class, BrainstormingNotFoundException.class,
       StepFormNotFoundException.class,
       ResponseNotFoundException.class, StepWeightNotFoundException.class, FeedBackNotFoundException.class,
-      ResultAiNotFoundException.class, AiAnswerNotFoundException.class
+      ResultAiNotFoundException.class, AiAnswerNotFoundException.class, ReportNotFoundException.class
   })
   public ResponseEntity<Object> handleNotFoundException(final Exception ex) {
      // Log at WARN to reduce noise, client will receive a clean error payload

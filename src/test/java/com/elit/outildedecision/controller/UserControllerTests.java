@@ -4,11 +4,12 @@ import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.AvatarNotFoundException;
 import com.elit.outildedecision.exception.CouldNotSaveUserException;
 import com.elit.outildedecision.exception.UserNotFoundException;
+import com.elit.outildedecision.model.UserModel;
 import com.elit.outildedecision.model.UserResponseModel;
-import com.elit.outildedecision.security.AppUserPrincipal;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.elit.outildedecision.util.Constants;
 import com.elit.outildedecision.util.ModelSamples;
+import com.elit.outildedecision.util.ModelSamples.UserSamples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,7 +17,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,16 +24,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import com.elit.outildedecision.util.ModelSamples.UserSamples;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -46,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTests {
   @Autowired
   private MockMvc mockMvc;
-  @MockBean
+  @MockitoBean
   private UserServiceImpl userService;
 
   @InjectMocks
@@ -71,7 +74,7 @@ class UserControllerTests {
   void findUserByIdExists() throws Exception {
     userResponseModel = UserSamples.getUserResponseModel();
     when(userService.getAllInfosUserById(userResponseModel.getUserId())).thenReturn(userResponseModel);
-    mockMvc.perform(get("/user/"+userResponseModel.getUserId())).andDo(print()).andExpect(status().isOk());
+    mockMvc.perform(get("/user/" + userResponseModel.getUserId())).andDo(print()).andExpect(status().isOk());
   }
 
   @WithMockUser(authorities = {"USER", "ADMIN"})
@@ -99,6 +102,7 @@ class UserControllerTests {
       .andExpect(status().isOk())
       .andExpect(content().string(containsString("Successful Update")));
   }
+
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void shouldUpdatePasswordById_LastPwdNotCorrect () throws Exception {
@@ -109,6 +113,7 @@ class UserControllerTests {
       .andExpect(status().isBadRequest())
       .andExpect(content().string(containsString("L'ancien mot de passe renseigné n'est pas correct.")));
   }
+
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void shouldUpdatePasswordById_PwdOldAndNewAreSame () throws Exception {
@@ -244,5 +249,34 @@ class UserControllerTests {
     mockMvc.perform(delete("/user/avatar/1"))
       .andDo(print())
       .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void viewAvatarByIdUser_AvatarOk() throws Exception {
+    when(userService.viewAvatarByUserId(eq(user.getUserId()), any())).thenReturn(ResponseEntity.ok().body(Constants.AVATAR_NOT_FOUND));
+    mockMvc.perform(get("/user/avatar/1"))
+      .andDo(print())
+      .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void updateUser_Ok() throws Exception {
+    final UserModel usermodel = new UserModel();
+    usermodel.setUsername("me");
+    usermodel.setUserLastName(userLastName);
+    usermodel.setUserFirstName(userFirstName);
+    usermodel.setUserEmail("test@example.com");
+
+    when(userService.updateUser(usermodel)).thenReturn(ResponseEntity.ok().body(Map.of()));
+    mockMvc.perform(put("/user/update")
+        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+        .param("userLastName", usermodel.getUserLastName())
+        .param("userFirstName", usermodel.getUserFirstName())
+        .param("username", usermodel.getUsername())
+        .param("userEmail", usermodel.getUserEmail()))
+      .andDo(print())
+      .andExpect(status().isOk());
   }
 }
