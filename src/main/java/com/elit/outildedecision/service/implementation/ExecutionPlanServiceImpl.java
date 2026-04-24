@@ -31,6 +31,7 @@ import com.elit.outildedecision.repository.ExecutionPlanQuestionRepository;
 import com.elit.outildedecision.repository.ExecutionPlanRepository;
 import com.elit.outildedecision.repository.ExecutionPlanVoteRepo;
 import com.elit.outildedecision.repository.MethodRepository;
+import com.elit.outildedecision.repository.MethodologyRepository;
 import com.elit.outildedecision.repository.MultiCriteriaAnalysisRepository;
 import com.elit.outildedecision.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.repository.PredictibilityResultsRepository;
@@ -91,6 +92,10 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    */
   private final ExecutionPlanVoteRepo executionPlanVoteRepo;
   /**
+   * the methodology repository.
+   */
+  private final MethodologyRepository methodologyRepository;
+  /**
    * the project repository.
    */
   private final ProjectRepository projectRepository;
@@ -127,6 +132,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    */
   public ExecutionPlanServiceImpl(final ProjectUserPermissionRepository projectUserPermissionRepository,
                                   final MethodRepository methodRepository,
+                                  final MethodologyRepository methodologyRepository,
                                   final ExecutionPlanVoteRepo executionPlanVoteRepo,
                                   final ProjectRepository projectRepository,
                                   final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
@@ -138,6 +144,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
                                   final ExecutionPlanAnswerRepository executionPlanAnswerRepository) {
     this.projectUserPermissionRepository = projectUserPermissionRepository;
     this.methodRepository = methodRepository;
+    this.methodologyRepository = methodologyRepository;
     this.executionPlanVoteRepo = executionPlanVoteRepo;
     this.projectRepository = projectRepository;
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
@@ -402,8 +409,14 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     String choosenMethodology = predictibilityAnalysis.getChosenMethodology();
     List<Method> methodList;
 
-    if (choosenMethodology.equalsIgnoreCase("Hybride") || choosenMethodology.equalsIgnoreCase("Hybrid")) {
+    if (choosenMethodology != null
+      && (choosenMethodology.equalsIgnoreCase("Hybride") || choosenMethodology.equalsIgnoreCase("Hybrid"))) {
       methodList = methodRepository.findAll();
+    } else if (choosenMethodology != null) {
+      Methodology chosenMethodologyEntity = methodologyRepository.findByName(choosenMethodology);
+      methodList = Objects.nonNull(chosenMethodologyEntity)
+        ? chosenMethodologyEntity.getMethods()
+        : predictibilityAnalysis.getMethodology().getMethods();
     } else {
       Methodology methodology = predictibilityAnalysis.getMethodology();
       methodList = methodology.getMethods();
