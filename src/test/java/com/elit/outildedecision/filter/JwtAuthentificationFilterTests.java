@@ -1,39 +1,33 @@
 package com.elit.outildedecision.filter;
 
-
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
+import com.elit.outildedecision.config.JwtProperties;
 import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.filters.JwtAuthenticationFilter;
 import com.elit.outildedecision.model.UserResponseModel;
 import com.elit.outildedecision.service.implementation.UserServiceImpl;
 import com.elit.outildedecision.util.ModelSamples;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.elit.outildedecision.security.AppUserPrincipal;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.core.Authentication;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import com.elit.outildedecision.config.JwtProperties;
-import com.elit.outildedecision.filters.JwtAuthenticationFilter;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
@@ -48,7 +42,7 @@ class JwtAuthenticationFilterTests {
   AuthenticationManager authenticationManager;
   @Mock
   private UserServiceImpl customUserDetailsService;
-  @MockBean
+  @MockitoBean
   private UserServiceImpl userService;
 
   @InjectMocks
@@ -67,6 +61,7 @@ class JwtAuthenticationFilterTests {
 
     Mockito.reset(authenticationManager);
   }
+
   @Test
   @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
   void testAttemptAuthenticationSuccess() throws JsonProcessingException {

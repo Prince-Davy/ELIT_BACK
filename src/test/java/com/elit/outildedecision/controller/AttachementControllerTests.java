@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
@@ -36,12 +35,14 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,12 +54,11 @@ import java.util.Optional;
 class AttachementControllerTests {
   @Autowired
   private MockMvc mockMvc;
-  @MockBean
+  @MockitoBean
   private AttachmentServiceImpl attachmentService;
-
-  @MockBean
+  @MockitoBean
   private UserServiceImpl userService;
-  @MockBean
+  @MockitoBean
   AttachmentRepository attachmentRepository;
   @Mock
   CustomMethodSecurityExpressionRoot customMethodSecurity;

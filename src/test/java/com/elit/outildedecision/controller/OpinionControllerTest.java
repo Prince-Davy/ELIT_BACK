@@ -15,15 +15,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,9 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 class OpinionControllerTest {
   @Autowired
   private MockMvc mockMvc;
-  @MockBean
+  @MockitoBean
   OpinionService opinionService;
-  @MockBean
+  @MockitoBean
   private UserServiceImpl userService;
   @InjectMocks
   OpinionController OpinionController;
@@ -66,6 +64,7 @@ class OpinionControllerTest {
       .accept(MediaType.APPLICATION_JSON).content(asJsonString(opinionModel) )).andDo(print()).andReturn().getResponse();
     Assertions.assertEquals(200,response.getStatus());
   }
+
   @Test
   void createOpinion_whenOpinionOfUserAlreadyExists() throws Exception {
     OpinionModel opinionModel = new OpinionModel();

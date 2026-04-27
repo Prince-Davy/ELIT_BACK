@@ -3,7 +3,9 @@ package com.elit.outildedecision.controller;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.exception.ReportNotFoundException;
 import com.elit.outildedecision.service.ReportService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,16 +22,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -261,5 +263,25 @@ class ReportControllerTests {
     mockMvc.perform(delete("/report/" + projectId))
       .andDo(print())
       .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "User"})
+  void shouldRenameReportById_Success() throws Exception {
+    when(reportService.renameReportById(eq(reportId), any())).thenReturn(ResponseEntity.ok().body("Le fichier a été mis à jour."));
+    mockMvc.perform(put("/report/" + reportId))
+      .andDo(print())
+      .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "User"})
+  void shouldRenameReportById_ThrowException() throws Exception {
+    when(reportService.renameReportById(eq(reportId), any())).thenThrow(new ReportNotFoundException("Ce report n'existe pas."));
+    mockMvc.perform(put("/report/" + reportId))
+      .andDo(print())
+      .andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.status").value(404))
+      .andExpect(jsonPath("$.message").value("Ce report n'existe pas."));
   }
 }
