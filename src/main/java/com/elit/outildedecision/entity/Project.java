@@ -26,6 +26,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -56,6 +57,7 @@ public class Project implements Serializable {
 
   @Size(min = 3, message = "La description du projet doit contenir au moins 3 caractères")
   @Size(max = 800, message = "La description du projet ne doit pas dépasser 800 caractères")
+  @Pattern(regexp = "^(?:[^\\r\\n]*(?:\\r?\\n|$)){0,5}$", message = "La description du projet ne doit pas dépasser 5 lignes")
   private String description;
   private String folderPath;
   private Long chefId;
