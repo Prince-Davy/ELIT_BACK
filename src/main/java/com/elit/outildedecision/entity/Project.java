@@ -56,7 +56,7 @@ public class Project implements Serializable {
   private String name;
 
   @Size(min = 3, message = "La description du projet doit contenir au moins 3 caractères")
-  @Size(max = 800, message = "La description du projet ne doit pas dépasser 800 caractères")
+  @Size(max = 255, message = "La description du projet ne doit pas dépasser 255 caractères")
   @Pattern(regexp = "^(?:[^\\r\\n]*(?:\\r?\\n|$)){0,5}$", message = "La description du projet ne doit pas dépasser 5 lignes")
   private String description;
   private String folderPath;
