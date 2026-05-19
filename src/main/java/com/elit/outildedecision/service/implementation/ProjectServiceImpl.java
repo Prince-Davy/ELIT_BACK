@@ -561,33 +561,97 @@ public class ProjectServiceImpl implements ProjectService {
   private long getTotalProjectCreatedUser(TriModel triModel, UserDetails userDetails) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
       return projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
-    } else {
-      return projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
     }
+    if (isStrictCompletedMode(triModel)) {
+      return getStrictCompletedProjectCount(triModel, userDetails, true);
+    }
+    return projectUserPermissionRepository.getTotalProjectCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
   }
 
   private long getTotalProjectAffectedUser(TriModel triModel, UserDetails userDetails) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
       return projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
-    } else {
-      return projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
     }
+    if (isStrictCompletedMode(triModel)) {
+      return getStrictCompletedProjectCount(triModel, userDetails, false);
+    }
+    return projectUserPermissionRepository.getTotalProjectAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
   }
 
   private Page<ProjectUserPermission> getUserAffectedProject(TriModel triModel, UserDetails userDetails, Pageable pageable) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
       return projectUserPermissionRepository.findProjectWithAuditAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
-    } else {
-      return projectUserPermissionRepository.findProjectAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
     }
+    if (isStrictCompletedMode(triModel)) {
+      return getStrictCompletedProjectPage(triModel, userDetails, pageable, false);
+    }
+    return projectUserPermissionRepository.findProjectAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
   }
 
   private Page<ProjectUserPermission> getUserCreatedProject(TriModel triModel, UserDetails userDetails, Pageable pageable) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
       return projectUserPermissionRepository.findProjectWithAuditCreatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
-    } else {
-      return projectUserPermissionRepository.findProjectCreatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
     }
+    if (isStrictCompletedMode(triModel)) {
+      return getStrictCompletedProjectPage(triModel, userDetails, pageable, true);
+    }
+    return projectUserPermissionRepository.findProjectCreatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+  }
+
+  private boolean isStrictCompletedMode(TriModel triModel) {
+    return triModel.getStatus() != null
+      && "COMPLETED".equalsIgnoreCase(triModel.getStatus())
+      && triModel.getTypeAnalyse() != null
+      && ("IA".equalsIgnoreCase(triModel.getTypeAnalyse()) || "COLLABORATIVE".equalsIgnoreCase(triModel.getTypeAnalyse()));
+  }
+
+  private long getStrictCompletedProjectCount(TriModel triModel, UserDetails userDetails, boolean creator) {
+    Page<ProjectUserPermission> candidates = creator
+      ? projectUserPermissionRepository.findProjectCreatedByUser(triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged())
+      : projectUserPermissionRepository.findProjectAffected(triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged());
+    return filterCompletedStrict(candidates.getContent(), triModel.getTypeAnalyse()).size();
+  }
+
+  private Page<ProjectUserPermission> getStrictCompletedProjectPage(TriModel triModel, UserDetails userDetails, Pageable pageable, boolean creator) {
+    Page<ProjectUserPermission> candidates = creator
+      ? projectUserPermissionRepository.findProjectCreatedByUser(triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged())
+      : projectUserPermissionRepository.findProjectAffected(triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged());
+    List<ProjectUserPermission> filtered = filterCompletedStrict(candidates.getContent(), triModel.getTypeAnalyse());
+    if (!pageable.isPaged()) {
+      return new PageImpl<>(filtered, pageable, filtered.size());
+    }
+    int start = (int) pageable.getOffset();
+    int end = Math.min(start + pageable.getPageSize(), filtered.size());
+    List<ProjectUserPermission> content = start >= filtered.size() ? Collections.emptyList() : filtered.subList(start, end);
+    return new PageImpl<>(content, pageable, filtered.size());
+  }
+
+  private List<ProjectUserPermission> filterCompletedStrict(List<ProjectUserPermission> permissions, String typeAnalyse) {
+    if (!"IA".equalsIgnoreCase(typeAnalyse) && !"COLLABORATIVE".equalsIgnoreCase(typeAnalyse)) {
+      return permissions;
+    }
+    return permissions.stream()
+      .filter(permission -> {
+        Project project = permission.getProject();
+        if ("IA".equalsIgnoreCase(typeAnalyse)) {
+          return isCompletedByIa(project);
+        }
+        return isCompletedByCollaborative(project);
+      })
+      .collect(Collectors.toList());
+  }
+
+  private boolean isCompletedByIa(Project project) {
+    return resultIaRepository.findByProject(project).isPresent();
+  }
+
+  private boolean isCompletedByCollaborative(Project project) {
+    MultiCriteriaAnalysis latestMultiCriteriaAnalysis = multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(project.getProjectId());
+    if (latestMultiCriteriaAnalysis == null) {
+      return false;
+    }
+    PredictibilityAnalysis latestPredictibilityAnalysis = predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(latestMultiCriteriaAnalysis.getMultiCriteriaAnalysisId());
+    return latestPredictibilityAnalysis != null && Boolean.TRUE.equals(latestPredictibilityAnalysis.getIsFinished());
   }
 
   /**
