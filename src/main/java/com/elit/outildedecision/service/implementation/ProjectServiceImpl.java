@@ -560,7 +560,7 @@ public class ProjectServiceImpl implements ProjectService {
 
   private long getTotalProjectCreatedUser(TriModel triModel, UserDetails userDetails) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+      return projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(triModel.getKey(), null, "ALL", userDetails.getUsername());
     }
     if (isStrictCompletedMode(triModel)) {
       return getStrictCompletedProjectCount(triModel, userDetails, true);
@@ -570,7 +570,7 @@ public class ProjectServiceImpl implements ProjectService {
 
   private long getTotalProjectAffectedUser(TriModel triModel, UserDetails userDetails) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+      return projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(triModel.getKey(), null, "ALL", userDetails.getUsername());
     }
     if (isStrictCompletedMode(triModel)) {
       return getStrictCompletedProjectCount(triModel, userDetails, false);
@@ -580,7 +580,7 @@ public class ProjectServiceImpl implements ProjectService {
 
   private Page<ProjectUserPermission> getUserAffectedProject(TriModel triModel, UserDetails userDetails, Pageable pageable) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.findProjectWithAuditAffected(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+      return projectUserPermissionRepository.findProjectWithAuditAffected(triModel.getKey(), null, "ALL", userDetails.getUsername(), pageable);
     }
     if (isStrictCompletedMode(triModel)) {
       return getStrictCompletedProjectPage(triModel, userDetails, pageable, false);
@@ -590,7 +590,7 @@ public class ProjectServiceImpl implements ProjectService {
 
   private Page<ProjectUserPermission> getUserCreatedProject(TriModel triModel, UserDetails userDetails, Pageable pageable) {
     if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.findProjectWithAuditCreatedByUser(triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+      return projectUserPermissionRepository.findProjectWithAuditCreatedByUser(triModel.getKey(), null, "ALL", userDetails.getUsername(), pageable);
     }
     if (isStrictCompletedMode(triModel)) {
       return getStrictCompletedProjectPage(triModel, userDetails, pageable, true);
