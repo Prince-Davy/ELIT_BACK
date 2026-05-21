@@ -62,6 +62,7 @@ import java.util.stream.Stream;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -258,6 +259,58 @@ class ProjectServiceImplTest {
 
     when(projectUserPermissionRepository.findAll()).thenReturn(projectUserPermissions);
     Assertions.assertEquals(projects, projectServiceImpl.getUserProjects(keyword));
+  }
+
+  @Test
+  void getUserProjectList_auditFilterUsesCreatedAndAffectedAuditQueries() throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    TriModel triModel = new TriModel("", "ALL", null, true, 0, 10, "AUDIT");
+
+    when(projectUserPermissionRepository.findProjectWithAuditCreatedByUser(any(), any(), any(), any(), any(Pageable.class)))
+      .thenReturn(new PageImpl<>(new ArrayList<>()));
+    when(projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(any(), any(), any(), any()))
+      .thenReturn(0L);
+    when(projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(any(), any(), any(), any()))
+      .thenReturn(0L);
+
+    ResponsePageProject response = projectServiceImpl.getUserProjectList(triModel);
+
+    Assertions.assertEquals(0, response.getProjectsPage().getTotalElements());
+    verify(projectUserPermissionRepository).findProjectWithAuditCreatedByUser(any(), any(), any(), any(), any(Pageable.class));
+    verify(projectUserPermissionRepository).getTotalProjectWithAuditCreatedUser(any(), any(), any(), any());
+    verify(projectUserPermissionRepository).getTotalProjectWithAuditAffectedUser(any(), any(), any(), any());
+  }
+
+  @Test
+  void getUserProjectList_auditFilterUsesAffectedAuditQueriesWhenInactiveTab() throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    TriModel triModel = new TriModel("", "ALL", null, false, 0, 10, "AUDIT");
+
+    when(projectUserPermissionRepository.findProjectWithAuditAffected(any(), any(), any(), any(), any(Pageable.class)))
+      .thenReturn(new PageImpl<>(new ArrayList<>()));
+    when(projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(any(), any(), any(), any()))
+      .thenReturn(0L);
+    when(projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(any(), any(), any(), any()))
+      .thenReturn(0L);
+
+    ResponsePageProject response = projectServiceImpl.getUserProjectList(triModel);
+
+    Assertions.assertEquals(0, response.getProjectsPage().getTotalElements());
+    verify(projectUserPermissionRepository).findProjectWithAuditAffected(any(), any(), any(), any(), any(Pageable.class));
+    verify(projectUserPermissionRepository).getTotalProjectWithAuditCreatedUser(any(), any(), any(), any());
+    verify(projectUserPermissionRepository).getTotalProjectWithAuditAffectedUser(any(), any(), any(), any());
   }
 
   @Test
