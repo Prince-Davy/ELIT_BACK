@@ -1,6 +1,8 @@
 package com.elit.outildedecision.controller;
 
 import com.elit.outildedecision.entity.FeedbackIa;
+import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.model.FeedBackIaModel;
@@ -44,8 +46,29 @@ public class FeedbackIaController {
    */
   @PostMapping("/projectIa/{ignoredProjectId}")
   @PreAuthorize("isProjectOwner(#ignoredProjectId) or isContributer(#ignoredProjectId)")
-  public ResponseEntity<Object> saveFeedback(@RequestBody final FeedbackIa feedbackIa, @PathVariable final Long ignoredProjectId) throws ProjectNotFoundException, FeedBackNotFoundException {
+  public ResponseEntity<Object> saveFeedback(@RequestBody final FeedBackIaModel feedbackModel, @PathVariable final Long ignoredProjectId) throws ProjectNotFoundException, FeedBackNotFoundException {
     // ignoredProjectId est utilisé dans l'annotation @PreAuthorize pour vérifier les autorisations
+    // Construire l'entité FeedbackIa à partir du modèle reçu (permet d'accepter un payload simple venant du front)
+    FeedbackIa feedbackIa = new FeedbackIa();
+    feedbackIa.setIsLiked(feedbackModel.getIsLiked());
+    feedbackIa.setMethodology(feedbackModel.getMethodology());
+    feedbackIa.setFeedbackAnswer(feedbackModel.getFeedbackAnswer());
+
+    Project project = new Project();
+    // si le front ne fournit pas projectId, on utilise la valeur du path (utilisée pour la pré-autorisation)
+    Long projectId = feedbackModel.getProjectId() != null ? feedbackModel.getProjectId() : ignoredProjectId;
+    project.setProjectId(projectId);
+    feedbackIa.setProject(project);
+
+    User user = new User();
+    user.setUserId(feedbackModel.getUserId());
+    feedbackIa.setUser(user);
+
+    return feedbackIaService.saveFeedback(feedbackIa);
+  }
+
+  // Maintenir une surcharge pour les appels unitaires/legacy (non mappée en HTTP)
+  public ResponseEntity<Object> saveFeedback(final FeedbackIa feedbackIa, final Long ignoredProjectId) throws ProjectNotFoundException, FeedBackNotFoundException {
     return feedbackIaService.saveFeedback(feedbackIa);
   }
 
