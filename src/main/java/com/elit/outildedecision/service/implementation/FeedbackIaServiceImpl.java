@@ -7,7 +7,6 @@ import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.model.FeedBackIaModel;
 import com.elit.outildedecision.repository.FeedbackIaRepository;
 import com.elit.outildedecision.repository.ProjectRepository;
-import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.FeedbackIaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,16 +28,14 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
   public static final String FEEDBACK_NOT_FOUND = "Ce Feedback n'existe pas !";
   private final FeedbackIaRepository feedbackIaRepository;
   private final ProjectRepository projectRepository;
-  private final UserRepository userRepository;
 
   /**
    * @param feedbackIaRepository feedbackIaRepository
    * @param projectRepository projectRepository
    */
-  public FeedbackIaServiceImpl(final FeedbackIaRepository feedbackIaRepository, final ProjectRepository projectRepository, final UserRepository userRepository) {
+  public FeedbackIaServiceImpl(final FeedbackIaRepository feedbackIaRepository, final ProjectRepository projectRepository) {
     this.feedbackIaRepository = feedbackIaRepository;
     this.projectRepository = projectRepository;
-    this.userRepository = userRepository;
   }
 
   /**
@@ -54,15 +51,6 @@ public class FeedbackIaServiceImpl implements FeedbackIaService {
   public ResponseEntity<Object> saveFeedback(final FeedbackIa feedbackIa) throws ProjectNotFoundException {
     Project project = projectRepository.findById(feedbackIa.getProject().getProjectId())
       .orElseThrow(() -> new ProjectNotFoundException(PROJECT_NOT_FOUND));
-
-    // Attacher l'entité Project récupérée pour éviter les problèmes de persistance
-    feedbackIa.setProject(project);
-
-    // Récupérer et attacher l'entité User si fournie
-    if (Objects.nonNull(feedbackIa.getUser()) && Objects.nonNull(feedbackIa.getUser().getUserId()) && Objects.nonNull(userRepository)) {
-      userRepository.findById(feedbackIa.getUser().getUserId()).ifPresent(feedbackIa::setUser);
-    }
-
     Optional<FeedbackIa> feedback = feedbackIaRepository.findByProject_ProjectIdAndUser_UserId(feedbackIa.getProject().getProjectId(), feedbackIa.getUser().getUserId());
 
     if (Objects.nonNull(project.getProjectId()) && feedback.isPresent()) {
