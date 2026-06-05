@@ -10,12 +10,7 @@ import com.elit.outildedecision.entity.Project;
 import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.StepWeight;
 import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
-import com.elit.outildedecision.exception.StepFormNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
+import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.CriteriaModel;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
@@ -221,7 +216,7 @@ public class MultiCriteriaServiceImplTests {
   }
 
   @Test
-  public void updateMultiCriteriaAnalysisTest() throws StepFormNotFoundException {
+  public void updateMultiCriteriaAnalysisTest() throws StepFormNotFoundException, FormValidationException {
 
     when(formStepRepo.findById(1l)).thenReturn(Optional.of(formStep));
 

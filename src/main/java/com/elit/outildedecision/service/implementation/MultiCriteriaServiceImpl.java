@@ -10,6 +10,7 @@ import com.elit.outildedecision.entity.ProjectUserPermission;
 import com.elit.outildedecision.entity.StepWeight;
 import com.elit.outildedecision.entity.User;
 import com.elit.outildedecision.exception.EscoreException;
+import com.elit.outildedecision.exception.FormValidationException;
 import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
@@ -32,6 +33,7 @@ import com.elit.outildedecision.repository.StepWeightRepo;
 import com.elit.outildedecision.repository.UserRepository;
 import com.elit.outildedecision.service.MultiCriteriaAnalysisService;
 import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.validator.MultiCriteriaFormValidator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -306,15 +308,26 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
 
   /**
    * Update a MultiCriteriaAnalysis.
+   * Validates that all required fields (text answers and evaluation criteria) are properly filled.
    *
    * @param projectId                 the id of the project
    * @param multiCriteriaAnalysisStep the step of the MultiCriteriaAnalysis to update
-   * @throws RuntimeException if the project or the step do not exist
+   * @throws StepFormNotFoundException if the step does not exist
+   * @throws FormValidationException if validation fails (missing answers or criteria)
    */
   @Override
   // @PreAuthorize("isProjectOwner(#projectId)")
   public void updateMultiCriteriaAnalysis(
-    final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException {
+    final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException, FormValidationException {
+    
+    // Validate the form before proceeding with the update
+    MultiCriteriaFormValidator.ValidationResult validationResult = 
+      MultiCriteriaFormValidator.validateMultiCriteriaStep(multiCriteriaAnalysisStep);
+    
+    if (validationResult.hasErrors()) {
+      throw new FormValidationException(validationResult.buildErrorMessage());
+    }
+    
     FormStep formStepToUpdate =
       formStepRepo
         .findById(multiCriteriaAnalysisStep.getStepId())

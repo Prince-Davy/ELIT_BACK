@@ -151,7 +151,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
    */
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler({
-      CouldNotSaveUserException.class, QuestionFormatNotValidException.class, ResponseNotValidException.class
+      CouldNotSaveUserException.class, QuestionFormatNotValidException.class, ResponseNotValidException.class,
+      FormValidationException.class
   })
   public ResponseEntity<Object> handleBadRequestException(final Exception ex) {
     LOGGER.warn("Bad Request: {}", ex.getMessage());

@@ -1,12 +1,7 @@
 package com.elit.outildedecision.controller;
 
 
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.exception.UserNotAuthorizedException;
-import com.elit.outildedecision.exception.QuestionsNotFoundException;
-import com.elit.outildedecision.exception.EscoreException;
-import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.*;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
@@ -121,7 +116,7 @@ public class MultiCriteriaAnalysisController {
   @PutMapping("/multi-criteria-analysis/{projectId}")
   @PreAuthorize("isContributer(#projectId)")
   public ResponseEntity<String> updateMultiCriteriaAnalysis(@PathVariable final Long projectId,
-    @RequestBody final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException, ProjectNotFoundException {
+    @RequestBody final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException, ProjectNotFoundException, FormValidationException {
     multiCriteriaAnalysisService.updateMultiCriteriaAnalysis(projectId, multiCriteriaAnalysisStep);
     projectService.updateFormTypeStatus(projectId, FormProgressStatus.COLLABORATIVE);
     return ResponseEntity.ok().body("Votre Modification sont enregistrées avec succés");

@@ -5,6 +5,7 @@ import com.elit.outildedecision.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.exception.UserNotAuthorizedException;
 import com.elit.outildedecision.exception.QuestionsNotFoundException;
 import com.elit.outildedecision.exception.StepFormNotFoundException;
+import com.elit.outildedecision.exception.FormValidationException;
 import com.elit.outildedecision.exception.EscoreException;
 import com.elit.outildedecision.model.FormQuestionModel;
 import com.elit.outildedecision.model.MultiCriteriaAnalysisScoreModel;
@@ -45,12 +46,15 @@ public interface MultiCriteriaAnalysisService {
 
   /**
    * Updates the multi-criteria analysis form for the specified project.
+   * Validates that all required fields (text answers and evaluation criteria) are properly filled.
    *
    * @param projectId the ID of the project for which to update the form
    * @param multiCriteriaAnalysis a FormStep object representing the updated form
+   * @throws StepFormNotFoundException if the step does not exist
+   * @throws FormValidationException if validation fails (missing answers or criteria)
    */
   void updateMultiCriteriaAnalysis(
-    Long projectId, MultiCriteriaStepModel multiCriteriaAnalysis) throws StepFormNotFoundException;
+    Long projectId, MultiCriteriaStepModel multiCriteriaAnalysis) throws StepFormNotFoundException, FormValidationException;
 
   /**
    * Updates an existing multi-criteria analysis question.
