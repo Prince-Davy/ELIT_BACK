@@ -1,5 +1,6 @@
 package com.elit.outildedecision.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class FeedbackIaMethodCreateDto {
 
   private Boolean isLiked;
 
+  @Size(max = 255, message = "Le feedback ne peut pas dépasser 255 caractères")
   private String feedbackAnswer;
 
   private Long projectId;

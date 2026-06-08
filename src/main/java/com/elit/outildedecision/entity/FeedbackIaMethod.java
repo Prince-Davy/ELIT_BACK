@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,8 +36,10 @@ public class FeedbackIaMethod {
 
   /**
    * Champ libre (modifiable) permettant à l'utilisateur de préciser son feedback.
+   * Limité à 255 caractères maximum.
    */
-  @Column(name = "feedback_answer")
+  @Size(max = 255, message = "Le feedback ne peut pas dépasser 255 caractères")
+  @Column(name = "feedback_answer", length = 255)
   private String feedbackAnswer;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)

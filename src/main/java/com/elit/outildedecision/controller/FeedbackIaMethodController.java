@@ -5,6 +5,7 @@ import com.elit.outildedecision.exception.FeedBackNotFoundException;
 import com.elit.outildedecision.exception.ProjectNotFoundException;
 import com.elit.outildedecision.model.FeedBackIaMethodModel;
 import com.elit.outildedecision.service.FeedbackIaMethodService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,7 +47,7 @@ public class FeedbackIaMethodController {
   @PostMapping("/projectIa/method/{ignoredProjectId}")
   @PreAuthorize("isProjectOwner(#ignoredProjectId) or isContributer(#ignoredProjectId)")
   public ResponseEntity<Object> saveFeedback(
-    @RequestBody final FeedbackIaMethodCreateDto dto,
+    @Valid @RequestBody final FeedbackIaMethodCreateDto dto,
     @PathVariable final Long ignoredProjectId
   ) throws ProjectNotFoundException {
     // ignoredProjectId utilisé uniquement dans @PreAuthorize
