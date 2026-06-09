@@ -93,7 +93,7 @@ public class AiAnswerController {
     @ApiResponse(responseCode = "404", description = "Answers not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  @PreAuthorize("isProjectOwner(#projectId)")
+  @PreAuthorize("isProjectOwner(#projectId) or isContributer(#projectId)")
   public ResponseEntity<AiAnswerDTO> getAnswers(@PathVariable final Long projectId) throws AiAnswerNotFoundException {
     log.info("Received request to fetch AI answers for project ID: {}", projectId);
 

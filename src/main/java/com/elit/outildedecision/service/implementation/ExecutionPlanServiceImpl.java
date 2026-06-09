@@ -120,6 +120,7 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    * it's used to inject the dependencies
    * @param projectUserPermissionRepository the project user permission repository to inject
    * @param methodRepository the method repository to inject
+   * @param methodologyRepository the methodology repository to inject
    * @param executionPlanVoteRepo the execution plan vote repository to inject
    * @param projectRepository the project repository to inject
    * @param predictibilityAnalysisRepository the predictibility analysis repository to inject

@@ -30,7 +30,7 @@ public class MethodologyEvaluationController {
    * @return methodology evaluations.
    */
   @GetMapping
-  @PreAuthorize("isProjectOwner(#projectId)")
+  @PreAuthorize("isProjectOwner(#projectId) or isContributer(#projectId)")
   public ResponseEntity<List<MethodologyEvaluationDto>> getMethodologyEvaluations(@PathVariable final Long projectId) {
     log.info("Received request to fetch Methodology evalutations for project ID: {}", projectId);
 
