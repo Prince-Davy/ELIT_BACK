@@ -319,15 +319,11 @@ public class MultiCriteriaServiceImpl implements MultiCriteriaAnalysisService {
   // @PreAuthorize("isProjectOwner(#projectId)")
   public void updateMultiCriteriaAnalysis(
     final Long projectId, final MultiCriteriaStepModel multiCriteriaAnalysisStep) throws StepFormNotFoundException, FormValidationException {
-    
     // Validate the form before proceeding with the update
-    MultiCriteriaFormValidator.ValidationResult validationResult = 
-      MultiCriteriaFormValidator.validateMultiCriteriaStep(multiCriteriaAnalysisStep);
-    
+    MultiCriteriaFormValidator.ValidationResult validationResult = MultiCriteriaFormValidator.validateMultiCriteriaStep(multiCriteriaAnalysisStep);
     if (validationResult.hasErrors()) {
       throw new FormValidationException(validationResult.buildErrorMessage());
     }
-    
     FormStep formStepToUpdate =
       formStepRepo
         .findById(multiCriteriaAnalysisStep.getStepId())

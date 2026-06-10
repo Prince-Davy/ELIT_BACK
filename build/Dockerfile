@@ -3,9 +3,12 @@ FROM maven:3.9.12-eclipse-temurin-21
 LABEL description="This image is used for quality build"
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends bc \
-      python3-pip python3-venv pipx && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends bc \
+      python3-pip python3-venv pipx \
+    && apt-get install -y --only-upgrade libssl3 openssl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install anybadge via pipx (dans un venv dédié)
 RUN pipx install anybadge

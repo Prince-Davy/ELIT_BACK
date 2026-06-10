@@ -3,15 +3,21 @@ package com.elit.outildedecision.validator;
 import com.elit.outildedecision.entity.Criteria;
 import com.elit.outildedecision.entity.FormQuestion;
 import com.elit.outildedecision.model.MultiCriteriaStepModel;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Validator for multi-criteria analysis forms.
  * Validates that all required fields (text answers and evaluation criteria) are properly filled.
  */
-public class MultiCriteriaFormValidator {
+@Slf4j
+public final class MultiCriteriaFormValidator {
+
+  private MultiCriteriaFormValidator() {
+    /* This utility class should not be instantiated */
+  }
 
   /**
    * Validates a multi-criteria analysis step model.
@@ -22,13 +28,11 @@ public class MultiCriteriaFormValidator {
    */
   public static ValidationResult validateMultiCriteriaStep(final MultiCriteriaStepModel multiCriteriaStep) {
     ValidationResult result = new ValidationResult();
-    
     if (multiCriteriaStep == null || multiCriteriaStep.getFormQuestions() == null) {
       return result;
     }
 
     List<FormQuestion> formQuestions = new ArrayList<>(multiCriteriaStep.getFormQuestions());
-    
     // Sort questions by their reference to get consistent numbering
     formQuestions.sort((q1, q2) -> {
       int num1 = extractQuestionNumber(q1.getQuestionRef());
@@ -71,16 +75,16 @@ public class MultiCriteriaFormValidator {
     if (questionRef == null || questionRef.isEmpty()) {
       return 0;
     }
-    
     try {
       String[] parts = questionRef.split("_");
       if (parts.length > 0) {
         return Integer.parseInt(parts[parts.length - 1]);
       }
     } catch (NumberFormatException e) {
-      // If parsing fails, return 0
+
+      // Log at debug level since this is expected for non-numeric refs
+      log.debug("Unable to parse question number from ref: {}", questionRef);
     }
-    
     return 0;
   }
 

@@ -122,6 +122,7 @@ public class MultiCriteriaServiceImplTests {
 
     formQuestion = new FormQuestion();
     formQuestion.setQuestionRef("QREF");
+    formQuestion.setAnswerText("Une réponse de test");
     formStep.getFormQuestions().add(formQuestion);
     formQuestion.setCriterias(new HashSet<>());
 

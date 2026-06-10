@@ -21,6 +21,10 @@ FROM eclipse-temurin:21-jre-jammy
 ENV TZ 'Europe/Paris'
 RUN echo $TZ > /etc/timezone
 
+RUN apt-get update \
+  && apt-get install -y --only-upgrade libssl3 openssl \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # --- Add: import the certificate into a dedicated truststore and configure the JVM ---
 RUN mkdir -p /opt/certs
