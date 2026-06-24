@@ -1,8 +1,8 @@
 package com.elit.outildedecision.audit.entity;
 
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.shared.kernel.entity.Project;
+import com.elit.outildedecision.shared.kernel.entity.User;
+import com.elit.outildedecision.shared.util.MethodType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -76,8 +76,6 @@ public class Audit implements Serializable {
   @ManyToOne(optional = false)
   @JoinColumn(name = "project_id", referencedColumnName = "projectId")
   @JsonBackReference("audit_project")
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private Project project;
 
   /**
@@ -87,8 +85,6 @@ public class Audit implements Serializable {
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", referencedColumnName = "userId")
   @JsonBackReference("audit_user")
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private User user;
 
   /**
@@ -99,8 +95,6 @@ public class Audit implements Serializable {
   @OneToMany(mappedBy = "audit", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_questions")
   @Builder.Default
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private List<Question> questions = new ArrayList<>();
 
   /**
@@ -108,7 +102,5 @@ public class Audit implements Serializable {
    */
   @OneToOne(mappedBy = "audit", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_auditScore")
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private AuditScore auditScore;
 }

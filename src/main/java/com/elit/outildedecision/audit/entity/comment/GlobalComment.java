@@ -18,6 +18,7 @@ import jakarta.persistence.DiscriminatorType;
 
 
 
+/** Global comment class. */
 @Entity
 @Table(
   name = "global_comment",

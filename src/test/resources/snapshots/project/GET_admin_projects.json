@@ -1,0 +1,19 @@
+[ {
+  "projectId" : 3,
+  "name" : "Project Pilot",
+  "description" : "Deterministic seed for the project snapshot journey",
+  "createdAt" : "2026-06-23T00:02:29.447+00:00",
+  "updatedAt" : "2026-06-23T00:02:29.447+00:00",
+  "confirmationState" : "PENDING",
+  "chefId" : 5,
+  "chefLasName" : null,
+  "chefFirstName" : null,
+  "isArchived" : false,
+  "formProgressStatus" : null,
+  "projectState" : null,
+  "contributors" : null,
+  "attachments" : null,
+  "multiCriteriaAnalysisList" : null,
+  "multiCriteriaStatus" : null,
+  "resultAi" : null
+} ]

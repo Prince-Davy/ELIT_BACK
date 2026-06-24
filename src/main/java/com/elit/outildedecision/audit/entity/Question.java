@@ -1,7 +1,6 @@
 package com.elit.outildedecision.audit.entity;
 
-import com.elit.outildedecision.audit.model.ScoringType;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -87,8 +86,6 @@ public class Question implements Serializable {
   @JoinColumn(name = "audit_id", referencedColumnName = "auditId")
   @JsonBackReference("audit_questions")
   @NotNull(message = "Audit reference is required")
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private Audit audit;
 
   /**

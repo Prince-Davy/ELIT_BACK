@@ -8,16 +8,19 @@ package com.elit.outildedecision.audit.entity;
  *  {@code MAUVAIS} – Poor performance
  */
 public enum LevelScore {
+  /** Bon. */
   BON,
+  /** Moyen. */
   MOYEN,
+  /** Mauvais. */
   MAUVAIS;
 
 
   /**
    * Determines the {@link LevelScore} based on a given score percentage.
    * The logic is defined as:
-   *  {@code BON} if percentage ≥ 80
-   *  {@code MOYEN} if percentage ≥ 50
+   *  {@code BON} if percentage &gt; 80
+   *  {@code MOYEN} if percentage &gt; 40
    *  {@code MAUVAIS} otherwise
    *
    * @param percentage the score percentage to evaluate

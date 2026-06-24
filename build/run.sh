@@ -2,7 +2,7 @@
 
 # Remove downloading log in order to save VM space
 # Be aware to put site at the end of the command, exitcode bug.
-mvn -Dspring.profiles.active=test -ntp checkstyle:check pmd:check clean verify site
+mvn -Dspring.profiles.active=test -ntp clean checkstyle:check pmd:check verify site
 export exitcode=$?
 
 #check mvn result and exitcode=1 if failed

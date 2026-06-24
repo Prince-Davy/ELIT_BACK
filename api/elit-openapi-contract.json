@@ -1,0 +1,3874 @@
+{
+  "paths" : {
+    "DELETE /admin/projects/{id}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "id",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /brainstorming/{projectId}/{brainstormingId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "brainstormingId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /feedbacks-method/projectIa/method/{projectId}/{userId}/{methodName}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "methodName",
+        "required" : true,
+        "type" : "string"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "SimpleMessageDto"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /feedbacks/projectIa/{projectId}/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "SimpleMessageDto"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /report/{reportId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "reportId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /user/attachments/{attachmentId}/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "attachmentId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /user/avatar/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /user/projects/{id}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "id",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "DELETE /user/projects/{projectId}/delete-contributor/{contributorID}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "contributorID",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /admin/projects" : {
+      "parameters" : [ ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ProjectResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /answers/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "AnswerResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /audit/project/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "AuditResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /audit/project/{projectId}/audit/{auditId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "auditId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "AuditResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /audit/project/{projectId}/has-audit" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "boolean"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /audit/{auditId}/auditScore" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "auditId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "AuditScoreResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /brainstorming/abstract/{prevId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "prevId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "object"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /brainstorming/abstract/{projectId}/{predictibilityAnalysisId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "predictibilityAnalysisId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "object"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /brainstorming/{projectId}/{predictibilityAnalysisId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "predictibilityAnalysisId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "object"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /confirm-account" : {
+      "parameters" : [ {
+        "in" : "query",
+        "name" : "token",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /feedbacks-method/projectIa/method/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "FeedbackMethodResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /feedbacks-method/projectIa/method/{projectId}/{userId}/{methodName}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "methodName",
+        "required" : true,
+        "type" : "string"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "FeedbackMethodResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /feedbacks/projectIa/{projectId}/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "FeedbackResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /kiviat/methodology/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "KiviatResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /kiviat/project/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "KiviatResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /multi-criteria-analysis/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "MulticriteriaAnalysisResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /multi-criteria-analysis/{projectId}/score" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "MultiCriteriaAnalysisScoreResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /projects/{projectId}/methodology-evaluations" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "MethodologyEvaluationDto[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /refreshToken" : {
+      "parameters" : [ ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : "<no-content>",
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /report/download/{reportId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "reportId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : "<no-content>",
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /report/preview/{reportId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "reportId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : "<no-content>",
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /report/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ReportResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /result/ai/mapping/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "RecommendationItemResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /result/ai/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ResultResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /survey/answer/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "SurveyAnswerResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /survey/question" : {
+      "parameters" : [ ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "SurveyQuestionResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /user/attachments/download/{projectId}/{attachmentId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "attachmentId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : "<no-content>",
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /user/attachments/preview/{projectId}/{attachmentId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "attachmentId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : "<no-content>",
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /user/avatar/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : "<no-content>",
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /user/projects" : {
+      "parameters" : [ {
+        "in" : "query",
+        "name" : "keyword",
+        "required" : false,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ProjectResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /user/projects/getdata/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ProjectResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /user/users" : {
+      "parameters" : [ {
+        "in" : "query",
+        "name" : "keyword",
+        "required" : false,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "UserResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /user/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "UserResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /vote/{predictibilityAnalysisId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "predictibilityAnalysisId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "VoteResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /{projectId}/executionPlan/formConstraints/{executionPlanId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "executionPlanId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ExecutionPlanFormResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /{projectId}/executionPlan/methodologies/{executionPlanId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "executionPlanId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ExecutionVoteResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /{projectId}/executionPlan/{executionPlanId}/score" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "executionPlanId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ExecutionPlanScoreResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "GET /{projectId}/predictibility/{analyseId}/score" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "PredictibilityScoreResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /answers/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "AnswerRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "SimpleMessageDto"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /audit" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "AuditRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "AuditResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /audit/updateAudit" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "AuditRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "AuditResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /audit/{auditId}/calculate" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "auditId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "AuditScoreResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /brainstorming/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "BrainstormingRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "integer:int64"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /executionPlan/create/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "integer:int64"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /feedbacks-method/projectIa/method/{ignoredProjectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "ignoredProjectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "FeedbackMethodRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "SimpleMessageDto"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /feedbacks/projectIa/{ignoredProjectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "ignoredProjectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "FeedbackRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "SimpleMessageDto"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /login" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "object"
+      },
+      "responses" : {
+        "200" : "<no-content>",
+        "401" : "<no-content>"
+      }
+    },
+    "POST /predictibility-analysis/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "integer:int64"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /projects/{projectId}/ai-analysis" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "AnswerRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "SimpleMessageDto"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /register" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "UserRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /report/upload/{projectId}/{analyseId}/{type}/{iteration}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "iteration",
+        "required" : true,
+        "type" : "integer:int32"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "type",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : {
+        "multipart/form-data" : "object"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /reset-password" : {
+      "parameters" : [ {
+        "in" : "query",
+        "name" : "token",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : {
+        "application/json" : "PasswordChangeRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /result/ai/method-recommendation/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "204" : "<no-content>",
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /result/ai/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "AnswerRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "SimpleMessageDto"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /send-reset-password-email" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "string"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /sendRegistrationConfirmationEmailAgain" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "UserRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /survey/answer" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "SurveyAnswerRequest[]"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /user/attachments/upload/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "multipart/form-data" : "object"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "object"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /user/projectlist/" : {
+      "parameters" : [ ],
+      "request" : {
+        "application/json" : "ProjectFilterRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "ProjectPageResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /user/projects" : {
+      "parameters" : [ ],
+      "request" : {
+        "multipart/form-data" : "ProjectRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "ProjectResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /user/projects/{projectId}/add-contributor" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "query",
+        "name" : "contributor",
+        "required" : true,
+        "type" : "ContributorRequest"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /{projectId}/executionPlan/isFinished/{executionPlanId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "executionPlanId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "boolean"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /{projectId}/executionPlan/methodologies/vote" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "ExecutionVoteRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /{projectId}/predictibility/{analyseId}/chosenMethodology" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "ChosenMethodologyRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /{projectId}/vote" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "VoteRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "POST /{projectId}/vote/" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "VoteRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /admin/projects/{id}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "id",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "query",
+        "name" : "isConfirmed",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /brainstorming/validate/{projectId}/{brainstormingId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "brainstormingId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "query",
+        "name" : "isChecked",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /brainstorming/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "BrainstormingRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /multi-criteria-analysis/{projectId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "MultiCriteriaStepRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /report/upload/{projectId}/{analyseId}/{type}/{iteration}/update" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "iteration",
+        "required" : true,
+        "type" : "integer:int32"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "type",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : {
+        "multipart/form-data" : "object"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /user/attachments/edit/{attachmentId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "attachmentId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "query",
+        "name" : "newAttachmentName",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /user/avatar/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "multipart/form-data" : "object"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /user/info/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "query",
+        "name" : "userFirstName",
+        "required" : true,
+        "type" : "string"
+      }, {
+        "in" : "query",
+        "name" : "userLastName",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /user/password/{userId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "userId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "query",
+        "name" : "newPass",
+        "required" : true,
+        "type" : "string"
+      }, {
+        "in" : "query",
+        "name" : "oldPass",
+        "required" : true,
+        "type" : "string"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /user/projects/{id}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "id",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "multipart/form-data" : "ProjectRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "ProjectResponse"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /vote/{projectId}/{voteId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "voteId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "VoteRequest"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /{projectId}/executionPlan/formConstraints/putAnswers/{executionPlanId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "executionPlanId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "ExecutionPlanAnswerRequest[]"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /{projectId}/multi-criteria-analysis/isFinished/{analyseId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /{projectId}/multi-criteria-analysis/iteration/{analyseId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /{projectId}/multi-criteria-analysis/question" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : {
+        "application/json" : "FormQuestionModel"
+      },
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /{projectId}/predictibility/isFinished/{analyseId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
+    "PUT /{projectId}/predictibility/iteration/{analyseId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "analyseId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "string"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    }
+  },
+  "schemas" : {
+    "AnswerRequest" : {
+      "[required]" : [ "data" ],
+      "data" : "map<string>"
+    },
+    "AnswerResponse" : {
+      "data" : "map<string>"
+    },
+    "Attachment" : {
+      "attachmentId" : "integer:int64",
+      "contentType" : "string",
+      "createdAt" : "string:date-time",
+      "creator" : "User",
+      "fileName" : "string",
+      "filePath" : "string",
+      "project" : "Project",
+      "updatedAt" : "string:date-time"
+    },
+    "AttachmentResponse" : {
+      "attachmentId" : "integer:int64",
+      "contentType" : "string",
+      "createdAt" : "string:date-time",
+      "creatorFirstName" : "string",
+      "creatorLastName" : "string",
+      "fileName" : "string",
+      "filePath" : "string",
+      "updatedAt" : "string:date-time"
+    },
+    "Audit" : {
+      "auditId" : "integer:int64",
+      "auditLaunchDate" : "string:date-time",
+      "auditScore" : "AuditScore",
+      "method" : "string{SCALED_AGILITY,kanban,other,scrum,vmodel,waterfall}",
+      "project" : "Project",
+      "questions" : "Question[]",
+      "user" : "User"
+    },
+    "AuditCategoryResult" : {
+      "[required]" : [ "scorePercentageCategory" ],
+      "auditCategoryResultId" : "integer:int64",
+      "auditScore" : "AuditScore",
+      "category" : "string{COMMUNICATION_ET_COLLABORATION,OBJECTIF_ET_PERIMETRES,ORGANISATIONS,OUTILS_ET_DOCUMENTATION,PLANIFICATION_ET_RESSOURCES,SUIVI_RISQUE_ET_CHANGEMENT}",
+      "level" : "string{BON,MAUVAIS,MOYEN}",
+      "scorePercentageCategory" : "number:double"
+    },
+    "AuditCategoryResultResponse" : {
+      "category" : "string",
+      "categoryCommentId" : "integer:int64",
+      "level" : "string{BON,MAUVAIS,MOYEN}",
+      "scorePercentageCategory" : "number:double",
+      "text" : "string"
+    },
+    "AuditRequest" : {
+      "[required]" : [ "projectId" ],
+      "auditId" : "integer:int64",
+      "method" : "string{SCALED_AGILITY,kanban,other,scrum,vmodel,waterfall}",
+      "projectId" : "integer:int64",
+      "questions" : "QuestionRequest[]"
+    },
+    "AuditResponse" : {
+      "auditId" : "integer:int64",
+      "auditLaunchDate" : "string:date-time",
+      "categoryResults" : "AuditCategoryResultResponse[]",
+      "method" : "string{SCALED_AGILITY,kanban,other,scrum,vmodel,waterfall}",
+      "projectId" : "integer:int64",
+      "projectName" : "string",
+      "questions" : "QuestionResponse[]",
+      "totalAuditCount" : "integer:int64",
+      "totalQuestions" : "integer:int32",
+      "totalWeight" : "integer:int32",
+      "userFirstName" : "string",
+      "userId" : "integer:int64",
+      "userLastName" : "string",
+      "userRole" : "string"
+    },
+    "AuditScore" : {
+      "[required]" : [ "audit", "globalScorePercentage", "user" ],
+      "audit" : "Audit",
+      "auditCategoryResults" : "AuditCategoryResult[]",
+      "globalComment" : "GlobalComment",
+      "globalScorePercentage" : "number:double",
+      "id" : "integer:int64",
+      "questionResponses" : "QuestionResponseScore[]",
+      "submissionDate" : "string:date-time",
+      "user" : "User"
+    },
+    "AuditScoreResponse" : {
+      "auditCategoryResults" : "AuditCategoryResultResponse[]",
+      "auditId" : "integer:int64",
+      "auditScoreId" : "integer:int64",
+      "globalComment" : "CommentResponse",
+      "globalScorePercentage" : "number:double",
+      "questionResponses" : "QuestionResponseScoreResponse[]",
+      "submissionDate" : "string:date-time",
+      "userId" : "integer:int64"
+    },
+    "Brainstorming" : {
+      "brainstormingId" : "integer:int64",
+      "brainstormingText" : "string",
+      "formQuestion" : "FormQuestion",
+      "isChecked" : "boolean",
+      "predictibilityAnalysis" : "PredictibilityAnalysis",
+      "user" : "User"
+    },
+    "BrainstormingRequest" : {
+      "brainstormingId" : "integer:int64",
+      "brainstormingText" : "string",
+      "firstName" : "string",
+      "isChecked" : "boolean",
+      "lastName" : "string",
+      "predictibilityAnalysisId" : "integer:int64",
+      "questionId" : "integer:int64",
+      "role" : "string",
+      "userId" : "integer:int64"
+    },
+    "BrainstormingResponse" : {
+      "brainstormingId" : "integer:int64",
+      "brainstormingText" : "string",
+      "firstName" : "string",
+      "isChecked" : "boolean",
+      "lastName" : "string",
+      "predictibilityAnalysisId" : "integer:int64",
+      "questionId" : "integer:int64",
+      "role" : "string",
+      "userId" : "integer:int64"
+    },
+    "BrainstormingSummaryResponse" : {
+      "brainstormingId" : "integer:int64",
+      "brainstormingText" : "string",
+      "isChecked" : "boolean"
+    },
+    "ChosenMethodologyRequest" : {
+      "[required]" : [ "chosenMethodology" ],
+      "chosenMethodology" : "string"
+    },
+    "CommentResponse" : {
+      "id" : "integer:int64",
+      "level" : "string{BON,MAUVAIS,MOYEN}",
+      "method" : "string{SCALED_AGILITY,kanban,other,scrum,vmodel,waterfall}",
+      "text" : "string",
+      "title" : "string"
+    },
+    "ContributorRequest" : {
+      "avatarPath" : "string",
+      "contributerId" : "integer:int64",
+      "email" : "string",
+      "firstName" : "string",
+      "func" : "string",
+      "isAdmin" : "boolean",
+      "lastName" : "string",
+      "role" : "string"
+    },
+    "Criteria" : {
+      "criteriaId" : "integer:int64",
+      "criteriaName" : "string",
+      "criteriaValue" : "integer:int32",
+      "formQuestion" : "FormQuestion",
+      "score" : "number:float"
+    },
+    "CriteriaModel" : {
+      "criteriaId" : "integer:int64",
+      "criteriaName" : "string",
+      "criteriaValue" : "integer:int32",
+      "questionId" : "integer:int64"
+    },
+    "CriteriaResponse" : {
+      "criteriaId" : "integer:int64",
+      "criteriaName" : "string",
+      "criteriaValue" : "integer:int32",
+      "score" : "number:float"
+    },
+    "CriteriaScoreResponse" : {
+      "criteriaName" : "string",
+      "criteriaScore" : "number:float"
+    },
+    "ErrorMessage" : {
+      "message" : "string",
+      "status" : "integer:int32"
+    },
+    "ExecutionPlan" : {
+      "createdAt" : "string:date-time",
+      "executionIteration" : "integer:int32",
+      "executionPlanAnswers" : "ExecutionPlanAnswer[]",
+      "executionPlanId" : "integer:int64",
+      "isFinished" : "boolean",
+      "predictibilityAnalysis" : "PredictibilityAnalysis",
+      "updatedAt" : "string:date-time"
+    },
+    "ExecutionPlanAnswer" : {
+      "answer" : "string",
+      "executionPlan" : "ExecutionPlan",
+      "executionPlanAnswerId" : "integer:int64",
+      "executionPlanQuestion" : "ExecutionPlanQuestion"
+    },
+    "ExecutionPlanAnswerRequest" : {
+      "answer" : "string",
+      "executionPlanQuestionId" : "integer:int64"
+    },
+    "ExecutionPlanFormResponse" : {
+      "answer" : "string",
+      "description" : "string",
+      "executionQuestionId" : "integer:int64",
+      "title" : "string"
+    },
+    "ExecutionPlanQuestion" : {
+      "executionPlanAnswers" : "ExecutionPlanAnswer[]",
+      "executionPlanQuestionId" : "integer:int64",
+      "question" : "string",
+      "title" : "string"
+    },
+    "ExecutionPlanScoreResponse" : {
+      "allMethods" : "MethodModel[]",
+      "chooseMethod" : "string[]",
+      "countVotes" : "integer:int32",
+      "executionPlanId" : "integer:int64",
+      "executionPlanIteration" : "integer:int32",
+      "isFinished" : "boolean",
+      "predictibilityResults" : "PredictibilityResultsResponseModel[]"
+    },
+    "ExecutionVoteRequest" : {
+      "executionPlanId" : "integer:int64",
+      "methodId" : "integer:int64",
+      "methodId2ForHybrid" : "integer:int64"
+    },
+    "ExecutionVoteResponse" : {
+      "advantages" : "string",
+      "disadvantages" : "string",
+      "id" : "integer:int64",
+      "methodDescription" : "string",
+      "methodName" : "string",
+      "methodologyName" : "string",
+      "votes" : "ExecutionVoteUserResponse[]"
+    },
+    "ExecutionVoteUserResponse" : {
+      "id" : "integer:int64",
+      "userId" : "integer:int64"
+    },
+    "ExplanatoryFactorDto" : {
+      "answer" : "string",
+      "question" : "string",
+      "question_score" : "number:double"
+    },
+    "FeedbackMethodRequest" : {
+      "feedbackAnswer" : "string",
+      "isLiked" : "boolean",
+      "methodName" : "string",
+      "projectId" : "integer:int64",
+      "userId" : "integer:int64"
+    },
+    "FeedbackMethodResponse" : {
+      "feedbackAnswer" : "string",
+      "isLiked" : "boolean",
+      "methodName" : "string",
+      "projectId" : "integer:int64",
+      "userId" : "integer:int64"
+    },
+    "FeedbackRequest" : {
+      "feedbackAnswer" : "string",
+      "id" : "integer:int64",
+      "isLiked" : "boolean",
+      "methodology" : "string",
+      "project" : "Project",
+      "user" : "User"
+    },
+    "FeedbackResponse" : {
+      "feedbackAnswer" : "string",
+      "isLiked" : "boolean",
+      "methodology" : "string",
+      "projectId" : "integer:int64",
+      "userId" : "integer:int64"
+    },
+    "FormQuestion" : {
+      "answerText" : "string",
+      "brainstormings" : "Brainstorming[]",
+      "criterias" : "Criteria[]",
+      "formStep" : "FormStep",
+      "questionId" : "integer:int64",
+      "questionRef" : "string",
+      "questionText" : "string",
+      "updateQuestion" : "boolean"
+    },
+    "FormQuestionModel" : {
+      "answerText" : "string",
+      "brainstormings" : "BrainstormingResponse[]",
+      "criterias" : "CriteriaModel[]",
+      "questionId" : "integer:int64",
+      "questionRef" : "string",
+      "questionText" : "string",
+      "stepId" : "integer:int64",
+      "updateQuestion" : "boolean"
+    },
+    "FormQuestionResponse" : {
+      "answerText" : "string",
+      "brainstormings" : "BrainstormingSummaryResponse[]",
+      "criterias" : "CriteriaResponse[]",
+      "questionId" : "integer:int64",
+      "questionRef" : "string",
+      "questionText" : "string",
+      "updateQuestion" : "boolean"
+    },
+    "FormStep" : {
+      "escore" : "number:float",
+      "formQuestions" : "FormQuestion[]",
+      "multiCriteriaAnalysis" : "MultiCriteriaAnalysis",
+      "stepId" : "integer:int64",
+      "stepName" : "string",
+      "stepRef" : "integer:int64",
+      "stepScores" : "StepScore[]",
+      "stepWeights" : "StepWeight[]"
+    },
+    "FormStepModel" : {
+      "escore" : "number:float",
+      "multiCriteriaAnalysisId" : "integer:int64",
+      "stepId" : "integer:int64",
+      "stepName" : "string",
+      "stepRef" : "integer:int64"
+    },
+    "FormStepResponse" : {
+      "escore" : "number:float",
+      "formQuestions" : "FormQuestionResponse[]",
+      "stepId" : "integer:int64",
+      "stepName" : "string",
+      "stepRef" : "integer:int64",
+      "stepScores" : "StepScoreResponse[]",
+      "stepWeights" : "StepWeightResponse[]"
+    },
+    "GlobalComment" : {
+      "id" : "integer:int64",
+      "level" : "string{BON,MAUVAIS,MOYEN}",
+      "method" : "string{SCALED_AGILITY,kanban,other,scrum,vmodel,waterfall}",
+      "text" : "string",
+      "title" : "string"
+    },
+    "KiviatResponse" : {
+      "confianceEtDelegation" : "number:double",
+      "coordination" : "number:double",
+      "flexibiliteGestion" : "number:double",
+      "flexibiliteSolution" : "number:double",
+      "id" : "string{agile,classique,hybrid}",
+      "maitrisePerimetre" : "number:double"
+    },
+    "Method" : {
+      "advantages" : "string",
+      "description" : "string",
+      "disadvantages" : "string",
+      "id" : "integer:int64",
+      "methodology" : "Methodology",
+      "name" : "string"
+    },
+    "MethodModel" : {
+      "name" : "string",
+      "votes" : "integer:int32"
+    },
+    "Methodology" : {
+      "advantages" : "string",
+      "description" : "string",
+      "disadvantages" : "string",
+      "methodologyId" : "integer:int64",
+      "methods" : "Method[]",
+      "name" : "string"
+    },
+    "MethodologyEvaluation" : {
+      "createdAt" : "string:date-time",
+      "id" : "integer:int64",
+      "methodology" : "string",
+      "project" : "Project",
+      "questionScores" : "map<number:double>",
+      "score" : "number:double"
+    },
+    "MethodologyEvaluationDto" : {
+      "explanatory_factor" : "ExplanatoryFactorDto[]",
+      "methodology" : "string",
+      "score" : "number:double"
+    },
+    "MethodologyScoreModel" : {
+      "name" : "string",
+      "nbVotes" : "integer:int32",
+      "value" : "number:float",
+      "valueVoteSum" : "integer:int32"
+    },
+    "MultiCriteriaAnalysis" : {
+      "createdAt" : "string:date-time",
+      "formSteps" : "FormStep[]",
+      "isFinished" : "boolean",
+      "multiCriteriaAnalysisId" : "integer:int64",
+      "multiCriteriaAnalysisIteration" : "integer:int32",
+      "predictibilityAnalysis" : "PredictibilityAnalysis",
+      "project" : "Project",
+      "updatedAt" : "string:date-time"
+    },
+    "MultiCriteriaAnalysisScoreResponse" : {
+      "multiCriteriaStepScores" : "MultiCriteriaStepScoreResponse[]"
+    },
+    "MultiCriteriaStepRequest" : {
+      "escore" : "number:float",
+      "formQuestions" : "FormQuestion[]",
+      "stepId" : "integer:int64",
+      "stepName" : "string",
+      "stepWeights" : "StepWeight[]"
+    },
+    "MultiCriteriaStepScoreResponse" : {
+      "criteriaScores" : "CriteriaScoreResponse[]",
+      "escore" : "number:float",
+      "stepName" : "string"
+    },
+    "MulticriteriaAnalysisResponse" : {
+      "createdAt" : "string:date-time",
+      "formSteps" : "FormStepResponse[]",
+      "isFinished" : "boolean",
+      "multiCriteriaAnalysisId" : "integer:int64",
+      "multiCriteriaAnalysisIteration" : "integer:int32",
+      "predictibilityAnalysis" : "PredictibilityAnalyseResponseModel",
+      "updatedAt" : "string:date-time"
+    },
+    "Notification" : {
+      "body" : "string",
+      "icon" : "string",
+      "notificationDate" : "string:date-time",
+      "notificationId" : "integer:int64",
+      "project" : "Project",
+      "title" : "string"
+    },
+    "PageProjectResponse" : {
+      "content" : "ProjectResponse[]",
+      "empty" : "boolean",
+      "first" : "boolean",
+      "last" : "boolean",
+      "number" : "integer:int32",
+      "numberOfElements" : "integer:int32",
+      "pageable" : "PageableObject",
+      "size" : "integer:int32",
+      "sort" : "SortObject",
+      "totalElements" : "integer:int64",
+      "totalPages" : "integer:int32"
+    },
+    "PageableObject" : {
+      "offset" : "integer:int64",
+      "pageNumber" : "integer:int32",
+      "pageSize" : "integer:int32",
+      "paged" : "boolean",
+      "sort" : "SortObject",
+      "unpaged" : "boolean"
+    },
+    "PasswordChangeRequest" : {
+      "confirmPassword" : "string",
+      "newPassword" : "string",
+      "oldPassword" : "string"
+    },
+    "PredictibilityAnalyseResponseModel" : {
+      "brainstormings" : "BrainstormingSummaryResponse[]",
+      "executionPlan" : "ExecutionPlanScoreResponse",
+      "finalChosenMethodology" : "string",
+      "isFinished" : "boolean",
+      "predictibilityAnalysisId" : "integer:int64",
+      "predictibilityAnalysisIteration" : "integer:int32",
+      "votes" : "VoteSummaryResponse[]"
+    },
+    "PredictibilityAnalysis" : {
+      "brainstormings" : "Brainstorming[]",
+      "chosenMethodology" : "string",
+      "createdAt" : "string:date-time",
+      "executionPlan" : "ExecutionPlan",
+      "isFinished" : "boolean",
+      "methodology" : "Methodology",
+      "multiCriteriaAnalysis" : "MultiCriteriaAnalysis",
+      "predictibilityAnalysisId" : "integer:int64",
+      "predictibilityAnalysisIteration" : "integer:int32",
+      "predictibilityResults" : "PredictibilityResults[]",
+      "updatedAt" : "string:date-time",
+      "votes" : "Vote[]"
+    },
+    "PredictibilityResults" : {
+      "name" : "string",
+      "predictibilityAnalysis" : "PredictibilityAnalysis",
+      "predictibilityResultsId" : "integer:int64",
+      "value" : "number:float"
+    },
+    "PredictibilityResultsResponseModel" : {
+      "name" : "string",
+      "value" : "number:float"
+    },
+    "PredictibilityScoreResponse" : {
+      "average" : "number:float",
+      "chosenMethodology" : "string",
+      "formSteps" : "FormStepModel[]",
+      "methodologies" : "MethodologyScoreModel[]",
+      "predictibilityIteration" : "integer:int32",
+      "tieBreakRequired" : "boolean"
+    },
+    "Project" : {
+      "[required]" : [ "name" ],
+      "attachments" : "Attachment[]",
+      "audits" : "Audit[]",
+      "chefId" : "integer:int64",
+      "confirmationState" : "string",
+      "createdAt" : "string:date-time",
+      "description" : "string",
+      "folderPath" : "string",
+      "formProgressStatus" : "string{BOTH,COLLABORATIVE,IA,None}",
+      "isArchived" : "boolean",
+      "methodologyEvaluations" : "MethodologyEvaluation[]",
+      "multiCriteriaAnalysisList" : "MultiCriteriaAnalysis[]",
+      "name" : "string",
+      "notifications" : "Notification[]",
+      "projectId" : "integer:int64",
+      "projectState" : "string{ALL,COMPLETED,IN PROGRESS,PENDING}",
+      "projectUserPermissions" : "ProjectUserPermission[]",
+      "reports" : "Report[]",
+      "updatedAt" : "string:date-time"
+    },
+    "ProjectFilterRequest" : {
+      "activeTab" : "boolean",
+      "key" : "string",
+      "page" : "integer:int32",
+      "size" : "integer:int32",
+      "sort" : "string",
+      "status" : "string",
+      "typeAnalyse" : "string"
+    },
+    "ProjectPageResponse" : {
+      "projectsPage" : "PageProjectResponse",
+      "totalProjetAffected" : "integer:int64",
+      "totalProjetCreated" : "integer:int64"
+    },
+    "ProjectRequest" : {
+      "contributers" : "ContributorRequest[]",
+      "description" : "string",
+      "files" : "string:binary[]",
+      "name" : "string"
+    },
+    "ProjectResponse" : {
+      "attachments" : "AttachmentResponse[]",
+      "chefFirstName" : "string",
+      "chefId" : "integer:int64",
+      "chefLasName" : "string",
+      "confirmationState" : "string",
+      "contributors" : "ContributorRequest[]",
+      "createdAt" : "string:date-time",
+      "description" : "string",
+      "formProgressStatus" : "string{BOTH,COLLABORATIVE,IA,None}",
+      "isArchived" : "boolean",
+      "multiCriteriaAnalysisList" : "MulticriteriaAnalysisResponse[]",
+      "multiCriteriaStatus" : "string",
+      "name" : "string",
+      "projectId" : "integer:int64",
+      "projectState" : "string{ALL,COMPLETED,IN PROGRESS,PENDING}",
+      "resultAi" : "ResultResponse",
+      "updatedAt" : "string:date-time"
+    },
+    "ProjectUserPermission" : {
+      "permission" : "string",
+      "project" : "Project",
+      "user" : "User",
+      "userFunction" : "string"
+    },
+    "Question" : {
+      "[required]" : [ "audit", "auditAnswerLabel", "auditAnswerValue", "category", "questionRef" ],
+      "audit" : "Audit",
+      "auditAnswerLabel" : "string",
+      "auditAnswerValue" : "integer:int32",
+      "category" : "string{COMMUNICATION_ET_COLLABORATION,OBJECTIF_ET_PERIMETRES,ORGANISATIONS,OUTILS_ET_DOCUMENTATION,PLANIFICATION_ET_RESSOURCES,SUIVI_RISQUE_ET_CHANGEMENT}",
+      "questionId" : "integer:int64",
+      "questionRef" : "string",
+      "scoringType" : "string{DIRECT,REVERSED}",
+      "weight" : "integer:int32"
+    },
+    "QuestionRequest" : {
+      "[required]" : [ "auditAnswerLabel", "auditAnswerValue", "category", "questionRef", "scoringType", "weight" ],
+      "auditAnswerLabel" : "string",
+      "auditAnswerValue" : "integer:int32",
+      "category" : "string{COMMUNICATION_ET_COLLABORATION,OBJECTIF_ET_PERIMETRES,ORGANISATIONS,OUTILS_ET_DOCUMENTATION,PLANIFICATION_ET_RESSOURCES,SUIVI_RISQUE_ET_CHANGEMENT}",
+      "questionRef" : "string",
+      "scoringType" : "string{DIRECT,REVERSED}",
+      "weight" : "integer:int32"
+    },
+    "QuestionResponse" : {
+      "auditAnswerLabel" : "string",
+      "auditAnswerValue" : "integer:int32",
+      "categoryDisplayName" : "string",
+      "id" : "integer:int64",
+      "isAnswered" : "boolean",
+      "maxPossibleScore" : "integer:int32",
+      "questionRef" : "string",
+      "scorePercentage" : "number:double",
+      "scoringType" : "string{DIRECT,REVERSED}",
+      "weight" : "integer:int32",
+      "weightedScore" : "integer:int32"
+    },
+    "QuestionResponseScore" : {
+      "answerLabel" : "string",
+      "answerValue" : "integer:int32",
+      "auditScore" : "AuditScore",
+      "id" : "integer:int64",
+      "question" : "Question",
+      "score" : "number:double"
+    },
+    "QuestionResponseScoreResponse" : {
+      "answerLabel" : "string",
+      "answerValue" : "integer:int32",
+      "category" : "string{COMMUNICATION_ET_COLLABORATION,OBJECTIF_ET_PERIMETRES,ORGANISATIONS,OUTILS_ET_DOCUMENTATION,PLANIFICATION_ET_RESSOURCES,SUIVI_RISQUE_ET_CHANGEMENT}",
+      "questionId" : "integer:int64",
+      "questionRef" : "string",
+      "score" : "number:double"
+    },
+    "RecommendationItemResponse" : {
+      "color" : "string",
+      "description" : "string",
+      "title" : "string"
+    },
+    "Report" : {
+      "analyseId" : "integer:int64",
+      "createdAt" : "string:date-time",
+      "iteration" : "integer:int32",
+      "project" : "Project",
+      "reportId" : "integer:int64",
+      "reportPath" : "string",
+      "type" : "string"
+    },
+    "ReportResponse" : {
+      "creationDate" : "string:date-time",
+      "id" : "integer:int64",
+      "iteration" : "integer:int32",
+      "title" : "string",
+      "type" : "string"
+    },
+    "ResultResponse" : {
+      "id" : "integer:int64",
+      "predictedMethod" : "string",
+      "predictedProba" : "number:double",
+      "projectId" : "integer:int64"
+    },
+    "SimpleMessageDto" : {
+      "message" : "string",
+      "status" : "integer:int32",
+      "timestamp" : "string:date-time"
+    },
+    "SortObject" : {
+      "empty" : "boolean",
+      "sorted" : "boolean",
+      "unsorted" : "boolean"
+    },
+    "StepScore" : {
+      "criteriaName" : "string",
+      "formStep" : "FormStep",
+      "id" : "integer:int64",
+      "value" : "number:float"
+    },
+    "StepScoreResponse" : {
+      "criteriaName" : "string",
+      "id" : "integer:int64",
+      "value" : "number:float"
+    },
+    "StepWeight" : {
+      "criteriaDescription" : "string",
+      "criteriaName" : "string",
+      "formStep" : "FormStep",
+      "weightId" : "integer:int64",
+      "weightValue" : "number:float"
+    },
+    "StepWeightResponse" : {
+      "criteriaDescription" : "string",
+      "criteriaName" : "string",
+      "weightId" : "integer:int64",
+      "weightValue" : "number:float"
+    },
+    "SurveyAnswerRequest" : {
+      "[required]" : [ "answerValue" ],
+      "answerType" : "string{FREE_ANSWER,SELECTED_ANSWER}",
+      "answerValue" : "string",
+      "questionId" : "integer:int64",
+      "userId" : "integer:int64"
+    },
+    "SurveyAnswerResponse" : {
+      "answer" : "string",
+      "questionId" : "integer:int64",
+      "userId" : "integer:int64"
+    },
+    "SurveyQuestionResponse" : {
+      "id" : "integer:int64",
+      "question" : "string",
+      "type" : "string"
+    },
+    "User" : {
+      "brainstormings" : "Brainstorming[]",
+      "isAdmin" : "boolean",
+      "isEmailVerified" : "boolean",
+      "isUserActive" : "boolean",
+      "userAvatarPath" : "string",
+      "userEmail" : "string",
+      "userFirstName" : "string",
+      "userId" : "integer:int64",
+      "userLastName" : "string",
+      "userPassword" : "string",
+      "username" : "string",
+      "verificationTokens" : "VerificationToken[]"
+    },
+    "UserRequest" : {
+      "[required]" : [ "userEmail", "userFirstName", "userLastName", "username" ],
+      "userAvatar" : "string:binary",
+      "userEmail" : "string:email",
+      "userEmailConfirmation" : "string",
+      "userFirstName" : "string",
+      "userLastName" : "string",
+      "userPassword" : "string",
+      "userPasswordConfirmation" : "string",
+      "username" : "string"
+    },
+    "UserResponse" : {
+      "userAvatar" : "string:byte",
+      "userEmail" : "string",
+      "userFirstName" : "string",
+      "userId" : "integer:int64",
+      "userLastName" : "string",
+      "username" : "string"
+    },
+    "UserSummaryResponse" : {
+      "userFirstName" : "string",
+      "userId" : "integer:int64",
+      "userLastName" : "string"
+    },
+    "VerificationToken" : {
+      "expiryDate" : "string:date-time",
+      "token" : "string",
+      "type" : "string"
+    },
+    "Vote" : {
+      "chosenPMM" : "string",
+      "createdAt" : "string:date-time",
+      "isConfirmed" : "boolean",
+      "justification" : "string",
+      "predictibilityAnalysis" : "PredictibilityAnalysis",
+      "predictibilityValue" : "integer:int32",
+      "user" : "User",
+      "voteId" : "integer:int64"
+    },
+    "VoteRequest" : {
+      "[required]" : [ "predictibilityAnalysisId" ],
+      "chosenPMM" : "string",
+      "isConfirmed" : "boolean",
+      "justification" : "string",
+      "predictibilityAnalysisId" : "integer:int64",
+      "predictibilityValue" : "integer:int32",
+      "userId" : "integer:int64",
+      "voteId" : "integer:int64"
+    },
+    "VoteResponse" : {
+      "chosenPMM" : "string",
+      "isConfirmed" : "boolean",
+      "justification" : "string",
+      "predictibilityAnalysisId" : "integer:int64",
+      "predictibilityValue" : "integer:int32",
+      "userId" : "integer:int64",
+      "voteId" : "integer:int64"
+    },
+    "VoteSummaryResponse" : {
+      "chosenPMM" : "string",
+      "createdAt" : "string:date-time",
+      "isConfirmed" : "boolean",
+      "justification" : "string",
+      "predictibilityValue" : "integer:int32",
+      "user" : "UserSummaryResponse",
+      "voteId" : "integer:int64"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+[ {
+  "auditId" : 4,
+  "method" : "scrum",
+  "projectId" : 15,
+  "projectName" : "Audit Pilot",
+  "userId" : 15,
+  "userFirstName" : "John",
+  "userLastName" : "Doe",
+  "userRole" : "CDP",
+  "auditLaunchDate" : "15-06-2026 08:06:33",
+  "questions" : [ {
+    "id" : 4,
+    "questionRef" : "Q1",
+    "categoryDisplayName" : "Organisations",
+    "weight" : 3,
+    "auditAnswerLabel" : "Often",
+    "auditAnswerValue" : 2,
+    "weightedScore" : 6,
+    "maxPossibleScore" : 6,
+    "scorePercentage" : 100.0,
+    "isAnswered" : true,
+    "scoringType" : "DIRECT"
+  } ],
+  "totalQuestions" : 1,
+  "totalWeight" : 3,
+  "totalAuditCount" : 1,
+  "categoryResults" : [ ]
+} ]

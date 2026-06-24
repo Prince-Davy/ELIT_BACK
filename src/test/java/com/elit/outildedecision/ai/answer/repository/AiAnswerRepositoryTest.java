@@ -1,20 +1,21 @@
 package com.elit.outildedecision.ai.answer.repository;
 
 import com.elit.outildedecision.ai.answer.entity.AiAnswer;
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.shared.kernel.entity.Project;
+import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 public class AiAnswerRepositoryTest {
 
@@ -53,15 +54,15 @@ public class AiAnswerRepositoryTest {
   @Test
   public void testFindByProject_ProjectId() {
     List<AiAnswer> answers = aiAnswerRepository.findByProject_ProjectId(project.getProjectId());
-    assertEquals(2, answers.size());
-    assertTrue(answers.stream().anyMatch(a -> a.getQuestion().equals("Q1")));
-    assertTrue(answers.stream().anyMatch(a -> a.getQuestion().equals("Q2")));
+    assertThat(answers).hasSize(2);
+    assertThat(answers).anyMatch(a -> a.getQuestion().equals("Q1"));
+    assertThat(answers).anyMatch(a -> a.getQuestion().equals("Q2"));
   }
 
   @Test
   public void testDeleteByProject_ProjectId() {
     aiAnswerRepository.deleteByProject_ProjectId(project.getProjectId());
     List<AiAnswer> answers = aiAnswerRepository.findByProject_ProjectId(project.getProjectId());
-    assertTrue(answers.isEmpty());
+    assertThat(answers).isEmpty();
   }
 }

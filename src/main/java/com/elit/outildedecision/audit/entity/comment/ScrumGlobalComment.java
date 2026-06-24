@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
+/** Scrum global comment class. */
 @Entity
 @DiscriminatorValue("SCRUM")
 @Getter

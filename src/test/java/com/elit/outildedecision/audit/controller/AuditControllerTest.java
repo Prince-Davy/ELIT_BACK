@@ -1,12 +1,12 @@
 package com.elit.outildedecision.audit.controller;
 
-import com.elit.outildedecision.audit.model.AuditRequestModel;
-import com.elit.outildedecision.audit.model.AuditResponseModel;
-import com.elit.outildedecision.audit.model.AuditScoreDTO;
+import com.elit.outildedecision.audit.dto.AuditRequest;
+import com.elit.outildedecision.audit.dto.AuditResponse;
+import com.elit.outildedecision.audit.dto.AuditScoreResponse;
 import com.elit.outildedecision.audit.service.AuditScoreService;
 import com.elit.outildedecision.audit.service.AuditService;
-import com.elit.outildedecision.exception.AuditNotFoundException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.audit.exception.AuditNotFoundException;
+import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +22,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -69,17 +65,16 @@ class AuditControllerTest {
   void createAudit_devraitDeleguerAuServiceAvecNomUtilisateurAuthentifie() throws Exception {
     // Arrange
     setAuthenticatedUser("john.doe");
-    AuditRequestModel request = mock(AuditRequestModel.class);
-    AuditResponseModel body = new AuditResponseModel();
-    ResponseEntity<AuditResponseModel> expected =
-      ResponseEntity.status(HttpStatus.CREATED).body(body);
-    when(auditService.createAudit(request, "john.doe")).thenReturn(expected);
+    AuditRequest request = mock(AuditRequest.class);
+    AuditResponse body = new AuditResponse();
+    when(auditService.createAudit(request, "john.doe")).thenReturn(body);
 
     // Act
-    ResponseEntity<AuditResponseModel> response = auditController.createAudit(request);
+    ResponseEntity<AuditResponse> response = auditController.createAudit(request);
 
     // Assert
-    assertSame(expected, response);
+    Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertSame(body, response.getBody());
     verify(auditService, times(1)).createAudit(request, "john.doe");
   }
 
@@ -87,51 +82,30 @@ class AuditControllerTest {
   void updateAudit_devraitDeleguerAuServiceAvecNomUtilisateurAuthentifie() throws Exception {
     // Arrange
     setAuthenticatedUser("jane.doe");
-    AuditRequestModel request = mock(AuditRequestModel.class);
-    AuditResponseModel body = new AuditResponseModel();
-    ResponseEntity<AuditResponseModel> expected =
-      ResponseEntity.status(HttpStatus.CREATED).body(body);
-    when(auditService.updateAudit(request, "jane.doe")).thenReturn(expected);
+    AuditRequest request = mock(AuditRequest.class);
+    AuditResponse body = new AuditResponse();
+    when(auditService.updateAudit(request, "jane.doe")).thenReturn(body);
 
     // Act
-    ResponseEntity<AuditResponseModel> response = auditController.updateAudit(request);
+    AuditResponse response = auditController.updateAudit(request);
 
     // Assert
-    assertSame(expected, response);
+    assertSame(body, response);
     verify(auditService, times(1)).updateAudit(request, "jane.doe");
   }
 
   @Test
   void getAuditsByProject_devraitRetournerListeDepuisService() throws Exception {
     // Arrange
-    List<AuditResponseModel> expected = List.of(new AuditResponseModel(), new AuditResponseModel());
+    List<AuditResponse> expected = List.of(new AuditResponse(), new AuditResponse());
     when(auditService.getAuditsByProject(projectId)).thenReturn(expected);
 
     // Act
-    List<AuditResponseModel> result = auditController.getAuditsByProject(projectId);
+    List<AuditResponse> result = auditController.getAuditsByProject(projectId);
 
     // Assert
     assertSame(expected, result);
     verify(auditService, times(1)).getAuditsByProject(projectId);
-  }
-
-  @Test
-  void getAuditsByProjectPaginated_devraitRetournerPageDepuisService() throws Exception {
-    // Arrange
-    int page = 1;
-    int size = 20;
-    List<AuditResponseModel> content = List.of(new AuditResponseModel());
-    Page<AuditResponseModel> expected =
-      new PageImpl<>(content, PageRequest.of(page, size), content.size());
-    when(auditService.getAuditsByProjectPaginated(projectId, page, size)).thenReturn(expected);
-
-    // Act
-    Page<AuditResponseModel> result =
-      auditController.getAuditsByProjectPaginated(projectId, page, size);
-
-    // Assert
-    assertSame(expected, result);
-    verify(auditService, times(1)).getAuditsByProjectPaginated(projectId, page, size);
   }
 
   @Test
@@ -148,102 +122,100 @@ class AuditControllerTest {
 
   @Test
   void calculateScoreOfTheAudit_shouldReturnResponse() throws AuditNotFoundException {
-    when(auditService.calculateScoringOfAudit(auditId)).thenReturn(AuditScoreDTO.builder().build());
+    when(auditService.calculateScoringOfAudit(auditId)).thenReturn(AuditScoreResponse.builder().build());
     auditController.calculateScoreOfTheAudit(auditId);
 
     verify(auditService, times(1)).calculateScoringOfAudit(eq(auditId));
   }
 
   @Test
-  void calculateScoreOfTheAudit_shouldThrowProjectNotFoundException() throws AuditNotFoundException {
-    doThrow(new EntityNotFoundException("Audit not found"))
+  void calculateScoreOfTheAudit_shouldPropagateAuditNotFoundException() throws AuditNotFoundException {
+    doThrow(new AuditNotFoundException("Audit not found"))
       .when(auditService).calculateScoringOfAudit(auditId);
 
-    assertThrows(EntityNotFoundException.class,
+    assertThrows(AuditNotFoundException.class,
       () -> auditController.calculateScoreOfTheAudit(auditId));
     verify(auditService, times(1)).calculateScoringOfAudit(auditId);
   }
 
   @Test
-  void findAuditScoreByAuditId_shouldReturnResponse(){
-    AuditScoreDTO auditScoreDTO = AuditScoreDTO.builder().build();
-    when(auditScoreService.findAuditScoreByAuditId(auditId)).thenReturn(auditScoreDTO);
+  void findAuditScoreByAuditId_shouldReturnResponse() throws AuditNotFoundException {
+    AuditScoreResponse auditScore = AuditScoreResponse.builder().build();
+    when(auditScoreService.findAuditScoreByAuditId(auditId)).thenReturn(auditScore);
 
-    ResponseEntity<AuditScoreDTO> response = auditController.findAuditScoreByAuditId(auditId);
+    AuditScoreResponse response = auditController.findAuditScoreByAuditId(auditId);
 
     verify(auditScoreService, times(1)).findAuditScoreByAuditId(eq(auditId));
+    assertSame(auditScore, response);
+  }
 
-    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-    Assertions.assertEquals(auditScoreDTO, response.getBody());
+  @Test
+  void findAuditScoreByAuditId_shouldPropagateAuditNotFoundException() throws AuditNotFoundException {
+    when(auditScoreService.findAuditScoreByAuditId(auditId))
+      .thenThrow(new AuditNotFoundException("not found"));
 
+    assertThrows(AuditNotFoundException.class,
+      () -> auditController.findAuditScoreByAuditId(auditId));
+    verify(auditScoreService, times(1)).findAuditScoreByAuditId(auditId);
   }
 
   @Test
   void getAuditByProjectAndAuditId_shouldReturnAudit_whenFound() throws Exception {
     // Arrange
-    AuditResponseModel expected = new AuditResponseModel();
+    AuditResponse expected = new AuditResponse();
     when(auditService.getAuditByProjectAndAuditId(projectId, auditId)).thenReturn(expected);
 
     // Act
-    ResponseEntity<AuditResponseModel> response = auditController.getAuditByProjectAndAuditId(projectId, auditId);
+    AuditResponse response = auditController.getAuditByProjectAndAuditId(projectId, auditId);
 
     // Assert
-    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-    Assertions.assertEquals(expected, response.getBody());
+    assertSame(expected, response);
     verify(auditService, times(1)).getAuditByProjectAndAuditId(projectId, auditId);
   }
 
   @Test
-  void getAuditByProjectAndAuditId_shouldReturn404_whenProjectNotFound() throws Exception {
+  void getAuditByProjectAndAuditId_shouldPropagateProjectNotFound() throws Exception {
     // Arrange
     when(auditService.getAuditByProjectAndAuditId(projectId, auditId))
       .thenThrow(new ProjectNotFoundException("not found"));
 
-    // Act
-    ResponseEntity<AuditResponseModel> response = auditController.getAuditByProjectAndAuditId(projectId, auditId);
-
-    // Assert
-    Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    // Act + Assert
+    assertThrows(ProjectNotFoundException.class,
+      () -> auditController.getAuditByProjectAndAuditId(projectId, auditId));
     verify(auditService, times(1)).getAuditByProjectAndAuditId(projectId, auditId);
   }
 
   @Test
-  void getAuditByProjectAndAuditId_shouldReturn404_whenAuditNotFound() throws Exception {
+  void getAuditByProjectAndAuditId_shouldPropagateAuditNotFound() throws Exception {
     // Arrange
     when(auditService.getAuditByProjectAndAuditId(projectId, auditId))
       .thenThrow(new AuditNotFoundException("not found"));
 
-    // Act
-    ResponseEntity<AuditResponseModel> response = auditController.getAuditByProjectAndAuditId(projectId, auditId);
-
-    // Assert
-    Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    // Act + Assert
+    assertThrows(AuditNotFoundException.class,
+      () -> auditController.getAuditByProjectAndAuditId(projectId, auditId));
     verify(auditService, times(1)).getAuditByProjectAndAuditId(projectId, auditId);
   }
 
   @Test
   void hasAuditForProject_shouldReturnTrue_whenProjectHasAudit() throws Exception {
     when(auditService.hasAuditForProject(projectId)).thenReturn(true);
-    ResponseEntity<Boolean> response = auditController.hasAuditForProject(projectId);
-    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-    Assertions.assertTrue(response.getBody());
+    Assertions.assertTrue(auditController.hasAuditForProject(projectId));
     verify(auditService, times(1)).hasAuditForProject(projectId);
   }
 
   @Test
   void hasAuditForProject_shouldReturnFalse_whenProjectHasNoAudit() throws Exception {
     when(auditService.hasAuditForProject(projectId)).thenReturn(false);
-    ResponseEntity<Boolean> response = auditController.hasAuditForProject(projectId);
-    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-    Assertions.assertFalse(response.getBody());
+    Assertions.assertFalse(auditController.hasAuditForProject(projectId));
     verify(auditService, times(1)).hasAuditForProject(projectId);
   }
 
   @Test
-  void hasAuditForProject_shouldReturn404_whenProjectNotFound() throws Exception {
+  void hasAuditForProject_shouldPropagateProjectNotFound() throws Exception {
     when(auditService.hasAuditForProject(projectId)).thenThrow(new ProjectNotFoundException("not found"));
-    ResponseEntity<Boolean> response = auditController.hasAuditForProject(projectId);
-    Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertThrows(ProjectNotFoundException.class,
+      () -> auditController.hasAuditForProject(projectId));
     verify(auditService, times(1)).hasAuditForProject(projectId);
   }
 }

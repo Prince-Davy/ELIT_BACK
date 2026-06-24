@@ -3,35 +3,33 @@ package com.elit.outildedecision.audit.service;
 import com.elit.outildedecision.audit.calculate.AgilityScoringStrategy;
 import com.elit.outildedecision.audit.calculate.AuditCategoryResultEnricher;
 import com.elit.outildedecision.audit.calculate.ScoringStrategyFactory;
+import com.elit.outildedecision.audit.dto.AuditRequest;
+import com.elit.outildedecision.audit.dto.AuditResponse;
+import com.elit.outildedecision.audit.dto.AuditScoreResponse;
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.Question;
+import com.elit.outildedecision.audit.entity.ScoringType;
 import com.elit.outildedecision.audit.mapper.AuditMapper;
-import com.elit.outildedecision.audit.model.*;
 import com.elit.outildedecision.audit.repository.AuditRepository;
 import com.elit.outildedecision.audit.repository.QuestionRepository;
-import com.elit.outildedecision.audit.service.impl.AuditServiceImpl;
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.exception.AuditNotFoundException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.UserNotFoundException;
-import com.elit.outildedecision.repository.ProjectRepository;
-import com.elit.outildedecision.repository.UserRepository;
-import com.elit.outildedecision.util.MethodType;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.audit.service.implementation.AuditServiceImpl;
+import com.elit.outildedecision.shared.kernel.entity.Project;
+import com.elit.outildedecision.shared.kernel.entity.User;
+import com.elit.outildedecision.audit.exception.AuditNotFoundException;
+import com.elit.outildedecision.shared.exception.BadRequestException;
+import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
+import com.elit.outildedecision.shared.user.exception.UserNotFoundException;
+import com.elit.outildedecision.shared.project.repository.ProjectRepository;
+import com.elit.outildedecision.shared.user.repository.UserRepository;
+import com.elit.outildedecision.shared.util.MethodType;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
@@ -52,12 +50,12 @@ class AuditServiceImplTest {
   @Mock private ProjectRepository projectRepository;
   @Mock private UserRepository userRepository;
   @Mock private QuestionRepository questionRepository;
-  @Mock private AuditMapper auditMapper;
   @Mock private ScoringStrategyFactory scoringStrategyFactory;
   @Mock private AuditCategoryResultEnricher auditCategoryResultEnricher;
   @Mock private AgilityScoringStrategy scrumScoringStrategy;
 
-  @InjectMocks
+  private final AuditMapper auditMapper = Mappers.getMapper(AuditMapper.class);
+
   private AuditServiceImpl auditService;
 
   private static final Long COMMON_ID = 1L;
@@ -72,8 +70,10 @@ class AuditServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    project = new Project();
+    auditService = new AuditServiceImpl(auditRepository, projectRepository, userRepository,
+        scoringStrategyFactory, auditMapper, auditCategoryResultEnricher);
 
+    project = new Project();
     ReflectionTestUtils.setField(project, "projectId", COMMON_ID);
     ReflectionTestUtils.setField(project, "name", PROJECT_NAME);
 
@@ -113,27 +113,13 @@ class AuditServiceImplTest {
     when(auditRepository.save(any(Audit.class))).thenReturn(audit);
     when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(1L);
 
-    AuditRequestModel request = mock(AuditRequestModel.class);
+    AuditRequest request = mock(AuditRequest.class);
     when(request.getProjectId()).thenReturn(COMMON_ID);
 
-    QuestionResponseModel questionResponse = QuestionResponseModel.builder()
-      .category(QuestionCategory.ORGANISATIONS)
-      .questionRef(question.getQuestionRef())
-      .weight(question.getWeight())
-      .auditId(question.getQuestionId())
-      .auditAnswerLabel(question.getAuditAnswerLabel())
-      .auditAnswerValue(question.getAuditAnswerValue()).build();
-
-    when(auditMapper.mapToQuestionResponseModel(any())).thenReturn(questionResponse);
-
     // Act
-    ResponseEntity<AuditResponseModel> response = auditService.createAudit(request, "alice@example.com");
+    AuditResponse responseBody = auditService.createAudit(request, "alice@example.com");
 
     // Assert
-    assertNotNull(response);
-    assertEquals(HttpStatus.CREATED, response.getStatusCode());
-
-    AuditResponseModel responseBody = response.getBody();
     assertNotNull(responseBody);
     assertEquals(1L, responseBody.getTotalAuditCount());
     assertEquals(COMMON_ID, responseBody.getProjectId());
@@ -152,7 +138,7 @@ class AuditServiceImplTest {
   @Test
   void createAudit_projectNotFound_throws() {
     // Arrange
-    AuditRequestModel request = mock(AuditRequestModel.class);
+    AuditRequest request = mock(AuditRequest.class);
     when(request.getProjectId()).thenReturn(COMMON_ID);
     when(projectRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -166,11 +152,10 @@ class AuditServiceImplTest {
   }
 
 
-
   @Test
   void updateAudit_userNotFound_throws() {
     // Arrange
-    AuditRequestModel request = mock(AuditRequestModel.class);
+    AuditRequest request = mock(AuditRequest.class);
     when(userRepository.findByUserEmail("ghost@example.com")).thenReturn(null);
 
     // Act + Assert
@@ -182,32 +167,29 @@ class AuditServiceImplTest {
   }
 
   @Test
+  void updateAudit_nullAuditId_throwsBadRequest() {
+    // Arrange
+    AuditRequest request = mock(AuditRequest.class);
+    when(userRepository.findByUserEmail(USER_EMAIL)).thenReturn(user);
+    when(request.getAuditId()).thenReturn(null);
+
+    // Act + Assert
+    assertThrows(BadRequestException.class,
+      () -> auditService.updateAudit(request, USER_EMAIL));
+
+    verifyNoInteractions(auditRepository);
+  }
+
+  @Test
   void getAuditsByProject_success() throws Exception {
 
     when(projectRepository.existsById(COMMON_ID)).thenReturn(true);
-
     when(auditRepository.findByProjectProjectIdOrderByCreatedAtDesc(COMMON_ID))
       .thenReturn(Collections.singletonList(audit));
     when(auditRepository.countAuditsByProjectId(COMMON_ID)).thenReturn(1L);
 
-// Mock du mapper pour chaque question
-    for (Question q : audit.getQuestions()) {
-      when(auditMapper.mapToQuestionResponseModel(q)).thenReturn(
-        QuestionResponseModel.builder()
-          .id(q.getQuestionId())
-          .questionRef(q.getQuestionRef())
-          .category(q.getCategory())
-          .weight(q.getWeight())
-          .auditId(q.getAudit() != null ? q.getAudit().getAuditId() : null)
-          .auditAnswerLabel(q.getAuditAnswerLabel())
-          .auditAnswerValue(q.getAuditAnswerValue())
-          .scoringType(q.getScoringType())
-          .build()
-      );
-    }
-
     // Act
-    List<AuditResponseModel> responses = auditService.getAuditsByProject(COMMON_ID);
+    List<AuditResponse> responses = auditService.getAuditsByProject(COMMON_ID);
 
     // Assert
     assertNotNull(responses);
@@ -229,89 +211,39 @@ class AuditServiceImplTest {
   }
 
   @Test
-  void getAuditsByProjectPaginated_success() throws Exception {
-    when(projectRepository.existsById(anyLong())).thenReturn(true);
-
-    Pageable pageable = PageRequest.of(0, 5);
-    Page<Audit> page = new PageImpl<>(Collections.singletonList(audit), pageable, 1);
-    when(auditRepository.findByProjectProjectIdOrderByCreatedAtDesc(anyLong(), any()))
-      .thenReturn(page);
-    when(auditRepository.countAuditsByProjectId(anyLong())).thenReturn(COMMON_ID);
-
-// Mock du mapper pour chaque question
-    for (Question q : audit.getQuestions()) {
-      when(auditMapper.mapToQuestionResponseModel(q)).thenReturn(
-        QuestionResponseModel.builder()
-          .id(q.getQuestionId())
-          .questionRef(q.getQuestionRef())
-          .category(q.getCategory())
-          .weight(q.getWeight())
-          .auditId(q.getAudit() != null ? q.getAudit().getAuditId() : null)
-          .auditAnswerLabel(q.getAuditAnswerLabel())
-          .auditAnswerValue(q.getAuditAnswerValue())
-          .scoringType(q.getScoringType())
-          .build()
-      );
-    }
-
-
-    // Act
-    Page<AuditResponseModel> result = auditService.getAuditsByProjectPaginated(anyLong(), 0, 5);
-
-    // Assert
-    assertEquals(1, result.getTotalElements());
-    assertEquals(1, result.getContent().size());
-    assertEquals(COMMON_ID, result.getContent().get(0).getProjectId());
-    verify(auditRepository).findByProjectProjectIdOrderByCreatedAtDesc(anyLong(), any());
-  }
-
-
-  @Test
   void calculateScoringOfAudit_shouldSuccess() throws AuditNotFoundException {
     // Arrange
-    Audit audit = Audit.builder()
+    Audit scoringAudit = Audit.builder()
       .auditId(COMMON_ID)
       .method(MethodType.SCRUM)
       .build();
 
-    Question question = Question.builder()
+    Question scoringQuestion = Question.builder()
       .questionRef("Q1")
       .weight(1)
       .auditAnswerLabel("Oui")
       .auditAnswerValue(10)
       .category(QuestionCategory.ORGANISATIONS)
       .scoringType(ScoringType.DIRECT)
-      .audit(audit)
+      .audit(scoringAudit)
       .build();
 
-    audit.setQuestions(List.of(question));
+    scoringAudit.setQuestions(List.of(scoringQuestion));
 
     AuditScore auditScore = AuditScore.builder()
       .id(COMMON_ID)
       .globalScorePercentage(100.0)
       .auditCategoryResults(List.of())
-      .audit(audit).user(user).build();
+      .audit(scoringAudit).user(user).build();
 
-    AuditScoreDTO auditScoreDTO = AuditScoreDTO.builder()
-      .auditScoreId(COMMON_ID)
-      .auditId(COMMON_ID)
-      .globalScorePercentage(100.0)
-      .questionResponses(List.of(
-        QuestionResponseScoreDTO.builder()
-          .score(10.0)
-          .category(question.getCategory())
-          .build()))
-      .build();
-
-    when(auditRepository.findById(COMMON_ID)).thenReturn(Optional.of(audit));
+    when(auditRepository.findById(COMMON_ID)).thenReturn(Optional.of(scoringAudit));
     when(scoringStrategyFactory.resolveStrategyByMethodType(MethodType.SCRUM)).thenReturn(scrumScoringStrategy);
-    when(scrumScoringStrategy.calculateScoring(audit)).thenReturn(auditScore);
+    when(scrumScoringStrategy.calculateScoring(scoringAudit)).thenReturn(auditScore);
     doNothing().when(auditCategoryResultEnricher).enrichAuditComment(auditScore, MethodType.SCRUM, auditScore.getAuditCategoryResults());
-    when(auditRepository.save(audit)).thenReturn(audit);
-    when(auditMapper.auditScoretoAuditScoreDto(auditScore)).thenReturn(auditScoreDTO);
+    when(auditRepository.save(scoringAudit)).thenReturn(scoringAudit);
 
     // Act
-    AuditScoreDTO result = auditService.calculateScoringOfAudit(COMMON_ID);
+    AuditScoreResponse result = auditService.calculateScoringOfAudit(COMMON_ID);
 
     // Assert
     assertNotNull(result);
@@ -320,10 +252,9 @@ class AuditServiceImplTest {
 
     verify(auditRepository).findById(COMMON_ID);
     verify(scoringStrategyFactory).resolveStrategyByMethodType(MethodType.SCRUM);
-    verify(scrumScoringStrategy).calculateScoring(audit);
+    verify(scrumScoringStrategy).calculateScoring(scoringAudit);
     verify(auditCategoryResultEnricher).enrichAuditComment(auditScore, MethodType.SCRUM, auditScore.getAuditCategoryResults());
-    verify(auditRepository).save(audit);
-    verify(auditMapper).auditScoretoAuditScoreDto(auditScore);
+    verify(auditRepository).save(scoringAudit);
   }
 
 
@@ -338,30 +269,42 @@ class AuditServiceImplTest {
   }
 
   @Test
+  void calculateScoringOfAudit_nullMethod_throwsBadRequest() {
+    // Arrange : audit without a methodology cannot be scored
+    Audit methodlessAudit = Audit.builder().auditId(COMMON_ID).method(null).build();
+    when(auditRepository.findById(COMMON_ID)).thenReturn(Optional.of(methodlessAudit));
+
+    // Act + Assert
+    assertThrows(BadRequestException.class,
+      () -> auditService.calculateScoringOfAudit(COMMON_ID));
+
+    verifyNoInteractions(scoringStrategyFactory);
+  }
+
+  @Test
+  void calculateScoringOfAudit_unsupportedMethod_throwsBadRequest() {
+    // Arrange : KANBAN has no registered scoring strategy
+    Audit kanbanAudit = Audit.builder().auditId(COMMON_ID).method(MethodType.KANBAN).build();
+    when(auditRepository.findById(COMMON_ID)).thenReturn(Optional.of(kanbanAudit));
+    when(scoringStrategyFactory.resolveStrategyByMethodType(MethodType.KANBAN))
+      .thenThrow(new IllegalArgumentException("Unsupported method type: kanban"));
+
+    // Act + Assert
+    assertThrows(BadRequestException.class,
+      () -> auditService.calculateScoringOfAudit(COMMON_ID));
+
+    verify(scoringStrategyFactory).resolveStrategyByMethodType(MethodType.KANBAN);
+  }
+
+  @Test
   void getAuditByProjectAndAuditId_success() throws Exception {
     // Arrange
     when(projectRepository.existsById(COMMON_ID)).thenReturn(true);
     when(auditRepository.findById(COMMON_ID))
       .thenReturn(Optional.of(audit));
 
-    // Mock du mapper pour chaque question
-    for (Question q : audit.getQuestions()) {
-      when(auditMapper.mapToQuestionResponseModel(q)).thenReturn(
-        QuestionResponseModel.builder()
-          .id(q.getQuestionId())
-          .questionRef(q.getQuestionRef())
-          .category(q.getCategory())
-          .weight(q.getWeight())
-          .auditId(q.getAudit() != null ? q.getAudit().getAuditId() : null)
-          .auditAnswerLabel(q.getAuditAnswerLabel())
-          .auditAnswerValue(q.getAuditAnswerValue())
-          .scoringType(q.getScoringType())
-          .build()
-      );
-    }
-
     // Act
-    AuditResponseModel response = auditService.getAuditByProjectAndAuditId(COMMON_ID, COMMON_ID);
+    AuditResponse response = auditService.getAuditByProjectAndAuditId(COMMON_ID, COMMON_ID);
 
     // Assert
     assertNotNull(response);

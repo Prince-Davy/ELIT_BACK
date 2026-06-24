@@ -1,13 +1,13 @@
 package com.elit.outildedecision.ai.answer.entity;
 
-import com.elit.outildedecision.entity.Project;
-import org.junit.Test;
+import com.elit.outildedecision.shared.kernel.entity.Project;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class AiAnswerTest {
+class AiAnswerTest {
   @Test
-  public void shouldCreateAiAnswerWithAllFields() {
+  void shouldCreateAiAnswerWithAllFields() {
     Project project = new Project();
     AiAnswer answer = AiAnswer.builder()
       .question("Q1")
@@ -17,14 +17,14 @@ public class AiAnswerTest {
       .build();
 
 
-    assertEquals("Q1", answer.getQuestion());
-    assertEquals("Category", answer.getCategory());
-    assertEquals("A1", answer.getAnswer());
-    assertEquals(project, answer.getProject());
+    assertThat(answer.getQuestion()).isEqualTo("Q1");
+    assertThat(answer.getCategory()).isEqualTo("Category");
+    assertThat(answer.getAnswer()).isEqualTo("A1");
+    assertThat(answer.getProject()).isEqualTo(project);
   }
 
   @Test
-  public void shouldSetAndGetFields() {
+  void shouldSetAndGetFields() {
     AiAnswer answer = new AiAnswer();
     Project project = new Project();
 
@@ -33,9 +33,9 @@ public class AiAnswerTest {
     answer.setAnswer("A1");
     answer.setProject(project);
 
-    assertEquals("Q1", answer.getQuestion());
-    assertEquals("Category", answer.getCategory());
-    assertEquals("A1", answer.getAnswer());
-    assertEquals(project, answer.getProject());
+    assertThat(answer.getQuestion()).isEqualTo("Q1");
+    assertThat(answer.getCategory()).isEqualTo("Category");
+    assertThat(answer.getAnswer()).isEqualTo("A1");
+    assertThat(answer.getProject()).isEqualTo(project);
   }
 }

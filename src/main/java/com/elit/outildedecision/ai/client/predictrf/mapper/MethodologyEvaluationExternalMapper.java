@@ -4,6 +4,7 @@ import com.elit.outildedecision.ai.client.predictrf.dto.MethodologyEvaluationExt
 import com.elit.outildedecision.ai.methodology.evaluation.entity.MethodologyEvaluation;
 import org.springframework.stereotype.Component;
 
+/** Methodology evaluation external mapper class. */
 @Component
 public final class MethodologyEvaluationExternalMapper {
   /**

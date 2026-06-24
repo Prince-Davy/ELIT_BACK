@@ -1,14 +1,16 @@
 package com.elit.outildedecision.audit.entity;
 
 import com.elit.outildedecision.audit.entity.comment.GlobalComment;
-import com.elit.outildedecision.entity.User;
+import com.elit.outildedecision.shared.kernel.entity.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,12 +32,15 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Audit score class. */
 @Entity
 @Table(name = "audit_score")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class AuditScore implements Serializable {
 
 
@@ -45,6 +50,7 @@ public class AuditScore implements Serializable {
  */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @EqualsAndHashCode.Include
   private Long id;
 
   /**
@@ -81,6 +87,9 @@ public class AuditScore implements Serializable {
   /**
    * Référence au template global utilisé (FK informative).
    */
+  // S1948: JPA relation, never Java-serialized (Serializable here is only for JPA; state is exposed
+  // through DTOs), so the non-serializable type is intentional.
+  @SuppressWarnings("java:S1948")
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "global_comment_id")
   private GlobalComment globalComment;
@@ -88,6 +97,9 @@ public class AuditScore implements Serializable {
   /**
    * List of the scores by audit category.
    */
+  // S1948: JPA relation, never Java-serialized (Serializable here is only for JPA; state is exposed
+  // through DTOs), so the non-serializable element type is intentional.
+  @SuppressWarnings("java:S1948")
   @Builder.Default
   @OneToMany(mappedBy = "auditScore", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("auditScore_categoryResults")

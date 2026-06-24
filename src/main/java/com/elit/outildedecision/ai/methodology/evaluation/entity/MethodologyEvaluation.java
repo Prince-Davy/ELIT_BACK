@@ -1,7 +1,7 @@
 package com.elit.outildedecision.ai.methodology.evaluation.entity;
 
 import com.elit.outildedecision.ai.methodology.evaluation.converter.PredictionConverter;
-import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.shared.kernel.entity.Project;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -87,6 +87,7 @@ public class MethodologyEvaluation {
    */
   @Convert(converter = PredictionConverter.class)
   @Column(name = "questionScores", columnDefinition = "json")
+  @Builder.Default
   private Map<String, Double> questionScores = new HashMap<>();
 
   /**

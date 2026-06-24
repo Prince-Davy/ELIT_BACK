@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/** Predict rf response class. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

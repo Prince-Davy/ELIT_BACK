@@ -1,8 +1,9 @@
 package com.elit.outildedecision.ai.answer.entity;
 
-import com.elit.outildedecision.entity.Project;
+import com.elit.outildedecision.shared.kernel.entity.Project;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,6 +42,7 @@ import jakarta.persistence.Table;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class AiAnswer {
 
   /**

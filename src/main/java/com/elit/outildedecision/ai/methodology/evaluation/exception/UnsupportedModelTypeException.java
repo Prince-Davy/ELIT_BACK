@@ -1,12 +1,18 @@
 package com.elit.outildedecision.ai.methodology.evaluation.exception;
 
-public class UnsupportedModelTypeException extends Exception {
+import com.elit.outildedecision.shared.exception.ApiException;
+import org.springframework.http.HttpStatus;
+
+/**
+ * Exception thrown when the requested model type is unsupported. Mapped to HTTP 422.
+ */
+public class UnsupportedModelTypeException extends ApiException {
   /**
    * Exceptions to handle unsupported model type.
    *
    * @param message message.
    */
   public UnsupportedModelTypeException(final String message) {
-    super(message);
+    super(HttpStatus.UNPROCESSABLE_ENTITY, message);
   }
 }

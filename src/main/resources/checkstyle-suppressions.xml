@@ -15,4 +15,6 @@
   <suppress checks="MemberNameCheck" files="."/> <!-- Force to not put _ in variable name -->
   <suppress checks="NewlineAtEndOfFile" files="."/> <!-- Force a new line at the end of the file -> USELESS -->
   <suppress checks="HideUtilityClassConstructor" files="."/> <!-- Force constructor to be private and fail the build -->
+  <!-- Generated sources (MapStruct *MapperImpl, etc.) are not hand-written; exclude them from style checks. -->
+  <suppress checks=".*" files="[\\/]generated-sources[\\/]"/>
 </suppressions>

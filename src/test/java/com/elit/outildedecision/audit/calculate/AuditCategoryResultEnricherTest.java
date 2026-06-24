@@ -9,8 +9,8 @@ import com.elit.outildedecision.audit.entity.comment.ScrumCategoryComment;
 import com.elit.outildedecision.audit.entity.comment.ScrumGlobalComment;
 import com.elit.outildedecision.audit.service.CategoryCommentService;
 import com.elit.outildedecision.audit.service.GlobalCommentService;
-import com.elit.outildedecision.util.MethodType;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.shared.util.MethodType;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,6 +69,34 @@ public class AuditCategoryResultEnricherTest {
     AuditCategoryResult enrichedResult = auditScore.getAuditCategoryResults().get(0);
     Assertions.assertEquals(categoryComment, enrichedResult.getCategoryComment());
     Assertions.assertEquals(levelScore, enrichedResult.getLevel());
+  }
+
+  @Test
+  void enrichAuditComment_missingGlobalComment_doesNotThrowAndLeavesNull() {
+    MethodType methodType = MethodType.SCRUM;
+    AuditScore auditScore = new AuditScore();
+    auditScore.setGlobalScorePercentage(GOOD_SCORE);
+
+    QuestionCategory category = QuestionCategory.ORGANISATIONS;
+    AuditCategoryResult categoryResult = new AuditCategoryResult();
+    categoryResult.setCategory(category);
+    categoryResult.setScorePercentageCategory(GOOD_SCORE);
+    List<AuditCategoryResult> categoryResults = List.of(categoryResult);
+
+    // Reference data not seeded for this (method, level) pair: must not break the calculation.
+    Mockito.when(globalCommentService.findByMethodAndLevel(methodType, LevelScore.BON))
+      .thenReturn(null);
+    Mockito.when(categoryCommentService.findAllByMethod(methodType))
+      .thenReturn(List.of());
+
+    Assertions.assertDoesNotThrow(() ->
+      enricher.enrichAuditComment(auditScore, methodType, categoryResults));
+
+    Assertions.assertNull(auditScore.getGlobalComment());
+    Assertions.assertEquals(1, auditScore.getAuditCategoryResults().size());
+    AuditCategoryResult enrichedResult = auditScore.getAuditCategoryResults().get(0);
+    Assertions.assertNull(enrichedResult.getCategoryComment());
+    Assertions.assertEquals(LevelScore.BON, enrichedResult.getLevel());
   }
 
 }

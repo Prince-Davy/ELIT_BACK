@@ -1,0 +1,33 @@
+{
+  "projectId" : 20,
+  "name" : "Project Pilot",
+  "description" : "Deterministic seed for the project snapshot journey",
+  "createdAt" : "2026-06-15T06:06:57.164+00:00",
+  "updatedAt" : "2026-06-15T06:06:57.164+00:00",
+  "confirmationState" : "PENDING",
+  "chefId" : 41,
+  "chefLasName" : null,
+  "chefFirstName" : null,
+  "isArchived" : false,
+  "formProgressStatus" : null,
+  "projectState" : null,
+  "contributors" : [ {
+    "contributerId" : 41,
+    "firstName" : "John",
+    "lastName" : "Doe",
+    "email" : "user@user.com",
+    "isAdmin" : false,
+    "func" : "Chef de projet",
+    "avatarPath" : null,
+    "role" : "CDP"
+  } ],
+  "attachments" : [ ],
+  "multiCriteriaAnalysisList" : [ ],
+  "multiCriteriaStatus" : null,
+  "resultAi" : {
+    "id" : null,
+    "predictedMethod" : null,
+    "predictedProba" : null,
+    "projectId" : null
+  }
+}

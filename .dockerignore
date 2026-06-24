@@ -1,0 +1,36 @@
+# Build context trimming — the Dockerfile only needs pom.xml, src/, log4j.xml,
+# cert/ and lombok.config (the rest only slows the build / risks leaking files).
+
+# Secrets — never ship into the build context
+.env
+*.env
+
+# Version control & IDE
+.git
+.gitignore
+.idea
+.vscode
+*.iml
+.editorconfig
+
+# Build output & local tooling
+target
+out
+build/target
+doxygenfile
+
+# Documentation & repo meta
+docs
+README.md
+*.md
+
+# CI / ops / infra not needed to build the app image
+.devcontainer
+azure-pipelines.yml
+app.qbuild.yml
+dev.docker-compose.yml
+manifests
+supervisor
+filebeat
+sonar-project.properties
+Makefile

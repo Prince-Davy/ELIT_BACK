@@ -1,11 +1,8 @@
 package com.elit.outildedecision.ai.methodology.evaluation.api.controller;
 
 import com.elit.outildedecision.ai.methodology.evaluation.service.MethodologyEvaluationService;
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.entity.ProjectUserPermission;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.service.implementation.UserServiceImpl;
-import com.elit.outildedecision.util.ProjectPermession;
+import com.elit.outildedecision.shared.user.service.implementation.UserServiceImpl;
+import com.elit.outildedecision.shared.util.ProjectPermession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +42,9 @@ class MethodologyEvaluationControllerSecurityTest {
 
   @BeforeEach
   void setup() {
-    when(userService.findByEmail("owner")).thenReturn(userWithPermission(ProjectPermession.CDP.name()));
-    when(userService.findByEmail("contributor")).thenReturn(userWithPermission(ProjectPermession.CONTRIBUTER.toString()));
-    when(userService.findByEmail("outsider")).thenReturn(userWithoutProjectMembership());
+    when(userService.getProjectPermissions("owner", PROJECT_ID)).thenReturn(List.of(ProjectPermession.CDP.name()));
+    when(userService.getProjectPermissions("contributor", PROJECT_ID)).thenReturn(List.of(ProjectPermession.CONTRIBUTER.toString()));
+    when(userService.getProjectPermissions("outsider", PROJECT_ID)).thenReturn(Collections.emptyList());
   }
 
   @Test
@@ -77,28 +74,6 @@ class MethodologyEvaluationControllerSecurityTest {
     verify(methodologyEvaluationService, never()).getMethodologyEvaluations(eq(PROJECT_ID), anyInt());
   }
 
-  private User userWithPermission(final String permissionLabel) {
-    User user = new User();
-    user.setUserEmail("test@example.com");
-
-    Project project = new Project();
-    project.setProjectId(PROJECT_ID);
-
-    ProjectUserPermission permission = new ProjectUserPermission();
-    permission.setProject(project);
-    permission.setUser(user);
-    permission.setPermission(permissionLabel);
-
-    user.setUserProjectPermissions(List.of(permission));
-    return user;
-  }
-
-  private User userWithoutProjectMembership() {
-    User user = new User();
-    user.setUserEmail("outsider@example.com");
-    user.setUserProjectPermissions(Collections.emptyList());
-    return user;
-  }
 }
 
 

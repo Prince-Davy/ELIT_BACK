@@ -7,9 +7,9 @@ import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.AuditCategoryResult;
 import com.elit.outildedecision.audit.entity.Question;
 import com.elit.outildedecision.audit.entity.QuestionResponseScore;
-import com.elit.outildedecision.audit.model.ScoringType;
-import com.elit.outildedecision.util.MethodType;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.audit.entity.ScoringType;
+import com.elit.outildedecision.shared.util.MethodType;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.EnumSet;
@@ -29,11 +29,13 @@ import java.util.stream.Collectors;
 @Component
 public final class AgilityScoringStrategy implements MethodsScoringStrategy {
 
+  /** {@inheritDoc} */
   @Override
   public Set<MethodType> supportedTypes() {
     return EnumSet.of(MethodType.SCRUM, MethodType.SCALED_AGILITY, MethodType.VMODEL, MethodType.WATERFALL);
   }
 
+  /** {@inheritDoc} */
   @Override
   public AuditScore calculateScoring(final Audit audit) {
     Objects.requireNonNull(audit, "audit is null");
@@ -60,7 +62,7 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
         final int weight = safeWeight(question);
         final int effectiveValue = effectiveValue(question);
         final int maxPossible = maxPossibleScore(weight);
-        final double percentage = (maxPossible == 0) ? 0d : effectiveValue * (double) weight * 100d / (double) maxPossible;
+        final double percentage = (maxPossible == 0) ? 0d : effectiveValue * weight * 100d / maxPossible;
 
         return QuestionResponseScore.builder()
           .answerLabel(question.getAuditAnswerLabel())
@@ -68,7 +70,7 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
           .score(round(percentage))
           .question(question)
           .build();
-      }).collect(Collectors.toList());
+      }).toList();
   }
 
   /**
@@ -163,8 +165,7 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
    * @return the round
    */
   private static double round(final double value) {
-    double factor = Math.pow(10, 0);
-    return Math.round(value * factor) / factor;
+    return Math.round(value);
   }
 
   /**
@@ -186,7 +187,7 @@ public final class AgilityScoringStrategy implements MethodsScoringStrategy {
    */
   private static int safeAnswerValue(final Question q) {
     final Integer v = q.getAuditAnswerValue();
-    return (v == null) ? 0 : v;
+    return (v == null) ? 0 : Math.max(0, v);
   }
 
   /**

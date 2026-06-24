@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/** Ai answer repository interface. */
 @Repository
 public interface AiAnswerRepository extends JpaRepository<AiAnswer, Long> {
 

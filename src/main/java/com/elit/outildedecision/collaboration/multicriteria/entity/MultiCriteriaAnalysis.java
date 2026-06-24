@@ -1,0 +1,88 @@
+package com.elit.outildedecision.collaboration.multicriteria.entity;
+
+import com.elit.outildedecision.collaboration.predictibility.entity.PredictibilityAnalysis;
+import com.elit.outildedecision.shared.kernel.entity.Project;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+/** Multi criteria analysis class. */
+@Entity
+@Table(name = "multi_criteria_analysis")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode(of = "multiCriteriaAnalysisId")
+public class MultiCriteriaAnalysis implements Serializable {
+  @OneToMany(mappedBy = "multiCriteriaAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference("multiCriteria_step")
+  private List<FormStep> formSteps;
+
+  @ManyToOne(optional = false, cascade = CascadeType.ALL)
+  @JoinColumn(name = "project_id", referencedColumnName = "projectId")
+  @JsonBackReference("multiCriteria_project")
+  private Project project;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long multiCriteriaAnalysisId;
+
+  @CreationTimestamp
+  @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
+  private Timestamp createdAt;
+
+  @UpdateTimestamp
+  @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
+  private Timestamp updatedAt;
+
+  private Integer multiCriteriaAnalysisIteration;
+  private Boolean isFinished;
+
+  @OneToOne(mappedBy = "multiCriteriaAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonBackReference("previsibility_multi")
+  private PredictibilityAnalysis predictibilityAnalysis;
+
+  /**
+   * @return String
+   */
+  @Override
+  public String toString() {
+    return "MultiCriteriaAnalysis{"
+        + "multiCriteriaAnalysisId="
+        + multiCriteriaAnalysisId
+        + ", createdAt="
+        + createdAt
+        + ", updatedAt="
+        + updatedAt
+        + ", multiCriteriaAnalysisIteration="
+        + multiCriteriaAnalysisIteration
+        + ", isFinished="
+        + isFinished
+        + ", formSteps="
+        + formSteps
+        + '}';
+  }
+}

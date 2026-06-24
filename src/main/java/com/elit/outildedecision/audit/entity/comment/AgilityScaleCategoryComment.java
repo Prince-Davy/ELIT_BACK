@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
+/** Agility scale category comment class. */
 @Entity
 @DiscriminatorValue("SCALED_AGILITY")
 @Getter

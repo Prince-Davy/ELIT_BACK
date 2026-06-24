@@ -1,15 +1,15 @@
 package com.elit.outildedecision.ai.analysis.service;
 
-import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
+import com.elit.outildedecision.ai.analysis.service.implementation.AnalyzeProjectServiceImpl;
+import com.elit.outildedecision.ai.answer.dto.AnswerRequest;
 import com.elit.outildedecision.ai.answer.service.AiAnswerService;
-import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedModelTypeException;
 import com.elit.outildedecision.ai.methodology.evaluation.service.MethodologyEvaluationService;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.ResultAiNotFoundException;
-import com.elit.outildedecision.exception.ResultAlreadyExistsException;
-import com.elit.outildedecision.service.ProjectService;
-import com.elit.outildedecision.service.ResultIaService;
-import com.elit.outildedecision.util.FormProgressStatus;
+import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
+import com.elit.outildedecision.ai.result.exception.ResultAiNotFoundException;
+import com.elit.outildedecision.ai.result.exception.ResultAlreadyExistsException;
+import com.elit.outildedecision.shared.project.service.ProjectService;
+import com.elit.outildedecision.ai.result.service.ResultIaService;
+import com.elit.outildedecision.shared.util.FormProgressStatus;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,8 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -45,11 +45,11 @@ class AnalyzeProjectServiceImplTest {
   @InjectMocks
   private AnalyzeProjectServiceImpl analyzeProjectService;
 
-  private AiAnswerDTO dto;
+  private AnswerRequest dto;
 
   @BeforeEach
   void setup() {
-    dto = new AiAnswerDTO();
+    dto = new AnswerRequest();
     dto.setData(Map.of());
   }
 
@@ -61,8 +61,8 @@ class AnalyzeProjectServiceImplTest {
     doThrow(new ResultAiNotFoundException("AI result not found"))
       .when(resultIaService).generateAndSaveResult(eq(projectId), any());
 
-    assertThrows(ResultAiNotFoundException.class, () ->
-      analyzeProjectService.analyzeProject(dto, projectId));
+    assertThatExceptionOfType(ResultAiNotFoundException.class)
+        .isThrownBy(() -> analyzeProjectService.analyzeProject(dto, projectId));
   }
 
   @SneakyThrows
@@ -73,8 +73,8 @@ class AnalyzeProjectServiceImplTest {
     doThrow(new ProjectNotFoundException("Project not found"))
       .when(projectService).updateFormTypeStatus(eq(projectId), any());
 
-    assertThrows(ProjectNotFoundException.class, () ->
-      analyzeProjectService.analyzeProject(dto, projectId));
+    assertThatExceptionOfType(ProjectNotFoundException.class)
+        .isThrownBy(() -> analyzeProjectService.analyzeProject(dto, projectId));
   }
 
   @SneakyThrows
@@ -85,8 +85,8 @@ class AnalyzeProjectServiceImplTest {
     doThrow(new ResultAlreadyExistsException("Result already exists"))
       .when(resultIaService).generateAndSaveResult(eq(projectId), any());
 
-    assertThrows(ResultAlreadyExistsException.class, () ->
-      analyzeProjectService.analyzeProject(dto, projectId));
+    assertThatExceptionOfType(ResultAlreadyExistsException.class)
+        .isThrownBy(() -> analyzeProjectService.analyzeProject(dto, projectId));
   }
 
   @Test
@@ -95,7 +95,7 @@ class AnalyzeProjectServiceImplTest {
 
     String result = analyzeProjectService.analyzeProject(dto, projectId);
 
-    assertEquals("Project successfully analyzed with AI service.", result);
+    assertThat(result).isEqualTo("Project successfully analyzed with AI service.");
     verify(aiAnswerService).saveAnswers(projectId, dto.getData());
     verify(projectService).updateFormTypeStatus(projectId, FormProgressStatus.IA);
     verify(resultIaService).generateAndSaveResult(projectId, dto);

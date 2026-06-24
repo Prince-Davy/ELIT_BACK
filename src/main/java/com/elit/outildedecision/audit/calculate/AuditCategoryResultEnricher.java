@@ -7,8 +7,8 @@ import com.elit.outildedecision.audit.entity.comment.CategoryComment;
 import com.elit.outildedecision.audit.entity.comment.GlobalComment;
 import com.elit.outildedecision.audit.service.CategoryCommentService;
 import com.elit.outildedecision.audit.service.GlobalCommentService;
-import com.elit.outildedecision.util.MethodType;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.shared.util.MethodType;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

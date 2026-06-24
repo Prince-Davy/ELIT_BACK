@@ -3,16 +3,16 @@ package com.elit.outildedecision.audit.service;
 import com.elit.outildedecision.audit.entity.LevelScore;
 import com.elit.outildedecision.audit.entity.comment.CategoryComment;
 import com.elit.outildedecision.audit.repository.CategoryCommentRepository;
-import com.elit.outildedecision.audit.service.impl.CategoryCommentServiceImpl;
-import com.elit.outildedecision.util.MethodType;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.audit.service.implementation.CategoryCommentServiceImpl;
+import com.elit.outildedecision.shared.util.MethodType;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.elit.outildedecision.util.QuestionCategory.ORGANISATIONS;
+import static com.elit.outildedecision.shared.util.QuestionCategory.ORGANISATIONS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

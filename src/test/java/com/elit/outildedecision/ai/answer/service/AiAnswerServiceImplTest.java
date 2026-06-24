@@ -4,9 +4,9 @@ import com.elit.outildedecision.ai.answer.entity.AiAnswer;
 import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
 import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
 import com.elit.outildedecision.ai.answer.service.implementation.AiAnswerServiceImpl;
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.shared.kernel.entity.Project;
+import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
+import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,9 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AiAnswerServiceImplTest {
@@ -56,8 +62,9 @@ class AiAnswerServiceImplTest {
     inOrder.verify(aiAnswerRepository).saveAll(listCaptor.capture());
 
     List<AiAnswer> saved = listCaptor.getValue();
-    assertNotNull(saved);
-    assertEquals(2, saved.size(), "Le nombre d'answers sauvegardées doit correspondre à la taille de la map fournie");
+    assertThat(saved)
+        .as("Le nombre d'answers sauvegardées doit correspondre à la taille de la map fournie")
+        .hasSize(2);
   }
 
   @Test
@@ -68,7 +75,8 @@ class AiAnswerServiceImplTest {
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
     // When / Then
-    assertThrows(ProjectNotFoundException.class, () -> aiAnswerService.saveAnswers(projectId, data));
+    assertThatExceptionOfType(ProjectNotFoundException.class)
+        .isThrownBy(() -> aiAnswerService.saveAnswers(projectId, data));
     verify(aiAnswerRepository, never()).saveAll(anyList());
   }
 
@@ -80,7 +88,8 @@ class AiAnswerServiceImplTest {
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
     // When / Then
-    assertThrows(AiAnswerNotFoundException.class, () -> aiAnswerService.saveAnswers(projectId, Map.of()));
+    assertThatExceptionOfType(AiAnswerNotFoundException.class)
+        .isThrownBy(() -> aiAnswerService.saveAnswers(projectId, Map.of()));
     verify(aiAnswerRepository, never()).saveAll(anyList());
   }
 
@@ -91,10 +100,10 @@ class AiAnswerServiceImplTest {
     when(aiAnswerRepository.findByProject_ProjectId(projectId)).thenReturn(List.of());
 
     // When / Then
-    assertThrows(AiAnswerNotFoundException.class, () -> aiAnswerService.getAnswersByProject(projectId));
+    assertThatExceptionOfType(AiAnswerNotFoundException.class)
+        .isThrownBy(() -> aiAnswerService.getAnswersByProject(projectId));
   }
 
-  // java
   @Test
   void saveAnswers_shouldThrowAiAnswerNotFoundException_whenDataNull() {
     // Given
@@ -103,7 +112,8 @@ class AiAnswerServiceImplTest {
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
     // When / Then
-    assertThrows(AiAnswerNotFoundException.class, () -> aiAnswerService.saveAnswers(projectId, null));
+    assertThatExceptionOfType(AiAnswerNotFoundException.class)
+        .isThrownBy(() -> aiAnswerService.saveAnswers(projectId, null));
     verify(aiAnswerRepository, never()).deleteByProject_ProjectId(anyLong());
     verify(aiAnswerRepository, never()).saveAll(anyList());
   }
@@ -134,21 +144,24 @@ class AiAnswerServiceImplTest {
     inOrder.verify(aiAnswerRepository).saveAll(captor.capture());
 
     java.util.List<AiAnswer> saved = captor.getValue();
-    assertNotNull(saved);
-    assertEquals(2, saved.size(), "Seules les paires valides doivent être sauvegardées");
+    assertThat(saved)
+        .as("Seules les paires valides doivent être sauvegardées")
+        .hasSize(2);
 
     java.util.Set<String> questions = saved.stream()
       .map(AiAnswer::getQuestion)
       .collect(java.util.stream.Collectors.toSet());
-    assertTrue(questions.contains("Q3"));
-    assertTrue(questions.contains("Q4")); // '  Q4  ' doit être trim -> 'Q4'
+    assertThat(questions).contains("Q3");
+    assertThat(questions).contains("Q4"); // '  Q4  ' doit être trim -> 'Q4'
 
     java.util.Map<String, String> savedMap = saved.stream()
       .collect(java.util.stream.Collectors.toMap(AiAnswer::getQuestion, AiAnswer::getAnswer));
-    assertEquals("A3", savedMap.get("Q3"));
-    assertEquals("A4", savedMap.get("Q4")); // '  A4  ' doit être trim -> 'A4'
+    assertThat(savedMap.get("Q3")).isEqualTo("A3");
+    assertThat(savedMap.get("Q4")).isEqualTo("A4"); // '  A4  ' doit être trim -> 'A4'
 
-    assertTrue(saved.stream().allMatch(a -> a.getProject() == project), "Chaque réponse doit référencer le projet résolu");
+    assertThat(saved)
+        .as("Chaque réponse doit référencer le projet résolu")
+        .allMatch(a -> a.getProject() == project);
   }
 
   @Test
@@ -164,7 +177,8 @@ class AiAnswerServiceImplTest {
     data.put("Q1", " ");   // invalide
 
     // When / Then
-    assertThrows(AiAnswerNotFoundException.class, () -> aiAnswerService.saveAnswers(projectId, data));
+    assertThatExceptionOfType(AiAnswerNotFoundException.class)
+        .isThrownBy(() -> aiAnswerService.saveAnswers(projectId, data));
 
     // delete est appelé (car data non vide), mais saveAll ne doit pas l'être
     verify(aiAnswerRepository).deleteByProject_ProjectId(projectId);
@@ -183,7 +197,8 @@ class AiAnswerServiceImplTest {
     doThrow(new RuntimeException("repo failure")).when(aiAnswerRepository).deleteByProject_ProjectId(projectId);
 
     // When / Then
-    assertThrows(RuntimeException.class, () -> aiAnswerService.saveAnswers(projectId, data));
+    assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> aiAnswerService.saveAnswers(projectId, data));
     verify(aiAnswerRepository, never()).saveAll(anyList());
   }
 
@@ -202,8 +217,7 @@ class AiAnswerServiceImplTest {
     java.util.List<AiAnswer> result = aiAnswerService.getAnswersByProject(projectId);
 
     // Then
-    assertNotNull(result);
-    assertEquals(2, result.size());
+    assertThat(result).hasSize(2);
     verify(aiAnswerRepository).findByProject_ProjectId(projectId);
   }
 

@@ -1,13 +1,15 @@
 package com.elit.outildedecision.audit.entity;
 
 import com.elit.outildedecision.audit.entity.comment.CategoryComment;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 import jakarta.persistence.Entity;
@@ -54,10 +56,12 @@ import jakarta.validation.constraints.NotNull;
   name = "audit_category_result",
   uniqueConstraints = @UniqueConstraint(columnNames = {"audit_score_id", "category"})
 )
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class AuditCategoryResult {
 
   /**
@@ -65,6 +69,7 @@ public class AuditCategoryResult {
    */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @EqualsAndHashCode.Include
   private Long auditCategoryResultId;
 
   /**

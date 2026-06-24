@@ -3,8 +3,10 @@ package com.elit.outildedecision.audit.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,12 +19,15 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Column;
 import java.io.Serializable;
 
+/** Question response score class. */
 @Entity
 @Table(name = "question_response_score")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class QuestionResponseScore implements Serializable {
 
   /**
@@ -31,6 +36,7 @@ public class QuestionResponseScore implements Serializable {
    */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @EqualsAndHashCode.Include
   private Long id;
 
   /**

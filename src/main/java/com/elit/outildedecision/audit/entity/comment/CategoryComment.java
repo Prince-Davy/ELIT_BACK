@@ -1,6 +1,6 @@
 package com.elit.outildedecision.audit.entity.comment;
 
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +18,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 
+/** Category comment class. */
 @Entity
 @Table(name = "category_comment", uniqueConstraints = @UniqueConstraint(columnNames = {"category", "level", "method_type"}))
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

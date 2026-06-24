@@ -1,0 +1,864 @@
+[
+  {
+    "id": "Project Complexity",
+    "questionText": "Quelle est la complexité du projet ?",
+    "questionNumber": 1,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible (composant unique)",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Complexité du projet - Faible",
+            "description": "La méthodologie traditionnelle convient bien aux projets simples sans dépendances complexes, car elle suit un déroulement séquentiel où chaque phase est terminée avant de passer à la suivante.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Complexité du projet - Faible",
+            "description": "Appliquer une méthodologie hybride à un projet simple pourrait ajouter une complexité inutile et allonger les processus de validation.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Complexité du projet - Faible",
+            "description": "Pour un projet simple sans dépendances, l’agilité permet de s’adapter facilement grâce à des itérations continues.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "medium",
+        "label": "Modérée (collection d'éléments et de sous-systèmes interactifs pour un seul produit)",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Complexité du projet - Moyenne",
+            "description": "Pour un projet de complexité modérée, cette méthodologie fonctionne bien mais exige une planification séquentielle précise pour gérer les dépendances limitées.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Complexité du projet - Moyenne",
+            "description": "Combiner planification et flexibilité dans une approche hybride facilite la gestion des interdépendances.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Complexité du projet - Moyenne",
+            "description": "Avec un projet de complexité modérée, l'agilité offre la possibilité de s’adapter rapidement aux interdépendances, facilitant les modifications en fonction de l’évolution des besoins.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevée (ensemble important de systèmes différents qui fonctionnent ensemble)",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Complexité du projet - Élevée",
+            "description": "Dans les projets très complexes, la gestion minutieuse des interdépendances devient cruciale avec une méthodologie traditionnelle.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Complexité du projet - Élevée",
+            "description": "La coordination des équipes et des pratiques peut être compliquée dans un projet géré en hybride, entrainant des risques de retards.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Complexité du projet - Élevée",
+            "description": "Une approche agile est avantageuse pour des projets complexes, où des ajustements continus et une flexibilité accrue sont nécessaires pour gérer l'interdépendance des éléments.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Duration Change",
+    "questionText": "Quelle flexibilité est permise sur la durée du projet ?",
+    "questionNumber": 3,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible : La durée doit être strictement respectée",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur la durée - Faible",
+            "description": "Les délais stricts sont mieux gérés par une méthodologie traditionnelle, qui impose une planification rigoureuse et des contrôles serrés pour assurer le respect des échéances.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur la durée - Faible",
+            "description": "La complexité de coordination dans un modèle hybride peut rendre le respect strict des délais plus difficile, surtout avec des équipes ajustant fréquemment leur travail.",
+            "level": "Red"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur la durée - Faible",
+            "description": "La méthodologie agile peut être difficilement compatible avec des délais stricts, car les itérations et ajustements fréquents peuvent entraîner des déviations dans le planning initial.",
+            "level": "Red"
+          }
+        ]
+      },
+      {
+        "id": "medium",
+        "label": "Moyenne : Une déviation insignifiante de la durée est permise",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur la durée - Moyenne",
+            "description": "Les projets nécessitant des ajustements de calendrier mineurs peuvent être compliqués à gérer avec une méthodologie traditionnelle peu flexible.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur la durée - Moyenne",
+            "description": "Un cadre hybride est adapté pour des projets avec une légère tolérance aux retards mineurs, permettant d’allier structure rigoureuse et flexibilité modérée.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur la durée - Moyenne",
+            "description": "L'agilité se concentre sur la valeur du produit plutôt que sur la durée du projet. Les itérations permettent de réévaluer continuellement les priorités et délais.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevée : Un écart considérable par rapport à la durée initiale est autorisé",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur la durée - Élevée",
+            "description": "Pour des écarts importants, cette approche rigide peut s’avérer inadéquate, car elle n’offre pas la souplesse nécessaire aux ajustements fréquents.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur la durée - Élevée",
+            "description": "Avec des ajustements réguliers, une grande flexibilité de planning peut nuire à la structure du projet, bien que les phases hybrides s’y adaptent mieux qu’une approche purement séquentielle.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur la durée - Élevée",
+            "description": "L'agilité se concentre sur la valeur du produit plutôt que sur la durée du projet. Les itérations permettent de réévaluer continuellement les priorités et délais.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Budget Change",
+    "questionText": "Quelle est la flexibilité sur le respect du budget du projet ?",
+    "questionNumber": 4,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible : Le budget doit être strictement respecté",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le budget - Faible",
+            "description": "Un contrôle rigide des coûts, possible avec une méthodologie traditionnelle, est adapté aux projets nécessitant un strict respect du budget.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le budget - Faible",
+            "description": "Les ajustements continus des priorités peuvent entraîner des coûts imprévus, difficilement compatibles avec un budget fixe.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le budget - Faible",
+            "description": "Un budget strict peut poser problème en agile, car les ajustements itératifs et les modifications fréquentes peuvent générer des coûts imprévus qui compliquent la gestion financière.",
+            "level": "Red"
+          }
+        ]
+      },
+      {
+        "id": "medium",
+        "label": "Moyenne : Une déviation insignifiante du budget est permise",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le budget - Moyenne",
+            "description": "Dans cette approche, la validation d'ajustements budgétaires mineurs peut être complexe et contraignante.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le budget - Moyenne",
+            "description": "La méthodologie hybride est recommandée lorsque des ajustements mineurs au budget sont permis. Elle permet de maintenir un certain contrôle tout en s'adaptant aux changements modérés.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le budget - Moyenne",
+            "description": "Une approche agile est idéale dans un contexte de budget flexible, car elle permet de répondre aux besoins évolutifs sans contrainte financière rigide.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevée : Un écart considérable par rapport au budget initial est autorisé",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le budget - Élevée",
+            "description": "Les ajustements budgétaires importants sont longs et compliqués à approuver dans un cadre traditionnel.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le budget - Élevée",
+            "description": "Dans le cadre d’un projet hybride, les variations budgétaires importantes peuvent être longues à valider, ajoutant une contrainte de coordination.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le budget - Élevée",
+            "description": "Une approche agile est idéale dans un contexte de budget flexible, car elle permet de répondre aux besoins évolutifs sans contrainte financière rigide.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Requirement Change",
+    "questionText": "Quelle flexibilité est permise sur le respect des besoins du client ?",
+    "questionNumber": 7,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible : Les besoins doivent êtres strictement respectés",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le besoin client - Faible",
+            "description": "Pour des besoins devant être strictement respectés, la méthodologie traditionnelle, avec son contrôle rigoureux des exigences, est appropriée.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le besoin client - Faible",
+            "description": "Les itérations fréquentes de la méthodologie hybride peuvent parfois provoquer des écarts par rapport aux besoins initiaux, ajoutant des fonctionnalités imprévues.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le besoin client - Faible",
+            "description": "Dans cette approche, des changements mineurs aux besoins du client peuvent entraîner une hausse des coûts et une complexité accrue.",
+            "level": "Red"
+          }
+        ]
+      },
+      {
+        "id": "medium",
+        "label": "Moyenne : Une déviation insignifiante des besoins est permise",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le respect des besoins du client - Moyenne",
+            "description": "Dans cette approche, des changements mineurs aux besoins du client peuvent entraîner une hausse des coûts et une complexité accrue.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le respect des besoins du client - Moyenne",
+            "description": "Ce modèle convient pour des projets où les exigences du client peuvent légèrement évoluer sans bouleverser le planning.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le respect des besoins du client - Moyenne",
+            "description": "La méthodologie agile est idéale pour s'adapter aux changements ponctuels des besoins du client, permettant de les ajuster au fil des itérations.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevée : Un écart considérable par rapport aux besoins est autorisé",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le respect des besoins du client - Élevée",
+            "description": "Des variations importantes dans les besoins du client peuvent poser des problèmes de coût et de complexité car la méthodologie traditionnelle repose sur des spécifications définies en début de projet.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "Une gestion hybride s’adapte bien aux changements des besoins clients grâces aux itérations fréquentes.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "La méthodologie agile est idéale pour s'adapter aux changements réguliers des besoins du client, permettant de les ajuster continuellement au fil des itérations.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "veryHigh",
+        "label": "Très élevé : Le respect des besoins n'est pas strictement requis",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "Des variations très importantes dans les besoins du client peuvent poser des problèmes de coût et de complexité car la méthodologie traditionnelle repose sur des spécifications définies en début de projet.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "Une gestion hybride s’adapte bien aux changements des besoins clients grâces aux itérations fréquentes.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Flexibilité sur le respect des besoins du client - Très élevée",
+            "description": "La méthodologie Agile est idéale pour s'adapter aux changements réguliers des besoins du client, permettant de les ajuster continuellement au fil des itérations.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Technological uncertainty",
+    "questionText": "Quel est le défi technologique du projet ?",
+    "questionNumber": 8,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible : technologies familières",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Défi technologique - Faible",
+            "description": "Les technologies familières s’intègrent bien avec une méthodologie traditionnelle, dont les processus sont bien définis et structurés.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Défi technologique - Faible",
+            "description": "Avec des technologies connues, un cadre hybride assure une organisation efficace tout en maintenant une réactivité pour les imprévus.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Défi technologique - Faible",
+            "description": "Avec des technologies bien connues, la méthodologie agile permet de générer de la valeur rapidement dès les premières itérations, tirant parti de la maîtrise technique de l’équipe.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "medium",
+        "label": "Moyen : adaptation de technologies familières",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Défi technologique - Moyen",
+            "description": "La méthodologie classique peut manquer de flexibilité pour s'adapter aux ajustements nécessaires, aux imprévus, aux besoins d'innovation si le niveau technologique est élevé.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Défi technologique - Moyen",
+            "description": "La souplesse d’une approche hybride peut faciliter l’adaptation aux évolutions technologiques tout en préservant un cadre structuré.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Défi technologique - Moyen",
+            "description": "La méthodologie agile permet de s'adapter rapidement aux changements techniques et technologiques.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevé : première utilisation de la technologie",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Défi technologique - Élevé",
+            "description": "Les développements technologiques innovantes demandent souvent une flexibilité que la méthodologie traditionnelle ne fournit pas.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Défi technologique - Élevé",
+            "description": "La méthodologie hybride pourrait manquer de la flexibilité nécessaire pour s’adapter rapidement aux besoins d'innovation.",
+            "level": "Red"
+          },
+          {
+            "id": "agile",
+            "title": "Défi technologique - Élevé",
+            "description": "Lorsque la technologie est nouvelle, l’Agilité permet des ajustements rapides, permettant à l'équipe de s'adapter rapidement et d'explorer des solutions innovantes au fil des sprints.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "veryHigh",
+        "label": "Très élevé : développement de nouvelles technologies",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Défi technologique - Très élevé",
+            "description": "Les développements technologiques inédits demandent souvent une flexibilité que la méthodologie traditionnelle ne fournit pas.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Défi technologique - Très élevé",
+            "description": "La méthodologie hybride pourrait manquer de la flexibilité nécessaire pour s’adapter rapidement aux besoins d'innovation.",
+            "level": "Red"
+          },
+          {
+            "id": "agile",
+            "title": "Défi technologique - Très élevé",
+            "description": "Lorsque la technologie est nouvelle, l’Agilité permet des ajustements rapides, permettant à l'équipe de s'adapter rapidement et d'explorer des solutions innovantes au fil des sprints.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Risk rate",
+    "questionText": "Quel est le taux de risque dans le projet (risque stratégique, opérationnel, tactique) ?",
+    "questionNumber": 9,
+    "responses": [
+      {
+        "id": "<10%",
+        "label": "Faible : moins de 10%",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau de risque - Faible",
+            "description": "Pour des projets à faible risque, une planification rigoureuse permet de minimiser les impacts des imprévus.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau de risque - Faible",
+            "description": "La méthodologie hybride permet une bonne identification des risques dans la phase de plannification initiale et une certaine réactivité pour s'ajuster en cours de projet si nécessaire.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau de risque - Faible",
+            "description": "L'agilité, avec ses itérations fréquentes, permet une gestion réactive des risques, même faibles, en assurant un suivi continu et une réévaluation constante des priorités.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "10% to 50%",
+        "label": "Moyen : de 10% à 50%",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau de risque - Moyen",
+            "description": "La méthodologie classique peut convenir dans un projet à risque modéré mais une plannification rigide peut limiter l'adpatabilité.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau de risque - Moyen",
+            "description": "La méthodologie hybride permet une bonne identification des risques dans la phase de plannification initiale et une certaine réactivité pour s'ajuster en cours de projet si nécessaire.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau de risque - Moyen",
+            "description": "Un cadre agile est bien adapté pour gérer des risques modérés, car il permet de pivoter rapidement si des problèmes apparaissent, évitant ainsi que les risques n’atteignent un niveau critique.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "50% to 75%",
+        "label": "Élevé : de 50% à 75%",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau de risque - Élevé",
+            "description": "La rigidité de la méthodologie classique peut aggraver les risques car elle ne permet pas de répondre rapidement aux problèmes.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau de risque - Élevé",
+            "description": "Le manque de flexibilité de la méthodologie hybride peut aggraver les risques et ralentir la résolution des problèmes.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau de risque - Élevé",
+            "description": "L'agilité est conseillée pour limiter les risques car elle repose sur des cycles courts et permet des ajustements fréquents.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "75% to 100%",
+        "label": "Très élevé : de 75% à 100%",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau de risque - Très élevé",
+            "description": "La rigidité de la méthodologie classique peut aggrave les risques car elle ne permet pas de répondre rapidement aux problèmes.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau de risque - Très élevé",
+            "description": "Le manque de flexibilité de la méthodologie hybride peut aggraver les risques et ralentir la résolution des problèmes.",
+            "level": "Red"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau de risque - Très élevé",
+            "description": "L'agilité est conseillée pour limiter les risques car elle repose sur des cycles courts et permet des ajustements fréquents.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Management/sponsor engagement",
+    "questionText": "Quel est le niveau d'engagement du management et de la direction (Disponibilité, décision, …) ?",
+    "questionNumber": 10,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'engagement de la direction - Faible",
+            "description": "La méthodologie classique impose l'implication du management à un niveau élevé car il est responsable des décisions majeures, de la validation des livrables et du respect des jalons. Le risque est d'entraîner des retards et blocages.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'engagement de la direction - Faible",
+            "description": "Un manque d'engagement de la part du management peut compromettre la clarté des objectifs et des priorités, rendant ainsi plus difficile la coordination entre les phases planifiées et les ajustements nécessaires en cours de projet.",
+            "level": "Red"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'engagement de la direction - Faible",
+            "description": "Une intervention ponctuelle du management est suffisante en agile, car cette méthodologie encourage l'auto-organisation et l'autonomie de l'équipe, limitant le besoin de supervision constante.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "moderate",
+        "label": "Moyen",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'engagement de la direction - Moyen",
+            "description": "Les décisions et validations du management, nécessaires avec cette approche, peuvent créer des blocages si la réactivité fait défaut.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'engagement de la direction - Moyen",
+            "description": "Cette approche requiert un engagement modéré du management, permettant de superviser tout en laissant une flexibilité d’ajustement aux équipes.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'engagement de la direction - Moyen",
+            "description": "Une intervention ponctuelle du management pourrait perturber le fonctionnement agile, car il risquerait de restreindre la flexibilité et l'auto-organisation, fondamentales dans cette approche.",
+            "level": "Yellow"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevé",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'engagement de la direction - Élevé",
+            "description": "Pour un management impliqué, cette méthodologie permet une supervision active et continue de toutes les phases du projet.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'engagement de la direction - Élevé",
+            "description": "L'hybride nécessite un équilibre entre direction et flexibilité. Un engagement trop élevé du management serait contre-productif, car cela reviendrait à imposer une gestion de projet trop directive.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'engagement de la direction - Élevé",
+            "description": "Un engagement excessif du management pourrait perturber le fonctionnement agile, car il risquerait de restreindre la flexibilité et l'auto-organisation, fondamentales dans cette approche.",
+            "level": "Red"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "The role of the customer",
+    "questionText": "Quel est le niveau d'implication et de participation du client ?",
+    "questionNumber": 12,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible : la présence du client pendant les moments clés du projet",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'implication du client - Faible",
+            "description": "Une implication limitée du client est compatible avec cette méthodologie, qui permet de fixer les objectifs et livrables dès le début du projet.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'implication du client - Faible",
+            "description": "Sans une implication active du client, il peut être difficile de prioriser correctement les exigences et les fonctionnalités.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'implication du client - Faible",
+            "description": "Les feedback réguliers sont cruciaux pour l’ajustement des fonctionnalités et priorités. Un manque de disponibilité du client peut affecter la qualité et la pertinence des livrables.",
+            "level": "Red"
+          }
+        ]
+      },
+      {
+        "id": "moderate",
+        "label": "Moyen : participtaion du client pendant la création",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'implication du client - Moyen",
+            "description": "Une intégration de feedbacks en cours de projet peut être difficile dans une approche rigide et linéaire.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'implication du client - Moyen",
+            "description": "Ce modèle facilite la participation client à des étapes clés, intégrant leurs retours sans perturber la structure globale.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'implication du client - Moyen",
+            "description": "Les feedback réguliers sont cruciaux pour l’ajustement des fonctionnalités et priorités. Un manque de disponibilité du client peut affecter la qualité et la pertinence des livrables.",
+            "level": "Yellow"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevé : participation du client au moment du développement",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'implication du client - Élevé",
+            "description": "Des ajustements fréquents du client sont peu compatibles avec la structure rigide de cette méthodologie.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'implication du client - Élevé",
+            "description": "Un modèle hybride permet des ajustements fréquents basés sur le feedback client, exigeant une implication active pour que les changements soient gérés efficacement.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'implication du client - Élevé",
+            "description": "La méthodologie agile repose sur des cycles de feedback fréquents pour ajuster et améliorer le produit. Une implication régulière du client renforce la confiance et assure une bonne vision du produit.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Customer experience level",
+    "questionText": "Quel est le niveau de connaissance du client sur ses besoins et sur le produit ?",
+    "questionNumber": 14,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau de connaissance du client sur ses besoins - Faible",
+            "description": "Une compréhension limitée des besoins pourrait entraîner une planification inappropriée, rendant difficile l'ajustement des exigences en cours de projet.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau de connaissance du client sur ses besoins - Faible",
+            "description": "Une compréhension limitée des besoins pourrait entraîner une planification inappropriée, rendant difficile l'ajustement des exigences en cours de projet.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau de connaissance du client sur ses besoins - Faible",
+            "description": "Le cadre agile est pertinent pour des clients ayant une connaissance limitée de leurs besoins, car il favorise les ajustements au fil des itérations et une meilleure compréhension du produit.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "moderate",
+        "label": "Moyen",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau de connaissance du client sur ses besoins - Moyen",
+            "description": "La rigidité de cette approche peut compliquer les ajustements nécessaires pour des besoins qui ne sont pas clairement définis en début de projet.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau de connaissance du client sur ses besoins - Moyen",
+            "description": "Lorsque les besoins sont modérément bien définis, ce modèle permet de combiner une base structurée avec une certaine flexibilité pour affiner les spécifications.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau de connaissance du client sur ses besoins - Moyen",
+            "description": "Le cadre agile permet de faire des ajustements réguliers grâce aux itérations, favorisant une meilleure compréhension des attentes au fil du temps.",
+            "level": "Green"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevé",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau de connaissance du client sur ses besoins - Élevé",
+            "description": "Une connaissance précise des besoins du client permet de se baser sur des spécifications fixes, adaptées à la méthodologie traditionnelle.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau de connaissance du client sur ses besoins - Élevé",
+            "description": "Un cadre hybride est bien adapté aux clients ayant une vision claire de leurs besoins, car il garantit une planification initiale solide et permet des ajustements précis si nécessaire.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau de connaissance du client sur ses besoins - Élevé",
+            "description": "Pour un client avec une idée très précise de ses besoins, l'agile pourrait introduire des complexités inutiles, car les ajustements fréquents ne seraient pas toujours nécessaires.",
+            "level": "Yellow"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Team's dedication",
+    "questionText": "Quel est le niveau d'implication des participants ?",
+    "questionNumber": 18,
+    "responses": [
+      {
+        "id": "low",
+        "label": "Faible : il est difficile pour l'équipe d'apprendre de nouvelles connaissances et technologies, de s'adapter aux changements",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'implication des participants - Faible",
+            "description": "Pour des équipes avec une faible capacité d'adaptation, une méthodologie traditionnelle convient bien, en reposant sur une planification détaillée et sans réactivité élevée.",
+            "level": "Green"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'implication des participants - Faible",
+            "description": "Une équipe avec une faible capacité d'adaptation peut avoir du mal à suivre les phases itératives d'un modèle hybride, risquant de créer des retards dans les ajustements.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Implication de l'équipe - Faible",
+            "description": "Une implication faible de l'équipe peut poser problème dans un contexte agile, car la réactivité et la capacité à s’adapter sont essentielles pour suivre le rythme des itérations.",
+            "level": "Red"
+          }
+        ]
+      },
+      {
+        "id": "medium",
+        "label": "Moyen : pour certains membres de l'équipe, il est difficile d'apprendre de nouvelles connaissances et technologies, mais l'équipe peut s'adapter aux changements",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'implication des participants - Moyen",
+            "description": "Dans des équipes innovantes, une approche rigide risque de brider leur créativité et de les démotiver, en sous-utilisant leurs compétences d'adaptation.",
+            "level": "Yellow"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'implication des participants - Moyen",
+            "description": "Les équipes disposant d'une capacité d'adaptation modérée peuvent bénéficier du cadre hybride, qui offre un équilibre entre structure et flexibilité.",
+            "level": "Green"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'implication des participants - Moyen",
+            "description": "La méthodologie agile peut convenir à une équipe pouvant s'adapter aux changements, car elle favorise une approche itérative et flexible, permettant une adaptation continue.",
+            "level": "Yellow"
+          }
+        ]
+      },
+      {
+        "id": "high",
+        "label": "Élevé : absorbe facilement les nouvelles connaissances, peut s'adapter aux changements",
+        "recommandations": [
+          {
+            "id": "classique",
+            "title": "Niveau d'implication des participants - Elevé",
+            "description": "Pour des équipes innovantes, cette méthodologie peut freiner l'innovation et réduire la motivation, en imposant un cadre rigide.",
+            "level": "Red"
+          },
+          {
+            "id": "hybrid",
+            "title": "Niveau d'implication des participants - Elevé",
+            "description": "Pour des équipes très impliquées et adaptables, l’approche hybride pourrait limiter leur potentiel en imposant des phases structurées, freinant parfois leur capacité d'initiative.",
+            "level": "Yellow"
+          },
+          {
+            "id": "agile",
+            "title": "Niveau d'implication des participants - Elevé",
+            "description": "Une équipe fortement impliquée peut pleinement tirer profit de l’agile, exploitant la flexibilité de la méthodologie pour innover et intégrer rapidement des améliorations continues.",
+            "level": "Green"
+          }
+        ]
+      }
+    ]
+  }
+]

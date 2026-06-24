@@ -3,10 +3,10 @@ package com.elit.outildedecision.audit.calculate;
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.audit.entity.AuditScore;
 import com.elit.outildedecision.audit.entity.Question;
-import com.elit.outildedecision.audit.model.ScoringType;
-import com.elit.outildedecision.entity.User;
-import com.elit.outildedecision.util.MethodType;
-import com.elit.outildedecision.util.QuestionCategory;
+import com.elit.outildedecision.audit.entity.ScoringType;
+import com.elit.outildedecision.shared.kernel.entity.User;
+import com.elit.outildedecision.shared.util.MethodType;
+import com.elit.outildedecision.shared.util.QuestionCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +26,10 @@ public class ScrumScoringStrategyTest {
 
   private AgilityScoringStrategy strategy;
 
-  private final static double HUNDRED_PERCENT= 100.0;
-  private final static int YES= 2;
-  private final static int NO= 0;
-  private final static QuestionCategory OUTILS_DOCUMENTATION_CATEGORY = QuestionCategory.OUTILS_ET_DOCUMENTATION;
+  private static final double HUNDRED_PERCENT= 100.0;
+  private static final int YES= 2;
+  private static final int NO= 0;
+  private static final QuestionCategory OUTILS_DOCUMENTATION_CATEGORY = QuestionCategory.OUTILS_ET_DOCUMENTATION;
 
 
   @BeforeEach

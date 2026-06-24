@@ -4,9 +4,12 @@ import com.elit.outildedecision.ai.methodology.evaluation.exception.UnsupportedM
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.RequiredArgsConstructor;
 
+/** Model type enum. */
 @RequiredArgsConstructor
 public enum ModelType {
+  /** Agile. */
   AGILE("agile"),
+  /** Traditional. */
   TRADITIONAL("traditional");
 
   private final String value;

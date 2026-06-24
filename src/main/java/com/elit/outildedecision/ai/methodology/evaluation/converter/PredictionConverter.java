@@ -1,7 +1,7 @@
 package com.elit.outildedecision.ai.methodology.evaluation.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.persistence.AttributeConverter;
@@ -9,6 +9,7 @@ import jakarta.persistence.Converter;
 import java.io.IOException;
 import java.util.Map;
 
+/** Prediction converter class. */
 @Slf4j
 @Converter
 public class PredictionConverter implements AttributeConverter<Map<String, Double>, String> {
@@ -21,10 +22,14 @@ public class PredictionConverter implements AttributeConverter<Map<String, Doubl
    * @param prediction prediction
    * @return json
    */
-  @SneakyThrows
   @Override
   public String convertToDatabaseColumn(final Map<String, Double> prediction) {
-    return objectMapper.writeValueAsString(prediction);
+    try {
+      return objectMapper.writeValueAsString(prediction);
+    } catch (final JsonProcessingException e) {
+      log.error("JSON writing error", e);
+      throw new IllegalArgumentException("Could not convert map to JSON", e);
+    }
   }
 
   /**

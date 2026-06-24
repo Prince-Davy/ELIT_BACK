@@ -10,6 +10,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 
+/** Scrum category comment class. */
 @Entity
 @DiscriminatorValue("SCRUM")
 @Getter

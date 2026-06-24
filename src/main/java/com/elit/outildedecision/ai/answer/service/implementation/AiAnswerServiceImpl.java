@@ -2,21 +2,21 @@ package com.elit.outildedecision.ai.answer.service.implementation;
 
 import com.elit.outildedecision.ai.answer.entity.AiAnswer;
 import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
-import com.elit.outildedecision.entity.Project;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.shared.kernel.entity.Project;
+import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
 import com.elit.outildedecision.ai.answer.repository.AiAnswerRepository;
-import com.elit.outildedecision.repository.ProjectRepository;
+import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import com.elit.outildedecision.ai.answer.service.AiAnswerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
+/** Ai answer service impl class. */
 @Service
 @Slf4j
 public class AiAnswerServiceImpl implements AiAnswerService {
@@ -74,7 +74,7 @@ public class AiAnswerServiceImpl implements AiAnswerService {
         aiAnswer.setAnswer(entry.getValue().trim());
         return aiAnswer;
       })
-      .collect(Collectors.toList());
+      .toList();
 
     if (answersToSave.isEmpty()) {
       log.warn("No valid answers to save for project {}", projectId);
@@ -89,16 +89,18 @@ public class AiAnswerServiceImpl implements AiAnswerService {
    * Retrieves all AI-generated answers for a given project.
    *
    * @param projectId the ID of the project
-   * @return a list of AiAnswer entities
+   * @return the AI answer entities for the project
    * @throws AiAnswerNotFoundException if no answers are found
    */
   @Override
+  @Transactional(readOnly = true)
   public List<AiAnswer> getAnswersByProject(final Long projectId) throws AiAnswerNotFoundException {
     List<AiAnswer> answers = aiAnswerRepository.findByProject_ProjectId(projectId);
     if (answers == null || answers.isEmpty()) {
       log.warn("No AI answers found for project {}", projectId);
       throw new AiAnswerNotFoundException("No AI answers found for project " + projectId);
     }
+    log.info("Returning {} AI answers for project {}", answers.size(), projectId);
     return answers;
   }
 }

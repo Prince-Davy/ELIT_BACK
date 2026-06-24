@@ -7,8 +7,8 @@ import com.elit.outildedecision.ai.methodology.evaluation.entity.MethodologyEval
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+/** Methodology evaluation mapper class. */
 @Component
 public class MethodologyEvaluationMapper {
 
@@ -29,7 +29,7 @@ public class MethodologyEvaluationMapper {
         .questionScore(questionScores.get(aiAnswer.getQuestion()))
         .answer(aiAnswer.getAnswer())
         .build())
-      .collect(Collectors.toList());
+      .toList();
 
     return MethodologyEvaluationDto.builder()
       .methodology(evaluation.getMethodology())

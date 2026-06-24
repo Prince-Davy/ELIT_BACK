@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/** Predict rf request class. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,11 +1,12 @@
 package com.elit.outildedecision.ai.analysis.controller;
 
 import com.elit.outildedecision.ai.analysis.service.AnalyzeProjectService;
-import com.elit.outildedecision.ai.answer.dto.AiAnswerDTO;
-import com.elit.outildedecision.common.dto.SimpleMessageDto;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
-import com.elit.outildedecision.exception.ResultAiNotFoundException;
-import com.elit.outildedecision.exception.ResultAlreadyExistsException;
+import com.elit.outildedecision.ai.answer.dto.AnswerRequest;
+import com.elit.outildedecision.shared.common.dto.SimpleMessageDto;
+import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
+import com.elit.outildedecision.ai.result.exception.ResultAiNotFoundException;
+import com.elit.outildedecision.ai.result.exception.ResultAlreadyExistsException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,27 +20,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
+/** Analyze project controller class. */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/projects/{projectId}/ai-analysis")
+@Tag(name = "AI - Analysis", description = "Analyse IA d'un projet")
 public class AnalyzeProjectController {
   private final AnalyzeProjectService analyzeProjectService;
 
   /**
    * Launch AI project analysis.
    *
-   * @param projectId   project id.
-   * @param aiAnswerDTO AI answer.
+   * @param projectId     project id.
+   * @param answerRequest AI answers.
    * @return status
    */
   @PostMapping
   @PreAuthorize("isProjectOwner(#projectId)")
-  public ResponseEntity<SimpleMessageDto> analyse(@PathVariable final long projectId, @RequestBody final AiAnswerDTO aiAnswerDTO)
+  public ResponseEntity<SimpleMessageDto> analyse(@PathVariable final long projectId, @RequestBody final AnswerRequest answerRequest)
     throws ResultAiNotFoundException, ProjectNotFoundException, ResultAlreadyExistsException {
     log.info("Received request to analyse project ID {} with AI.", projectId);
 
-    String analysisState = analyzeProjectService.analyzeProject(aiAnswerDTO, projectId);
+    String analysisState = analyzeProjectService.analyzeProject(answerRequest, projectId);
     return ResponseEntity.ok(new SimpleMessageDto(analysisState, HttpStatus.OK.value(), LocalDateTime.now()));
   }
 }

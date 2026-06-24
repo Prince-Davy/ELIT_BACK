@@ -9,10 +9,16 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
+
+/** Predict rf api client class. */
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class PredictRfApiClient {
+
+  private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(30);
+
   private final WebClient aiWebClient;
 
   @Value("${ia.prediction.api.endpoint.process-predict-rf}")
@@ -25,7 +31,7 @@ public class PredictRfApiClient {
    * @return response
    */
   public PredictRfResponse predict(final PredictRfRequest request) {
-    log.debug("" + request);
+    log.debug("Predict RF request: {}", request);
     return aiWebClient.post()
       .uri(endpointPredictRf)
       .bodyValue(request)
@@ -39,6 +45,6 @@ public class PredictRfApiClient {
             })
       )
       .bodyToMono(PredictRfResponse.class)
-      .block();
+      .block(REQUEST_TIMEOUT);
   }
 }

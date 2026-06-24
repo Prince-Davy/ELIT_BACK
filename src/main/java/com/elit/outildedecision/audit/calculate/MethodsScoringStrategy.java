@@ -2,10 +2,11 @@ package com.elit.outildedecision.audit.calculate;
 
 import com.elit.outildedecision.audit.entity.Audit;
 import com.elit.outildedecision.audit.entity.AuditScore;
-import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.shared.util.MethodType;
 
 import java.util.Set;
 
+/** Methods scoring strategy interface. */
 public interface MethodsScoringStrategy {
 
   /**

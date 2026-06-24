@@ -1,7 +1,6 @@
 package com.elit.outildedecision.audit.calculate;
 
-import com.elit.outildedecision.util.MethodType;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.elit.outildedecision.shared.util.MethodType;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -13,6 +12,7 @@ import java.util.EnumMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/** Scoring strategy factory class. */
 @Component
 public final class ScoringStrategyFactory {
 
@@ -26,7 +26,6 @@ public final class ScoringStrategyFactory {
    *                   Must not be {@code null}.
    * @throws NullPointerException if {@code strategies} is {@code null}.
    */
-  @Autowired
   public ScoringStrategyFactory(final List<MethodsScoringStrategy> strategies) {
     Objects.requireNonNull(strategies, "strategies must not be null");
     this.registry = buildRegistry(strategies);

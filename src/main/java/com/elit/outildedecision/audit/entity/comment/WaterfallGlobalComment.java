@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
+/** Waterfall global comment class. */
 @Entity
 @DiscriminatorValue("WATERFALL")
 @Getter

@@ -4,8 +4,8 @@
 		"https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="com.puppycrawl.tools.checkstyle.Checker">
 
-</module>
+	<module name="LineLength">
+		<property name="max" value="120"/>
+	</module>
 
- <module name="LineLength">
-   <property name="max" value="120"/>
- </module>
+</module>

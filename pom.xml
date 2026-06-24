@@ -24,9 +24,12 @@
     <spring-boot.version>${project.parent.version}</spring-boot.version>
 
     <!-- Dependencies (uniquement celles non gérées par la BOM Spring Boot) -->
-    <!-- Harmonisation: ton POM utilisait 1.5.3.Final; on aligne la propriété -->
-    <mapstruct.version>1.5.3.Final</mapstruct.version>
-    <lombok.version>1.18.30</lombok.version>
+    <!-- Versions alignées sur les annotation processors (Étape 0 migration) -->
+    <mapstruct.version>1.6.3</mapstruct.version>
+    <lombok.version>1.18.34</lombok.version>
+    <archunit.version>1.3.0</archunit.version>
+    <!-- Seuil JaCoCo baseline (Étape 0) : non régression, à relever au fil des étapes -->
+    <jacoco.line.coverage.min>0.00</jacoco.line.coverage.min>
 
 
     <!-- Overrides sécurité Trivy -->
@@ -45,8 +48,6 @@
     <maven-javadoc.version>3.2.0</maven-javadoc.version>
     <maven-pmd.version>3.28.0</maven-pmd.version>
     <maven-surefire-report.version>3.2.5</maven-surefire-report.version>
-    <mapstruct.version>1.5.3.Final</mapstruct.version>
-    <lombok.version>1.18.30</lombok.version>
   </properties>
 
   <dependencies>
@@ -109,6 +110,14 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- ArchUnit : règles d'architecture par parcours (Étape 0 migration) -->
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>${archunit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- DB drivers (laisser la BOM gérer si possible) -->
     <dependency>
       <groupId>com.mysql</groupId>
@@ -160,17 +169,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.liquibase</groupId>
-      <artifactId>liquibase-core</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.liquibase</groupId>
-          <artifactId>liquibase-commercial</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
       <version>${mapstruct.version}</version>
@@ -181,16 +179,11 @@
       <version>${mapstruct.version}</version>
     </dependency>
 
-    <!-- springdoc 1.7.x : OK avec Boot 3, on peut migrer vers 2.x en phase 2 -->
+    <!-- springdoc 2.x : starter webmvc-ui (auto-config compatible Spring Boot 3.5, module security intégré) -->
     <dependency>
       <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-ui</artifactId>
-      <version>1.7.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-security</artifactId>
-      <version>1.7.0</version>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>2.8.17</version>
     </dependency>
 
     <dependency>
@@ -293,6 +286,26 @@
               <title>Coverage with JaCoCo</title>
             </configuration>
           </execution>
+          <!-- Garde-fou de couverture au seuil baseline (Étape 0), relevé au fil des étapes -->
+          <execution>
+            <id>jacoco-check</id>
+            <phase>verify</phase>
+            <goals><goal>check</goal></goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>LINE</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>${jacoco.line.coverage.min}</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -309,13 +322,13 @@
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-              <version>1.18.34</version>
+              <version>${lombok.version}</version>
             </path>
             <!-- MapStruct processor -->
             <path>
               <groupId>org.mapstruct</groupId>
               <artifactId>mapstruct-processor</artifactId>
-              <version>1.6.3</version>
+              <version>${mapstruct.version}</version>
             </path>
             <!-- Binding Lombok + MapStruct (nécessaire) -->
             <path>
@@ -360,6 +373,33 @@
         <configuration>
           <suppressionsLocation>src/main/resources/checkstyle-suppressions.xml</suppressionsLocation>
         </configuration>
+        <!-- Lie checkstyle:check à verify (la pipeline échoue sur violation) -->
+        <executions>
+          <execution>
+            <id>checkstyle-check</id>
+            <phase>verify</phase>
+            <goals><goal>check</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- PMD : lié à verify (config alignée sur la section reporting) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>${maven-pmd.version}</version>
+        <configuration>
+          <rulesets>
+            <ruleset>${project.basedir}/src/main/resources/pmdcustomruleset.xml</ruleset>
+          </rulesets>
+        </configuration>
+        <executions>
+          <execution>
+            <id>pmd-check</id>
+            <phase>verify</phase>
+            <goals><goal>check</goal></goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

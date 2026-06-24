@@ -1,138 +1,187 @@
-# 🚩 Documentation :
+# ELIT — Backend (`com.elit:outildedecision`)
 
-[Documentation complète](https://capgemini.sharepoint.com/:w:/r/sites/ELIThELponITprojectmanagement/Shared%20Documents/General/1%20-%20Dev%20Team%20area/Environnement%20de%20d%C3%A9veloppement/Guide%20d%27installation%20ELIT.docx?d=w6adc79bd058f4752ba25bf73a31cf7d9&csf=1&web=1&e=XgrhjU) 
+API REST **Spring Boot 3.5 / Java 21** au service de l'outil d'aide à la décision ELIT.
+Tous les endpoints sont exposés sous le context path `/api`.
 
-## Lunch the application locally without Docker (Recommand for developement)
+## 🚩 Documentation
 
-1. Download JAVA and MAVEN
-2. Duplicate .ven.tpl and rename in .env
-3. Open a terminal, navigate to the project directory, and run the command :
+- [Documentation complète](https://capgemini.sharepoint.com/:w:/r/sites/ELIThELponITprojectmanagement/Shared%20Documents/General/1%20-%20Dev%20Team%20area/Environnement%20de%20d%C3%A9veloppement/Guide%20d%27installation%20ELIT.docx?d=w6adc79bd058f4752ba25bf73a31cf7d9&csf=1&web=1&e=XgrhjU)
+- [Good practices document](https://capgemini.sharepoint.com/:w:/r/sites/ELIThELponITprojectmanagement/_layouts/15/Doc.aspx?sourcedoc=%7B5775C1E1-62A0-41F1-98E3-B741BCC4A495%7D&file=BonnePratique.docx&action=default&mobileredirect=true) — n'hésitez pas à le mettre à jour.
+- 📚 **Docs techniques dans [`docs/`](docs/)** :
+  - [Vue d'ensemble de l'architecture](docs/ARCHITECTURE_OVERVIEW.md)
+  - [Règles de calcul métier par composant](docs/REGLES_CALCUL_METIER.md)
+  - [Contrat des endpoints](docs/ENDPOINTS_BACKEND.md)
 
-```shell
-  mvn clean install
+> 📊 Ces docs contiennent des diagrammes [Mermaid](https://mermaid.js.org/). Sur **IntelliJ IDEA**,
+> installez le plugin **Mermaid** (Settings → Plugins → Marketplace) pour les voir dans l'aperçu Markdown
+> (GitHub et VSCode les affichent nativement).
+
+> 🚨 **NON NÉGOCIABLE** — dès que vous touchez à une **règle de calcul métier** (un calculateur du
+> package `calculate/`), vous **DEVEZ** mettre à jour [`docs/REGLES_CALCUL_METIER.md`](docs/REGLES_CALCUL_METIER.md)
+> (et l'architecture si elle bouge) **dans le même commit**. Une formule modifiée sans doc à jour est un
+> commit incomplet. 🚨
+
+## Prérequis
+
+- **JDK 21** (Temurin recommandé).
+- on utilise le wrapper Maven (`mvnw`).
+- Docker (uniquement pour le lancement conteneurisé).
+
+> ⚠️ Toujours préfixer les commandes Maven par le JDK et utiliser le wrapper.
+>
+> PowerShell (adaptez le chemin à votre installation du JDK 21) :
+>
+> ```powershell
+>  .\mvnw.cmd <goals>
+> ```
+
+## 🏅 Règle d'or — le code vert ou rien
+
+> **Avant tout commit** : `clean test` puis `checkstyle:check pmd:check` doivent être **verts**.
+> **Avant chaque push** : `clean verify` doit être **vert**.
+
+```powershell
+.\mvnw.cmd clean test
+.\mvnw.cmd checkstyle:check pmd:check
+.\mvnw.cmd clean verify   # avant le push
 ```
-Only one time for get 'target' file
 
-2. Lunch application
-```shell
-mvn spring-boot:run
-```   
+> ☠️ Quiconque push du code rouge sans lancer le gate `rm -rf` sa propre dignité : **build broken = skill issue**, `git blame` ne pardonne pas et le CI te `kill -9` en place publique. Sois pas ce dev. 💀
 
-3. Bonus : Before push on git excute this (if this command fail, your pipeline will faill)
-```shell
-checkstyle:check pmd:check verify site 
-``` 
+## Configuration
 
-## Lunch the application locally with Docker (Recommand for ISO AzureDevOps)
+- **Comment fonctionnent les `.properties`** : `application.properties` est la **base commune**
+  (valeurs par défaut/prod), chargée en premier. Spring applique ensuite
+  `application-<profil>.properties` par-dessus : ces fichiers ne contiennent **que les valeurs qui
+  diffèrent** de la base (pas de recopie). Les valeurs sont résolues depuis le `.env` via la syntaxe
+  `${MA_VARIABLE}`, avec repli optionnel `${MA_VARIABLE:valeur_par_defaut}` quand un défaut est défini.
+- **Profils disponibles** : `local`, `docker`, `test`. Le profil actif est choisi via
+  `SPRING_PROFILES_ACTIVE`.
+- Les lancements local/Docker lisent les secrets depuis un fichier `.env`
+  (`spring.config.import=optional:file:.env`). Dupliquez `.env.tpl` → `.env`.
+- Base de données par défaut : **MySQL**. `DB_SERVER=localhost` pour un lancement IDE/Maven, `db` pour Docker.
+- Le profil **`test` démarre sur H2 en mémoire**, sans réseau ni `.env` : c'est ce dont dépend le
+  harnais de snapshots, il doit rester auto-suffisant.
 
-1. Create the network : elit_shared_network
+## Lancer l'application en local (sans Docker — recommandé pour le développement)
 
-```shell
-  docker network create elit_shared_network 
-```
+1. Dupliquer `.env.tpl` en `.env` et renseigner les variables (notamment `DB_SERVER=localhost`).
+2. Lancer l'application (préfixez par le JDK 21, adaptez le chemin à votre installation) :
 
-2. Open dev.docker-compose.yml
-
-```shell
-  docker-compose -f dev.docker-compose.yml up --build --force-recreate --remove-orphans 
-```
-
-## Local user accounts
-
-| Id | First name | Last name | Login                | Password     |
-|:---|:-----------|:----------|:---------------------|:-------------|
-| 1  | John       | Doe       | user@user.com        | Azerty1234!? |
-| 2  | Nancy      | Michel    | admin@elite.fr       | Azerty1234!? |
-| 3  | Charles    | Baker     | contributer@elit.com | Azerty1234!? |
-| 4  | Rochelle   | Wright    | observer@elit.com    | Azerty1234!? |
-
-# Old Documentation
-
-## Launch the application locally
-
-### With IDE
-
-Once the project is imported to your favorite IDE, refer to its documentation on how to launch a Java project.
-Make sure : 
-1. It runs on your local machine.
-2. It uses Java 11 as runner (either JDK or JRE should be fine as long as the version is correct).
-3. The main class should be `com.elit.outildedecision.OutildedecisionApplication`
-4. ***VERY IMPORTANT*** : use `local` as Spring profile. Feel free to ask your favorite AI how to add required information to the run configuration.
-5. Optional : save console output to a file on your local filesystem, in case there is a log that becomes inaccessible. The directory `logs/` in the project is an ideal candidate to store this file as it should be excluded from version control.
-
-
-## Launch the application in development mode in the same way as in production mode
-
-1. Create an `.env` file from the `.env.tpl` file
-
-2. Change value of variable `DB_SERVER` to `localhost` if you launch the application from IDE or maven, and to `db` if you launch from Docker.
-
-3. If you launch from IDE or Maven, you should comment the following part in file `dev.docker-compose.yml` because container 'back' will NOT be used :
-
-  ```yaml
-  back:
-    container_name: 'elit_backend'
-    build:
-      context: "."
-      dockerfile: Dockerfile
-    env_file: .env
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./out/:/usr/src/app/out/
-    depends_on:
-      - db
-    networks:
-      - elit_network
+   ```powershell
+   $env:JAVA_HOME="C:\Users\<vous>\.jdks\temurin-21.0.11"; .\mvnw.cmd spring-boot:run
    ```
-      
-4. Launch the following docker-compose command :
-  `docker-compose -f dev.docker-compose.yml up --build --force-recreate --remove-orphans`
 
-5. You'll have (2/3) Docker containers : database, phpMyAdmin and backend (depending on step 2).
+   Pour forcer un profil explicitement :
 
+   ```powershell
+   $env:JAVA_HOME="C:\Users\<vous>\.jdks\temurin-21.0.11"; $env:SPRING_PROFILES_ACTIVE="local"; .\mvnw.cmd spring-boot:run
+   ```
 
+   L'application démarre sur **http://localhost:8080**, context path `/api`
+   (Swagger UI : http://localhost:8080/api/swagger-ui.html).
 
+## Lancer l'application avec Docker (iso AzureDevOps)
 
-## Database 
+1. Créer le réseau partagé :
 
-The project uses `H2` (in-memory DB) for local environment (actual setup, please correct when local environment will be fully back on Docker).
-It uses a `MySQL` database managed by DevOps team in INTEG environment (please update this file when application will be deployed in production environment).
+   ```shell
+   docker network create elit_shared_network
+   ```
 
-Since in memory database is non-persistent and we don't have rights to access INTEG database, we use Liquibase to manage schema evolution. 
-Moreover, Hibernate official documentation states not to use `jpa.hibernate.ddl-auto=update` in live environments.
+2. Démarrer la stack (base, phpMyAdmin et backend) :
 
-To learn more about Liquibase, please consult the [official documentation](https://docs.liquibase.com/home.html).
+   ```shell
+   docker-compose -f dev.docker-compose.yml up --build --force-recreate --remove-orphans
+   ```
 
-### How the project uses Liquibase
+   > Si vous lancez le backend depuis l'IDE ou Maven, commentez le service `back` dans
+   > `dev.docker-compose.yml` et passez `DB_SERVER=localhost`.
 
-From application.properties config file applicable to current environment we refer to a liquibase master change log. For dev we have the following :
+## Build & tests
+
+| Tâche                                                               | Goals (après le préfixe JDK ci-dessus)                  |
+| ------------------------------------------------------------------- | ------------------------------------------------------- |
+| Compilation + tests unitaires                                       | `clean test`                                            |
+| Gate qualité complète (ce que la CI exécute)                        | `clean verify` — tests + JaCoCo + Checkstyle + PMD      |
+| Lint seul                                                           | `checkstyle:check pmd:check`                            |
+| Un seul test (classe)                                               | `test -Dtest=AuditServiceImplTest`                      |
+| Un seul test (méthode)                                              | `test -Dtest=AuditServiceImplTest#shouldReturnNotFound` |
+| Ré-enregistrer les snapshots (changement de contrat acté seulement) | `test "-Dsnapshots.record=true"`                        |
+
+**Avant tout commit**, `clean test` puis `checkstyle:check pmd:check` doivent être au vert.
+Checkstyle et PMD sont liés à la phase `verify` et font échouer le build à la moindre violation.
+
+## Base de données
+
+- Schéma piloté par Hibernate avec **`ddl-auto=update`** (Liquibase a été retiré, le schéma est gelé).
+- Les noms `@Table` / `@Column` sont conservés à l'identique lors des renommages d'entités, sous peine
+  de créer une table fantôme.
+
+## Jeux de données initiaux (seeds)
+
+Au démarrage, `DataSeedInitializer` (un `ApplicationRunner` dans `shared/config/seed/`) exécute **une
+fois** tous les `DataSeeder` enregistrés, sur **tous les environnements**.
+
+| Seeder           | Contenu                                                                                                                | Source                       | Switch dédié                 |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ---------------------------- |
+| `demo-users`     | Les 4 comptes de démo (voir [Comptes utilisateurs locaux](#comptes-utilisateurs-locaux)), mot de passe hashé en BCrypt | code Java (`DemoDataSeeder`) | `app.seed.demo.enabled`      |
+| `reference-data` | Données métier de référence : `methodology`, `method`, `execution_plan_question`, `survey_question`, `category_comment`, `global_comment` | scripts SQL `db/seed/reference/*.sql` | `app.seed.reference.enabled` |
+
+**Principes :**
+
+- **Interrupteur global** : `app.seed.enabled` (défaut `true`) ; chaque seeder a son propre switch
+  (défaut `true`).
+- **Idempotent** : chaque seeder vérifie l'existence avant d'insérer (`demo-users` par e-mail,
+  `reference-data` insère une table seulement si elle est vide `COUNT(*) = 0`). Un redémarrage ne
+  duplique ni n'écrase rien.
+- **Gestion d'erreur** : sur le profil `test`, l'échec d'un seeder est loggué puis ignoré (le contexte
+  de test reste debout) ; sur **tout autre profil**, un échec **interrompt le démarrage** pour éviter
+  une base à moitié peuplée.
+- **Profil `test`** : les deux seeders sont désactivés (`app.seed.demo.enabled=false`,
+  `app.seed.reference.enabled=false`) — chaque test sème ses propres données.
+- **`reference-data` cible MySQL** : les scripts utilisent le dialecte historique MySQL et ne tournent
+  donc que sur les environnements `local`/`docker`/prod (pas sur H2).
+- **Extensible** : pour ajouter un jeu de données, créer un `@Component` implémentant `DataSeeder` —
+  il est découvert et exécuté automatiquement, sans modifier l'initializer.
+
+Pour désactiver tout le seeding en local, ajouter dans `.env` (ou en propriété) :
 
 ```properties
-spring.liquibase.change-log=classpath:liquibase/dev/master.xml
+app.seed.enabled=false
 ```
 
-Said changelog being located at `src/main/resources/liquibase/dev/master.xml`. By default, `src/main/resources` being in Spring classpath, the master change log is supposed to be automatically picked up and Liquibase run by Spring Boot.
+## Documentation API (Swagger / OpenAPI)
 
-Liquibase stores the changelogs already ran in tables `DATABASECHANGELOG` and `DATABASECHANGELOGLOCK`. Therefore, you only need to describe what changes you made during the current feature.
+- Swagger UI : `${BACKEND_URL}/api/swagger-ui.html`
+- JSON : `${BACKEND_URL}/api/v3/api-docs`
+- YAML : `${BACKEND_URL}/api/v3/api-docs.yaml`
 
-When changing entities (adding, removing or renaming properties), we need to tell Liquibase to update database schema with a changelog containing a changeset. A good prodecure to follow is :
-- Create an XML file in `src/main/resources/liquibase/<env>/changelog` following the convention.
-- Create a XML data change log item copied from existing files.
-- Include a `<changeSet>` element. Fill in the `author` and `id` required attributes. The `author` attribute is not very important but the `id` is, very much so. A good rule of thumb is to use [unix timestamp](https://www.unixtimestamp.com/) to ensure your change set is effectively unique (there is a 'Copy' button you can use on the provided site). You can use seconds or milliseconds it is up to you.
-- Include the change to the data model. Refer to the [Liquibase changetype documentation](https://docs.liquibase.com/change-types/home.html) to learn more about the syntax of what you want to change.
-- Add the reference to the created data change log in the master change log, _appending at the end_.
+## Comptes utilisateurs locaux
 
-Liquibase will be run at next application startup and the database will be updated correctly. Once the behavior is validated in dev, copy the script for integration environment and production environment if applicable.
+| Id  | Prénom   | Nom    | Login                | Mot de passe |
+| :-- | :------- | :----- | :------------------- | :----------- |
+| 1   | John     | Doe    | user@user.com        | Azerty1234!? |
+| 2   | Nancy    | Michel | admin@elite.fr       | Azerty1234!? |
+| 3   | Charles  | Baker  | contributer@elit.com | Azerty1234!? |
+| 4   | Rochelle | Wright | observer@elit.com    | Azerty1234!? |
 
-## Springdoc-openapi with swagger-ui
+## Conventions de commit
 
-- The Swagger UI page should then be available at `${BACKEND_URL}/api/swagger-ui.html
-- Documentation will be available at the following url for json format : `${BACKEND_URL}/api/v3/api-docs`
-- Documentation will be available at the following url for yaml format : `${BACKEND_URL}/api/v3/api-docs.yaml`
+Le projet suit la convention **[Conventional Commits](https://www.conventionalcommits.org/)** :
 
-## Good practices document
+```
+<type>(<scope>): <description courte à l'impératif>
+```
 
-We have a good practices document available [here](https://capgemini.sharepoint.com/:w:/r/sites/ELIThELponITprojectmanagement/_layouts/15/Doc.aspx?sourcedoc=%7B5775C1E1-62A0-41F1-98E3-B741BCC4A495%7D&file=BonnePratique.docx&action=default&mobileredirect=true). Feel free to update it as needed. 
+- **type** : `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `style`, `build`, `ci`.
+- **scope** (optionnel) : le périmètre touché (ex. `audit`, `ai`, `collaboration`, `shared`).
+- **description** : concise, à l'impératif présent, sans point final.
+
+Exemples (issus de l'historique du projet) :
+
+```
+refactor(collaborative): éradication totale des packages plats
+feat(audit): ajoute le calcul du score de criticité
+fix(ai): corrige le mapping du kiviat
+```

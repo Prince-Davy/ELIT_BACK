@@ -2,7 +2,7 @@ package com.elit.outildedecision.audit.entity.comment;
 
 
 import com.elit.outildedecision.audit.entity.LevelScore;
-import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.shared.util.MethodType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +18,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 
 
+/** Abstract comment class. */
 @MappedSuperclass
 @Getter
 @Setter

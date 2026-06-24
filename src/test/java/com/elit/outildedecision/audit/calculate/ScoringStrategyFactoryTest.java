@@ -1,6 +1,6 @@
 package com.elit.outildedecision.audit.calculate;
 
-import com.elit.outildedecision.util.MethodType;
+import com.elit.outildedecision.shared.util.MethodType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

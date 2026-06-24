@@ -2,11 +2,12 @@ package com.elit.outildedecision.ai.answer.service;
 
 import com.elit.outildedecision.ai.answer.entity.AiAnswer;
 import com.elit.outildedecision.ai.answer.exception.AiAnswerNotFoundException;
-import com.elit.outildedecision.exception.ProjectNotFoundException;
+import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
 
 import java.util.List;
 import java.util.Map;
 
+/** Ai answer service interface. */
 public interface AiAnswerService {
 
   /**
@@ -23,7 +24,7 @@ public interface AiAnswerService {
    * Retrieves all AI-generated answers associated with a specific project.
    *
    * @param projectId the ID of the project
-   * @return a list of AiAnswer entities
+   * @return the AI answer entities for the project
    * @throws AiAnswerNotFoundException if no answers are found for the project
    */
   List<AiAnswer> getAnswersByProject(Long projectId) throws AiAnswerNotFoundException;
