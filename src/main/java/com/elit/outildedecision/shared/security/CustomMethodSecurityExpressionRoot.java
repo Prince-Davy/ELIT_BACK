@@ -71,6 +71,22 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot
   }
 
   /**
+   * Checks if the authenticated user is a contributor or an observer of the audit with the given auditId.
+   *
+   * @param auditId the ID of the audit to check the contributor/observer permission
+   * @return true if the authenticated user is a contributor or an observer of the audit, false otherwise
+   */
+  public boolean isContributorOrObserverByAuditId(final Long auditId) {
+    try {
+      final UserDetails userDetails = (UserDetails) this.getPrincipal();
+      final List<String> permissions = userService.getProjectPermissionsByAudit(userDetails.getUsername(), auditId);
+      return permissions.contains(ProjectPermession.CONTRIBUTER.toString()) || permissions.contains(ProjectPermession.OBSERVER.toString());
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  /**
    * Checks if the authenticated user has contributor permissions for the project with the given ID.
    *
    * @param projectId the ID of the project to check permissions for

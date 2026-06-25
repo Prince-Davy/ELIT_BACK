@@ -137,7 +137,7 @@ public class AuditController {
    * @throws AuditNotFoundException if no audit score exists for the audit
    */
   @GetMapping("/{auditId}/auditScore")
-  @PreAuthorize("hasAnyAuthority('USER') and (isProjectOwnerByAuditId(#auditId))")
+  @PreAuthorize("hasAnyAuthority('USER') and (isProjectOwnerByAuditId(#auditId) or isContributorOrObserverByAuditId(#auditId))")
   public AuditScoreResponse findAuditScoreByAuditId(@PathVariable final Long auditId) throws AuditNotFoundException {
     return this.auditScoreService.findAuditScoreByAuditId(auditId);
   }
