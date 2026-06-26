@@ -10,15 +10,6 @@ trigger:
       - recette
       - release/*
 
-pr:
-  branches:
-    include:
-      - develop
-      - devops
-      - main
-      - recette
-      - release/*
-
 resources:
   repositories:
     - repository: templates
