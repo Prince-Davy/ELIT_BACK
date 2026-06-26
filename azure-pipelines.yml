@@ -7,6 +7,16 @@ trigger:
       - develop
       - devops
       - main
+      - recette
+      - release/*
+
+pr:
+  branches:
+    include:
+      - develop
+      - devops
+      - main
+      - recette
       - release/*
 
 resources:
@@ -50,7 +60,7 @@ extends:
   parameters:
     DEPLOY_INTEG: true
     DEPLOY_PROD: false
-    DEPLOY_TEST: false
+    DEPLOY_TEST: true
     NO_DOXYGEN_FAIL: true
     NO_QUALITY_FAIL: true
     NO_SECURITY_FAIL: true
