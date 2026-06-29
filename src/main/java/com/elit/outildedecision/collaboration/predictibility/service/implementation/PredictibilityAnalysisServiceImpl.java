@@ -217,8 +217,13 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
 
     persistPredictibilityResults(predictibilityAnalysis, methodologyScoreList, analyseId);
 
-    predictibilityAnalysis.setMethodology(
-        methodologyRepository.findByName(scoreResult.chosenMethodology().getFrenchLabel()));
+    // En cas d'égalité tranchée par le chef, l'association methodology doit refléter son choix
+    // manuel (chosenMethodology) et non l'auto-pick, sinon le score de l'étape 3 (loadScorableMethods)
+    // serait calculé sur une autre méthodologie que celle choisie.
+    String effectiveMethodology = predictibilityAnalysis.getChosenMethodology() != null
+        ? predictibilityAnalysis.getChosenMethodology()
+        : scoreResult.chosenMethodology().getFrenchLabel();
+    predictibilityAnalysis.setMethodology(methodologyRepository.findByName(effectiveMethodology));
     predictibilityAnalysisRepository.save(predictibilityAnalysis);
 
     PredictibilityScoreResponse response = predictibilityMapper.toScoreResponse(predictibilityAnalysis);

@@ -39,6 +39,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -274,6 +276,30 @@ class PredictibilityAnalysisServiceImplTest {
     assertThat(response.getFormSteps())
         .singleElement()
         .satisfies(step -> assertThat(step.getEScore()).isZero());
+  }
+
+  @Test
+  void calculateScore_persistsChiefChoiceAsMethodologyWhenTieResolved() throws Exception {
+    // Égalité tranchée par le chef sur une méthodologie différente de l'auto-pick (AGILE) :
+    // l'association methodology doit suivre le choix du chef, pas l'auto-pick.
+    predictibilityAnalysis.setChosenMethodology("Classique");
+    stubScoreComputation(true);
+
+    predictibilityAnalysisService.calculatePredictibilityAnalysisScore(longId, longId);
+
+    verify(methodologyRepository).findByName("Classique");
+    verify(methodologyRepository, never()).findByName("Agile");
+  }
+
+  @Test
+  void calculateScore_persistsAutoPickAsMethodologyWhenNoChoice() throws Exception {
+    // Aucun choix manuel : l'association methodology reflète l'auto-pick (AGILE).
+    predictibilityAnalysis.setChosenMethodology(null);
+    stubScoreComputation(false);
+
+    predictibilityAnalysisService.calculatePredictibilityAnalysisScore(longId, longId);
+
+    verify(methodologyRepository).findByName("Agile");
   }
 
   private void stubScoreComputation(final boolean tie) {
