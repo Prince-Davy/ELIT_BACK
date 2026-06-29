@@ -236,7 +236,7 @@ Contraintes : **1 commentaire par utilisateur / question / analyse** ; la créat
 
 ## 7. Couverture Postman (collection *ELIT - Parcours Collaboratif*)
 
-État : **59 requêtes / 66 assertions — 0 échec**. Couverture des endpoints du contexte `collaboration` :
+État : **64 requêtes / 74 assertions — 0 échec**. Couverture des endpoints du contexte `collaboration` :
 
 | Module | Couvert | Non couvert (raison) |
 |---|---|---|
@@ -257,3 +257,9 @@ Contraintes : **1 commentaire par utilisateur / question / analyse** ; la créat
 > `tieBreakRequired === true` tant que l'owner n'a pas tranché, puis `=== false` après
 > `POST .../chosenMethodology`. Il calcule le score multicritère avant de finaliser (sinon
 > `FormStep.eScore` reste `null` — cf. correctif §4).
+>
+> Le folder prolonge ensuite jusqu'à l'**étape 3** pour valider que le choix manuel (*Hybride*,
+> ≠ auto-pick *Agile*) pilote bien le plan d'exécution : `Get Methodologies` propose des méthodes de
+> **plusieurs** méthodologies (Hybride ⇒ `findAll`), et surtout `Get Execution Plan Score` renvoie un
+> `allMethods` de **même cardinal** que les méthodes proposées — invariant garanti uniquement parce que
+> l'association `methodology` reflète le choix du chef (cf. §«Départage de méthodologie» et historique).
