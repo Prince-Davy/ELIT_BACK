@@ -163,6 +163,11 @@ le formulaire » de l'étape 3** tant que l'égalité n'est pas résolue. Après
 (owner), un nouveau `GET .../score` renvoie `tieBreakRequired = false`. Sans vote confirmé, le flag
 reste `false` (l'égalité n'a de sens que sur des votes réels).
 
+Quand l'owner tranche, son choix (`chosenMethodology`) prime sur l'auto-pick : au recalcul du score,
+l'association `methodology` est alignée sur le choix manuel et **non** sur la méthodologie déduite par
+ordre de déclaration. Sans cela, l'étape 3 (`loadScorableMethods` dans `ExecutionPlanServiceImpl`)
+calculerait le plan d'exécution sur une autre méthodologie que celle choisie en cas d'égalité.
+
 ### Historique des correctifs
 
 | Correctif | Commit |
@@ -178,6 +183,7 @@ reste `false` (l'égalité n'a de sens que sur des votes réels).
 | Création de prévisibilité ouverte au Contributeur (`isProjectOwner` → `isContributer`) : vote méthodologie parallèle, plus d'attente du créateur (loader infini côté contributeur) | _antérieur_ |
 | `tieBreakRequired` exposé sur `GET .../score` (égalité de méthodologie non départagée → bouton étape 3 grisé côté front) | _ce commit_ |
 | `GET .../score` 500 (NPE) quand un `FormStep.eScore` est `null` → traité comme `0` | _ce commit_ |
+| Égalité tranchée : `chosenMethodology` (choix owner) aligné sur l'association `methodology` au recalcul du score → l'étape 3 calcule le plan sur la bonne méthodologie | _ce commit_ |
 
 ---
 
@@ -230,7 +236,7 @@ Contraintes : **1 commentaire par utilisateur / question / analyse** ; la créat
 
 ## 7. Couverture Postman (collection *ELIT - Parcours Collaboratif*)
 
-État : **59 requêtes / 66 assertions — 0 échec**. Couverture des endpoints du contexte `collaboration` :
+État : **64 requêtes / 74 assertions — 0 échec**. Couverture des endpoints du contexte `collaboration` :
 
 | Module | Couvert | Non couvert (raison) |
 |---|---|---|
@@ -251,3 +257,9 @@ Contraintes : **1 commentaire par utilisateur / question / analyse** ; la créat
 > `tieBreakRequired === true` tant que l'owner n'a pas tranché, puis `=== false` après
 > `POST .../chosenMethodology`. Il calcule le score multicritère avant de finaliser (sinon
 > `FormStep.eScore` reste `null` — cf. correctif §4).
+>
+> Le folder prolonge ensuite jusqu'à l'**étape 3** pour valider que le choix manuel (*Hybride*,
+> ≠ auto-pick *Agile*) pilote bien le plan d'exécution : `Get Methodologies` propose des méthodes de
+> **plusieurs** méthodologies (Hybride ⇒ `findAll`), et surtout `Get Execution Plan Score` renvoie un
+> `allMethods` de **même cardinal** que les méthodes proposées — invariant garanti uniquement parce que
+> l'association `methodology` reflète le choix du chef (cf. §«Départage de méthodologie» et historique).

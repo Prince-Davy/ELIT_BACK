@@ -297,7 +297,8 @@ class VoteServiceImplTest {
     when(userRepository.findByUserEmail(anyString())).thenReturn(user);
     when(predictibilityAnalysisRepository.findById(testPredictabilityAnalysis.getPredictibilityAnalysisId())).thenReturn(Optional.empty());
 
-    RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> voteService.getVote(1L));
+    PredictibilityAnalysisNotFoundException exception = Assertions.assertThrows(
+      PredictibilityAnalysisNotFoundException.class, () -> voteService.getVote(1L));
 
     Assertions.assertEquals("Predictibility Analysis Id non trouvé.", exception.getMessage());
   }

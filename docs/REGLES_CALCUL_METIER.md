@@ -217,9 +217,15 @@ scoreMéthodologie = (sommeVotes × 0.2) / nombreVotants
         = 0 si aucun votant (évite la division NaN)
 ```
 
-La **méthodologie choisie** est celle dont la **somme cumulée de votes** est la plus élevée ; en cas
-d'égalité, la première dans l'ordre de déclaration de l'enum gagne. Les scores sont renvoyés dans cet
-ordre de déclaration (sortie stable).
+La **méthodologie choisie** (auto-pick) est celle dont la **somme cumulée de votes** est la plus élevée ;
+en cas d'égalité, la première dans l'ordre de déclaration de l'enum gagne. Les scores sont renvoyés dans
+cet ordre de déclaration (sortie stable). L'égalité (≥2 méthodologies au max non nul) lève le flag
+`tieBreakRequired` tant que le chef n'a pas tranché (voir `PredictibilityAnalysisServiceImpl`).
+
+> **Égalité tranchée par le chef** : quand le chef sélectionne manuellement une méthodologie
+> (`chosenMethodology`), c'est ce choix — et non l'auto-pick — qui est persisté dans l'association
+> `methodology` au recalcul du score. Indispensable pour que l'étape 3 (`loadScorableMethods`) calcule
+> le plan d'exécution sur la méthodologie réellement choisie.
 
 > `0.2` (`SUM_CONSTANT`) est un facteur d'échelle métier fixe appliqué à la somme des votes.
 
