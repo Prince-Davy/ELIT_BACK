@@ -184,6 +184,21 @@ class PredictibilityAnalysisServiceImplTest {
   }
 
   @Test
+  void addFinalChosenMethodology_whenAnalysisDoesNotBelongToProject() {
+    Long otherProjectId = 2L;
+    Project otherProject = new Project();
+    otherProject.setProjectId(otherProjectId);
+
+    when(projectRepository.findById(otherProjectId)).thenReturn(Optional.of(otherProject));
+    when(predictibilityAnalysisRepository.findById(longId)).thenReturn(Optional.of(predictibilityAnalysis));
+
+    ProjectNotFoundException exception = Assertions.assertThrows(ProjectNotFoundException.class,
+        () -> predictibilityAnalysisService.addFinalChosenMethodology(
+            chosenMethodologyRequest, otherProjectId, longId));
+    Assertions.assertEquals("Ce projet n'existe pas", exception.getMessage());
+  }
+
+  @Test
   void putIsFinishedPredictibilityAnalysis_NotFound() {
     when(predictibilityAnalysisRepository.findById(longId)).thenReturn(Optional.empty());
     assertThrows(PredictibilityAnalysisNotFoundException.class,

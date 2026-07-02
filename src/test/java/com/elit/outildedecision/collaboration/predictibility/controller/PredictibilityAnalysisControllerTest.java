@@ -125,6 +125,18 @@ class PredictibilityAnalysisControllerTest {
   }
 
   @Test
+  void addFinalChosenMethodology_whenProjectNotFound() throws Exception {
+    when(predictibilityAnalysisService.addFinalChosenMethodology(any(ChosenMethodologyRequest.class), eq(projectId), eq(analyseId)))
+        .thenThrow(new ProjectNotFoundException("Ce projet n'existe pas"));
+    MockHttpServletResponse response = mockMvc.perform(
+        post("/" + projectId + "/predictibility/" + analyseId + "/chosenMethodology")
+            .content(chosenMethodology)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andReturn().getResponse();
+    Assertions.assertEquals(404, response.getStatus());
+  }
+
+  @Test
   void shouldGetPredictabilityAnalysisScore_success() throws Exception {
     PredictibilityScoreResponse predictibilityResult = new PredictibilityScoreResponse();
     when(predictibilityAnalysisService.calculatePredictibilityAnalysisScore(projectId, analyseId))
