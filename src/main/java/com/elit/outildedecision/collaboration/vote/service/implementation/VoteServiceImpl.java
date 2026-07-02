@@ -164,7 +164,7 @@ public class VoteServiceImpl implements VoteService {
 
     PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository
       .findById(predictibilityAnalysisId)
-      .orElseThrow(() -> new RuntimeException("Predictibility Analysis Id non trouvé."));
+      .orElseThrow(() -> new PredictibilityAnalysisNotFoundException("Predictibility Analysis Id non trouvé."));
 
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
 
