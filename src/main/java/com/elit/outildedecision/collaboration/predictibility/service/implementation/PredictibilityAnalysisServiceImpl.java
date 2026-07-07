@@ -172,6 +172,11 @@ public class PredictibilityAnalysisServiceImpl implements PredictibilityAnalysis
     PredictibilityAnalysis predictibilityAnalysis = predictibilityAnalysisRepository.findById(analyseId)
         .orElseThrow(() -> new PredictibilityAnalysisNotFoundException("Cette analyse n'existe pas"));
 
+    if (!Objects.equals(
+        predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId(), projectId)) {
+      throw new ProjectNotFoundException(Constants.PROJECT_DOESNT_EXIST);
+    }
+
     String chosenMethodologyToSave = request.getChosenMethodology();
     predictibilityAnalysis.setChosenMethodology(chosenMethodologyToSave);
     predictibilityAnalysisRepository.save(predictibilityAnalysis);
