@@ -132,6 +132,7 @@ secrets:
       key: FILE_RECOMMANDATIONS
     - vaultKey: PORT
       key: PORT
+    - key: CHAT_BOT_AI_URL
 
 
   # --- THIS SECTION IS FOR MORE COMPLEX CONFIGURATION --- ##
