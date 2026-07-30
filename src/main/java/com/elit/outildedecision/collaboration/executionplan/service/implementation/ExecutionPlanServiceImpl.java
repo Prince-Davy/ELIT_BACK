@@ -218,11 +218,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
       model.setMethodDescription(method.getDescription());
 
       List<ExecutionPlanVote> votesEntities =
-          projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
-              ? executionPlanVoteRepository.findAllVotesByMethodIdAndExecutionPlanId(
-                  method.getId(), executionPlanId)
-              : executionPlanVoteRepository.findVoteByMethodIdUserIdAndExecutionPlanId(
-                  method.getId(), user.getUserId(), executionPlanId);
+          executionPlanVoteRepository.findAllVotesByMethodIdAndExecutionPlanId(
+              method.getId(), executionPlanId);
       List<ExecutionVoteUserResponse> votesList = new ArrayList<>();
       for (ExecutionPlanVote vote : votesEntities) {
         ExecutionVoteUserResponse voteModel = new ExecutionVoteUserResponse();
