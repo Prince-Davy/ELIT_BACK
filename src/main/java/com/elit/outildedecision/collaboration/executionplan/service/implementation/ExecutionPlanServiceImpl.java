@@ -42,7 +42,6 @@ import com.elit.outildedecision.shared.project.exception.ProjectNotFoundExceptio
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import com.elit.outildedecision.shared.project.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.shared.user.repository.UserRepository;
-import com.elit.outildedecision.shared.util.ProjectPermession;
 import com.elit.outildedecision.shared.util.ProjectState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
