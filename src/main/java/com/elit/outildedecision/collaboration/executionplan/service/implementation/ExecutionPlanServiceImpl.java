@@ -42,7 +42,6 @@ import com.elit.outildedecision.shared.project.exception.ProjectNotFoundExceptio
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import com.elit.outildedecision.shared.project.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.shared.user.repository.UserRepository;
-import com.elit.outildedecision.shared.util.ProjectPermession;
 import com.elit.outildedecision.shared.util.ProjectState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -218,11 +217,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
       model.setMethodDescription(method.getDescription());
 
       List<ExecutionPlanVote> votesEntities =
-          projectUserPermission.getPermission().equals(ProjectPermession.CDP.name())
-              ? executionPlanVoteRepository.findAllVotesByMethodIdAndExecutionPlanId(
-                  method.getId(), executionPlanId)
-              : executionPlanVoteRepository.findVoteByMethodIdUserIdAndExecutionPlanId(
-                  method.getId(), user.getUserId(), executionPlanId);
+          executionPlanVoteRepository.findAllVotesByMethodIdAndExecutionPlanId(
+              method.getId(), executionPlanId);
       List<ExecutionVoteUserResponse> votesList = new ArrayList<>();
       for (ExecutionPlanVote vote : votesEntities) {
         ExecutionVoteUserResponse voteModel = new ExecutionVoteUserResponse();
