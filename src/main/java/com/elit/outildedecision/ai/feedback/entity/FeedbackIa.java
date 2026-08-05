@@ -9,8 +9,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,7 +27,9 @@ import lombok.Setter;
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "feedback_ia")
+@Table(name = "feedback_ia", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_feedback_project_user", columnNames = { "project_id", "user_id" })
+})
 public class FeedbackIa {
 
   @Id
@@ -43,11 +46,11 @@ public class FeedbackIa {
   @Column(name = "feedbackAnswer")
   private String feedbackAnswer;
 
-  @OneToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "project_id", nullable = false)
   private Project project;
 
-  @OneToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 }

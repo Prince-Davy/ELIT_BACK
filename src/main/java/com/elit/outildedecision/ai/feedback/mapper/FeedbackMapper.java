@@ -7,14 +7,14 @@ import com.elit.outildedecision.ai.feedback.entity.FeedbackIa;
 import com.elit.outildedecision.ai.feedback.entity.FeedbackIaMethod;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
 /**
- * MapStruct mapper for the AI feedback feature (methodology feedback and method feedback).
+ * MapStruct mapper for the AI feedback feature (methodology feedback and method
+ * feedback).
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring")
 public interface FeedbackMapper {
 
   /**
@@ -23,6 +23,7 @@ public interface FeedbackMapper {
    * @param request the inbound payload
    * @return the feedback entity
    */
+  @Mapping(target = "id", ignore = true)
   FeedbackIa toEntity(FeedbackRequest request);
 
   /**

@@ -38,7 +38,7 @@ class FeedbackMapperTest {
 
     FeedbackIa entity = mapper.toEntity(request);
 
-    assertThat(entity.getId()).isEqualTo(1L);
+    assertThat(entity.getId()).isNull();
     assertThat(entity.getIsLiked()).isTrue();
     assertThat(entity.getMethodology()).isEqualTo("Agile");
     assertThat(entity.getFeedbackAnswer()).isEqualTo("nice");
