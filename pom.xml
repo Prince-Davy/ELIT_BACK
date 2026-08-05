@@ -34,7 +34,10 @@
 
     <!-- Overrides sécurité Trivy -->
     <tomcat.version>10.1.55</tomcat.version>
-    <netty.version>4.1.135.Final</netty.version>
+    <netty.version>4.1.136.Final</netty.version>
+    <jackson-bom.version>2.21.4</jackson-bom.version>
+    <spring-framework.version>6.2.19</spring-framework.version>
+    <spring-data-bom.version>2025.0.12</spring-data-bom.version>
 
     <!-- Plugins -->
     <!-- Mises à niveau nécessaires pour Java 17 et JUnit 5 -->
