@@ -3598,6 +3598,7 @@
     },
     "Project" : {
       "[required]" : [ "name" ],
+      "aiResults" : "ResultAi[]",
       "attachments" : "Attachment[]",
       "audits" : "Audit[]",
       "chefId" : "integer:int64",
@@ -3639,14 +3640,17 @@
     },
     "ProjectResponse" : {
       "attachments" : "AttachmentResponse[]",
+      "auditStatus" : "string{COMPLETED,IN_PROGRESS,NOT_STARTED}",
       "chefFirstName" : "string",
       "chefId" : "integer:int64",
       "chefLasName" : "string",
+      "collaborativeStatus" : "string{COMPLETED,IN_PROGRESS,NOT_STARTED}",
       "confirmationState" : "string",
       "contributors" : "ContributorRequest[]",
       "createdAt" : "string:date-time",
       "description" : "string",
       "formProgressStatus" : "string{BOTH,COLLABORATIVE,IA,None}",
+      "iaStatus" : "string{COMPLETED,IN_PROGRESS,NOT_STARTED}",
       "isArchived" : "boolean",
       "multiCriteriaAnalysisList" : "MulticriteriaAnalysisResponse[]",
       "multiCriteriaStatus" : "string",
@@ -3731,6 +3735,12 @@
       "iteration" : "integer:int32",
       "title" : "string",
       "type" : "string"
+    },
+    "ResultAi" : {
+      "id" : "integer:int64",
+      "predictedMethod" : "string",
+      "predictedProba" : "number:double",
+      "project" : "Project"
     },
     "ResultResponse" : {
       "id" : "integer:int64",

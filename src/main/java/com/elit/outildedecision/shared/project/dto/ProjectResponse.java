@@ -4,6 +4,7 @@ import com.elit.outildedecision.collaboration.multicriteria.dto.MulticriteriaAna
 import com.elit.outildedecision.ai.result.dto.ResultResponse;
 import com.elit.outildedecision.shared.attachment.dto.AttachmentResponse;
 import com.elit.outildedecision.shared.util.FormProgressStatus;
+import com.elit.outildedecision.shared.util.JourneyState;
 import com.elit.outildedecision.shared.util.ProjectState;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -109,4 +110,20 @@ public class ProjectResponse {
    * The results of the A.I. analysis.
    */
   private ResultResponse resultAi;
+
+  /**
+   * The state of the AI journey for this project. Only populated by the project list journey.
+   */
+  private JourneyState iaStatus;
+
+  /**
+   * The state of the collaborative journey for this project. Only populated by the project list
+   * journey.
+   */
+  private JourneyState collaborativeStatus;
+
+  /**
+   * The state of the audit journey for this project. Only populated by the project list journey.
+   */
+  private JourneyState auditStatus;
 }

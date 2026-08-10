@@ -32,6 +32,9 @@ public interface ProjectMapper {
   @Mapping(target = "multiCriteriaAnalysisList", ignore = true)
   @Mapping(target = "multiCriteriaStatus", ignore = true)
   @Mapping(target = "resultAi", ignore = true)
+  @Mapping(target = "iaStatus", ignore = true)
+  @Mapping(target = "collaborativeStatus", ignore = true)
+  @Mapping(target = "auditStatus", ignore = true)
   ProjectResponse toResponseBase(Project project);
 
   /**
