@@ -1,6 +1,7 @@
 package com.elit.outildedecision.shared.kernel.entity;
 
 import com.elit.outildedecision.ai.methodology.evaluation.entity.MethodologyEvaluation;
+import com.elit.outildedecision.ai.result.entity.ResultAi;
 import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.collaboration.report.entity.Report;
 import com.elit.outildedecision.shared.attachment.entity.Attachment;
@@ -100,6 +101,16 @@ public class Project implements Serializable {
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_project")
   private List<Audit> audits;
+
+  /**
+   * AI analysis results produced for the project. Inverse side only: the {@code ai} context owns
+   * the lifecycle of a {@link ResultAi}, this mapping merely lets the shared kernel tell whether
+   * the AI journey has produced a result.
+   */
+  // S1948: JPA relation never Java-serialized, observable state is exposed through DTOs.
+  @SuppressWarnings("java:S1948")
+  @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+  private List<ResultAi> aiResults;
 
   /**
    * list of methodology evaluations associated with the project.
