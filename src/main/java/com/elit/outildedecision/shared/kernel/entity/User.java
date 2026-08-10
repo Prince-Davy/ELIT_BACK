@@ -29,31 +29,44 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class User implements Serializable {
+  /** The user project permissions. */
   @OneToMany(mappedBy = "user")
   @JsonIgnore
   @JsonManagedReference("user_permissions")
   private List<ProjectUserPermission> userProjectPermissions;
 
+  /** The user id. */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long userId;
 
+  /** The username. */
   private String username;
+  /** The user last name. */
   private String userLastName;
+  /** The user first name. */
   private String userFirstName;
+  /** The user email. */
   private String userEmail;
+  /** The user avatar path. */
   private String userAvatarPath;
 
+  /** The user password. */
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String userPassword;
 
+  /** Whether the email verified flag is set. */
   private Boolean isEmailVerified;
+  /** Whether the user active flag is set. */
   private Boolean isUserActive;
+  /** Whether the admin flag is set. */
   private Boolean isAdmin;
 
+  /** The verification tokens. */
   @OneToMany(mappedBy = "user")
   private List<VerificationToken> verificationTokens;
 
+  /** The brainstormings. */
   @OneToMany(mappedBy = "user")
   @JsonManagedReference("user_brainstorming")
   private List<Brainstorming> brainstormings;

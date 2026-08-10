@@ -34,21 +34,29 @@ import java.util.Set;
 @EqualsAndHashCode(of = "questionId")
 public class FormQuestion implements Serializable {
 
+  /** Serialization version identifier. */
   private static final long serialVersionUID = 1L;
+  /** The form step. */
   @ManyToOne(optional = false)
   @JoinColumn(name = "step_id", referencedColumnName = "stepId")
   @JsonBackReference("question_step")
   private FormStep formStep;
 
+  /** The question id. */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long questionId;
 
+  /** The question text. */
   private String questionText;
+  /** The answer text. */
   private String answerText;
+  /** The question ref. */
   private String questionRef;
+  /** The update question. */
   @Builder.Default
   private Boolean updateQuestion = false;
+  /** The criterias. */
   @JsonManagedReference("question_criteria")
   @OneToMany(
       mappedBy = "formQuestion",
@@ -57,6 +65,7 @@ public class FormQuestion implements Serializable {
       orphanRemoval = true)
   private Set<Criteria> criterias;
 
+  /** The brainstormings. */
   @OneToMany(mappedBy = "formQuestion", fetch = FetchType.LAZY)
   @JsonManagedReference("question_brainstorming")
   private List<Brainstorming> brainstormings;

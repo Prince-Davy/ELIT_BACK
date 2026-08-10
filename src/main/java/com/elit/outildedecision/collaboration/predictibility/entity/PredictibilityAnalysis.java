@@ -43,31 +43,40 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode(of = "predictibilityAnalysisId")
 public class PredictibilityAnalysis implements Serializable {
+  /** The predictibility analysis id. */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "predictibility_analysis_id")
   private Long predictibilityAnalysisId;
 
+  /** The predictibility analysis iteration. */
   private Integer predictibilityAnalysisIteration;
+  /** Whether the finished flag is set. */
   private Boolean isFinished;
+  /** The chosen methodology. */
   private String chosenMethodology;
 
+  /** The created at. */
   @CreationTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
   private Timestamp createdAt;
 
+  /** The updated at. */
   @UpdateTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
   private Timestamp updatedAt;
 
+  /** The execution plan. */
   @OneToOne(mappedBy = "predictibilityAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonBackReference("execution_previsibility")
   private ExecutionPlan executionPlan;
 
+  /** The votes. */
   @OneToMany(mappedBy = "predictibilityAnalysis", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonManagedReference("predictibility_analysis_vote")
   private List<Vote> votes;
 
+  /** The brainstormings. */
   @OneToMany(
     mappedBy = "predictibilityAnalysis",
     cascade = CascadeType.ALL,
@@ -76,6 +85,7 @@ public class PredictibilityAnalysis implements Serializable {
   @JsonManagedReference("predictibility_analysis_brainstorming")
   private List<Brainstorming> brainstormings;
 
+  /** The multi criteria analysis. */
   @OneToOne(
     cascade = CascadeType.ALL
     // orphanRemoval = true
@@ -84,10 +94,12 @@ public class PredictibilityAnalysis implements Serializable {
   @JsonManagedReference("previsibility_multi")
   private MultiCriteriaAnalysis multiCriteriaAnalysis;
 
+  /** The methodology. */
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(referencedColumnName = "methodologyId", name = "methodology_id")
   private Methodology methodology;
 
+  /** The predictibility results. */
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "predictibilityAnalysis")
   @JsonManagedReference("predictibility_analysis_results")
   private List<PredictibilityResults> predictibilityResults;

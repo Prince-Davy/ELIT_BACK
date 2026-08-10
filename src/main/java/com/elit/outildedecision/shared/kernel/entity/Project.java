@@ -47,57 +47,75 @@ import java.util.List;
 @Table(name = "project")
 public class Project implements Serializable {
 
+  /** Serialization version identifier. */
   private static final long serialVersionUID = 1L;
+  /** The project user permissions. */
   @OneToMany(mappedBy = "project")
   @JsonManagedReference("project_permissions")
   private List<ProjectUserPermission> projectUserPermissions;
 
+  /** The project id. */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @JsonView(View.AnswerIa.class)
   private Long projectId;
 
+  /** The name. */
   @NotEmpty(message = "Ce champs est obligatoire !")
   @Size(min = 3, message = "Le nom du projet doit contenir au moins 3 caractères")
   @Size(max = 20, message = "Le nom du projet ne doit pas dépasser 20 caractères")
   private String name;
 
+  /** The description. */
   @Size(min = 3, message = "La description du projet doit contenir au moins 3 caractères")
   @Size(max = 255, message = "La description du projet ne doit pas dépasser 255 caractères")
   @Pattern(regexp = "^[^\\r\\n]*(?:\\r?\\n[^\\r\\n]*){0,4}$", message = "La description du projet ne doit pas dépasser 5 lignes")
   private String description;
+  /** The folder path. */
   private String folderPath;
+  /** The chef id. */
   private Long chefId;
+  /** The confirmation state. */
   private String confirmationState;
+  /** Whether the archived flag is set. */
   private Boolean isArchived;
+  /** The form progress status. */
   @Enumerated(EnumType.STRING)
   private FormProgressStatus formProgressStatus;
+  /** The project state. */
   @Enumerated(EnumType.STRING)
   private ProjectState projectState;
 
+  /** The created at. */
   @CreationTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
   private Timestamp createdAt;
 
+  /** The updated at. */
   @UpdateTimestamp
   @JsonFormat(pattern = "dd-MM-yyyy", timezone = "Europe/Paris")
   private Timestamp updatedAt;
 
+  /** The attachments. */
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Attachment> attachments;
 
+  /** The multi criteria analysis list. */
   @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("multiCriteria_project")
   private List<MultiCriteriaAnalysis> multiCriteriaAnalysisList;
 
+  /** The reports. */
   @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("report_project")
   private List<Report> reports;
 
+  /** The notifications. */
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("notification_project")
   private List<Notification> notifications;
 
+  /** The audits. */
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JsonManagedReference("audit_project")
   private List<Audit> audits;
