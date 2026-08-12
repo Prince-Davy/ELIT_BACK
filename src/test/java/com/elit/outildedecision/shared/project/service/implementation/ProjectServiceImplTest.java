@@ -30,12 +30,15 @@ import com.elit.outildedecision.shared.project.dto.ProjectFilterRequest;
 import com.elit.outildedecision.collaboration.multicriteria.repository.MultiCriteriaAnalysisRepository;
 import com.elit.outildedecision.collaboration.predictibility.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;
+import com.elit.outildedecision.shared.kernel.journey.ProjectJourneyStatusRules;
 import com.elit.outildedecision.shared.project.repository.ProjectUserPermissionRepository;
+import com.elit.outildedecision.shared.project.repository.specification.ProjectFilterSpecification;
 import com.elit.outildedecision.ai.result.repository.ResultIaRepository;
 import com.elit.outildedecision.ai.result.service.ResultIaService;
 import com.elit.outildedecision.shared.user.repository.UserRepository;
 import com.elit.outildedecision.shared.security.AppUserPrincipal;
 import com.elit.outildedecision.collaboration.predictibility.entity.PredictibilityAnalysis;
+import com.elit.outildedecision.shared.util.JourneyState;
 import com.elit.outildedecision.shared.util.ProjectAnalysisState;
 import com.elit.outildedecision.shared.util.ProjectPermession;
 import org.apache.tomcat.util.json.ParseException;
@@ -44,6 +47,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -51,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import com.elit.outildedecision.shared.attachment.mapper.AttachmentMapper;
 import com.elit.outildedecision.shared.attachment.mapper.AttachmentMapperImpl;
 import com.elit.outildedecision.shared.project.mapper.ProjectMapper;
@@ -74,6 +79,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -116,6 +122,10 @@ class ProjectServiceImplTest {
   AttachmentMapper attachmentMapper = new AttachmentMapperImpl();
   @Spy
   MulticriteriaMapper multicriteriaMapper = new MulticriteriaMapperImpl();
+  @Spy
+  ProjectJourneyStatusRules journeyStatusRules = new ProjectJourneyStatusRules();
+  @Mock
+  ProjectFilterSpecification projectFilterSpecification;
   User user;
   Project projectToSave;
   ProjectUserPermission projectUserPermission;
@@ -283,146 +293,25 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void getUserProjectList_auditFilterUsesCreatedAndAffectedAuditQueries() throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
+  void shouldListProjectsThroughTheFilterSpecificationWhenListingUserProjects()
+      throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     Authentication authentication = mock(Authentication.class);
     when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
-
     SecurityContext securityContext = mock(SecurityContext.class);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
 
-    ProjectFilterRequest triModel = new ProjectFilterRequest("", "ALL", null, true, 0, 10, "AUDIT");
-
-    when(projectUserPermissionRepository.findProjectWithAuditCreatedByUser(any(), any(), any(), any(), any(Pageable.class)))
-      .thenReturn(new PageImpl<>(new ArrayList<>()));
-    when(projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(any(), any(), any(), any()))
-      .thenReturn(0L);
-    when(projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(any(), any(), any(), any()))
-      .thenReturn(0L);
+    ProjectFilterRequest triModel = new ProjectFilterRequest("", "COMPLETED", null, true, 0, 10, "IA");
+    when(projectUserPermissionRepository.findAll(ArgumentMatchers.<Specification<ProjectUserPermission>>any(),
+        any(Pageable.class))).thenReturn(new PageImpl<>(new ArrayList<>()));
+    when(projectUserPermissionRepository.count(ArgumentMatchers.<Specification<ProjectUserPermission>>any()))
+        .thenReturn(0L);
 
     ProjectPageResponse response = projectServiceImpl.getUserProjectList(triModel);
 
     Assertions.assertEquals(0, response.getProjectsPage().getTotalElements());
-    verify(projectUserPermissionRepository).findProjectWithAuditCreatedByUser(any(), any(), any(), any(), any(Pageable.class));
-    verify(projectUserPermissionRepository).getTotalProjectWithAuditCreatedUser(any(), any(), any(), any());
-    verify(projectUserPermissionRepository).getTotalProjectWithAuditAffectedUser(any(), any(), any(), any());
-  }
-
-  @Test
-  void getUserProjectList_auditFilterUsesAffectedAuditQueriesWhenInactiveTab() throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
-
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-
-    ProjectFilterRequest triModel = new ProjectFilterRequest("", "ALL", null, false, 0, 10, "AUDIT");
-
-    when(projectUserPermissionRepository.findProjectWithAuditAffected(any(), any(), any(), any(), any(Pageable.class)))
-      .thenReturn(new PageImpl<>(new ArrayList<>()));
-    when(projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(any(), any(), any(), any()))
-      .thenReturn(0L);
-    when(projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(any(), any(), any(), any()))
-      .thenReturn(0L);
-
-    ProjectPageResponse response = projectServiceImpl.getUserProjectList(triModel);
-
-    Assertions.assertEquals(0, response.getProjectsPage().getTotalElements());
-    verify(projectUserPermissionRepository).findProjectWithAuditAffected(any(), any(), any(), any(), any(Pageable.class));
-    verify(projectUserPermissionRepository).getTotalProjectWithAuditCreatedUser(any(), any(), any(), any());
-    verify(projectUserPermissionRepository).getTotalProjectWithAuditAffectedUser(any(), any(), any(), any());
-  }
-
-  @Test
-  void getUserProjectList_strictCompletedIAAndCollaborative() throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn(new AppUserPrincipal(user));
-
-    SecurityContext securityContext = mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-
-    Project projectIa = new Project();
-    projectIa.setProjectId(1L);
-    projectIa.setChefId(user.getUserId());
-    projectIa.setFormProgressStatus(null);
-    projectIa.setProjectState(null);
-    projectIa.setName("IA project");
-    projectIa.setMultiCriteriaAnalysisList(new ArrayList<>());
-
-    Project projectCollab = new Project();
-    projectCollab.setProjectId(2L);
-    projectCollab.setChefId(user.getUserId());
-    projectCollab.setFormProgressStatus(null);
-    projectCollab.setProjectState(null);
-    projectCollab.setName("Collaborative project");
-    projectCollab.setMultiCriteriaAnalysisList(new ArrayList<>());
-
-    Project projectBothIa = new Project();
-    projectBothIa.setProjectId(3L);
-    projectBothIa.setChefId(user.getUserId());
-    projectBothIa.setFormProgressStatus(null);
-    projectBothIa.setProjectState(null);
-    projectBothIa.setName("Both IA project");
-    projectBothIa.setMultiCriteriaAnalysisList(new ArrayList<>());
-
-    ProjectUserPermission permIa = new ProjectUserPermission();
-    permIa.setProject(projectIa);
-    permIa.setUser(user);
-
-    ProjectUserPermission permCollab = new ProjectUserPermission();
-    permCollab.setProject(projectCollab);
-    permCollab.setUser(user);
-
-    ProjectUserPermission permBothIa = new ProjectUserPermission();
-    permBothIa.setProject(projectBothIa);
-    permBothIa.setUser(user);
-
-    PageImpl<ProjectUserPermission> candidatePage = new PageImpl<>(List.of(permIa, permCollab, permBothIa));
-    when(projectUserPermissionRepository.findProjectCreatedByUser(any(), any(), any(), any(), any(Pageable.class)))
-      .thenReturn(candidatePage);
-    when(projectUserPermissionRepository.findProjectAffected(any(), any(), any(), any(), any(Pageable.class)))
-      .thenReturn(candidatePage);
-    when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
-
-    com.elit.outildedecision.ai.result.entity.ResultAi resultIaProjectIa = new com.elit.outildedecision.ai.result.entity.ResultAi();
-    resultIaProjectIa.setProject(projectIa);
-    com.elit.outildedecision.ai.result.entity.ResultAi resultIaProjectBoth = new com.elit.outildedecision.ai.result.entity.ResultAi();
-    resultIaProjectBoth.setProject(projectBothIa);
-
-    when(resultIaRepository.findByProject(projectIa)).thenReturn(Optional.of(resultIaProjectIa));
-    when(resultIaRepository.findByProject(projectBothIa)).thenReturn(Optional.of(resultIaProjectBoth));
-    when(resultIaRepository.findByProject(projectCollab)).thenReturn(Optional.empty());
-
-    MultiCriteriaAnalysis collabAnalysis = new MultiCriteriaAnalysis();
-    collabAnalysis.setMultiCriteriaAnalysisId(10L);
-    collabAnalysis.setProject(projectCollab);
-    collabAnalysis.setIsFinished(true);
-    collabAnalysis.setFormSteps(new ArrayList<>());
-    projectCollab.setMultiCriteriaAnalysisList(List.of(collabAnalysis));
-
-    PredictibilityAnalysis collabPredictibility = new PredictibilityAnalysis();
-    collabPredictibility.setMultiCriteriaAnalysis(collabAnalysis);
-    collabPredictibility.setIsFinished(true);
-    collabPredictibility.setPredictibilityAnalysisId(11L);
-
-    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(anyLong()))
-      .thenReturn(null);
-    when(multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(projectCollab.getProjectId()))
-      .thenReturn(collabAnalysis);
-    when(predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(collabAnalysis.getMultiCriteriaAnalysisId()))
-      .thenReturn(collabPredictibility);
-
-    ProjectFilterRequest triModelIa = new ProjectFilterRequest("", "COMPLETED", null, true, 0, 10, "IA");
-    ProjectPageResponse responseIa = projectServiceImpl.getUserProjectList(triModelIa);
-    Assertions.assertEquals(2, responseIa.getProjectsPage().getTotalElements());
-    Assertions.assertEquals(2, responseIa.getTotalProjetCreated());
-
-    ProjectFilterRequest triModelCollab = new ProjectFilterRequest("", "COMPLETED", null, true, 0, 10, "COLLABORATIVE");
-    ProjectPageResponse responseCollab = projectServiceImpl.getUserProjectList(triModelCollab);
-    Assertions.assertEquals(1, responseCollab.getProjectsPage().getTotalElements());
-    Assertions.assertEquals(1, responseCollab.getTotalProjetCreated());
+    verify(projectFilterSpecification, atLeastOnce()).byFilter(triModel, user.getUserEmail(), true);
+    verify(projectFilterSpecification, atLeastOnce()).byFilter(triModel, user.getUserEmail(), false);
   }
 
   @Test
@@ -614,7 +503,10 @@ class ProjectServiceImplTest {
       attachmentModelList,
       multicriteriaAnalysisodelList,
       null,
-      new ResultResponse()
+      new ResultResponse(),
+      JourneyState.NOT_STARTED,
+      JourneyState.NOT_STARTED,
+      JourneyState.NOT_STARTED
     );
 
     when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectToSave));

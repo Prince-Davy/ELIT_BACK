@@ -29,5 +29,8 @@
     "predictedMethod" : null,
     "predictedProba" : null,
     "projectId" : null
-  }
+  },
+  "iaStatus" : "NOT_STARTED",
+  "collaborativeStatus" : "NOT_STARTED",
+  "auditStatus" : "NOT_STARTED"
 }

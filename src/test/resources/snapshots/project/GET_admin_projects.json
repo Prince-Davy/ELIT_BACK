@@ -15,5 +15,8 @@
   "attachments" : null,
   "multiCriteriaAnalysisList" : null,
   "multiCriteriaStatus" : null,
-  "resultAi" : null
+  "resultAi" : null,
+  "iaStatus" : null,
+  "collaborativeStatus" : null,
+  "auditStatus" : null
 } ]

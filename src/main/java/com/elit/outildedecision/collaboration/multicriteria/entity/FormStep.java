@@ -33,24 +33,32 @@ import java.util.Set;
 @EqualsAndHashCode(of = "stepId")
 public class FormStep implements Serializable {
 
+  /** Serialization version identifier. */
   private static final long serialVersionUID = 1L;
+  /** The step id. */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long stepId;
 
+  /** The step name. */
   private String stepName;
+  /** The step ref. */
   private Long stepRef;
+  /** The e score. */
   private Float eScore;
 
+  /** The multi criteria analysis. */
   @ManyToOne(optional = false)
   @JoinColumn(name = "multi_criteria_analysis_id", referencedColumnName = "multiCriteriaAnalysisId")
   @JsonBackReference("multiCriteria_step")
   private MultiCriteriaAnalysis multiCriteriaAnalysis;
 
+  /** The form questions. */
   @OneToMany(mappedBy = "formStep", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference("question_step")
   private Set<FormQuestion> formQuestions;
 
+  /** The step weights. */
   @OneToMany(
       mappedBy = "formStep",
       fetch = FetchType.EAGER,
@@ -59,6 +67,7 @@ public class FormStep implements Serializable {
   @JsonManagedReference("step_weight")
   private Set<StepWeight> stepWeights;
 
+  /** The step scores. */
   @OneToMany(
       mappedBy = "formStep",
       cascade = CascadeType.ALL,

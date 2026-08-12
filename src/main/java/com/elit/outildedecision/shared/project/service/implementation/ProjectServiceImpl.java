@@ -5,6 +5,7 @@ import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlan
 import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.collaboration.predictibility.entity.PredictibilityAnalysis;
 import com.elit.outildedecision.shared.kernel.entity.Project;
+import com.elit.outildedecision.shared.kernel.journey.ProjectJourneyStatusRules;
 import com.elit.outildedecision.shared.project.entity.ProjectPropertyKey;
 import com.elit.outildedecision.shared.project.entity.ProjectUserPermission;
 import com.elit.outildedecision.ai.result.entity.ResultAi;
@@ -43,10 +44,11 @@ import com.elit.outildedecision.shared.project.dto.ProjectResponse;
 import com.elit.outildedecision.shared.project.mapper.ProjectMapper;
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import com.elit.outildedecision.shared.project.repository.ProjectUserPermissionRepository;
+import com.elit.outildedecision.shared.project.repository.specification.ProjectFilterSpecification;
 import com.elit.outildedecision.shared.project.service.ProjectService;
 import com.elit.outildedecision.shared.project.service.ProjectValidationResult;
 import com.elit.outildedecision.shared.user.repository.UserRepository;
-import com.elit.outildedecision.shared.util.Constants;
+import com.elit.outildedecision.shared.util.AnalysisJourney;
 import com.elit.outildedecision.shared.util.FormProgressStatus;
 import com.elit.outildedecision.shared.util.ProjectAnalysisState;
 import com.elit.outildedecision.shared.util.ProjectConfirmationState;
@@ -67,7 +69,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -164,6 +165,14 @@ public class ProjectServiceImpl implements ProjectService {
    * The attachmentMapper converting attachment entities to attachment DTOs.
    */
   private final AttachmentMapper attachmentMapper;
+  /**
+   * The projectFilterSpecification building the filtered project list queries.
+   */
+  private final ProjectFilterSpecification projectFilterSpecification;
+  /**
+   * The journeyStatusRules resolving the state of each analysis journey of a project.
+   */
+  private final ProjectJourneyStatusRules journeyStatusRules;
 
   /**
    * Instantiates a new Project service.
@@ -188,6 +197,8 @@ public class ProjectServiceImpl implements ProjectService {
    * @param aiAnswerRepository               the AI answer repository
    * @param projectMapper                    the project mapper
    * @param attachmentMapper                 the attachment mapper
+   * @param projectFilterSpecification       the project list filter specification
+   * @param journeyStatusRules               the analysis journey status rules
    */
   public ProjectServiceImpl(final ProjectRepository projectRepository, final UserRepository userRepository,
                             final AttachmentService attachmentService,
@@ -205,7 +216,9 @@ public class ProjectServiceImpl implements ProjectService {
                             final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
                             final VoteRepository voteRepository, final ExecutionPlanVoteRepository executionPlanVoteRepo,
                             final AiAnswerRepository aiAnswerRepository, final ProjectMapper projectMapper,
-                            final AttachmentMapper attachmentMapper) {
+                            final AttachmentMapper attachmentMapper,
+                            final ProjectFilterSpecification projectFilterSpecification,
+                            final ProjectJourneyStatusRules journeyStatusRules) {
     this.projectRepository = projectRepository;
     this.userRepository = userRepository;
     this.attachmentService = attachmentService;
@@ -226,6 +239,8 @@ public class ProjectServiceImpl implements ProjectService {
     this.fileSystemService = fileSystemService;
     this.projectMapper = projectMapper;
     this.attachmentMapper = attachmentMapper;
+    this.projectFilterSpecification = projectFilterSpecification;
+    this.journeyStatusRules = journeyStatusRules;
   }
 
   /**
@@ -468,7 +483,10 @@ public class ProjectServiceImpl implements ProjectService {
             null,
             multicriteriaAnalysisList,
             projectStatus,
-            resultAnalyseIa));
+            resultAnalyseIa,
+            journeyStatusRules.resolve(project, AnalysisJourney.IA),
+            journeyStatusRules.resolve(project, AnalysisJourney.COLLABORATIVE),
+            journeyStatusRules.resolve(project, AnalysisJourney.AUDIT)));
       }
 
     }
@@ -480,121 +498,25 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   private long getTotalProjectCreatedUser(final ProjectFilterRequest triModel, final UserDetails userDetails) {
-    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.getTotalProjectWithAuditCreatedUser(
-          triModel.getKey(), null, "ALL", userDetails.getUsername());
-    }
-    if (isStrictCompletedMode(triModel)) {
-      return getStrictCompletedProjectCount(triModel, userDetails, true);
-    }
-    return projectUserPermissionRepository.getTotalProjectCreatedUser(
-        triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+    return projectUserPermissionRepository.count(
+        projectFilterSpecification.byFilter(triModel, userDetails.getUsername(), true));
   }
 
   private long getTotalProjectAffectedUser(final ProjectFilterRequest triModel, final UserDetails userDetails) {
-    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.getTotalProjectWithAuditAffectedUser(
-          triModel.getKey(), null, "ALL", userDetails.getUsername());
-    }
-    if (isStrictCompletedMode(triModel)) {
-      return getStrictCompletedProjectCount(triModel, userDetails, false);
-    }
-    return projectUserPermissionRepository.getTotalProjectAffectedUser(
-        triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername());
+    return projectUserPermissionRepository.count(
+        projectFilterSpecification.byFilter(triModel, userDetails.getUsername(), false));
   }
 
   private Page<ProjectUserPermission> getUserAffectedProject(final ProjectFilterRequest triModel,
                                                              final UserDetails userDetails, final Pageable pageable) {
-    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.findProjectWithAuditAffected(
-          triModel.getKey(), null, "ALL", userDetails.getUsername(), pageable);
-    }
-    if (isStrictCompletedMode(triModel)) {
-      return getStrictCompletedProjectPage(triModel, userDetails, pageable, false);
-    }
-    return projectUserPermissionRepository.findProjectAffected(
-        triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
+    return projectUserPermissionRepository.findAll(
+        projectFilterSpecification.byFilter(triModel, userDetails.getUsername(), false), pageable);
   }
 
   private Page<ProjectUserPermission> getUserCreatedProject(final ProjectFilterRequest triModel,
                                                             final UserDetails userDetails, final Pageable pageable) {
-    if (Constants.AUDIT.equalsIgnoreCase(triModel.getTypeAnalyse())) {
-      return projectUserPermissionRepository.findProjectWithAuditCreatedByUser(
-          triModel.getKey(), null, "ALL", userDetails.getUsername(), pageable);
-    }
-    if (isStrictCompletedMode(triModel)) {
-      return getStrictCompletedProjectPage(triModel, userDetails, pageable, true);
-    }
-    return projectUserPermissionRepository.findProjectCreatedByUser(
-        triModel.getKey(), triModel.getTypeAnalyse(), triModel.getStatus(), userDetails.getUsername(), pageable);
-  }
-
-  private boolean isStrictCompletedMode(final ProjectFilterRequest triModel) {
-    return triModel.getStatus() != null
-        && "COMPLETED".equalsIgnoreCase(triModel.getStatus())
-        && triModel.getTypeAnalyse() != null
-        && ("IA".equalsIgnoreCase(triModel.getTypeAnalyse())
-        || "COLLABORATIVE".equalsIgnoreCase(triModel.getTypeAnalyse()));
-  }
-
-  private long getStrictCompletedProjectCount(final ProjectFilterRequest triModel, final UserDetails userDetails,
-                                              final boolean creator) {
-    Page<ProjectUserPermission> candidates = creator
-        ? projectUserPermissionRepository.findProjectCreatedByUser(
-        triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged())
-        : projectUserPermissionRepository.findProjectAffected(
-        triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged());
-    return filterCompletedStrict(candidates.getContent(), triModel.getTypeAnalyse()).size();
-  }
-
-  private Page<ProjectUserPermission> getStrictCompletedProjectPage(final ProjectFilterRequest triModel,
-                                                                    final UserDetails userDetails,
-                                                                    final Pageable pageable, final boolean creator) {
-    Page<ProjectUserPermission> candidates = creator
-        ? projectUserPermissionRepository.findProjectCreatedByUser(
-        triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged())
-        : projectUserPermissionRepository.findProjectAffected(
-        triModel.getKey(), "ALL", triModel.getStatus(), userDetails.getUsername(), Pageable.unpaged());
-    List<ProjectUserPermission> filtered = filterCompletedStrict(candidates.getContent(), triModel.getTypeAnalyse());
-    if (!pageable.isPaged()) {
-      return new PageImpl<>(filtered, pageable, filtered.size());
-    }
-    int start = (int) pageable.getOffset();
-    int end = Math.min(start + pageable.getPageSize(), filtered.size());
-    List<ProjectUserPermission> content = start >= filtered.size() ? Collections.emptyList()
-        : filtered.subList(start, end);
-    return new PageImpl<>(content, pageable, filtered.size());
-  }
-
-  private List<ProjectUserPermission> filterCompletedStrict(final List<ProjectUserPermission> permissions,
-                                                            final String typeAnalyse) {
-    if (!"IA".equalsIgnoreCase(typeAnalyse) && !"COLLABORATIVE".equalsIgnoreCase(typeAnalyse)) {
-      return permissions;
-    }
-    return permissions.stream()
-        .filter(permission -> {
-          Project project = permission.getProject();
-          if ("IA".equalsIgnoreCase(typeAnalyse)) {
-            return isCompletedByIa(project);
-          }
-          return isCompletedByCollaborative(project);
-        })
-        .toList();
-  }
-
-  private boolean isCompletedByIa(final Project project) {
-    return resultIaRepository.findByProject(project).isPresent();
-  }
-
-  private boolean isCompletedByCollaborative(final Project project) {
-    MultiCriteriaAnalysis latestMultiCriteriaAnalysis =
-        multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(project.getProjectId());
-    if (latestMultiCriteriaAnalysis == null) {
-      return false;
-    }
-    PredictibilityAnalysis latestPredictibilityAnalysis = predictibilityAnalysisRepository
-        .findByLastIterationAndMultiCriteriaId(latestMultiCriteriaAnalysis.getMultiCriteriaAnalysisId());
-    return latestPredictibilityAnalysis != null && Boolean.TRUE.equals(latestPredictibilityAnalysis.getIsFinished());
+    return projectUserPermissionRepository.findAll(
+        projectFilterSpecification.byFilter(triModel, userDetails.getUsername(), true), pageable);
   }
 
   /**
@@ -727,7 +649,10 @@ public class ProjectServiceImpl implements ProjectService {
         null, null,
         project.getIsArchived(), project.getFormProgressStatus(), project.getProjectState(), contributorModelList,
         attachmentList,
-        multicriteriaAnalysisList, null, resultAnalyseIa);
+        multicriteriaAnalysisList, null, resultAnalyseIa,
+        journeyStatusRules.resolve(project, AnalysisJourney.IA),
+        journeyStatusRules.resolve(project, AnalysisJourney.COLLABORATIVE),
+        journeyStatusRules.resolve(project, AnalysisJourney.AUDIT));
   }
 
   /**
