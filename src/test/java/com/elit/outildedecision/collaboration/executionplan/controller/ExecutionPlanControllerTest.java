@@ -68,8 +68,8 @@ class ExecutionPlanControllerTest {
   void updateAnswersShouldReturnOk() throws Exception {
     when(executionPlanService.updateAnswers(eq(1L), eq(1L), any())).thenReturn(List.of("ok"));
     mockMvc.perform(put("/1/executionPlan/formConstraints/putAnswers/1")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(List.of(new ExecutionPlanAnswerRequest()))))
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(List.of(new ExecutionPlanAnswerRequest()))))
         .andExpect(status().isOk());
   }
 
@@ -79,13 +79,24 @@ class ExecutionPlanControllerTest {
     mockMvc.perform(get("/1/executionPlan/methodologies/1")).andExpect(status().isOk());
   }
 
+  /**
+   * Test for the getVotes method of ExecutionPlanController.
+   * It verifies that the method returns a OK status when called with valid
+   * parameters.
+   */
+  @Test
+  void getVotesShouldReturnOk() throws Exception {
+    when(executionPlanService.getVotes(1L)).thenReturn(List.of());
+    mockMvc.perform(get("/1/executionPlan/methodologies/votes/1")).andExpect(status().isOk());
+  }
+
   @Test
   void postMethodologiesVoteShouldReturnOk() throws Exception {
     when(executionPlanService.postMethodologiesVote(eq(1L), any(ExecutionVoteRequest.class)))
         .thenReturn("Le vote a bien été enregistré.");
     mockMvc.perform(post("/1/executionPlan/methodologies/vote")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(new ExecutionVoteRequest())))
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(new ExecutionVoteRequest())))
         .andExpect(status().isOk());
   }
 

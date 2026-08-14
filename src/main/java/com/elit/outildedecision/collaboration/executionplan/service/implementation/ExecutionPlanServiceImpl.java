@@ -55,7 +55,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Implementation of {@link ExecutionPlanService}: manages the execution plan lifecycle (creation,
+ * Implementation of {@link ExecutionPlanService}: manages the execution plan
+ * lifecycle (creation,
  * form constraints, methodology votes, scoring and completion).
  */
 @Service
@@ -85,19 +86,18 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   @Transactional
   public Long createExecutionPlan(final Long projectId) {
     log.info("Creating execution plan for projectId={}", projectId);
-    Project project =
-        projectRepository
-            .findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas"));
+    Project project = projectRepository
+        .findById(projectId)
+        .orElseThrow(() -> new ProjectNotFoundException("Ce projet n'existe pas"));
 
-    MultiCriteriaAnalysis lastMultiCriteriaAnalysis =
-        multiCriteriaAnalysisRepository.findLatestMultiCriteriaAnalysisByProjectId(
+    MultiCriteriaAnalysis lastMultiCriteriaAnalysis = multiCriteriaAnalysisRepository
+        .findLatestMultiCriteriaAnalysisByProjectId(
             project.getProjectId());
     if (lastMultiCriteriaAnalysis == null) {
       throw new NotFoundException("Aucune analyse multicritère pour ce projet.");
     }
-    PredictibilityAnalysis lastPredictibilityAnalysis =
-        predictibilityAnalysisRepository.findByLastIterationAndMultiCriteriaId(
+    PredictibilityAnalysis lastPredictibilityAnalysis = predictibilityAnalysisRepository
+        .findByLastIterationAndMultiCriteriaId(
             lastMultiCriteriaAnalysis.getMultiCriteriaAnalysisId());
     if (lastPredictibilityAnalysis == null
         || !Boolean.TRUE.equals(lastPredictibilityAnalysis.getIsFinished())) {
@@ -105,9 +105,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
           "La prévisibilité doit être finalisée avant de créer le plan d'exécution.");
     }
 
-    ExecutionPlan lastExecutionPlan =
-        executionPlanRepository.findByLastIterationAndPredictibilityId(
-            lastPredictibilityAnalysis.getPredictibilityAnalysisId());
+    ExecutionPlan lastExecutionPlan = executionPlanRepository.findByLastIterationAndPredictibilityId(
+        lastPredictibilityAnalysis.getPredictibilityAnalysisId());
 
     int nextIteration = 1;
 
@@ -120,13 +119,12 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
       nextIteration = lastExecutionPlan.getExecutionIteration() + 1;
     }
 
-    ExecutionPlan executionPlan =
-        executionPlanRepository.save(
-            ExecutionPlan.builder()
-                .predictibilityAnalysis(lastPredictibilityAnalysis)
-                .isFinished(false)
-                .executionIteration(nextIteration)
-                .build());
+    ExecutionPlan executionPlan = executionPlanRepository.save(
+        ExecutionPlan.builder()
+            .predictibilityAnalysis(lastPredictibilityAnalysis)
+            .isFinished(false)
+            .executionIteration(nextIteration)
+            .build());
 
     List<ExecutionPlanQuestion> executionPlanQuestions = executionPlanQuestionRepository.findAll();
     for (ExecutionPlanQuestion executionPlanQuestion : executionPlanQuestions) {
@@ -156,14 +154,14 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   @Override
   @Transactional
   public List<String> updateAnswers(final Long projectId,
-                                    final Long executionPlanId,
-                                    final List<ExecutionPlanAnswerRequest> answers)
+      final Long executionPlanId,
+      final List<ExecutionPlanAnswerRequest> answers)
       throws ProjectNotFoundException, ExecutionPlanNotFoundException {
     checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
     List<String> result = new ArrayList<>();
     for (ExecutionPlanAnswerRequest answerRequest : answers) {
-      ExecutionPlanAnswer executionPlanAnswerFromDb =
-          executionPlanAnswerRepository.findByExecutionPlanIdAndExecutionPlanQuestionId(
+      ExecutionPlanAnswer executionPlanAnswerFromDb = executionPlanAnswerRepository
+          .findByExecutionPlanIdAndExecutionPlanQuestionId(
               executionPlanId, answerRequest.getExecutionPlanQuestionId());
       if (Objects.nonNull(executionPlanAnswerFromDb)) {
         executionPlanAnswerFromDb.setAnswer(answerRequest.getAnswer());
@@ -188,9 +186,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
     ExecutionPlan executionPlan = checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
     Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
-    ProjectUserPermission projectUserPermission =
-        projectUserPermissionRepository.findByProjectIdUserID(
-            project.getProjectId(), user.getUserId());
+    ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(
+        project.getProjectId(), user.getUserId());
 
     String choosenMethodology = predictibilityAnalysis.getChosenMethodology();
     List<Method> methodList;
@@ -216,9 +213,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
       model.setMethodName(method.getName());
       model.setMethodDescription(method.getDescription());
 
-      List<ExecutionPlanVote> votesEntities =
-          executionPlanVoteRepository.findAllVotesByMethodIdAndExecutionPlanId(
-              method.getId(), executionPlanId);
+      List<ExecutionPlanVote> votesEntities = executionPlanVoteRepository.findAllVotesByMethodIdAndExecutionPlanId(
+          method.getId(), executionPlanId);
       List<ExecutionVoteUserResponse> votesList = new ArrayList<>();
       for (ExecutionPlanVote vote : votesEntities) {
         ExecutionVoteUserResponse voteModel = new ExecutionVoteUserResponse();
@@ -234,14 +230,31 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
 
   /** {@inheritDoc} */
   @Override
+  @Transactional(readOnly = true, noRollbackFor = { ProjectNotFoundException.class,
+      ExecutionPlanNotFoundException.class })
+  public List<ExecutionVoteUserResponse> getVotes(final Long executionPlanId)
+      throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+    List<ExecutionPlanVote> votesEntities = executionPlanVoteRepository.findAllVotesByExecutionPlanId(executionPlanId);
+
+    List<ExecutionVoteUserResponse> result = new ArrayList<>();
+    for (ExecutionPlanVote vote : votesEntities) {
+      ExecutionVoteUserResponse voteModel = new ExecutionVoteUserResponse();
+      voteModel.setId(vote.getId());
+      voteModel.setUserId(vote.getUser().getUserId());
+      result.add(voteModel);
+    }
+    return result;
+  }
+
+  /** {@inheritDoc} */
+  @Override
   @Transactional
   public String postMethodologiesVote(final Long projectId, final ExecutionVoteRequest request)
       throws VoteAlreadyExistException, ProjectNotFoundException, ExecutionPlanNotFoundException {
     User user = getAuthenticatedUser();
     checkAssociationProjectAndExecutionPlan(projectId, request.getExecutionPlanId());
-    ExecutionPlanVote executionPlanVoteFromDb =
-        executionPlanVoteRepository.findVoteByUserIdAndExecutionPlanId(
-            user.getUserId(), request.getExecutionPlanId());
+    ExecutionPlanVote executionPlanVoteFromDb = executionPlanVoteRepository.findVoteByUserIdAndExecutionPlanId(
+        user.getUserId(), request.getExecutionPlanId());
     if (Objects.nonNull(executionPlanVoteFromDb)) {
       throw new VoteAlreadyExistException(
           "Cet utilisateur a déjà soumis un vote sur ce plan d'exécution.");
@@ -270,14 +283,12 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   public ExecutionPlanScoreResponse getExecutionPlanScore(final Long executionPlanId)
       throws UserNotAuthorizedException, ExecutionPlanNotFoundException {
     User user = getAuthenticatedUser();
-    ExecutionPlan executionPlan =
-        executionPlanRepository
-            .findById(executionPlanId)
-            .orElseThrow(() -> new ExecutionPlanNotFoundException(PLAN_EXECUTION_NOT_FOUND_MESSAGE));
+    ExecutionPlan executionPlan = executionPlanRepository
+        .findById(executionPlanId)
+        .orElseThrow(() -> new ExecutionPlanNotFoundException(PLAN_EXECUTION_NOT_FOUND_MESSAGE));
     Project project = executionPlan.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject();
-    ProjectUserPermission projectUserPermission =
-        projectUserPermissionRepository.findByProjectIdUserID(
-            project.getProjectId(), user.getUserId());
+    ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(
+        project.getProjectId(), user.getUserId());
     if (Objects.isNull(projectUserPermission)) {
       throw new UserNotAuthorizedException("L'utilisateur ne fait pas parti du projet.");
     }
@@ -308,7 +319,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   }
 
   /**
-   * Builds the score response of an execution plan from its votes and predictibility results.
+   * Builds the score response of an execution plan from its votes and
+   * predictibility results.
    *
    * @param executionPlan the execution plan
    * @return the execution plan score
@@ -316,18 +328,17 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   private ExecutionPlanScoreResponse buildScore(final ExecutionPlan executionPlan) {
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
 
-    List<ExecutionPlanVote> votesList =
-        executionPlanVoteRepository.findAllVotesByExecutionPlanId(executionPlan.getExecutionPlanId());
+    List<ExecutionPlanVote> votesList = executionPlanVoteRepository
+        .findAllVotesByExecutionPlanId(executionPlan.getExecutionPlanId());
     List<Method> allMethods = loadScorableMethods(predictibilityAnalysis);
     ExecutionPlanVoteScore voteScore = executionPlanScoreCalculator.computeVoteScore(allMethods, votesList);
 
-    List<PredictibilityResults> predictibilityResultsList =
-        predictibilityResultsRepository.findAllPredictibilityResultsByPreAnalysisId(
+    List<PredictibilityResults> predictibilityResultsList = predictibilityResultsRepository
+        .findAllPredictibilityResultsByPreAnalysisId(
             predictibilityAnalysis.getPredictibilityAnalysisId());
     List<PredictibilityResultsResponseModel> predictibilityResults = new ArrayList<>();
     for (PredictibilityResults predictibilityResult : predictibilityResultsList) {
-      PredictibilityResultsResponseModel predictibilityResultNew =
-          new PredictibilityResultsResponseModel();
+      PredictibilityResultsResponseModel predictibilityResultNew = new PredictibilityResultsResponseModel();
       predictibilityResultNew.setName(predictibilityResult.getName());
       predictibilityResultNew.setValue(predictibilityResult.getValue());
       predictibilityResults.add(predictibilityResultNew);
@@ -345,10 +356,13 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   }
 
   /**
-   * Loads the methods that can be scored for the given predictibility analysis: the methods of the
-   * chosen methodology for {@code Classique} and {@code Agile}, all methods otherwise (hybrid).
+   * Loads the methods that can be scored for the given predictibility analysis:
+   * the methods of the
+   * chosen methodology for {@code Classique} and {@code Agile}, all methods
+   * otherwise (hybrid).
    *
-   * @param predictibilityAnalysis the predictibility analysis holding the chosen methodology
+   * @param predictibilityAnalysis the predictibility analysis holding the chosen
+   *                               methodology
    * @return the scorable methods
    */
   private List<Method> loadScorableMethods(final PredictibilityAnalysis predictibilityAnalysis) {
@@ -361,10 +375,11 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   }
 
   /**
-   * Persists a single methodology vote for the given user, method and execution plan.
+   * Persists a single methodology vote for the given user, method and execution
+   * plan.
    *
-   * @param user the voting user
-   * @param methodId the voted method id
+   * @param user            the voting user
+   * @param methodId        the voted method id
    * @param executionPlanId the execution plan id
    */
   private void saveVote(final User user, final Long methodId, final Long executionPlanId) {
@@ -381,27 +396,27 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
    * @return the authenticated user
    */
   private User getAuthenticatedUser() {
-    UserDetails userDetails =
-        (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     return userRepository.findByUserEmail(userDetails.getUsername());
   }
 
   /**
    * Loads the execution plan and verifies it belongs to the given project.
    *
-   * @param projectId the project id from the request path
+   * @param projectId       the project id from the request path
    * @param executionPlanId the execution plan id
    * @return the matching execution plan
    * @throws ExecutionPlanNotFoundException when the execution plan is not found
-   * @throws ProjectNotFoundException when the project does not match the execution plan
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
    */
   private ExecutionPlan checkAssociationProjectAndExecutionPlan(final Long projectId, final Long executionPlanId)
       throws ExecutionPlanNotFoundException, ProjectNotFoundException {
-    ExecutionPlan executionPlan =
-        executionPlanRepository
-            .findById(executionPlanId)
-            .orElseThrow(() -> new ExecutionPlanNotFoundException(PLAN_EXECUTION_NOT_FOUND_MESSAGE));
-    if (!executionPlan.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId().equals(projectId)) {
+    ExecutionPlan executionPlan = executionPlanRepository
+        .findById(executionPlanId)
+        .orElseThrow(() -> new ExecutionPlanNotFoundException(PLAN_EXECUTION_NOT_FOUND_MESSAGE));
+    if (!executionPlan.getPredictibilityAnalysis().getMultiCriteriaAnalysis().getProject().getProjectId()
+        .equals(projectId)) {
       throw new ProjectNotFoundException("Le project dans le path et celui de Plan d'exécution ne correspondent pas");
     }
     return executionPlan;

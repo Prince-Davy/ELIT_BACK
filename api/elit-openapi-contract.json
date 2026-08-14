@@ -1446,6 +1446,43 @@
         }
       }
     },
+    "GET /{projectId}/executionPlan/methodologies/votes/{executionPlanId}" : {
+      "parameters" : [ {
+        "in" : "path",
+        "name" : "executionPlanId",
+        "required" : true,
+        "type" : "integer:int64"
+      }, {
+        "in" : "path",
+        "name" : "projectId",
+        "required" : true,
+        "type" : "integer:int64"
+      } ],
+      "request" : "<none>",
+      "responses" : {
+        "200" : {
+          "*/*" : "ExecutionVoteUserResponse[]"
+        },
+        "400" : {
+          "application/json" : "ErrorMessage"
+        },
+        "401" : {
+          "application/json" : "ErrorMessage"
+        },
+        "403" : {
+          "application/json" : "ErrorMessage"
+        },
+        "404" : {
+          "application/json" : "ErrorMessage"
+        },
+        "409" : {
+          "application/json" : "ErrorMessage"
+        },
+        "500" : {
+          "*/*" : "object"
+        }
+      }
+    },
     "GET /{projectId}/executionPlan/methodologies/{executionPlanId}" : {
       "parameters" : [ {
         "in" : "path",

@@ -5,6 +5,7 @@ import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionPlanFor
 import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionPlanScoreResponse;
 import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionVoteRequest;
 import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionVoteResponse;
+import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionVoteUserResponse;
 import com.elit.outildedecision.collaboration.executionplan.exception.ExecutionPlanException;
 import com.elit.outildedecision.collaboration.executionplan.exception.VoteAlreadyExistException;
 import com.elit.outildedecision.collaboration.executionplan.service.ExecutionPlanService;
@@ -60,10 +61,11 @@ public class ExecutionPlanController {
   /**
    * Get questions and answers of an execution plan.
    *
-   * @param projectId the project id
+   * @param projectId       the project id
    * @param executionPlanId the execution plan id
    * @return the execution plan form entries
-   * @throws ProjectNotFoundException when the project does not match the execution plan
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
    * @throws ExecutionPlanNotFoundException when the execution plan is not found
    */
   @GetMapping("/{projectId}/executionPlan/formConstraints/{executionPlanId}")
@@ -77,11 +79,12 @@ public class ExecutionPlanController {
   /**
    * Update answers of an execution plan.
    *
-   * @param projectId the project id
+   * @param projectId       the project id
    * @param executionPlanId the execution plan id
-   * @param answers the answers to update
+   * @param answers         the answers to update
    * @return the confirmation messages
-   * @throws ProjectNotFoundException when the project does not match the execution plan
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
    * @throws ExecutionPlanNotFoundException when the execution plan is not found
    */
   @PutMapping(value = "/{projectId}/executionPlan/formConstraints/putAnswers/{executionPlanId}")
@@ -97,10 +100,11 @@ public class ExecutionPlanController {
   /**
    * Get methodologies proposed for an execution plan.
    *
-   * @param projectId the project id
+   * @param projectId       the project id
    * @param executionPlanId the execution plan id
    * @return the proposed methodologies with their votes
-   * @throws ProjectNotFoundException when the project does not match the execution plan
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
    * @throws ExecutionPlanNotFoundException when the execution plan is not found
    */
   @GetMapping("/{projectId}/executionPlan/methodologies/{executionPlanId}")
@@ -112,13 +116,33 @@ public class ExecutionPlanController {
   }
 
   /**
+   * Get votes proposed for an execution plan.
+   *
+   * @param projectId       the project id
+   * @param executionPlanId the execution plan id
+   * @return the proposed methodologies with their votes
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
+   * @throws ExecutionPlanNotFoundException when the execution plan is not found
+   */
+  @GetMapping("/{projectId}/executionPlan/methodologies/votes/{executionPlanId}")
+  @PreAuthorize("isContributer(#projectId)")
+  public ResponseEntity<List<ExecutionVoteUserResponse>> getVotes(
+      @PathVariable final Long projectId, @PathVariable final Long executionPlanId)
+      throws ProjectNotFoundException, ExecutionPlanNotFoundException {
+    return ResponseEntity.ok(executionPlanService.getVotes(executionPlanId));
+  }
+
+  /**
    * Vote for a methodology.
    *
-   * @param projectId the project id
+   * @param projectId            the project id
    * @param executionVoteRequest the vote request
    * @return the confirmation message
-   * @throws VoteAlreadyExistException when a vote already exists for the user
-   * @throws ProjectNotFoundException when the project does not match the execution plan
+   * @throws VoteAlreadyExistException      when a vote already exists for the
+   *                                        user
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
    * @throws ExecutionPlanNotFoundException when the execution plan is not found
    */
   @PostMapping("/{projectId}/executionPlan/methodologies/vote")
@@ -133,11 +157,12 @@ public class ExecutionPlanController {
   /**
    * Get the execution plan score.
    *
-   * @param projectId the project id
+   * @param projectId       the project id
    * @param executionPlanId the execution plan id
    * @return the execution plan score
    * @throws ExecutionPlanNotFoundException when the execution plan is not found
-   * @throws ProjectNotFoundException when the project does not match the execution plan
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
    */
   @GetMapping("/{projectId}/executionPlan/{executionPlanId}/score")
   @PreAuthorize("hasAnyAuthority('ADMIN') or isContributer(#projectId) or isObserver(#projectId)")
@@ -150,12 +175,14 @@ public class ExecutionPlanController {
   /**
    * Mark an execution plan as finished.
    *
-   * @param projectId the project id
+   * @param projectId       the project id
    * @param executionPlanId the execution plan id
    * @return {@code true} when the execution plan has been marked as finished
    * @throws ExecutionPlanNotFoundException when the execution plan is not found
-   * @throws ExecutionPlanException when the execution plan is already finished
-   * @throws ProjectNotFoundException when the project does not match the execution plan
+   * @throws ExecutionPlanException         when the execution plan is already
+   *                                        finished
+   * @throws ProjectNotFoundException       when the project does not match the
+   *                                        execution plan
    */
   @PostMapping("/{projectId}/executionPlan/isFinished/{executionPlanId}")
   @PreAuthorize("isProjectOwner(#projectId)")

@@ -3,6 +3,8 @@ package com.elit.outildedecision.collaboration.executionplan.service;
 import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionPlanAnswerRequest;
 import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionPlanFormResponse;
 import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionVoteRequest;
+import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionVoteResponse;
+import com.elit.outildedecision.collaboration.executionplan.dto.ExecutionVoteUserResponse;
 import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlan;
 import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlanVote;
 import com.elit.outildedecision.collaboration.executionplan.exception.ExecutionPlanException;
@@ -35,6 +37,8 @@ import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import com.elit.outildedecision.shared.project.repository.ProjectUserPermissionRepository;
 import com.elit.outildedecision.shared.security.AppUserPrincipal;
 import com.elit.outildedecision.shared.user.repository.UserRepository;
+import com.tngtech.archunit.thirdparty.com.google.common.collect.Lists;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +58,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -144,6 +149,22 @@ class ExecutionPlanServiceImplTest {
     projectUserPermission.setProject(project);
     projectUserPermission.setPermission("CDP");
     return projectUserPermission;
+  }
+
+  /**
+   * Creates an ExecutionPlanVote object for testing purposes.
+   * 
+   * @param userId              the ID of the user associated with the vote
+   * @param executionPlanVoteId the ID of the execution plan vote
+   */
+  private ExecutionPlanVote createExecutionPlanVote(Long userId, Long executionPlanVoteId) {
+    User executionPlanVoteUser = new User();
+    executionPlanVoteUser.setUserId(userId);
+
+    ExecutionPlanVote executionPlanVote = new ExecutionPlanVote();
+    executionPlanVote.setId(executionPlanVoteId);
+    executionPlanVote.setUser(executionPlanVoteUser);
+    return executionPlanVote;
   }
 
   @Test
@@ -244,6 +265,36 @@ class ExecutionPlanServiceImplTest {
     when(projectUserPermissionRepository.findByProjectIdUserID(longId, longId))
         .thenReturn(ownerPermission());
     Assertions.assertTrue(executionPlanService.getMethodologies(longId, longId).isEmpty());
+  }
+
+  /**
+   * Test the getVotes method of the ExecutionPlanServiceImpl class. </br>
+   * This test verifies that the getVotes method returns a list of
+   * ExecutionVoteUserResponse objects
+   */
+  @Test
+  void getVotes_Success() throws Exception {
+    ExecutionPlanVote vote1 = createExecutionPlanVote(1L, 1L);
+    ExecutionPlanVote vote2 = createExecutionPlanVote(2L, 2L);
+    List<ExecutionPlanVote> data = Lists.newArrayList(vote1, vote2);
+
+    when(executionPlanVoteRepository.findAllVotesByExecutionPlanId(anyLong())).thenReturn(data);
+    when(projectUserPermissionRepository.findByProjectIdUserID(longId, longId))
+        .thenReturn(ownerPermission());
+
+    List<ExecutionVoteUserResponse> result = executionPlanService.getVotes(longId);
+
+    Assertions.assertEquals(2, result.size(), "There should be 2 ExecutionVoteUserResponse objects in the results");
+
+    Assertions.assertEquals(1L, result.get(0).getId(),
+        "The id of the first ExecutionVoteUserResponse object should be 1L");
+    Assertions.assertEquals(1L, result.get(0).getUserId(),
+        "The user ID of the first ExecutionVoteUserResponse object should be 1L");
+
+    Assertions.assertEquals(2L, result.get(1).getId(),
+        "The id of the second ExecutionVoteUserResponse object should be 2L");
+    Assertions.assertEquals(2L, result.get(1).getUserId(),
+        "The user ID of the second ExecutionVoteUserResponse object should be 2L");
   }
 
   @Test
