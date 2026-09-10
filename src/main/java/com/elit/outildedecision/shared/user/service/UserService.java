@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This interface defines the contract for the User Service, which provides methods to manage user accounts.
+ * This interface defines the contract for the User Service, which provides
+ * methods to manage user accounts.
  */
 public interface UserService {
 
@@ -32,22 +33,27 @@ public interface UserService {
   /**
    * Retrieves the permission labels held by a user on a given project.
    * <p>
-   * Backed by a projection query so it does not navigate the lazy {@code User#userProjectPermissions}
-   * graph: usable by the method-security expressions which run outside any transaction
+   * Backed by a projection query so it does not navigate the lazy
+   * {@code User#userProjectPermissions}
+   * graph: usable by the method-security expressions which run outside any
+   * transaction
    * ({@code spring.jpa.open-in-view=false}).
    *
    * @param email     the email of the authenticated user
    * @param projectId the id of the project to check permissions for
-   * @return the permission labels held by the user on the project (possibly empty)
+   * @return the permission labels held by the user on the project (possibly
+   *         empty)
    */
   List<String> getProjectPermissions(String email, Long projectId);
 
   /**
-   * Retrieves the permission labels held by a user on the project that owns the given audit.
+   * Retrieves the permission labels held by a user on the project that owns the
+   * given audit.
    *
    * @param email   the email of the authenticated user
    * @param auditId the id of the audit whose owning project is checked
-   * @return the permission labels held by the user on that project (possibly empty)
+   * @return the permission labels held by the user on that project (possibly
+   *         empty)
    */
   List<String> getProjectPermissionsByAudit(String email, Long auditId);
 
@@ -56,24 +62,28 @@ public interface UserService {
    *
    * @param user a UserRequest object representing the user account to save
    * @return the success confirmation message
-   * @throws CouldNotSaveUserException  if the specified user account could not be saved
-   * @throws UserAlreadyExistsException if the specified user account already exists
+   * @throws CouldNotSaveUserException  if the specified user account could not be
+   *                                    saved
+   * @throws UserAlreadyExistsException if the specified user account already
+   *                                    exists
    */
   String saveUser(UserRequest user) throws CouldNotSaveUserException, UserAlreadyExistsException;
 
   /**
    * Updates the password for the user with the specified ID.
    *
-   * @param userId            the ID of the user to update the password for
-   * @param oldPass           a String representing the user's current password
-   * @param newPass           a String representing the user's new password
-   * @param authenticatedEmail the email of the authenticated user (must own the account)
+   * @param userId             the ID of the user to update the password for
+   * @param oldPass            a String representing the user's current password
+   * @param newPass            a String representing the user's new password
+   * @param authenticatedEmail the email of the authenticated user (must own the
+   *                           account)
    * @return the success confirmation message
    * @throws UserNotFoundException if the specified user account does not exist
-   * @throws ForbiddenException    if the authenticated user does not own the account
+   * @throws ForbiddenException    if the authenticated user does not own the
+   *                               account
    */
   String updatePasswordUserById(Long userId, String oldPass, String newPass, String authenticatedEmail)
-    throws UserNotFoundException, ForbiddenException;
+      throws UserNotFoundException, ForbiddenException;
 
   /**
    * Updates the avatar for the user with the specified ID.
@@ -81,24 +91,29 @@ public interface UserService {
    * @param userId     the ID of the user to update the avatar for
    * @param userAvatar a MultipartFile object representing the user's new avatar
    * @return the success confirmation message
-   * @throws CouldNotSaveUserException if the specified user account could not be updated
-   * @throws UserNotFoundException     if the specified user account does not exist
+   * @throws CouldNotSaveUserException if the specified user account could not be
+   *                                   updated
+   * @throws UserNotFoundException     if the specified user account does not
+   *                                   exist
    */
   String updateAvatarByIdUser(Long userId, MultipartFile userAvatar)
-    throws CouldNotSaveUserException, UserNotFoundException;
+      throws CouldNotSaveUserException, UserNotFoundException;
 
   /**
-   * Updates the information (first name, last name) for the user with the specified ID.
+   * Updates the information (first name, last name) for the user with the
+   * specified ID.
    *
    * @param userId        the ID of the user to update the information for
    * @param userFirstName a String representing the user's new first name
    * @param userLastName  a String representing the user's new last name
    * @return the success confirmation message
-   * @throws CouldNotSaveUserException if the specified user account could not be updated
-   * @throws UserNotFoundException     if the specified user account does not exist
+   * @throws CouldNotSaveUserException if the specified user account could not be
+   *                                   updated
+   * @throws UserNotFoundException     if the specified user account does not
+   *                                   exist
    */
   String updateInfosByIdUser(Long userId, String userFirstName, String userLastName)
-    throws CouldNotSaveUserException, UserNotFoundException;
+      throws CouldNotSaveUserException, UserNotFoundException;
 
   /**
    * Retrieves the avatar for the user with the specified ID.
@@ -111,9 +126,11 @@ public interface UserService {
   void viewAvatarByUserId(Long userId, HttpServletResponse response) throws IOException, AvatarNotFoundException;
 
   /**
-   * Creates a confirmation token and sends a registration confirmation email to the specified user.
+   * Creates a confirmation token and sends a registration confirmation email to
+   * the specified user.
    *
-   * @param user a User object representing the user to send the registration confirmation email to
+   * @param user a User object representing the user to send the registration
+   *             confirmation email to
    */
   void sendRegistrationConfirmationEmail(User user);
 
@@ -121,10 +138,12 @@ public interface UserService {
    * Searches for users matching the specified keyword.
    *
    * @param keyword a String representing the keyword to search for
-   * @return a List of UserResponse objects representing the users that match the specified keyword
+   * @param onlyActive  when true, only active and email verified users are returned
+   * @return a List of UserResponse objects representing the users that match the
+   *         specified keyword
    * @throws IOException if an I/O error occurs while retrieving the user data
    */
-  List<UserResponse> findUsersByKeyword(String keyword) throws IOException;
+  List<UserResponse> findUsersByKeyword(String keyword, boolean onlyActive) throws IOException;
 
   /**
    * Retrieves all information about the user with the specified ID.
@@ -148,10 +167,10 @@ public interface UserService {
   /**
    * Deletes the avatar for the user with the specified ID.
    *
-   * @param userId     the ID of the user to update the avatar for
+   * @param userId the ID of the user to update the avatar for
    * @return the success confirmation message
-   * @throws UserNotFoundException     if the specified user account does not exist
-   * @throws AvatarNotFoundException     if the specified avatar  does not exist
+   * @throws UserNotFoundException   if the specified user account does not exist
+   * @throws AvatarNotFoundException if the specified avatar does not exist
    */
   String deleteAvatarByIdUser(Long userId) throws AvatarNotFoundException, UserNotFoundException;
 
@@ -161,7 +180,9 @@ public interface UserService {
    * @param user the user to send the registration confirmation email to again
    * @return the success confirmation message
    * @throws UserAlreadyExistsException if the account is already active
-   * @throws CouldNotMailUserException  if the confirmation email could not be sent
+   * @throws CouldNotMailUserException  if the confirmation email could not be
+   *                                    sent
    */
-  String sendRegistrationConfirmationEmailAgain(UserRequest user) throws UserAlreadyExistsException, CouldNotMailUserException;
+  String sendRegistrationConfirmationEmailAgain(UserRequest user)
+      throws UserAlreadyExistsException, CouldNotMailUserException;
 }

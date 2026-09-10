@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * this class is the implementation of the BrainstormingService interface.
@@ -341,7 +340,7 @@ public class BrainstormingServiceImpl implements BrainstormingService {
     List<FormStep> formStepList =
       predictibilityAnalysis.getMultiCriteriaAnalysis().getFormSteps().stream()
         .filter(formStep -> formStep.getEScore() < 0.5)
-        .collect(Collectors.toList());
+        .toList();
     log.info("Brainstorming abstract built from {} form steps", formStepList.size());
 
     Long projectId = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject().getProjectId();

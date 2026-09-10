@@ -182,12 +182,8 @@ public class ExecutionPlanServiceImpl implements ExecutionPlanService {
   @Transactional(readOnly = true)
   public List<ExecutionVoteResponse> getMethodologies(final Long projectId, final Long executionPlanId)
       throws ProjectNotFoundException, ExecutionPlanNotFoundException {
-    User user = getAuthenticatedUser();
     ExecutionPlan executionPlan = checkAssociationProjectAndExecutionPlan(projectId, executionPlanId);
     PredictibilityAnalysis predictibilityAnalysis = executionPlan.getPredictibilityAnalysis();
-    Project project = predictibilityAnalysis.getMultiCriteriaAnalysis().getProject();
-    ProjectUserPermission projectUserPermission = projectUserPermissionRepository.findByProjectIdUserID(
-        project.getProjectId(), user.getUserId());
 
     String choosenMethodology = predictibilityAnalysis.getChosenMethodology();
     List<Method> methodList;

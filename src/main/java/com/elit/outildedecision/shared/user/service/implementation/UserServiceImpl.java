@@ -40,14 +40,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
-
 
 /**
  * Service implementation for managing user-related operations.
@@ -83,12 +79,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final VerificationMailService verificationMailService;
 
     /**
-     * Publisher used to emit the user-registered event once the account is persisted.
+     * Publisher used to emit the user-registered event once the account is
+     * persisted.
      */
     private final ApplicationEventPublisher eventPublisher;
 
     /**
-     * Repository for the binary content of user avatars ({@code user_avatar_content} table).
+     * Repository for the binary content of user avatars
+     * ({@code user_avatar_content} table).
      */
     private final UserAvatarContentRepository userAvatarContentRepository;
 
@@ -99,14 +97,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private String avatarUploadDir;
 
     /**
-     * Password policy: 12-32 chars, at least one lower, upper, digit and special char, no whitespace.
+     * Password policy: 12-32 chars, at least one lower, upper, digit and special
+     * char, no whitespace.
      */
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[~!@#$%^&*()_+`\\-=\\[\\]\\{\\};':\\\",./<>?])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])\\S{12,32}$",
             Pattern.CASE_INSENSITIVE);
 
     /**
-     * Maximum accepted avatar size in bytes (2 MiB): the whole file is held in memory before being
+     * Maximum accepted avatar size in bytes (2 MiB): the whole file is held in
+     * memory before being
      * persisted as a BLOB, so the upload is bounded well below the multipart limit.
      */
     private static final long MAX_AVATAR_SIZE_BYTES = 2L * 1024 * 1024;
@@ -114,19 +114,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     /**
      * Image MIME types accepted for a user avatar.
      */
-    private static final List<String> ALLOWED_AVATAR_MIME_TYPES =
-            List.of("image/png", "image/jpeg", "image/webp");
+    private static final List<String> ALLOWED_AVATAR_MIME_TYPES = List.of("image/png", "image/jpeg", "image/webp");
 
     /**
      * Constructor for UserServiceImpl.
      *
-     * @param userRepository           UserRepository instance to interact with the database.
-     * @param passwordEncoder          PasswordEncoder instance to encode and decode passwords.
-     * @param verificationTokenService VerificationTokenService instance to manage verification tokens.
-     * @param userMapper               UserMapper instance to convert user entities to response DTOs.
-     * @param verificationMailService  Service composing and sending the registration confirmation e-mail.
-     * @param eventPublisher           ApplicationEventPublisher used to emit the user-registered event.
-     * @param userAvatarContentRepository Repository for the binary content of user avatars.
+     * @param userRepository              UserRepository instance to interact with
+     *                                    the database.
+     * @param passwordEncoder             PasswordEncoder instance to encode and
+     *                                    decode passwords.
+     * @param verificationTokenService    VerificationTokenService instance to
+     *                                    manage verification tokens.
+     * @param userMapper                  UserMapper instance to convert user
+     *                                    entities to response DTOs.
+     * @param verificationMailService     Service composing and sending the
+     *                                    registration confirmation e-mail.
+     * @param eventPublisher              ApplicationEventPublisher used to emit the
+     *                                    user-registered event.
+     * @param userAvatarContentRepository Repository for the binary content of user
+     *                                    avatars.
      */
     public UserServiceImpl(
             final UserRepository userRepository,
@@ -176,7 +182,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param email     Email address of the authenticated user.
      * @param projectId Id of the project to check permissions for.
-     * @return the permission labels held by the user on the project (possibly empty).
+     * @return the permission labels held by the user on the project (possibly
+     *         empty).
      */
     @Override
     public List<String> getProjectPermissions(final String email, final Long projectId) {
@@ -184,11 +191,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     /**
-     * Method to retrieve the permission labels held by a user on the project owning the given audit.
+     * Method to retrieve the permission labels held by a user on the project owning
+     * the given audit.
      *
      * @param email   Email address of the authenticated user.
      * @param auditId Id of the audit whose owning project is checked.
-     * @return the permission labels held by the user on that project (possibly empty).
+     * @return the permission labels held by the user on that project (possibly
+     *         empty).
      */
     @Override
     public List<String> getProjectPermissionsByAudit(final String email, final Long auditId) {
@@ -215,23 +224,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     "Une erreur est survenue, le compte associé à cet e-mail existe déjà");
         }
         try {
-            User userToSave =
-                    User.builder()
-                            .userEmail(user.getUserEmail())
-                            .isUserActive(false)
-                            .isEmailVerified(false)
-                            .username(user.getUsername())
-                            .userFirstName(user.getUserFirstName())
-                            .userLastName(user.getUserLastName())
-                            .userPassword(passwordEncoder.encode(
-                                    user.getUserPassword()))
-                            .isAdmin(false)
-                            .build();
+            User userToSave = User.builder()
+                    .userEmail(user.getUserEmail())
+                    .isUserActive(false)
+                    .isEmailVerified(false)
+                    .username(user.getUsername())
+                    .userFirstName(user.getUserFirstName())
+                    .userLastName(user.getUserLastName())
+                    .userPassword(passwordEncoder.encode(
+                            user.getUserPassword()))
+                    .isAdmin(false)
+                    .build();
             User savedUser = userRepository.save(userToSave);
             VerificationToken token = verificationTokenService.createToken(savedUser, "confirm-account");
             log.info("User account created, userId={}", savedUser.getUserId());
             // Account + token are committed atomically here; the email is sent after commit
-            // (UserRegistrationListener) so a mail failure cannot roll back the account and the
+            // (UserRegistrationListener) so a mail failure cannot roll back the account and
+            // the
             // slow polling stays out of this transaction.
             eventPublisher.publishEvent(new UserRegisteredEvent(savedUser.getUserId(), token.getToken()));
             return "Votre compte a été créé avec succès";
@@ -273,14 +282,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param userId             The ID of the user to update.
      * @param oldPass            The user's current password.
      * @param newPass            The user's new password.
-     * @param authenticatedEmail The email of the authenticated user (must own the account).
+     * @param authenticatedEmail The email of the authenticated user (must own the
+     *                           account).
      * @return the success confirmation message.
      */
     @Override
     public String updatePasswordUserById(final Long userId,
-                                         final String oldPass,
-                                         final String newPass,
-                                         final String authenticatedEmail)
+            final String oldPass,
+            final String newPass,
+            final String authenticatedEmail)
             throws UserNotFoundException, ForbiddenException {
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -319,7 +329,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public String updateAvatarByIdUser(final Long userId,
-                                       final MultipartFile userAvatar)
+            final MultipartFile userAvatar)
             throws UserNotFoundException, CouldNotSaveUserException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -339,11 +349,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     /**
-     * Validates an uploaded avatar before it is read into memory: the file must be present, not
-     * empty, within {@link #MAX_AVATAR_SIZE_BYTES} and carry an allowed image MIME type.
+     * Validates an uploaded avatar before it is read into memory: the file must be
+     * present, not
+     * empty, within {@link #MAX_AVATAR_SIZE_BYTES} and carry an allowed image MIME
+     * type.
      *
      * @param avatar the uploaded avatar file
-     * @throws CouldNotSaveUserException if the file is missing, too large or not an allowed image
+     * @throws CouldNotSaveUserException if the file is missing, too large or not an
+     *                                   allowed image
      */
     private void validateAvatar(final MultipartFile avatar)
             throws CouldNotSaveUserException {
@@ -369,14 +382,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param userFirstName The user's new first name (maybe null).
      * @param userLastName  The user's new last name (maybe null).
      * @return the success confirmation message.
-     * @throws CouldNotSaveUserException If there is an error saving the updated user to the database.
+     * @throws CouldNotSaveUserException If there is an error saving the updated
+     *                                   user to the database.
      * @throws UserNotFoundException     If the specified user cannot be found.
      */
     @Override
     @Transactional
     public String updateInfosByIdUser(final Long userId,
-                                      final String userFirstName,
-                                      final String userLastName)
+            final String userFirstName,
+            final String userLastName)
             throws CouldNotSaveUserException, UserNotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -404,15 +418,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public void viewAvatarByUserId(final Long userId,
-                                   final HttpServletResponse response)
+            final HttpServletResponse response)
             throws IOException {
         User user = userRepository.getReferenceById(userId);
         String pathAvatar = user.getUserAvatarPath();
         UserAvatarContent avatarContent = userAvatarContentRepository.findById(userId).orElse(null);
         if (!Objects.isNull(pathAvatar) && avatarContent != null) {
             String fileName = StringUtils.getFilename(pathAvatar);
-            String mimeType =
-                    URLConnection.guessContentTypeFromName(fileName);
+            String mimeType = URLConnection.guessContentTypeFromName(fileName);
             if (mimeType == null) {
                 mimeType = "application/octet-stream";
             }
@@ -431,16 +444,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     /**
-     * Creates a confirmation token for the user and sends the registration confirmation email.
+     * Creates a confirmation token for the user and sends the registration
+     * confirmation email.
      *
-     * <p>Used by the resend flow, which owns its own transaction for the token creation.
+     * <p>
+     * Used by the resend flow, which owns its own transaction for the token
+     * creation.
      *
      * @param user The user to send the email to.
      */
     @Override
     public void sendRegistrationConfirmationEmail(final User user) {
-        VerificationToken verificationToken =
-                verificationTokenService.createToken(user, "confirm-account");
+        VerificationToken verificationToken = verificationTokenService.createToken(user, "confirm-account");
         verificationMailService.sendAccountConfirmationEmail(user, verificationToken.getToken());
     }
 
@@ -459,31 +474,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     /**
-     * Finds all users whose email or username contains a given keyword.
+     * Finds users whose email or username contains a given keyword.
      *
      * @param keyword The keyword to search for.
-     * @return A list of UserResponse objects containing information about the found users.
+     * @param onlyActive  when true, only active and email verified users are returned.
+     * @return A list of UserResponse objects containing information about the found
+     *         users.
      * @throws IOException If there is an error reading a user's avatar file.
      */
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> findUsersByKeyword(final String keyword)
+    public List<UserResponse> findUsersByKeyword(final String keyword, final boolean onlyActive)
             throws IOException {
-        List<UserResponse> foundUsers = new ArrayList<>();
-        if (keyword == null || "".equals(keyword)) {
-            for (User user : userRepository.findAll()) {
-                foundUsers.add(createUserResponse(user));
-            }
-        } else {
-            for (User user : userRepository.findAllByUserEmailOrUsernameContaining(
-                    keyword)) {
-                foundUsers.add(createUserResponse(user));
-            }
-        }
-
-        return foundUsers;
+        String normalizedKeyword = (keyword == null || keyword.isEmpty()) ? null : keyword;
+        return (onlyActive
+            ? userRepository.findActiveUsersByKeyword(normalizedKeyword)
+            : userRepository.findUsersByKeyword(normalizedKeyword))
+                .stream()
+                .map(this::createUserResponse)
+                .toList();
     }
-
 
     /**
      * Finds all users whose email or username contains a given keyword.
@@ -504,7 +514,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     /**
-     * Builds the logical avatar path stored on the user (no disk I/O; the bytes are persisted in the
+     * Builds the logical avatar path stored on the user (no disk I/O; the bytes are
+     * persisted in the
      * {@code user_avatar_content} table by {@link #updateAvatarByIdUser}).
      *
      * @param avatar the avatar file uploaded by the user
@@ -523,7 +534,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param userId the ID of the user to update the avatar for
      * @return the success confirmation message.
      * @throws UserNotFoundException   if the specified user account does not exist
-     * @throws AvatarNotFoundException if the specified avatar  does not exist
+     * @throws AvatarNotFoundException if the specified avatar does not exist
      */
     @Override
     @Transactional

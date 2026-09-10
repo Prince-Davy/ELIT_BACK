@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -61,10 +62,10 @@ class UserControllerTest {
   public void setup() {
     userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponse());
     userResponseModel = UserSamples.getUserResponse();
-    user =  UserSamples.getUser();
+    user = UserSamples.getUser();
   }
 
-  @WithMockUser(authorities = {"USER", "ADMIN"})
+  @WithMockUser(authorities = { "USER", "ADMIN" })
   @Test
   void findUserByIdExists() throws Exception {
     userResponseModel = UserSamples.getUserResponse();
@@ -72,167 +73,246 @@ class UserControllerTest {
     mockMvc.perform(get("/user/" + userResponseModel.getUserId())).andDo(print()).andExpect(status().isOk());
   }
 
-  @WithMockUser(authorities = {"USER", "ADMIN"})
+  @WithMockUser(authorities = { "USER", "ADMIN" })
   @Test
   void findUserByIdNotExists() throws Exception {
     when(userService.getAllInfosUserById(UserSamples.notExistUserId)).thenReturn(null);
-    mockMvc.perform(get("/user/"+UserSamples.notExistUserId)).andDo(print()).andExpect(status().isOk());
+    mockMvc.perform(get("/user/" + UserSamples.notExistUserId)).andDo(print()).andExpect(status().isOk());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void findUserByKeyWord_Success() throws Exception {
     userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponse());
-    when(userService.findUsersByKeyword("username")).thenReturn(userResponseModelList);
+    when(userService.findUsersByKeyword("username", false)).thenReturn(userResponseModelList);
     mockMvc.perform(get("/user/users")).andDo(print()).andExpect(status().isOk());
   }
 
+  /**
+   * Test of the method getUsersByKeyword in UserController with onlyActive=true.
+   * <br/>
+   * Case when the keyword is provided and the service returns a list of onlyActive and
+   * verified users.
+   */
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
+  @WithMockUser(authorities = { "ADMIN", "USER" })
+  void getUsersByKeyword_OnlyActiveTrue_WithKeyword() throws Exception {
+    userResponseModelList = Arrays.asList(ModelSamples.UserSamples.getUserResponse());
+    when(userService.findUsersByKeyword("username", true))
+        .thenReturn(userResponseModelList);
+    mockMvc.perform(get("/user/users")
+        .param("keyword", "username")
+        .param("onlyActive", "true"))
+        .andDo(print())
+        .andExpect(status().isOk());
+  }
+
+  /**
+   * Test of the method
+   * {@link UserController#getUsersByKeyword(String, boolean)}. <br/>
+   * Case when onlyActive=true and the service method throws an exception.
+   */
+  @Test
+  @WithMockUser(authorities = { "ADMIN", "USER" })
+  void getUsersByKeyword_OnlyActiveTrue_IOException() throws Exception {
+    when(userService.findUsersByKeyword("username", true))
+        .thenThrow(new IOException("Erreur lors de la recherche"));
+    mockMvc.perform(get("/user/users")
+        .param("keyword", "username")
+        .param("onlyActive", "true"))
+        .andDo(print())
+        .andExpect(status().isInternalServerError());
+  }
+
+  /**
+   * Test of the method
+   * {@link UserController#getUsersByKeyword(String, boolean)}. <br/>
+   * Case when onlyActive=true and the keyword is null.
+   */
+  @Test
+  @WithMockUser(authorities = { "ADMIN", "USER" })
+  void getUsersByKeyword_OnlyActiveTrue_NullKeyword() throws Exception {
+    userResponseModelList = Arrays.asList(UserSamples.getUserResponse());
+    when(userService.findUsersByKeyword(null, true))
+        .thenReturn(userResponseModelList);
+    mockMvc.perform(get("/user/users")
+        .param("onlyActive", "true"))
+        .andDo(print())
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(authorities = { "ADMIN", "USER" }, username = "user@user.com")
   void shouldUpdatePasswordById_Success() throws Exception {
-    when(userService.updatePasswordUserById(eq(user.getUserId()), eq(user.getUserPassword()), eq(newPassword), eq("user@user.com")))
-      .thenReturn("Successful Update");
-    mockMvc.perform(put("/user/password/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("oldPass", user.getUserPassword()).param("newPass", newPassword))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().string(containsString("Successful Update")));
+    when(userService.updatePasswordUserById(eq(user.getUserId()), eq(user.getUserPassword()), eq(newPassword),
+        eq("user@user.com")))
+        .thenReturn("Successful Update");
+    mockMvc
+        .perform(put("/user/password/" + user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .param("oldPass", user.getUserPassword()).param("newPass", newPassword))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("Successful Update")));
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
-  void shouldUpdatePasswordById_LastPwdNotCorrect () throws Exception {
+  @WithMockUser(authorities = { "ADMIN", "USER" }, username = "user@user.com")
+  void shouldUpdatePasswordById_LastPwdNotCorrect() throws Exception {
     when(userService.updatePasswordUserById(eq(user.getUserId()), eq("user"), eq(newPassword), eq("user@user.com")))
-      .thenThrow(new BadRequestException("L'ancien mot de passe renseigné n'est pas correct."));
-    mockMvc.perform(put("/user/password/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("oldPass", "user").param("newPass", newPassword))
-      .andDo(print())
-      .andExpect(status().isBadRequest())
-      .andExpect(content().string(containsString("L'ancien mot de passe renseigné n'est pas correct.")));
+        .thenThrow(new BadRequestException("L'ancien mot de passe renseigné n'est pas correct."));
+    mockMvc
+        .perform(put("/user/password/" + user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .param("oldPass", "user").param("newPass", newPassword))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(containsString("L'ancien mot de passe renseigné n'est pas correct.")));
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"},username = "user@user.com")
-  void shouldUpdatePasswordById_PwdOldAndNewAreSame () throws Exception {
-    when(userService.updatePasswordUserById(eq(user.getUserId()), eq(user.getUserPassword()), eq(user.getUserPassword()), eq("user@user.com")))
-      .thenThrow(new BadRequestException("Le nouveau mot de passe renseigné ne doit pas être identique au précédent."));
-    mockMvc.perform(put("/user/password/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("oldPass", user.getUserPassword()).param("newPass", user.getUserPassword()))
-      .andDo(print())
-      .andExpect(status().isBadRequest())
-      .andExpect(content().string(containsString("Le nouveau mot de passe renseigné ne doit pas être identique au précédent.")));
+  @WithMockUser(authorities = { "ADMIN", "USER" }, username = "user@user.com")
+  void shouldUpdatePasswordById_PwdOldAndNewAreSame() throws Exception {
+    when(userService.updatePasswordUserById(eq(user.getUserId()), eq(user.getUserPassword()),
+        eq(user.getUserPassword()), eq("user@user.com")))
+        .thenThrow(
+            new BadRequestException("Le nouveau mot de passe renseigné ne doit pas être identique au précédent."));
+    mockMvc
+        .perform(put("/user/password/" + user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .param("oldPass", user.getUserPassword()).param("newPass", user.getUserPassword()))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(content()
+            .string(containsString("Le nouveau mot de passe renseigné ne doit pas être identique au précédent.")));
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void updateAvatarByIdUser_Success() throws Exception {
 
     HashMap<String, String> contentTypeParams = new HashMap<String, String>();
     MediaType mediaType = new MediaType("multipart", "form-data", contentTypeParams);
     contentTypeParams.put("boundary", "265001916915724");
-    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",  "<<avatar data>>".getBytes());
+    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",
+        "<<avatar data>>".getBytes());
 
-    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart("/user/avatar/1").with(request -> {
-      request.setMethod(String.valueOf(HttpMethod.PUT));
-      return request;
-    });
+    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart(
+        "/user/avatar/1").with(request -> {
+          request.setMethod(String.valueOf(HttpMethod.PUT));
+          return request;
+        });
 
     when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenReturn("Votre photo a bien été modifiée.");
     mockMvc.perform(multipartPut.file((MockMultipartFile) file).contentType(mediaType))
-      .andDo(print())
-      .andExpect(status().isOk());
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void updateAvatarByIdUser_ThrowUserNotFoundException() throws Exception {
 
     HashMap<String, String> contentTypeParams = new HashMap<String, String>();
     MediaType mediaType = new MediaType("multipart", "form-data", contentTypeParams);
     contentTypeParams.put("boundary", "265001916915724");
-    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",  "<<avatar data>>".getBytes());
+    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",
+        "<<avatar data>>".getBytes());
 
-    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart("/api/user/avatar/1").with(request -> {
-      request.setMethod(String.valueOf(HttpMethod.PUT));
-      return request;
-    });
+    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart(
+        "/api/user/avatar/1").with(request -> {
+          request.setMethod(String.valueOf(HttpMethod.PUT));
+          return request;
+        });
 
-    when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenThrow(new UserNotFoundException("Cet utilisateur n'existe pas!"));
+    when(userService.updateAvatarByIdUser(user.getUserId(), file))
+        .thenThrow(new UserNotFoundException("Cet utilisateur n'existe pas!"));
     mockMvc.perform(multipartPut.file((MockMultipartFile) file).contentType(mediaType))
-      .andDo(print())
-      .andExpect(status().isNotFound());
+        .andDo(print())
+        .andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void updateAvatarByIdUser_ThrowCouldNotSaveUserException() throws Exception {
 
     HashMap<String, String> contentTypeParams = new HashMap<String, String>();
     MediaType mediaType = new MediaType("multipart", "form-data", contentTypeParams);
     contentTypeParams.put("boundary", "265001916915724");
-    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",  "<<avatar data>>".getBytes());
+    MultipartFile file = new MockMultipartFile("userAvatar", "avatar.jpg", "application/json",
+        "<<avatar data>>".getBytes());
 
-    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart("/user/avatar/1").with(request -> {
-      request.setMethod(String.valueOf(HttpMethod.PUT));
-      return request;
-    });
+    MockMultipartHttpServletRequestBuilder multipartPut = (MockMultipartHttpServletRequestBuilder) multipart(
+        "/user/avatar/1").with(request -> {
+          request.setMethod(String.valueOf(HttpMethod.PUT));
+          return request;
+        });
 
-    when(userService.updateAvatarByIdUser(user.getUserId(), file)).thenThrow(new CouldNotSaveUserException("Une erreur est survenue lors de l'enregistrement de votre photo."));
+    when(userService.updateAvatarByIdUser(user.getUserId(), file))
+        .thenThrow(new CouldNotSaveUserException("Une erreur est survenue lors de l'enregistrement de votre photo."));
     mockMvc.perform(multipartPut.file((MockMultipartFile) file).contentType(mediaType))
-      .andDo(print())
-      .andExpect(status().isBadRequest());
+        .andDo(print())
+        .andExpect(status().isBadRequest());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void shouldUpdateInfosByUserId_Success() throws Exception {
-    when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName)).thenReturn("Successful Update");
-    mockMvc.perform(put("/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userFirstName", userFirstName).param("userLastName", userLastName))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(content().string(containsString("Successful Update")));
+    when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName))
+        .thenReturn("Successful Update");
+    mockMvc
+        .perform(put("/user/info/" + user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .param("userFirstName", userFirstName).param("userLastName", userLastName))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("Successful Update")));
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void shouldUpdateInfosByUserId_ThrowCouldNotSaveUserException() throws Exception {
-    when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName)).thenThrow(new CouldNotSaveUserException("Erreur lors de l'enregistrement de userFisrtName"));
-    mockMvc.perform(put("/user/info/"+user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE).param("userFirstName", userFirstName).param("userLastName", userLastName))
-      .andDo(print())
-      .andExpect(status().isBadRequest())
-      .andExpect(content().string(containsString("Erreur lors de l'enregistrement")));
+    when(userService.updateInfosByIdUser(user.getUserId(), userFirstName, userLastName))
+        .thenThrow(new CouldNotSaveUserException("Erreur lors de l'enregistrement de userFisrtName"));
+    mockMvc
+        .perform(put("/user/info/" + user.getUserId()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .param("userFirstName", userFirstName).param("userLastName", userLastName))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(containsString("Erreur lors de l'enregistrement")));
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void deleteAvatarByIdUser_Success() throws Exception {
     when(userService.deleteAvatarByIdUser(user.getUserId())).thenReturn("Photo de profil supprimé avec succès");
     mockMvc.perform(delete("/user/avatar/1"))
-      .andDo(print())
-      .andExpect(status().isOk());
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void deleteAvatarByIdUser_UserNotFound() throws Exception {
-    when(userService.deleteAvatarByIdUser(user.getUserId())).thenThrow(new UserNotFoundException(Constants.USER_NOT_FOUND));
+    when(userService.deleteAvatarByIdUser(user.getUserId()))
+        .thenThrow(new UserNotFoundException(Constants.USER_NOT_FOUND));
     mockMvc.perform(delete("/user/avatar/1"))
-      .andDo(print())
-      .andExpect(status().isNotFound());
+        .andDo(print())
+        .andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void deleteAvatarByIdUser_AvatarNotFound() throws Exception {
-    when(userService.deleteAvatarByIdUser(user.getUserId())).thenThrow(new AvatarNotFoundException(Constants.AVATAR_NOT_FOUND));
+    when(userService.deleteAvatarByIdUser(user.getUserId()))
+        .thenThrow(new AvatarNotFoundException(Constants.AVATAR_NOT_FOUND));
     mockMvc.perform(delete("/user/avatar/1"))
-      .andDo(print())
-      .andExpect(status().isNotFound());
+        .andDo(print())
+        .andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockUser(authorities = {"ADMIN", "USER"})
+  @WithMockUser(authorities = { "ADMIN", "USER" })
   void viewAvatarByIdUser_AvatarOk() throws Exception {
     mockMvc.perform(get("/user/avatar/1"))
-      .andDo(print())
-      .andExpect(status().isOk());
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
 }

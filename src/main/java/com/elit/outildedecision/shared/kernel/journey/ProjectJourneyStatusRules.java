@@ -156,7 +156,7 @@ public class ProjectJourneyStatusRules {
 
   private Predicate existsFinishedExecutionPlan(final Path<Project> projectPath, final AbstractQuery<?> query,
                                                 final CriteriaBuilder builder) {
-    RelationSubquery relation = relationSubquery(projectPath, query, builder,
+    RelationSubquery relation = relationSubquery(query, builder,
         "multiCriteriaAnalysisList", "predictibilityAnalysis", "executionPlan");
     relation.subquery().where(builder.and(
         builder.equal(relation.projectRoot(), projectPath),
@@ -166,7 +166,7 @@ public class ProjectJourneyStatusRules {
 
   private Predicate existsRelation(final Path<Project> projectPath, final AbstractQuery<?> query,
                                    final CriteriaBuilder builder, final String... relationPath) {
-    RelationSubquery relation = relationSubquery(projectPath, query, builder, relationPath);
+    RelationSubquery relation = relationSubquery(query, builder, relationPath);
     relation.subquery().where(builder.equal(relation.projectRoot(), projectPath));
     return builder.exists(relation.subquery());
   }
@@ -176,13 +176,12 @@ public class ProjectJourneyStatusRules {
    * navigated by name so that the criteria code does not have to reference the entity classes of
    * every bounded context.
    *
-   * @param projectPath  the path pointing to the project to correlate the subquery with
    * @param query        the query hosting the subquery
    * @param builder      the criteria builder
    * @param relationPath the relations to join, from the project root
    * @return the subquery under construction, still missing its where clause
    */
-  private RelationSubquery relationSubquery(final Path<Project> projectPath, final AbstractQuery<?> query,
+  private RelationSubquery relationSubquery(final AbstractQuery<?> query,
                                             final CriteriaBuilder builder, final String... relationPath) {
     Subquery<Integer> subquery = query.subquery(Integer.class);
     Root<Project> projectRoot = subquery.from(Project.class);

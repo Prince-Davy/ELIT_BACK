@@ -30,16 +30,17 @@ Fichier: `src/context/AuthProvider.js`, `src/utils/AxiosInstance.js`
 
 Fichier: `src/hooks/apis/UserApi.js`
 
-| Méthode | Endpoint                        | Description                                       |
-| ------- | ------------------------------- | ------------------------------------------------- |
-| GET     | `/user/users`                   | Liste de tous les utilisateurs                    |
-| GET     | `/user/users?keyword={keyword}` | Recherche d'utilisateurs par mot-clé              |
-| GET     | `/user/{userId}`                | Récupère un utilisateur par son id                |
-| GET     | `/user/avatar/{userId}`         | Récupère l'avatar (blob) d'un utilisateur         |
-| PUT     | `/user/avatar/{userId}`         | Met à jour l'avatar (multipart)                   |
-| DELETE  | `/user/avatar/{userId}`         | Supprime l'avatar                                 |
-| PUT     | `/user/info/{userId}`           | Met à jour les informations du profil (multipart) |
-| PUT     | `/user/password/{userId}`       | Met à jour le mot de passe (multipart)            |
+| Méthode | Endpoint                                        | Description                                               |
+| ------- | ----------------------------------------------- | --------------------------------------------------------- |
+| GET     | `/user/users`                                   | Liste de tous les utilisateurs                            |
+| GET     | `/user/users?keyword={keyword}`                 | Recherche d'utilisateurs par mot-clé                      |
+| GET     | `/user/users?onlyActive=true&keyword={keyword}`     | Recherche d'utilisateurs actifs et vérifiés par mot-clé   |
+| GET     | `/user/{userId}`                                | Récupère un utilisateur par son id                        |
+| GET     | `/user/avatar/{userId}`                         | Récupère l'avatar (blob) d'un utilisateur                 |
+| PUT     | `/user/avatar/{userId}`                         | Met à jour l'avatar (multipart)                           |
+| DELETE  | `/user/avatar/{userId}`                         | Supprime l'avatar                                         |
+| PUT     | `/user/info/{userId}`                           | Met à jour les informations du profil (multipart)         |
+| PUT     | `/user/password/{userId}`                       | Met à jour le mot de passe (multipart)                    |
 
 ---
 

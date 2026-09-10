@@ -5845,6 +5845,14 @@
           "schema" : {
             "type" : "string"
           }
+        }, {
+          "name" : "onlyActive",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean",
+            "default" : false
+          }
         } ],
         "responses" : {
           "500" : {
@@ -10602,6 +10610,15 @@
             "type" : "integer",
             "format" : "int32"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
           "size" : {
             "type" : "integer",
             "format" : "int32"
@@ -10619,18 +10636,9 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "first" : {
-            "type" : "boolean"
-          },
-          "last" : {
-            "type" : "boolean"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -10640,16 +10648,6 @@
       "PageableObject" : {
         "type" : "object",
         "properties" : {
-          "offset" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "sort" : {
-            "$ref" : "#/components/schemas/SortObject"
-          },
-          "unpaged" : {
-            "type" : "boolean"
-          },
           "paged" : {
             "type" : "boolean"
           },
@@ -10660,6 +10658,16 @@
           "pageSize" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "offset" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "sort" : {
+            "$ref" : "#/components/schemas/SortObject"
+          },
+          "unpaged" : {
+            "type" : "boolean"
           }
         }
       },
@@ -10682,10 +10690,10 @@
       "SortObject" : {
         "type" : "object",
         "properties" : {
-          "empty" : {
+          "sorted" : {
             "type" : "boolean"
           },
-          "sorted" : {
+          "empty" : {
             "type" : "boolean"
           },
           "unsorted" : {

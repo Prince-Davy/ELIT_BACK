@@ -1319,6 +1319,11 @@
         "name" : "keyword",
         "required" : false,
         "type" : "string"
+      }, {
+        "in" : "query",
+        "name" : "onlyActive",
+        "required" : false,
+        "type" : "boolean"
       } ],
       "request" : "<none>",
       "responses" : {
