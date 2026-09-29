@@ -23,7 +23,8 @@ SPRING_MAIL_PASSWORD=sxcwmyfhazuhtzic
 
 # --- Azure Communication Service ---
 # Overrides the default baked into application.properties. Keep the real key out of git.
-AZURE_COMMUNICATION_CONNECTION_STRING=endpoint=https://sogetilabs-communication-service.europe.communication.azure.com/;accesskey=<your-access-key>
+# FYI the secret for sogetilabs cannot be shared in local dev, it will be available only in integ and recette env
+#AZURE_COMMUNICATION_CONNECTION_STRING=endpoint=https://sogetilabs-communication-service.europe.communication.azure.com/;accesskey=<your-access-key>
 
 # --- URLs (back / front) ---
 REACT_APP_BACKEND_API=http://localhost:8080
