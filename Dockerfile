@@ -24,7 +24,7 @@ RUN keytool -importcert -noprompt -trustcacerts \
   -alias sogetilabcert \
   -file /opt/certs/integ-elit-pmm-pred.crt \
   -keystore $JAVA_HOME/lib/security/cacerts \
-  -storepass 
+  -storepass changeit
 
 WORKDIR /app
 RUN mkdir -p /app/template /app/logs /app/avatars /app/projects /app/db
