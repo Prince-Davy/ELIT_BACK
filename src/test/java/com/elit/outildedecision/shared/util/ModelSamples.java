@@ -192,13 +192,13 @@ public class ModelSamples {
 
   public static class ReportSamples {
     public static List<ReportResponse> getReportResponseModels() {
-      return List.of(new ReportResponse(1L, "title", "type1", 1, null ));
+      return List.of(new ReportResponse(1L, "title", ReportTypes.MULTI_CRITERIA_ANALYSIS.toString(), 1, null ));
     }
 
     public static Report getReport() {
       Report report = new Report();
       report.setReportId(1L);
-      report.setType("type1");
+      report.setType(ReportTypes.MULTI_CRITERIA_ANALYSIS);
       report.setIteration(1);
       report.setAnalyseId(1L);
       report.setReportPath("pathtoreport");
