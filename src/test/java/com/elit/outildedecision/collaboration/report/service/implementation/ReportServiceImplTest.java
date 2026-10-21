@@ -273,8 +273,9 @@ class ReportServiceImplTest {
       reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
     verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.MULTI_CRITERIA_ANALYSIS
       && report.getProject() == project && report.getAnalyseId().equals(analysisId)));
+    byte[] expectedBytes = file.getBytes();
     verify(reportContentRepository).save(argThat(content -> Long.valueOf(7L).equals(content.getReportId())
-      && java.util.Arrays.equals(file.getBytes(), content.getContent())));
+      && java.util.Arrays.equals(expectedBytes, content.getContent())));
   }
 
   @Test
