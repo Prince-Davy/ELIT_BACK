@@ -1,196 +1,356 @@
 package com.elit.outildedecision.collaboration.report.service.implementation;
 
+import com.elit.outildedecision.ai.result.entity.ResultAi;
+import com.elit.outildedecision.ai.result.repository.ResultIaRepository;
+import com.elit.outildedecision.audit.entity.Audit;
+import com.elit.outildedecision.audit.repository.AuditRepository;
+import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlan;
 import com.elit.outildedecision.collaboration.executionplan.repository.ExecutionPlanRepository;
+import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.collaboration.multicriteria.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.collaboration.multicriteria.repository.MultiCriteriaAnalysisRepository;
+import com.elit.outildedecision.collaboration.predictibility.entity.PredictibilityAnalysis;
 import com.elit.outildedecision.collaboration.predictibility.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.collaboration.predictibility.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.collaboration.report.dto.ReportResponse;
 import com.elit.outildedecision.collaboration.report.entity.Report;
+import com.elit.outildedecision.collaboration.report.entity.ReportContent;
 import com.elit.outildedecision.collaboration.report.exception.ReportNotFoundException;
 import com.elit.outildedecision.collaboration.report.mapper.ReportMapper;
 import com.elit.outildedecision.collaboration.report.repository.ReportContentRepository;
 import com.elit.outildedecision.collaboration.report.repository.ReportRepository;
-import com.elit.outildedecision.shared.kernel.entity.Project;
 import com.elit.outildedecision.shared.exception.ConflictException;
 import com.elit.outildedecision.shared.exception.ExecutionPlanNotFoundException;
+import com.elit.outildedecision.shared.kernel.entity.Project;
 import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;
-import org.junit.jupiter.api.Assertions;
+import com.elit.outildedecision.shared.util.ReportTypes;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.server.ResponseStatusException;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/** Regression tests for legacy HTTP values, typed persistence and report ownership. */
 @ExtendWith(MockitoExtension.class)
 class ReportServiceImplTest {
-  @InjectMocks
-  private ReportServiceImpl reportService;
-  @Mock
-  ReportRepository reportRepository;
-  @Mock
-  ReportContentRepository reportContentRepository;
-  @Mock
-  ProjectRepository projectRepository;
-  @Mock
-  ExecutionPlanRepository executionPlanRepository;
-  @Mock
-  PredictibilityAnalysisRepository predictibilityAnalysisRepository;
-  @Mock
-  MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
-  @Mock
-  ReportMapper reportMapper;
-  private MultipartFile fileMultipart;
-  private Long projectId, analysisId;
-  Integer iteration;
-  private String type;
-  @TempDir
-  File tempDir;
+
+  @InjectMocks private ReportServiceImpl reportService;
+  @Mock private ReportRepository reportRepository;
+  @Mock private ReportContentRepository reportContentRepository;
+  @Mock private ProjectRepository projectRepository;
+  @Mock private ExecutionPlanRepository executionPlanRepository;
+  @Mock private PredictibilityAnalysisRepository predictibilityAnalysisRepository;
+  @Mock private MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
+  @Mock private ReportMapper reportMapper;
+  @Mock private ResultIaRepository resultIaRepository;
+  @Mock private AuditRepository auditRepository;
+
+  private final Long projectId = 1L;
+  private final Long analysisId = 1L;
+  private final Integer iteration = 1;
+  private MockMultipartFile file;
+  private Project project;
 
   @BeforeEach
-  public void setup() {
-    fileMultipart = new MockMultipartFile(
-      "file",
-      "report.pdf",
-      MediaType.APPLICATION_PDF_VALUE,
-      "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
-    projectId = 1L;
-    analysisId = 1L;
-    iteration = 1;
-    type = "type";
+  void setup() {
+    file = new MockMultipartFile("file", "report.pdf", MediaType.APPLICATION_PDF_VALUE,
+      "fixed-pdf-bytes".getBytes(StandardCharsets.UTF_8));
+    project = new Project();
+    project.setProjectId(projectId);
+    project.setFolderPath("");
+    // @Value is applied by Spring at runtime, but not by @InjectMocks in a unit test.
+    ReflectionTestUtils.setField(reportService, "storingFolder", "target/test-uploads/files");
+  }
+
+  private void existingProject() {
+    when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+  }
+
+  private void existingMulticriteria() {
+    MultiCriteriaAnalysis analysis = new MultiCriteriaAnalysis();
+    analysis.setProject(project);
+    when(multiCriteriaAnalysisRepository.findById(analysisId)).thenReturn(Optional.of(analysis));
   }
 
   @Test
-  void uploadReport2_whenRepportAlreadyExists() {
-    type = "execution_report";
-    Integer localIteration = 1;
-    Report report = new Report();
+  void uploadReport2_whenReportAlreadyExists() {
+    existingProject();
+    existingMulticriteria();
+    when(reportRepository.findReportByProjectAndAnalyseAndTypeAndIteration(
+      projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, iteration))
+      .thenReturn(new Report());
 
-    when(reportRepository.findReportByAnalyseIdAndType2(analysisId, type, localIteration)).thenReturn(report);
-    ConflictException e = Assertions.assertThrows(ConflictException.class, () -> reportService.uploadReport2(projectId, analysisId, type, fileMultipart, localIteration));
-    Assertions.assertEquals("Le rapport a déjà été généré pour cette analyse.", e.getMessage());
+    ConflictException error = assertThrows(ConflictException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+    assertEquals("Le rapport a déjà été généré pour cette analyse.", error.getMessage());
+    verify(reportRepository, never()).save(any(Report.class));
   }
 
   @Test
   void uploadReport2_whenProjectNotFound() {
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-    ProjectNotFoundException e = Assertions.assertThrows(ProjectNotFoundException.class, () -> reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration));
-    Assertions.assertEquals("Le projet avec l'ID " + projectId + " n'existe pas.", e.getMessage());
+    ProjectNotFoundException error = assertThrows(ProjectNotFoundException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "execution_report", file, iteration));
+    assertEquals("Le projet avec l'ID 1 n'existe pas.", error.getMessage());
   }
 
   @Test
   void uploadReport2_whenMulticriteriaNotFound() {
-    type = "multicriteria_report";
-    Project project = new Project();
-    project.setProjectId(projectId);
-    project.setFolderPath("projects");
-
-    when(reportRepository.findReportByAnalyseIdAndType2(analysisId, type, iteration)).thenReturn(null);
-    when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-    when(multiCriteriaAnalysisRepository.existsById(analysisId)).thenReturn(false);
-    MulticriteriaNotFoundException e = Assertions.assertThrows(MulticriteriaNotFoundException.class, () -> reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration));
-    Assertions.assertEquals("Cette analyse multicritère n'existe pas.", e.getMessage());
+    existingProject();
+    when(multiCriteriaAnalysisRepository.findById(analysisId)).thenReturn(Optional.empty());
+    MulticriteriaNotFoundException error = assertThrows(MulticriteriaNotFoundException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+    assertEquals("Cette analyse multicritère n'existe pas.", error.getMessage());
+    verify(reportRepository, never()).save(any(Report.class));
   }
 
   @Test
   void uploadReport2_whenPredictibilityAnalysisNotFound() {
-    type = "predictibility_report";
-    iteration = 1;
-    Project project = new Project();
-    project.setProjectId(projectId);
-    project.setFolderPath("projects");
-
-    when(reportRepository.findReportByAnalyseIdAndType2(analysisId, type, iteration)).thenReturn(null);
-    when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-    when(predictibilityAnalysisRepository.existsById(analysisId)).thenReturn(false);
-    PredictibilityAnalysisNotFoundException e = Assertions.assertThrows(PredictibilityAnalysisNotFoundException.class, () -> reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration));
-    Assertions.assertEquals("Cette analyse de prévisibilité n'existe pas.", e.getMessage());
+    existingProject();
+    when(predictibilityAnalysisRepository.findById(analysisId)).thenReturn(Optional.empty());
+    PredictibilityAnalysisNotFoundException error = assertThrows(PredictibilityAnalysisNotFoundException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "predictibility_report", file, iteration));
+    assertEquals("Cette analyse de prévisibilité n'existe pas.", error.getMessage());
+    verify(reportRepository, never()).save(any(Report.class));
   }
 
   @Test
   void uploadReport2_whenExecutionPlanNotFound() {
-    type = "execution_report";
-    iteration = 1;
-    Project project = new Project();
-    project.setProjectId(projectId);
-    project.setFolderPath("projects");
+    existingProject();
+    when(executionPlanRepository.findById(analysisId)).thenReturn(Optional.empty());
+    ExecutionPlanNotFoundException error = assertThrows(ExecutionPlanNotFoundException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "execution_report", file, iteration));
+    assertEquals("Ce plan d'exécution n'existe pas.", error.getMessage());
+    verify(reportRepository, never()).save(any(Report.class));
+  }
 
-    when(reportRepository.findReportByAnalyseIdAndType2(analysisId, type, iteration)).thenReturn(null);
-    when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-    when(executionPlanRepository.existsById(analysisId)).thenReturn(false);
-    ExecutionPlanNotFoundException e = Assertions.assertThrows(ExecutionPlanNotFoundException.class, () -> reportService.uploadReport2(projectId, analysisId, type, fileMultipart, iteration));
-    Assertions.assertEquals("Ce plan d'exécution n'existe pas.", e.getMessage());
+  @Test
+  void uploadReport2_whenAnalysisBelongsToAnotherProject() {
+    existingProject();
+    Project other = new Project();
+    other.setProjectId(9L);
+    MultiCriteriaAnalysis analysis = new MultiCriteriaAnalysis();
+    analysis.setProject(other);
+    when(multiCriteriaAnalysisRepository.findById(analysisId)).thenReturn(Optional.of(analysis));
+
+    assertThrows(MulticriteriaNotFoundException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+    verify(reportRepository, never()).save(any(Report.class));
+  }
+
+  @Test
+  void uploadReport2_whenTypeIsUnknownReturnsBadRequest() {
+    existingProject();
+    ResponseStatusException error = assertThrows(ResponseStatusException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "UNKNOWN_TYPE", file, iteration));
+    assertEquals(HttpStatus.BAD_REQUEST, error.getStatusCode());
+    verify(reportRepository, never()).save(any(Report.class));
+  }
+
+  @Test
+  void uploadReport2_whenAiResultNotFound() {
+    existingProject();
+    when(resultIaRepository.findById(analysisId)).thenReturn(Optional.empty());
+    ResponseStatusException error = assertThrows(ResponseStatusException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "ai_report", file, iteration));
+    assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
+    verify(reportRepository, never()).save(any(Report.class));
+  }
+
+  @Test
+  void uploadReport2_whenAuditBelongsToAnotherProject() {
+    existingProject();
+    Project other = new Project();
+    other.setProjectId(9L);
+    Audit audit = new Audit();
+    audit.setProject(other);
+    when(auditRepository.findById(analysisId)).thenReturn(Optional.of(audit));
+    ResponseStatusException error = assertThrows(ResponseStatusException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "audit_report", file, iteration));
+    assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
+  }
+
+  @Test
+  void uploadReport2_acceptsAiReportForMatchingProject() throws Exception {
+    existingProject();
+    ResultAi aiResult = new ResultAi();
+    aiResult.setProject(project);
+    when(resultIaRepository.findById(analysisId)).thenReturn(Optional.of(aiResult));
+    when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
+      Report report = invocation.getArgument(0);
+      report.setReportId(20L);
+      return report;
+    });
+
+    assertEquals("Fichier enregistré avec succès.",
+      reportService.uploadReport2(projectId, analysisId, "ai_report", file, iteration));
+    verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.AI_ANALYSIS));
+  }
+
+  @Test
+  void uploadReport2_acceptsAuditForMatchingProject() throws Exception {
+    existingProject();
+    Audit audit = new Audit();
+    audit.setProject(project);
+    when(auditRepository.findById(analysisId)).thenReturn(Optional.of(audit));
+    when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
+      Report report = invocation.getArgument(0);
+      report.setReportId(21L);
+      return report;
+    });
+
+    assertEquals("Fichier enregistré avec succès.",
+      reportService.uploadReport2(projectId, analysisId, "audit_report", file, iteration));
+    verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.AUDIT));
+  }
+
+  @Test
+  void uploadReport2_acceptsExecutionPlanLinkedToProject() throws Exception {
+    existingProject();
+    MultiCriteriaAnalysis multi = new MultiCriteriaAnalysis();
+    multi.setProject(project);
+    PredictibilityAnalysis prediction = new PredictibilityAnalysis();
+    prediction.setMultiCriteriaAnalysis(multi);
+    ExecutionPlan execution = new ExecutionPlan();
+    execution.setPredictibilityAnalysis(prediction);
+    when(executionPlanRepository.findById(analysisId)).thenReturn(Optional.of(execution));
+    when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
+      Report report = invocation.getArgument(0);
+      report.setReportId(22L);
+      return report;
+    });
+
+    assertEquals("Fichier enregistré avec succès.",
+      reportService.uploadReport2(projectId, analysisId, "execution_report", file, iteration));
+    verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.EXECUTION_PLAN));
+  }
+
+  @Test
+  void uploadReport2_rejectsBlankFilename() {
+    existingProject();
+    existingMulticriteria();
+    MockMultipartFile noName = new MockMultipartFile("file", "", MediaType.APPLICATION_PDF_VALUE,
+      "bytes".getBytes(StandardCharsets.UTF_8));
+
+    ResponseStatusException error = assertThrows(ResponseStatusException.class,
+      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", noName, iteration));
+    assertEquals(HttpStatus.BAD_REQUEST, error.getStatusCode());
+    verify(reportRepository, never()).save(any(Report.class));
+  }
+
+  @Test
+  void uploadReport2_savesReportAndBinaryInDatabase() throws Exception {
+    existingProject();
+    existingMulticriteria();
+    when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
+      Report report = invocation.getArgument(0);
+      report.setReportId(7L);
+      return report;
+    });
+
+    assertEquals("Fichier enregistré avec succès.",
+      reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+    verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.MULTI_CRITERIA_ANALYSIS
+      && report.getProject() == project && report.getAnalyseId().equals(analysisId)));
+    verify(reportContentRepository).save(argThat(content -> Long.valueOf(7L).equals(content.getReportId())
+      && java.util.Arrays.equals(file.getBytes(), content.getContent())));
+  }
+
+  @Test
+  void updateReport2_doesNotDependOnProjectReportsBeingLoaded() throws Exception {
+    existingProject();
+    existingMulticriteria();
+    Report previous = new Report();
+    previous.setReportId(7L);
+    previous.setProject(project);
+    previous.setType(ReportTypes.MULTI_CRITERIA_ANALYSIS);
+    when(reportRepository.findReportByProjectAndAnalyseAndTypeAndIteration(
+      projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, iteration))
+      .thenReturn(previous);
+
+    assertEquals("Le fichier a été mis à jours avec succès.",
+      reportService.uploadAndUpdateReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+    verify(reportRepository).save(previous);
+    verify(reportContentRepository).save(argThat(content -> Long.valueOf(7L).equals(content.getReportId())));
   }
 
   @Test
   void previewReport_whenReportNotFound() {
-    Long localReportId = 1L;
-    HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-    when(reportRepository.findById(localReportId)).thenReturn(Optional.empty());
-    ReportNotFoundException e = Assertions.assertThrows(ReportNotFoundException.class, () -> reportService.previewReport(localReportId, mockResponse));
-    Assertions.assertEquals("Le rapport avec l'ID " + localReportId + " n'existe pas.", e.getMessage());
+    when(reportRepository.findById(1L)).thenReturn(Optional.empty());
+    ReportNotFoundException error = assertThrows(ReportNotFoundException.class,
+      () -> reportService.previewReport(1L, new MockHttpServletResponse()));
+    assertEquals("Le rapport avec l'ID 1 n'existe pas.", error.getMessage());
   }
 
   @Test
   void downloadReport_whenReportNotFound() {
-    Long localReportId = 1L;
-    HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-    when(reportRepository.findById(localReportId)).thenReturn(Optional.empty());
-    ReportNotFoundException p = Assertions.assertThrows(ReportNotFoundException.class, () -> reportService.downloadReport(localReportId, mockResponse));
-    Assertions.assertEquals("Le rapport avec l'ID " + localReportId + " n'existe pas.", p.getMessage());
+    when(reportRepository.findById(1L)).thenReturn(Optional.empty());
+    ReportNotFoundException error = assertThrows(ReportNotFoundException.class,
+      () -> reportService.downloadReport(1L, new MockHttpServletResponse()));
+    assertEquals("Le rapport avec l'ID 1 n'existe pas.", error.getMessage());
+  }
+
+  @Test
+  void downloadReport_streamsAttachment() throws Exception {
+    Report report = new Report();
+    report.setReportId(7L);
+    report.setReportPath("target/test-uploads/files/report.pdf");
+    byte[] bytes = "binary".getBytes(StandardCharsets.UTF_8);
+    when(reportRepository.findById(7L)).thenReturn(Optional.of(report));
+    when(reportContentRepository.findById(7L)).thenReturn(Optional.of(new ReportContent(7L, bytes)));
+    MockHttpServletResponse response = new MockHttpServletResponse();
+
+    reportService.downloadReport(7L, response);
+    assertEquals("attachment; filename=\"report.pdf\"", response.getHeader("Content-Disposition"));
+    assertArrayEquals(bytes, response.getContentAsByteArray());
+    assertEquals(MediaType.APPLICATION_PDF_VALUE, response.getContentType());
   }
 
   @Test
   void getReportsByProjectId() throws ProjectNotFoundException {
-    projectId = 1L;
-    Project project = new Project();
-    project.setProjectId(projectId);
-    List<Report> reportsList = new ArrayList<>();
-
-    List<ReportResponse> reportstModelList = new ArrayList<>();
-
-    when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-    when(reportRepository.findReportsByProjectId(project.getProjectId())).thenReturn(reportsList);
-    assertEquals(reportstModelList, reportService.getReportsByProjectId(projectId));
+    existingProject();
+    when(reportRepository.findReportsByProjectId(projectId)).thenReturn(List.of());
+    assertEquals(List.<ReportResponse>of(), reportService.getReportsByProjectId(projectId));
   }
 
   @Test
   void getReportsByProjectId_whenProjectNotFound() {
-    projectId = 1L;
-    Project project = new Project();
-    project.setProjectId(projectId);
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-    ProjectNotFoundException p = Assertions.assertThrows(ProjectNotFoundException.class, () -> reportService.getReportsByProjectId(projectId));
-    Assertions.assertEquals("Le projet avec l'ID 1 n'existe pas.", p.getMessage());
+    ProjectNotFoundException error = assertThrows(ProjectNotFoundException.class,
+      () -> reportService.getReportsByProjectId(projectId));
+    assertEquals("Le projet avec l'ID 1 n'existe pas.", error.getMessage());
   }
 
   @Test
   void deleteReportById() throws ReportNotFoundException {
     Report report = new Report();
-    report.setReportId(1L);
-    report.setReportPath(String.valueOf(tempDir));
-    when(reportRepository.findById(report.getReportId())).thenReturn(Optional.of(report));
-    reportRepository.deleteById(report.getReportId());
-    verify(reportRepository, times(1)).deleteById(report.getReportId());
+    report.setReportId(7L);
+    when(reportRepository.findById(7L)).thenReturn(Optional.of(report));
+    when(reportContentRepository.existsById(7L)).thenReturn(true);
 
-    assertEquals("Fichier supprimé avec succès", reportService.deleteReportById(report.getReportId()));
+    assertEquals("Fichier supprimé avec succès", reportService.deleteReportById(7L));
+    verify(reportContentRepository, times(1)).deleteById(7L);
+    verify(reportRepository, times(1)).deleteById(7L);
   }
 }

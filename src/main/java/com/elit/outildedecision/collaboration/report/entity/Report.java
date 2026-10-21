@@ -20,6 +20,10 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import com.elit.outildedecision.shared.util.ReportTypes;
+import com.elit.outildedecision.shared.util.ReportTypeConverter;
+import jakarta.persistence.Convert;
+
 /**
  * Entity mapping the {@code report} table: a synthesis report file attached to a project analysis.
  */
@@ -45,7 +49,8 @@ public class Report implements Serializable {
 
   private String reportPath;
 
-  private String type;
+  @Convert(converter = ReportTypeConverter.class)
+  private ReportTypes type;
 
   private Integer iteration;
 

@@ -1,8 +1,11 @@
 package com.elit.outildedecision.collaboration.report.service.implementation;
 
+import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlan;
 import com.elit.outildedecision.collaboration.executionplan.repository.ExecutionPlanRepository;
+import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.collaboration.multicriteria.exception.MulticriteriaNotFoundException;
 import com.elit.outildedecision.collaboration.multicriteria.repository.MultiCriteriaAnalysisRepository;
+import com.elit.outildedecision.collaboration.predictibility.entity.PredictibilityAnalysis;
 import com.elit.outildedecision.collaboration.predictibility.exception.PredictibilityAnalysisNotFoundException;
 import com.elit.outildedecision.collaboration.predictibility.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.collaboration.report.dto.ReportResponse;
@@ -25,6 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.elit.outildedecision.ai.result.repository.ResultIaRepository;
+import com.elit.outildedecision.audit.repository.AuditRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -82,7 +90,15 @@ public class ReportServiceImpl implements ReportService {
    */
   private final ReportMapper reportMapper;
   /**
-   * Base folder used to build the logical report path (kept for the report title, no disk I/O).
+   * Repository instance for accessing AI result data.
+   */
+  private final ResultIaRepository resultIaRepository;
+  /**
+   * Repository instance for accessing audit data.
+   */
+  private final AuditRepository auditRepository;
+  /**
+   * Base folder used to store uploaded files.
    */
   @Value("${file.upload-dir}")
   private String storingFolder;
@@ -105,7 +121,9 @@ public class ReportServiceImpl implements ReportService {
     final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
     final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
     final ExecutionPlanRepository executionPlanRepository,
-    final ReportMapper reportMapper) {
+    final ReportMapper reportMapper,
+    final ResultIaRepository resultIaRepository,
+    final AuditRepository auditRepository) {
     this.reportRepository = reportRepository;
     this.reportContentRepository = reportContentRepository;
     this.projectRepository = projectRepository;
@@ -113,6 +131,8 @@ public class ReportServiceImpl implements ReportService {
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
     this.executionPlanRepository = executionPlanRepository;
     this.reportMapper = reportMapper;
+    this.resultIaRepository = resultIaRepository;
+    this.auditRepository = auditRepository;
   }
 
   /**
@@ -130,22 +150,24 @@ public class ReportServiceImpl implements ReportService {
     ExecutionPlanNotFoundException, IOException {
     log.info("Report upload requested for projectId={} analyseId={} type={} iteration={}",
       projectId, analyseId, type, iteration);
-    Report reportFromDB =
-      reportRepository.findReportByAnalyseIdAndType2(analyseId, type, iteration);
-    if (!Objects.isNull(reportFromDB)) {
-      log.warn("Report already generated for analyseId={} type={} iteration={}", analyseId, type, iteration);
+    Project project = findProject(projectId);
+    ReportTypes reportType = parseReportType(type);
+    assertAnalyseExists(reportType, analyseId, projectId);
+
+    // Include projectId in the duplicate key: different projects can reuse analysis IDs.
+    Report reportFromDB = reportRepository.findReportByProjectAndAnalyseAndTypeAndIteration(
+      projectId, analyseId, reportType, iteration);
+    if (reportFromDB != null) {
+      log.warn("Report already generated for projectId={} analyseId={} type={} iteration={}",
+        projectId, analyseId, reportType, iteration);
       throw new ConflictException("Le rapport a déjà été généré pour cette analyse.");
     }
 
-    Project project = findProject(projectId);
-    String folderPath = StringUtils.cleanPath(storingFolder + project.getFolderPath());
-    assertAnalyseExists(type, analyseId);
-
     byte[] bytes = file.getBytes();
-    String filePath = StringUtils.cleanPath(folderPath.concat("/").concat(file.getOriginalFilename()));
+    String filePath = buildLogicalReportPath(project, file);
     Report report =
       Report.builder()
-        .type(type)
+        .type(reportType)
         .reportPath(filePath)
         .analyseId(analyseId)
         .project(project)
@@ -174,27 +196,24 @@ public class ReportServiceImpl implements ReportService {
     log.info("Report update requested for projectId={} analyseId={} type={} iteration={}",
       projectId, analyseId, type, iteration);
     Project project = findProject(projectId);
-    assertAnalyseExists(type, analyseId);
+    ReportTypes reportType = parseReportType(type);
+    assertAnalyseExists(reportType, analyseId, projectId);
 
-    Report reportFromDB =
-      reportRepository.findReportByAnalyseIdAndType2(analyseId, type, iteration);
-
-    if (!Objects.isNull(reportFromDB) && !project.getReports().isEmpty()) {
-      String folderPath = StringUtils.cleanPath(storingFolder + project.getFolderPath());
-      // update reportPath with the new name of the updated file
-      String newFilePath = StringUtils.cleanPath(folderPath.concat("/").concat(file.getOriginalFilename()));
-
-      byte[] bytes = file.getBytes();
-      reportFromDB.setReportPath(newFilePath);
-      reportRepository.save(reportFromDB);
-      reportContentRepository.save(new ReportContent(reportFromDB.getReportId(), bytes));
-      log.info("Report updated for projectId={} analyseId={} type={} iteration={}",
+    Report reportFromDB = reportRepository.findReportByProjectAndAnalyseAndTypeAndIteration(
+      projectId, analyseId, reportType, iteration);
+    if (reportFromDB == null) {
+      log.warn("No report to update for projectId={} analyseId={} type={} iteration={}",
         projectId, analyseId, type, iteration);
-      return "Le fichier a été mis à jours avec succès.";
-    } else {
-      log.warn("No report to update for analyseId={} type={} iteration={}", analyseId, type, iteration);
       throw new ConflictException("Le rapport n'existe pas pour cette analyse.");
     }
+
+    // The report is already scoped to this project by the repository query.
+    reportFromDB.setReportPath(buildLogicalReportPath(project, file));
+    reportRepository.save(reportFromDB);
+    reportContentRepository.save(new ReportContent(reportFromDB.getReportId(), file.getBytes()));
+    log.info("Report updated for projectId={} analyseId={} type={} iteration={}",
+      projectId, analyseId, type, iteration);
+    return "Le fichier a été mis à jours avec succès.";
   }
 
   /**
@@ -228,7 +247,7 @@ public class ReportServiceImpl implements ReportService {
         .findById(reportId)
         .orElseThrow(() -> new ReportNotFoundException(String.format(REPORT_NOT_FOUND, reportId)));
 
-    streamReport(report, response, "report");
+    streamReport(report, response, "attachment");
   }
 
   /**
@@ -286,27 +305,92 @@ public class ReportServiceImpl implements ReportService {
   }
 
   /**
-   * Verifies that the analysis referenced by the report exists for the given report type.
-   *
-   * @param type      the report type (multi-criteria, predictibility or execution plan)
-   * @param analyseId the analysis id
-   * @throws MulticriteriaNotFoundException          if a multi-criteria analysis is missing
-   * @throws PredictibilityAnalysisNotFoundException if a predictibility analysis is missing
-   * @throws ExecutionPlanNotFoundException          if an execution plan is missing
+   * Parses the existing API values (for example {@code multicriteria_report}). The HTTP
+   * contract stays a String; the domain and persistence model use {@link ReportTypes}.
    */
-  private void assertAnalyseExists(final String type, final Long analyseId)
-    throws MulticriteriaNotFoundException, PredictibilityAnalysisNotFoundException,
-    ExecutionPlanNotFoundException {
-    if (type.equals(ReportTypes.MULTI_CRITERIA_ANALYSIS.toString())
-      && !multiCriteriaAnalysisRepository.existsById(analyseId)) {
-      throw new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas.");
-    } else if (type.equals(ReportTypes.PREDICTIBILITY_ANALYSIS.toString())
-      && !predictibilityAnalysisRepository.existsById(analyseId)) {
-      throw new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas.");
-    } else if (type.equals(ReportTypes.EXECUTION_PLAN.toString())
-      && !executionPlanRepository.existsById(analyseId)) {
-      throw new ExecutionPlanNotFoundException("Ce plan d'exécution n'existe pas.");
+  private ReportTypes parseReportType(final String value) {
+    try {
+      return ReportTypes.fromValue(value);
+    } catch (IllegalArgumentException exception) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
     }
+  }
+
+  /**
+   * Builds a logical path for the report title. The bytes are saved exclusively in MySQL.
+   * Never trust client-provided folder components in a filename.
+   */
+  private String buildLogicalReportPath(final Project project, final MultipartFile file) {
+    String suppliedName = file.getOriginalFilename();
+    String fileName = suppliedName == null
+      ? null : StringUtils.getFilename(StringUtils.cleanPath(suppliedName));
+    if (!StringUtils.hasText(fileName) || ".".equals(fileName) || "..".equals(fileName)) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nom de fichier de rapport invalide.");
+    }
+    String projectFolder = Objects.toString(project.getFolderPath(), "");
+    String logicalFolder = StringUtils.cleanPath(storingFolder + projectFolder);
+    return StringUtils.cleanPath(logicalFolder + "/" + fileName);
+  }
+
+  /**
+   * Verifies the analysis exists AND belongs to the requested project.
+   * A bare existsById check would allow attaching a report to the wrong project.
+   */
+  private void assertAnalyseExists(final ReportTypes type, final Long analyseId, final Long projectId)
+      throws MulticriteriaNotFoundException,
+      PredictibilityAnalysisNotFoundException,
+      ExecutionPlanNotFoundException {
+    switch (type) {
+      case MULTI_CRITERIA_ANALYSIS -> {
+        if (multiCriteriaAnalysisRepository.findById(analyseId)
+            .filter(analysis -> belongsToProject(analysis, projectId)).isEmpty()) {
+          throw new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas.");
+        }
+      }
+      case PREDICTIBILITY_ANALYSIS -> {
+        if (predictibilityAnalysisRepository.findById(analyseId)
+            .filter(analysis -> belongsToProject(analysis, projectId)).isEmpty()) {
+          throw new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas.");
+        }
+      }
+      case EXECUTION_PLAN -> {
+        if (executionPlanRepository.findById(analyseId)
+            .filter(plan -> belongsToProject(plan, projectId)).isEmpty()) {
+          throw new ExecutionPlanNotFoundException("Ce plan d'exécution n'existe pas.");
+        }
+      }
+      case AI_ANALYSIS -> {
+        if (resultIaRepository.findById(analyseId)
+            .filter(result -> result.getProject() != null
+                && Objects.equals(result.getProject().getProjectId(), projectId)).isEmpty()) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "Le résultat IA est introuvable pour ce projet.");
+        }
+      }
+      case AUDIT -> {
+        if (auditRepository.findById(analyseId)
+            .filter(audit -> audit.getProject() != null
+                && Objects.equals(audit.getProject().getProjectId(), projectId)).isEmpty()) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "L'audit est introuvable pour ce projet.");
+        }
+      }
+    }
+  }
+
+  private boolean belongsToProject(final MultiCriteriaAnalysis analysis, final Long projectId) {
+    return analysis.getProject() != null
+      && Objects.equals(analysis.getProject().getProjectId(), projectId);
+  }
+
+  private boolean belongsToProject(final PredictibilityAnalysis analysis, final Long projectId) {
+    return analysis.getMultiCriteriaAnalysis() != null
+      && belongsToProject(analysis.getMultiCriteriaAnalysis(), projectId);
+  }
+
+  private boolean belongsToProject(final ExecutionPlan plan, final Long projectId) {
+    return plan.getPredictibilityAnalysis() != null
+      && belongsToProject(plan.getPredictibilityAnalysis(), projectId);
   }
 
   /**
@@ -315,7 +399,7 @@ public class ReportServiceImpl implements ReportService {
    *
    * @param report      the report whose content must be streamed
    * @param response    the servlet response to write the binary content to
-   * @param disposition the Content-Disposition prefix ({@code inline} or {@code report})
+   * @param disposition the Content-Disposition prefix ({@code inline} or {@code attachment})
    * @throws ReportNotFoundException if the content backing the report is missing in the database
    * @throws IOException             if an I/O error occurs while writing the response
    */

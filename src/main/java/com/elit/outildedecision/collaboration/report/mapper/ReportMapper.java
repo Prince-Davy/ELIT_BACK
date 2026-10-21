@@ -22,5 +22,9 @@ public interface ReportMapper {
   @Mapping(target = "id", source = "reportId")
   @Mapping(target = "creationDate", source = "createdAt")
   @Mapping(target = "title", ignore = true)
+  @Mapping(
+    target = "type",
+    expression = "java(report.getType().toString())"
+)
   ReportResponse toResponse(Report report);
 }

@@ -26,6 +26,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import com.elit.outildedecision.shared.util.ReportTypes;
+
 
 /**
  * Snapshot journey for the report endpoints (ENDPOINTS_BACKEND §5):
@@ -33,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * {@code /report/{projectId}} (list), {@code /report/preview|download/{reportId}} (binary),
  * {@code DELETE /report/{reportId}}.
  *
- * <p>A {@link MultiCriteriaAnalysis} and a {@link Report} backed by a real on-disk file are
+ * <p>A {@link MultiCriteriaAnalysis} and a {@link Report} backed by database bytes are
  * seeded so the upload, list, binary and delete flows are deterministic. Binary endpoints are
  * asserted by status + Content-Type + size > 0 (§10.6); the list DTO is snapshotted (path-derived
  * title and generated ids/dates tolerated); plain-text bodies are frozen by string equality; one
@@ -42,9 +44,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ReportJourneySnapshotTest extends SnapshotTestSupport {
 
-  private static final String OWNER_EMAIL = "user@user.com";
+  private static final String OWNER_EMAIL = "report-journey-owner@elit.test";
   private static final String OWNER_PASSWORD = "Azerty1234!?";
-  private static final String TYPE = "MULTI_CRITERIA_ANALYSIS";
+  private static final String TYPE = ReportTypes.MULTI_CRITERIA_ANALYSIS.toString();
   private static final Path UPLOAD_DIR = Path.of("target", "test-uploads", "files");
 
   @Autowired
@@ -101,7 +103,7 @@ class ReportJourneySnapshotTest extends SnapshotTestSupport {
     Path stored = UPLOAD_DIR.resolve("report.pdf");
 
     Report report = reportRepository.save(Report.builder()
-        .type(TYPE)
+        .type(ReportTypes.MULTI_CRITERIA_ANALYSIS)
         .reportPath(stored.toString())
         .analyseId(analyseId)
         .project(project)
@@ -123,7 +125,7 @@ class ReportJourneySnapshotTest extends SnapshotTestSupport {
             .get("/report/{projectId}", projectId), token))
         .andReturn();
 
-    // title is derived from the on-disk path; id/creationDate are generated → tolerated.
+    // Title comes from a logical path; id/creationDate are generated and tolerated.
     assertSnapshot(result, "report/GET_report_byProject.json",
         SnapshotComparators.tolerating("[0].id", "[0].title", "[0].creationDate"));
   }
@@ -151,7 +153,7 @@ class ReportJourneySnapshotTest extends SnapshotTestSupport {
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(result.getResponse().getContentAsByteArray()).isNotEmpty();
-    assertThat(result.getResponse().getHeader("Content-Disposition")).contains("report");
+    assertThat(result.getResponse().getHeader("Content-Disposition")).contains("attachment");
   }
 
   @Test
