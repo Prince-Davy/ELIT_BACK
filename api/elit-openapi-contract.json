@@ -3769,7 +3769,7 @@
       "project" : "Project",
       "reportId" : "integer:int64",
       "reportPath" : "string",
-      "type" : "string"
+      "type" : "string{ai_report,audit_report,execution_report,multicriteria_report,predictibility_report}"
     },
     "ReportResponse" : {
       "creationDate" : "string:date-time",

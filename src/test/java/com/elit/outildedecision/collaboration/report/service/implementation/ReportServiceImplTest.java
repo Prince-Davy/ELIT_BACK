@@ -1,9 +1,5 @@
 package com.elit.outildedecision.collaboration.report.service.implementation;
 
-import com.elit.outildedecision.ai.result.entity.ResultAi;
-import com.elit.outildedecision.ai.result.repository.ResultIaRepository;
-import com.elit.outildedecision.audit.entity.Audit;
-import com.elit.outildedecision.audit.repository.AuditRepository;
 import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlan;
 import com.elit.outildedecision.collaboration.executionplan.repository.ExecutionPlanRepository;
 import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
@@ -24,6 +20,8 @@ import com.elit.outildedecision.shared.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.shared.kernel.entity.Project;
 import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;
+import com.elit.outildedecision.shared.port.AiReportOwnershipPort;
+import com.elit.outildedecision.shared.port.AuditReportOwnershipPort;
 import com.elit.outildedecision.shared.util.ReportTypes;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -63,8 +61,8 @@ class ReportServiceImplTest {
   @Mock private PredictibilityAnalysisRepository predictibilityAnalysisRepository;
   @Mock private MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
   @Mock private ReportMapper reportMapper;
-  @Mock private ResultIaRepository resultIaRepository;
-  @Mock private AuditRepository auditRepository;
+  @Mock private AiReportOwnershipPort aiReportOwnershipPort;
+  @Mock private AuditReportOwnershipPort auditReportOwnershipPort;
 
   private final Long projectId = 1L;
   private final Long analysisId = 1L;
@@ -171,7 +169,7 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_whenAiResultNotFound() {
     existingProject();
-    when(resultIaRepository.findById(analysisId)).thenReturn(Optional.empty());
+    when(aiReportOwnershipPort.belongsToProject(analysisId, projectId)).thenReturn(false);
     ResponseStatusException error = assertThrows(ResponseStatusException.class,
       () -> reportService.uploadReport2(projectId, analysisId, "ai_report", file, iteration));
     assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
@@ -181,11 +179,7 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_whenAuditBelongsToAnotherProject() {
     existingProject();
-    Project other = new Project();
-    other.setProjectId(9L);
-    Audit audit = new Audit();
-    audit.setProject(other);
-    when(auditRepository.findById(analysisId)).thenReturn(Optional.of(audit));
+    when(auditReportOwnershipPort.belongsToProject(analysisId, projectId)).thenReturn(false);
     ResponseStatusException error = assertThrows(ResponseStatusException.class,
       () -> reportService.uploadReport2(projectId, analysisId, "audit_report", file, iteration));
     assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
@@ -194,9 +188,7 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_acceptsAiReportForMatchingProject() throws Exception {
     existingProject();
-    ResultAi aiResult = new ResultAi();
-    aiResult.setProject(project);
-    when(resultIaRepository.findById(analysisId)).thenReturn(Optional.of(aiResult));
+    when(aiReportOwnershipPort.belongsToProject(analysisId, projectId)).thenReturn(true);
     when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
       Report report = invocation.getArgument(0);
       report.setReportId(20L);
@@ -211,9 +203,7 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_acceptsAuditForMatchingProject() throws Exception {
     existingProject();
-    Audit audit = new Audit();
-    audit.setProject(project);
-    when(auditRepository.findById(analysisId)).thenReturn(Optional.of(audit));
+    when(auditReportOwnershipPort.belongsToProject(analysisId, projectId)).thenReturn(true);
     when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
       Report report = invocation.getArgument(0);
       report.setReportId(21L);

@@ -10340,7 +10340,8 @@
             "type" : "string"
           },
           "type" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "multicriteria_report", "predictibility_report", "execution_report", "ai_report", "audit_report" ]
           },
           "iteration" : {
             "type" : "integer",

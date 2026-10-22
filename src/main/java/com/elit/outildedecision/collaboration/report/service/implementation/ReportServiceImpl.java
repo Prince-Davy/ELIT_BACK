@@ -29,8 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.elit.outildedecision.ai.result.repository.ResultIaRepository;
-import com.elit.outildedecision.audit.repository.AuditRepository;
+import com.elit.outildedecision.shared.port.AiReportOwnershipPort;
+import com.elit.outildedecision.shared.port.AuditReportOwnershipPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -90,13 +90,13 @@ public class ReportServiceImpl implements ReportService {
    */
   private final ReportMapper reportMapper;
   /**
-   * Repository instance for accessing AI result data.
+   * Port for verifying AI result ownership.
    */
-  private final ResultIaRepository resultIaRepository;
+  private final AiReportOwnershipPort aiReportOwnershipPort;
   /**
-   * Repository instance for accessing audit data.
+   * Port for verifying audit ownership.
    */
-  private final AuditRepository auditRepository;
+  private final AuditReportOwnershipPort auditReportOwnershipPort;
   /**
    * Base folder used to store uploaded files.
    */
@@ -122,8 +122,8 @@ public class ReportServiceImpl implements ReportService {
     final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
     final ExecutionPlanRepository executionPlanRepository,
     final ReportMapper reportMapper,
-    final ResultIaRepository resultIaRepository,
-    final AuditRepository auditRepository) {
+    final AiReportOwnershipPort aiReportOwnershipPort,
+    final AuditReportOwnershipPort auditReportOwnershipPort) {
     this.reportRepository = reportRepository;
     this.reportContentRepository = reportContentRepository;
     this.projectRepository = projectRepository;
@@ -131,8 +131,8 @@ public class ReportServiceImpl implements ReportService {
     this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
     this.executionPlanRepository = executionPlanRepository;
     this.reportMapper = reportMapper;
-    this.resultIaRepository = resultIaRepository;
-    this.auditRepository = auditRepository;
+    this.aiReportOwnershipPort = aiReportOwnershipPort;
+    this.auditReportOwnershipPort = auditReportOwnershipPort;
   }
 
   /**
@@ -360,17 +360,13 @@ public class ReportServiceImpl implements ReportService {
         }
       }
       case AI_ANALYSIS -> {
-        if (resultIaRepository.findById(analyseId)
-            .filter(result -> result.getProject() != null
-                && Objects.equals(result.getProject().getProjectId(), projectId)).isEmpty()) {
+        if (!aiReportOwnershipPort.belongsToProject(analyseId, projectId)) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Le résultat IA est introuvable pour ce projet.");
         }
       }
       case AUDIT -> {
-        if (auditRepository.findById(analyseId)
-            .filter(audit -> audit.getProject() != null
-                && Objects.equals(audit.getProject().getProjectId(), projectId)).isEmpty()) {
+        if (!auditReportOwnershipPort.belongsToProject(analyseId, projectId)) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND,
             "L'audit est introuvable pour ce projet.");
         }
