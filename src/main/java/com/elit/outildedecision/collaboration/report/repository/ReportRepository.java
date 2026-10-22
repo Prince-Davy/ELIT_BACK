@@ -30,6 +30,12 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
   /**
    * Looks up a report in the requested project only. Analysis IDs can overlap across
    * different report types and projects, so all four criteria are required.
+   *
+   * @param projectId the project identifier
+   * @param analyseId the analysis identifier
+   * @param type the report type
+   * @param iteration the report iteration
+   * @return the matching report or null if it does not exist
    */
   @Query("select r from Report r where r.project.projectId = :projectId "
     + "and r.analyseId = :analyseId and r.type = :type and r.iteration = :iteration")

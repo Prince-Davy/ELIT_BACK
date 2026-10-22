@@ -7,13 +7,25 @@ import org.springframework.stereotype.Component;
 
 /** Audit-context adapter implementing the shared report ownership contract. */
 @Component
-public class AuditReportOwnershipAdapter implements AuditReportOwnershipPort {
+public final class AuditReportOwnershipAdapter implements AuditReportOwnershipPort {
   private final AuditRepository repository;
 
+  /**
+   * Creates an ownership adapter.
+   *
+   * @param repository repository for audit records
+   */
   public AuditReportOwnershipAdapter(final AuditRepository repository) {
     this.repository = repository;
   }
 
+  /**
+   * Verifies that the audit belongs to the project.
+   *
+   * @param analyseId the report analysis identifier
+   * @param projectId the project identifier
+   * @return true if a matching record belongs to this project
+   */
   @Override
   public boolean belongsToProject(final Long analyseId, final Long projectId) {
     return projectId != null && repository.findById(analyseId)

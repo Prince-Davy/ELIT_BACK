@@ -7,13 +7,25 @@ import org.springframework.stereotype.Component;
 
 /** AI-context adapter implementing the shared report ownership contract. */
 @Component
-public class AiReportOwnershipAdapter implements AiReportOwnershipPort {
+public final class AiReportOwnershipAdapter implements AiReportOwnershipPort {
   private final ResultIaRepository repository;
 
+  /**
+   * Creates an ownership adapter.
+   *
+   * @param repository repository for AI result records
+   */
   public AiReportOwnershipAdapter(final ResultIaRepository repository) {
     this.repository = repository;
   }
 
+  /**
+   * Verifies that the AI result belongs to the project.
+   *
+   * @param analyseId the report analysis identifier
+   * @param projectId the project identifier
+   * @return true if a matching record belongs to this project
+   */
   @Override
   public boolean belongsToProject(final Long analyseId, final Long projectId) {
     return projectId != null && repository.findById(analyseId)

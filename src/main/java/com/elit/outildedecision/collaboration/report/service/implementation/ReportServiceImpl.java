@@ -113,6 +113,8 @@ public class ReportServiceImpl implements ReportService {
    * @param predictibilityAnalysisRepository The repository instance for accessing predictibility analysis data.
    * @param executionPlanRepository          The repository instance for accessing execution plan data.
    * @param reportMapper                     The mapper between report entities and their response DTOs.
+   * @param aiReportOwnershipPort            Port for AI report ownership validation.
+   * @param auditReportOwnershipPort         Port for audit ownership validation.
    */
   public ReportServiceImpl(
     final ReportRepository reportRepository,
@@ -307,6 +309,9 @@ public class ReportServiceImpl implements ReportService {
   /**
    * Parses the existing API values (for example {@code multicriteria_report}). The HTTP
    * contract stays a String; the domain and persistence model use {@link ReportTypes}.
+   *
+   * @param value the API report type value
+   * @return the corresponding domain enum
    */
   private ReportTypes parseReportType(final String value) {
     try {
@@ -319,6 +324,10 @@ public class ReportServiceImpl implements ReportService {
   /**
    * Builds a logical path for the report title. The bytes are saved exclusively in MySQL.
    * Never trust client-provided folder components in a filename.
+   *
+   * @param project the owning project
+   * @param file the file being uploaded
+   * @return the sanitized logical path
    */
   private String buildLogicalReportPath(final Project project, final MultipartFile file) {
     String suppliedName = file.getOriginalFilename();
@@ -335,6 +344,10 @@ public class ReportServiceImpl implements ReportService {
   /**
    * Verifies the analysis exists AND belongs to the requested project.
    * A bare existsById check would allow attaching a report to the wrong project.
+   *
+   * @param type the report category
+   * @param analyseId the analysis identifier
+   * @param projectId the owning project identifier
    */
   private void assertAnalyseExists(final ReportTypes type, final Long analyseId, final Long projectId)
       throws MulticriteriaNotFoundException,
@@ -371,6 +384,8 @@ public class ReportServiceImpl implements ReportService {
             "L'audit est introuvable pour ce projet.");
         }
       }
+      default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+        "Type de rapport non pris en charge : " + type);
     }
   }
 
