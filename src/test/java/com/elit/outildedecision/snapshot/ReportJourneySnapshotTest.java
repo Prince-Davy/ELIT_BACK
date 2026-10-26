@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.azure.communication.email.EmailClient;
 import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
-import com.elit.outildedecision.collaboration.report.entity.Report;
-import com.elit.outildedecision.collaboration.report.entity.ReportContent;
-import com.elit.outildedecision.collaboration.report.repository.ReportContentRepository;
-import com.elit.outildedecision.collaboration.report.repository.ReportRepository;
+import com.elit.outildedecision.shared.report.entity.Report;
+import com.elit.outildedecision.shared.report.entity.ReportContent;
+import com.elit.outildedecision.shared.report.repository.ReportContentRepository;
+import com.elit.outildedecision.shared.report.repository.ReportRepository;
 import com.elit.outildedecision.shared.kernel.entity.Project;
 import com.elit.outildedecision.shared.kernel.entity.User;
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;

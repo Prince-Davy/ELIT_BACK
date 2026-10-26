@@ -70,7 +70,7 @@
     "name" : "Shared - Attachments",
     "description" : "Gestion des pièces jointes d'un projet"
   }, {
-    "name" : "Collaboration - Report",
+    "name" : "Report",
     "description" : "Génération et gestion des rapports"
   } ],
   "paths" : {
@@ -1557,7 +1557,7 @@
     },
     "/report/upload/{projectId}/{analyseId}/{type}/{iteration}/update" : {
       "put" : {
-        "tags" : [ "Collaboration - Report" ],
+        "tags" : [ "Report" ],
         "operationId" : "updateReport2",
         "parameters" : [ {
           "name" : "projectId",
@@ -3992,7 +3992,7 @@
     },
     "/report/upload/{projectId}/{analyseId}/{type}/{iteration}" : {
       "post" : {
-        "tags" : [ "Collaboration - Report" ],
+        "tags" : [ "Report" ],
         "operationId" : "uploadReport2",
         "parameters" : [ {
           "name" : "projectId",
@@ -6461,7 +6461,7 @@
     },
     "/report/{projectId}" : {
       "get" : {
-        "tags" : [ "Collaboration - Report" ],
+        "tags" : [ "Report" ],
         "operationId" : "getReportsByProjectId",
         "parameters" : [ {
           "name" : "projectId",
@@ -6554,7 +6554,7 @@
     },
     "/report/preview/{reportId}" : {
       "get" : {
-        "tags" : [ "Collaboration - Report" ],
+        "tags" : [ "Report" ],
         "operationId" : "previewReport",
         "parameters" : [ {
           "name" : "reportId",
@@ -6637,7 +6637,7 @@
     },
     "/report/download/{reportId}" : {
       "get" : {
-        "tags" : [ "Collaboration - Report" ],
+        "tags" : [ "Report" ],
         "operationId" : "downloadReport",
         "parameters" : [ {
           "name" : "reportId",
@@ -8678,7 +8678,7 @@
     },
     "/report/{reportId}" : {
       "delete" : {
-        "tags" : [ "Collaboration - Report" ],
+        "tags" : [ "Report" ],
         "operationId" : "deleteReportById",
         "parameters" : [ {
           "name" : "reportId",

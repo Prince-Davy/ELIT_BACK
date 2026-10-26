@@ -3,7 +3,7 @@ package com.elit.outildedecision.shared.kernel.entity;
 import com.elit.outildedecision.ai.methodology.evaluation.entity.MethodologyEvaluation;
 import com.elit.outildedecision.ai.result.entity.ResultAi;
 import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
-import com.elit.outildedecision.collaboration.report.entity.Report;
+import com.elit.outildedecision.shared.report.entity.Report;
 import com.elit.outildedecision.shared.attachment.entity.Attachment;
 import com.elit.outildedecision.shared.config.View;
 import com.elit.outildedecision.shared.project.entity.Notification;
