@@ -10341,7 +10341,7 @@
           },
           "type" : {
             "type" : "string",
-            "enum" : [ "multicriteria_report", "predictibility_report", "execution_report", "ai_report", "audit_report" ]
+            "enum" : [ "multicriteria_report", "predictibility_report", "execution_report", "ai_report_methodology", "ai_report_result", "audit_report" ]
           },
           "iteration" : {
             "type" : "integer",

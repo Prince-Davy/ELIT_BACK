@@ -13,8 +13,10 @@ public enum ReportTypes {
   PREDICTIBILITY_ANALYSIS("predictibility_report"),
   /** execution report . */
   EXECUTION_PLAN("execution_report"),
-  /** AI report. */
-  AI_ANALYSIS("ai_report"),
+  /** AI methodology selection report. */
+  AI_METHODOLOGY("ai_report_methodology"),
+  /** AI method recommendation report. */
+  AI_RESULT("ai_report_result"),
   /** audit report. */
   AUDIT("audit_report");
 

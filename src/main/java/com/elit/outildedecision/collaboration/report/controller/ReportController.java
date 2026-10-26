@@ -8,6 +8,7 @@ import com.elit.outildedecision.collaboration.report.exception.ReportNotFoundExc
 import com.elit.outildedecision.collaboration.report.service.ReportService;
 import com.elit.outildedecision.shared.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
+import com.elit.outildedecision.shared.util.ReportTypes;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +66,7 @@ public class ReportController {
   public ResponseEntity<String> uploadReport2(
       @PathVariable final Long projectId,
       @PathVariable final Long analyseId,
-      @PathVariable final String type,
+      @PathVariable final ReportTypes type,
       @RequestParam("file") final MultipartFile file,
       @PathVariable final Integer iteration)
     throws ProjectNotFoundException, MulticriteriaNotFoundException,
@@ -93,7 +94,7 @@ public class ReportController {
   public ResponseEntity<String> updateReport2(
     @PathVariable final Long projectId,
     @PathVariable final Long analyseId,
-    @PathVariable final String type,
+    @PathVariable final ReportTypes type,
     @RequestParam("file") final MultipartFile file,
     @PathVariable final Integer iteration)
     throws ProjectNotFoundException, MulticriteriaNotFoundException,

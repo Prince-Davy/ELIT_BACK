@@ -12,9 +12,9 @@ public class ReportTest {
   void testReportType() {
     Report report = new Report();
 
-    report.setType(ReportTypes.AI_ANALYSIS);
+    report.setType(ReportTypes.AI_METHODOLOGY);
 
-    assertEquals(ReportTypes.AI_ANALYSIS, report.getType());
-    assertEquals("ai_report", report.getType().toString());
+    assertEquals(ReportTypes.AI_METHODOLOGY, report.getType());
+    assertEquals("ai_report_methodology", report.getType().toString());
   }
 }

@@ -5,6 +5,7 @@ import com.elit.outildedecision.collaboration.predictibility.exception.Predictib
 import com.elit.outildedecision.collaboration.report.exception.ReportNotFoundException;
 import com.elit.outildedecision.collaboration.report.service.ReportService;
 import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
+import com.elit.outildedecision.shared.util.ReportTypes;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class ReportControllerTest {
   private MockMvc mockMvc;
   private MultipartFile fileMultipart;
   private Long projectId, analysisId, reportId;
-  private String type;
+  private ReportTypes type;
 
   @BeforeEach
   public void setup() {
@@ -58,7 +59,16 @@ class ReportControllerTest {
     analysisId = 1l;
     reportId = 1l;
     iteration = 1;
-    type = "type";
+    type = ReportTypes.MULTI_CRITERIA_ANALYSIS;
+  }
+
+  @Test
+  @WithMockUser(authorities = {"ADMIN", "USER"})
+  void shouldRejectUnknownReportTypeInPath() throws Exception {
+    mockMvc.perform(multipart("/report/upload/1/1/unknown_report/1")
+        .file((MockMultipartFile) fileMultipart))
+      .andExpect(status().isBadRequest())
+      .andExpect(jsonPath("$.status").value(400));
   }
 
   @Test

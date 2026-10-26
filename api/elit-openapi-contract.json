@@ -1982,7 +1982,7 @@
         "in" : "path",
         "name" : "type",
         "required" : true,
-        "type" : "string"
+        "type" : "string{ai_report_methodology,ai_report_result,audit_report,execution_report,multicriteria_report,predictibility_report}"
       } ],
       "request" : {
         "multipart/form-data" : "object"
@@ -2670,7 +2670,7 @@
         "in" : "path",
         "name" : "type",
         "required" : true,
-        "type" : "string"
+        "type" : "string{ai_report_methodology,ai_report_result,audit_report,execution_report,multicriteria_report,predictibility_report}"
       } ],
       "request" : {
         "multipart/form-data" : "object"
@@ -3769,14 +3769,14 @@
       "project" : "Project",
       "reportId" : "integer:int64",
       "reportPath" : "string",
-      "type" : "string{ai_report,audit_report,execution_report,multicriteria_report,predictibility_report}"
+      "type" : "string{ai_report_methodology,ai_report_result,audit_report,execution_report,multicriteria_report,predictibility_report}"
     },
     "ReportResponse" : {
       "creationDate" : "string:date-time",
       "id" : "integer:int64",
       "iteration" : "integer:int32",
       "title" : "string",
-      "type" : "string"
+      "type" : "string{ai_report_methodology,ai_report_result,audit_report,execution_report,multicriteria_report,predictibility_report}"
     },
     "ResultAi" : {
       "id" : "integer:int64",

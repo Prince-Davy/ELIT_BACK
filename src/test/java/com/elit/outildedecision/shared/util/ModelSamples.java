@@ -192,7 +192,7 @@ public class ModelSamples {
 
   public static class ReportSamples {
     public static List<ReportResponse> getReportResponseModels() {
-      return List.of(new ReportResponse(1L, "title", ReportTypes.MULTI_CRITERIA_ANALYSIS.toString(), 1, null ));
+      return List.of(new ReportResponse(1L, "title", ReportTypes.MULTI_CRITERIA_ANALYSIS, 1, null ));
     }
 
     public static Report getReport() {

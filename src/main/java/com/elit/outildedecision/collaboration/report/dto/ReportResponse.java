@@ -1,5 +1,6 @@
 package com.elit.outildedecision.collaboration.report.dto;
 
+import com.elit.outildedecision.shared.util.ReportTypes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public class ReportResponse {
   /**
    * The type of the report.
    */
-  private String type;
+  private ReportTypes type;
 
   /**
    * The iteration of the report.

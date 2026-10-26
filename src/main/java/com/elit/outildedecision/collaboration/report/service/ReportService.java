@@ -7,6 +7,7 @@ import com.elit.outildedecision.collaboration.report.dto.ReportResponse;
 import com.elit.outildedecision.collaboration.report.exception.ReportNotFoundException;
 import com.elit.outildedecision.shared.exception.ExecutionPlanNotFoundException;
 import com.elit.outildedecision.shared.project.exception.ProjectNotFoundException;
+import com.elit.outildedecision.shared.util.ReportTypes;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public interface ReportService {
    *
    * @param projectId the ID of the project to associate the report with
    * @param analyseId the ID of the analysis to associate the report with
-   * @param type a String representing the type of report being uploaded
+   * @param type the typed report category
    * @param file the MultipartFile object representing the report file to upload
    * @param iteration an Integer representing the iteration number to associate with the report
    * @return a success message; a {@link com.elit.outildedecision.shared.exception.ConflictException}
@@ -34,7 +35,7 @@ public interface ReportService {
    * @throws IOException if an I/O error occurs while uploading the report file
    */
   String uploadReport2(
-    Long projectId, Long analyseId, String type, MultipartFile file, Integer iteration)
+    Long projectId, Long analyseId, ReportTypes type, MultipartFile file, Integer iteration)
     throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException,
     MulticriteriaNotFoundException, ExecutionPlanNotFoundException, IOException;
 
@@ -43,7 +44,7 @@ public interface ReportService {
    *
    * @param projectId the ID of the project to associate the report with
    * @param analyseId the ID of the analysis to associate the report with
-   * @param type a String representing the type of report being uploaded
+   * @param type the typed report category
    * @param file the MultipartFile object representing the report file to upload
    * @param iteration an Integer representing the iteration number to associate with the report
    * @return a success message; a {@link com.elit.outildedecision.shared.exception.ConflictException}
@@ -55,7 +56,7 @@ public interface ReportService {
    * @throws IOException if an I/O error occurs while uploading the report file
    */
   String uploadAndUpdateReport2(
-    Long projectId, Long analyseId, String type, MultipartFile file, Integer iteration)
+    Long projectId, Long analyseId, ReportTypes type, MultipartFile file, Integer iteration)
     throws ProjectNotFoundException, PredictibilityAnalysisNotFoundException,
     MulticriteriaNotFoundException, ExecutionPlanNotFoundException, IOException;
 

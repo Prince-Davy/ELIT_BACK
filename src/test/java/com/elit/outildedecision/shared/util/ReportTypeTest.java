@@ -17,5 +17,8 @@ import org.junit.jupiter.api.Test;
     void testReportTypes(){
         ReportTypes rt = ReportTypes.EXECUTION_PLAN;
         assertNotNull(rt);
+        assertEquals("ai_report_methodology", ReportTypes.AI_METHODOLOGY.toString());
+        assertEquals("ai_report_result", ReportTypes.AI_RESULT.toString());
+        assertEquals("audit_report", ReportTypes.AUDIT.toString());
     }
 }

@@ -92,7 +92,7 @@ class ReportServiceImplTest {
       .thenReturn(new Report());
 
     ConflictException error = assertThrows(ConflictException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, file, iteration));
     assertEquals("Le rapport a déjà été généré pour cette analyse.", error.getMessage());
     verify(reportRepository, never()).save(any(Report.class));
   }
@@ -101,7 +101,7 @@ class ReportServiceImplTest {
   void uploadReport2_whenProjectNotFound() {
     when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
     ProjectNotFoundException error = assertThrows(ProjectNotFoundException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "execution_report", file, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.EXECUTION_PLAN, file, iteration));
     assertEquals("Le projet avec l'ID 1 n'existe pas.", error.getMessage());
   }
 
@@ -111,7 +111,7 @@ class ReportServiceImplTest {
     when(collaborationReportOwnershipPort.belongsToProject(
       ReportTypes.MULTI_CRITERIA_ANALYSIS, analysisId, projectId)).thenReturn(false);
     MulticriteriaNotFoundException error = assertThrows(MulticriteriaNotFoundException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, file, iteration));
     assertEquals("Cette analyse multicritère n'existe pas.", error.getMessage());
     verify(reportRepository, never()).save(any(Report.class));
   }
@@ -122,7 +122,7 @@ class ReportServiceImplTest {
     when(collaborationReportOwnershipPort.belongsToProject(
       ReportTypes.PREDICTIBILITY_ANALYSIS, analysisId, projectId)).thenReturn(false);
     PredictibilityAnalysisNotFoundException error = assertThrows(PredictibilityAnalysisNotFoundException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "predictibility_report", file, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.PREDICTIBILITY_ANALYSIS, file, iteration));
     assertEquals("Cette analyse de prévisibilité n'existe pas.", error.getMessage());
     verify(reportRepository, never()).save(any(Report.class));
   }
@@ -133,7 +133,7 @@ class ReportServiceImplTest {
     when(collaborationReportOwnershipPort.belongsToProject(
       ReportTypes.EXECUTION_PLAN, analysisId, projectId)).thenReturn(false);
     ExecutionPlanNotFoundException error = assertThrows(ExecutionPlanNotFoundException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "execution_report", file, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.EXECUTION_PLAN, file, iteration));
     assertEquals("Ce plan d'exécution n'existe pas.", error.getMessage());
     verify(reportRepository, never()).save(any(Report.class));
   }
@@ -145,16 +145,7 @@ class ReportServiceImplTest {
       ReportTypes.MULTI_CRITERIA_ANALYSIS, analysisId, projectId)).thenReturn(false);
 
     assertThrows(MulticriteriaNotFoundException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
-    verify(reportRepository, never()).save(any(Report.class));
-  }
-
-  @Test
-  void uploadReport2_whenTypeIsUnknownReturnsBadRequest() {
-    existingProject();
-    ResponseStatusException error = assertThrows(ResponseStatusException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "UNKNOWN_TYPE", file, iteration));
-    assertEquals(HttpStatus.BAD_REQUEST, error.getStatusCode());
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, file, iteration));
     verify(reportRepository, never()).save(any(Report.class));
   }
 
@@ -163,7 +154,7 @@ class ReportServiceImplTest {
     existingProject();
     when(aiReportOwnershipPort.belongsToProject(analysisId, projectId)).thenReturn(false);
     ResponseStatusException error = assertThrows(ResponseStatusException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "ai_report", file, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.AI_METHODOLOGY, file, iteration));
     assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
     verify(reportRepository, never()).save(any(Report.class));
   }
@@ -173,7 +164,7 @@ class ReportServiceImplTest {
     existingProject();
     when(auditReportOwnershipPort.belongsToProject(analysisId, projectId)).thenReturn(false);
     ResponseStatusException error = assertThrows(ResponseStatusException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "audit_report", file, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.AUDIT, file, iteration));
     assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
   }
 
@@ -188,8 +179,23 @@ class ReportServiceImplTest {
     });
 
     assertEquals("Fichier enregistré avec succès.",
-      reportService.uploadReport2(projectId, analysisId, "ai_report", file, iteration));
-    verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.AI_ANALYSIS));
+      reportService.uploadReport2(projectId, analysisId, ReportTypes.AI_METHODOLOGY, file, iteration));
+    verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.AI_METHODOLOGY));
+  }
+
+  @Test
+  void uploadReport2_acceptsAiMethodRecommendationForMatchingProject() throws Exception {
+    existingProject();
+    when(aiReportOwnershipPort.belongsToProject(analysisId, projectId)).thenReturn(true);
+    when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
+      Report report = invocation.getArgument(0);
+      report.setReportId(23L);
+      return report;
+    });
+
+    assertEquals("Fichier enregistré avec succès.",
+      reportService.uploadReport2(projectId, analysisId, ReportTypes.AI_RESULT, file, iteration));
+    verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.AI_RESULT));
   }
 
   @Test
@@ -203,7 +209,7 @@ class ReportServiceImplTest {
     });
 
     assertEquals("Fichier enregistré avec succès.",
-      reportService.uploadReport2(projectId, analysisId, "audit_report", file, iteration));
+      reportService.uploadReport2(projectId, analysisId, ReportTypes.AUDIT, file, iteration));
     verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.AUDIT));
   }
 
@@ -219,7 +225,7 @@ class ReportServiceImplTest {
     });
 
     assertEquals("Fichier enregistré avec succès.",
-      reportService.uploadReport2(projectId, analysisId, "execution_report", file, iteration));
+      reportService.uploadReport2(projectId, analysisId, ReportTypes.EXECUTION_PLAN, file, iteration));
     verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.EXECUTION_PLAN));
   }
 
@@ -231,7 +237,7 @@ class ReportServiceImplTest {
       "bytes".getBytes(StandardCharsets.UTF_8));
 
     ResponseStatusException error = assertThrows(ResponseStatusException.class,
-      () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", noName, iteration));
+      () -> reportService.uploadReport2(projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, noName, iteration));
     assertEquals(HttpStatus.BAD_REQUEST, error.getStatusCode());
     verify(reportRepository, never()).save(any(Report.class));
   }
@@ -247,7 +253,7 @@ class ReportServiceImplTest {
     });
 
     assertEquals("Fichier enregistré avec succès.",
-      reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+      reportService.uploadReport2(projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, file, iteration));
     verify(reportRepository).save(argThat(report -> report.getType() == ReportTypes.MULTI_CRITERIA_ANALYSIS
       && report.getProject() == project && report.getAnalyseId().equals(analysisId)));
     byte[] expectedBytes = file.getBytes();
@@ -268,7 +274,7 @@ class ReportServiceImplTest {
       .thenReturn(previous);
 
     assertEquals("Le fichier a été mis à jours avec succès.",
-      reportService.uploadAndUpdateReport2(projectId, analysisId, "multicriteria_report", file, iteration));
+      reportService.uploadAndUpdateReport2(projectId, analysisId, ReportTypes.MULTI_CRITERIA_ANALYSIS, file, iteration));
     verify(reportRepository).save(previous);
     verify(reportContentRepository).save(argThat(content -> Long.valueOf(7L).equals(content.getReportId())));
   }

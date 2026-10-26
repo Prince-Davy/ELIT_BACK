@@ -21,7 +21,8 @@ class ReportTypeConverterTest {
     }
     assertEquals("multicriteria_report",
       converter.convertToDatabaseColumn(ReportTypes.MULTI_CRITERIA_ANALYSIS));
-    assertEquals("ai_report", converter.convertToDatabaseColumn(ReportTypes.AI_ANALYSIS));
+    assertEquals("ai_report_methodology", converter.convertToDatabaseColumn(ReportTypes.AI_METHODOLOGY));
+    assertEquals("ai_report_result", converter.convertToDatabaseColumn(ReportTypes.AI_RESULT));
     assertEquals("audit_report", converter.convertToDatabaseColumn(ReportTypes.AUDIT));
     assertEquals(ReportTypes.MULTI_CRITERIA_ANALYSIS,
       converter.convertToEntityAttribute("MULTI_CRITERIA_ANALYSIS"));

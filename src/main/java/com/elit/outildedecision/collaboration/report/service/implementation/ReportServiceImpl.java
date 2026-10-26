@@ -123,7 +123,7 @@ public class ReportServiceImpl implements ReportService {
   @Transactional
   public String uploadReport2(final Long projectId,
                               final Long analyseId,
-                              final String type,
+                              final ReportTypes type,
                               final MultipartFile file,
                               final Integer iteration) throws ProjectNotFoundException,
     PredictibilityAnalysisNotFoundException,
@@ -132,15 +132,14 @@ public class ReportServiceImpl implements ReportService {
     log.info("Report upload requested for projectId={} analyseId={} type={} iteration={}",
       projectId, analyseId, type, iteration);
     Project project = findProject(projectId);
-    ReportTypes reportType = parseReportType(type);
-    assertAnalyseExists(reportType, analyseId, projectId);
+    assertAnalyseExists(type, analyseId, projectId);
 
     // Include projectId in the duplicate key: different projects can reuse analysis IDs.
     Report reportFromDB = reportRepository.findReportByProjectAndAnalyseAndTypeAndIteration(
-      projectId, analyseId, reportType, iteration);
+      projectId, analyseId, type, iteration);
     if (reportFromDB != null) {
       log.warn("Report already generated for projectId={} analyseId={} type={} iteration={}",
-        projectId, analyseId, reportType, iteration);
+        projectId, analyseId, type, iteration);
       throw new ConflictException("Le rapport a déjà été généré pour cette analyse.");
     }
 
@@ -148,7 +147,7 @@ public class ReportServiceImpl implements ReportService {
     String filePath = buildLogicalReportPath(project, file);
     Report report =
       Report.builder()
-        .type(reportType)
+        .type(type)
         .reportPath(filePath)
         .analyseId(analyseId)
         .project(project)
@@ -168,7 +167,7 @@ public class ReportServiceImpl implements ReportService {
   @Transactional
   public String uploadAndUpdateReport2(final Long projectId,
                                        final Long analyseId,
-                                       final String type,
+                                       final ReportTypes type,
                                        final MultipartFile file,
                                        final Integer iteration) throws ProjectNotFoundException,
     PredictibilityAnalysisNotFoundException,
@@ -177,11 +176,10 @@ public class ReportServiceImpl implements ReportService {
     log.info("Report update requested for projectId={} analyseId={} type={} iteration={}",
       projectId, analyseId, type, iteration);
     Project project = findProject(projectId);
-    ReportTypes reportType = parseReportType(type);
-    assertAnalyseExists(reportType, analyseId, projectId);
+    assertAnalyseExists(type, analyseId, projectId);
 
     Report reportFromDB = reportRepository.findReportByProjectAndAnalyseAndTypeAndIteration(
-      projectId, analyseId, reportType, iteration);
+      projectId, analyseId, type, iteration);
     if (reportFromDB == null) {
       log.warn("No report to update for projectId={} analyseId={} type={} iteration={}",
         projectId, analyseId, type, iteration);
@@ -286,21 +284,6 @@ public class ReportServiceImpl implements ReportService {
   }
 
   /**
-   * Parses the existing API values (for example {@code multicriteria_report}). The HTTP
-   * contract stays a String; the domain and persistence model use {@link ReportTypes}.
-   *
-   * @param value the API report type value
-   * @return the corresponding domain enum
-   */
-  private ReportTypes parseReportType(final String value) {
-    try {
-      return ReportTypes.fromValue(value);
-    } catch (IllegalArgumentException exception) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
-    }
-  }
-
-  /**
    * Builds a logical path for the report title. The bytes are saved exclusively in MySQL.
    * Never trust client-provided folder components in a filename.
    *
@@ -348,7 +331,7 @@ public class ReportServiceImpl implements ReportService {
           throw new ExecutionPlanNotFoundException("Ce plan d'exécution n'existe pas.");
         }
       }
-      case AI_ANALYSIS -> {
+      case AI_METHODOLOGY, AI_RESULT -> {
         if (!aiReportOwnershipPort.belongsToProject(analyseId, projectId)) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Le résultat IA est introuvable pour ce projet.");

@@ -2,6 +2,7 @@ package com.elit.outildedecision.shared.exception.handler;
 
 import com.elit.outildedecision.shared.exception.ApiException;
 import com.elit.outildedecision.shared.exception.ErrorMessage;
+import com.elit.outildedecision.shared.util.ReportTypes;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -211,6 +213,23 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     log.warn("JSON parsing error: {}", ex.getMessage());
     String errorMessage = "Format de données invalide. Veuillez vérifier la structure JSON.";
     return build(HttpStatus.BAD_REQUEST, errorMessage);
+  }
+
+  /**
+   * Maps invalid path variable values (including report types) to HTTP 400.
+   *
+   * @param ex the parameter conversion failure
+   * @return a bad request response using the shared error format
+   */
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<Object> handlePathVariableTypeMismatch(
+      final MethodArgumentTypeMismatchException ex) {
+    String message = "Valeur invalide pour le parametre '" + ex.getName() + "'.";
+    if ("type".equals(ex.getName())
+        && ex.getRequiredType() == ReportTypes.class) {
+      message = "Type de rapport inconnu : " + ex.getValue();
+    }
+    return build(HttpStatus.BAD_REQUEST, message);
   }
 
   /**
