@@ -1,13 +1,7 @@
 package com.elit.outildedecision.collaboration.report.service.implementation;
 
-import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlan;
-import com.elit.outildedecision.collaboration.executionplan.repository.ExecutionPlanRepository;
-import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.collaboration.multicriteria.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.collaboration.multicriteria.repository.MultiCriteriaAnalysisRepository;
-import com.elit.outildedecision.collaboration.predictibility.entity.PredictibilityAnalysis;
 import com.elit.outildedecision.collaboration.predictibility.exception.PredictibilityAnalysisNotFoundException;
-import com.elit.outildedecision.collaboration.predictibility.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.collaboration.report.dto.ReportResponse;
 import com.elit.outildedecision.collaboration.report.entity.Report;
 import com.elit.outildedecision.collaboration.report.entity.ReportContent;
@@ -22,6 +16,7 @@ import com.elit.outildedecision.shared.project.exception.ProjectNotFoundExceptio
 import com.elit.outildedecision.shared.project.repository.ProjectRepository;
 import com.elit.outildedecision.shared.port.AiReportOwnershipPort;
 import com.elit.outildedecision.shared.port.AuditReportOwnershipPort;
+import com.elit.outildedecision.shared.port.CollaborationReportOwnershipPort;
 import com.elit.outildedecision.shared.util.ReportTypes;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -57,9 +52,7 @@ class ReportServiceImplTest {
   @Mock private ReportRepository reportRepository;
   @Mock private ReportContentRepository reportContentRepository;
   @Mock private ProjectRepository projectRepository;
-  @Mock private ExecutionPlanRepository executionPlanRepository;
-  @Mock private PredictibilityAnalysisRepository predictibilityAnalysisRepository;
-  @Mock private MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
+  @Mock private CollaborationReportOwnershipPort collaborationReportOwnershipPort;
   @Mock private ReportMapper reportMapper;
   @Mock private AiReportOwnershipPort aiReportOwnershipPort;
   @Mock private AuditReportOwnershipPort auditReportOwnershipPort;
@@ -86,9 +79,8 @@ class ReportServiceImplTest {
   }
 
   private void existingMulticriteria() {
-    MultiCriteriaAnalysis analysis = new MultiCriteriaAnalysis();
-    analysis.setProject(project);
-    when(multiCriteriaAnalysisRepository.findById(analysisId)).thenReturn(Optional.of(analysis));
+    when(collaborationReportOwnershipPort.belongsToProject(
+      ReportTypes.MULTI_CRITERIA_ANALYSIS, analysisId, projectId)).thenReturn(true);
   }
 
   @Test
@@ -116,7 +108,8 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_whenMulticriteriaNotFound() {
     existingProject();
-    when(multiCriteriaAnalysisRepository.findById(analysisId)).thenReturn(Optional.empty());
+    when(collaborationReportOwnershipPort.belongsToProject(
+      ReportTypes.MULTI_CRITERIA_ANALYSIS, analysisId, projectId)).thenReturn(false);
     MulticriteriaNotFoundException error = assertThrows(MulticriteriaNotFoundException.class,
       () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
     assertEquals("Cette analyse multicritère n'existe pas.", error.getMessage());
@@ -126,7 +119,8 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_whenPredictibilityAnalysisNotFound() {
     existingProject();
-    when(predictibilityAnalysisRepository.findById(analysisId)).thenReturn(Optional.empty());
+    when(collaborationReportOwnershipPort.belongsToProject(
+      ReportTypes.PREDICTIBILITY_ANALYSIS, analysisId, projectId)).thenReturn(false);
     PredictibilityAnalysisNotFoundException error = assertThrows(PredictibilityAnalysisNotFoundException.class,
       () -> reportService.uploadReport2(projectId, analysisId, "predictibility_report", file, iteration));
     assertEquals("Cette analyse de prévisibilité n'existe pas.", error.getMessage());
@@ -136,7 +130,8 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_whenExecutionPlanNotFound() {
     existingProject();
-    when(executionPlanRepository.findById(analysisId)).thenReturn(Optional.empty());
+    when(collaborationReportOwnershipPort.belongsToProject(
+      ReportTypes.EXECUTION_PLAN, analysisId, projectId)).thenReturn(false);
     ExecutionPlanNotFoundException error = assertThrows(ExecutionPlanNotFoundException.class,
       () -> reportService.uploadReport2(projectId, analysisId, "execution_report", file, iteration));
     assertEquals("Ce plan d'exécution n'existe pas.", error.getMessage());
@@ -146,11 +141,8 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_whenAnalysisBelongsToAnotherProject() {
     existingProject();
-    Project other = new Project();
-    other.setProjectId(9L);
-    MultiCriteriaAnalysis analysis = new MultiCriteriaAnalysis();
-    analysis.setProject(other);
-    when(multiCriteriaAnalysisRepository.findById(analysisId)).thenReturn(Optional.of(analysis));
+    when(collaborationReportOwnershipPort.belongsToProject(
+      ReportTypes.MULTI_CRITERIA_ANALYSIS, analysisId, projectId)).thenReturn(false);
 
     assertThrows(MulticriteriaNotFoundException.class,
       () -> reportService.uploadReport2(projectId, analysisId, "multicriteria_report", file, iteration));
@@ -218,13 +210,8 @@ class ReportServiceImplTest {
   @Test
   void uploadReport2_acceptsExecutionPlanLinkedToProject() throws Exception {
     existingProject();
-    MultiCriteriaAnalysis multi = new MultiCriteriaAnalysis();
-    multi.setProject(project);
-    PredictibilityAnalysis prediction = new PredictibilityAnalysis();
-    prediction.setMultiCriteriaAnalysis(multi);
-    ExecutionPlan execution = new ExecutionPlan();
-    execution.setPredictibilityAnalysis(prediction);
-    when(executionPlanRepository.findById(analysisId)).thenReturn(Optional.of(execution));
+    when(collaborationReportOwnershipPort.belongsToProject(
+      ReportTypes.EXECUTION_PLAN, analysisId, projectId)).thenReturn(true);
     when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> {
       Report report = invocation.getArgument(0);
       report.setReportId(22L);

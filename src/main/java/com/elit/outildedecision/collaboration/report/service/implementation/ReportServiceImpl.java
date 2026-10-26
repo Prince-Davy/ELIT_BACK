@@ -1,13 +1,7 @@
 package com.elit.outildedecision.collaboration.report.service.implementation;
 
-import com.elit.outildedecision.collaboration.executionplan.entity.ExecutionPlan;
-import com.elit.outildedecision.collaboration.executionplan.repository.ExecutionPlanRepository;
-import com.elit.outildedecision.collaboration.multicriteria.entity.MultiCriteriaAnalysis;
 import com.elit.outildedecision.collaboration.multicriteria.exception.MulticriteriaNotFoundException;
-import com.elit.outildedecision.collaboration.multicriteria.repository.MultiCriteriaAnalysisRepository;
-import com.elit.outildedecision.collaboration.predictibility.entity.PredictibilityAnalysis;
 import com.elit.outildedecision.collaboration.predictibility.exception.PredictibilityAnalysisNotFoundException;
-import com.elit.outildedecision.collaboration.predictibility.repository.PredictibilityAnalysisRepository;
 import com.elit.outildedecision.collaboration.report.dto.ReportResponse;
 import com.elit.outildedecision.collaboration.report.entity.Report;
 import com.elit.outildedecision.collaboration.report.entity.ReportContent;
@@ -31,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.elit.outildedecision.shared.port.AiReportOwnershipPort;
 import com.elit.outildedecision.shared.port.AuditReportOwnershipPort;
+import com.elit.outildedecision.shared.port.CollaborationReportOwnershipPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -73,18 +68,8 @@ public class ReportServiceImpl implements ReportService {
    * Repository instance for accessing project data.
    */
   private final ProjectRepository projectRepository;
-  /**
-   * Repository instance for accessing multi-criteria analysis data.
-   */
-  private final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository;
-  /**
-   * Repository instance for accessing predictibility analysis data.
-   */
-  private final PredictibilityAnalysisRepository predictibilityAnalysisRepository;
-  /**
-   * Repository instance for accessing execution plan data.
-   */
-  private final ExecutionPlanRepository executionPlanRepository;
+  /** Collaboration-owned analysis validation port. */
+  private final CollaborationReportOwnershipPort collaborationReportOwnershipPort;
   /**
    * Mapper between report entities and their response DTOs.
    */
@@ -109,9 +94,7 @@ public class ReportServiceImpl implements ReportService {
    * @param reportRepository                 The repository instance for accessing report data.
    * @param reportContentRepository          The repository instance for accessing report binary content.
    * @param projectRepository                The repository instance for accessing project data.
-   * @param multiCriteriaAnalysisRepository  The repository instance for accessing multi-criteria analysis data.
-   * @param predictibilityAnalysisRepository The repository instance for accessing predictibility analysis data.
-   * @param executionPlanRepository          The repository instance for accessing execution plan data.
+   * @param collaborationReportOwnershipPort Port validating collaborative analysis ownership.
    * @param reportMapper                     The mapper between report entities and their response DTOs.
    * @param aiReportOwnershipPort            Port for AI report ownership validation.
    * @param auditReportOwnershipPort         Port for audit ownership validation.
@@ -120,18 +103,14 @@ public class ReportServiceImpl implements ReportService {
     final ReportRepository reportRepository,
     final ReportContentRepository reportContentRepository,
     final ProjectRepository projectRepository,
-    final MultiCriteriaAnalysisRepository multiCriteriaAnalysisRepository,
-    final PredictibilityAnalysisRepository predictibilityAnalysisRepository,
-    final ExecutionPlanRepository executionPlanRepository,
+    final CollaborationReportOwnershipPort collaborationReportOwnershipPort,
     final ReportMapper reportMapper,
     final AiReportOwnershipPort aiReportOwnershipPort,
     final AuditReportOwnershipPort auditReportOwnershipPort) {
     this.reportRepository = reportRepository;
     this.reportContentRepository = reportContentRepository;
     this.projectRepository = projectRepository;
-    this.multiCriteriaAnalysisRepository = multiCriteriaAnalysisRepository;
-    this.predictibilityAnalysisRepository = predictibilityAnalysisRepository;
-    this.executionPlanRepository = executionPlanRepository;
+    this.collaborationReportOwnershipPort = collaborationReportOwnershipPort;
     this.reportMapper = reportMapper;
     this.aiReportOwnershipPort = aiReportOwnershipPort;
     this.auditReportOwnershipPort = auditReportOwnershipPort;
@@ -355,20 +334,17 @@ public class ReportServiceImpl implements ReportService {
       ExecutionPlanNotFoundException {
     switch (type) {
       case MULTI_CRITERIA_ANALYSIS -> {
-        if (multiCriteriaAnalysisRepository.findById(analyseId)
-            .filter(analysis -> belongsToProject(analysis, projectId)).isEmpty()) {
+        if (!collaborationReportOwnershipPort.belongsToProject(type, analyseId, projectId)) {
           throw new MulticriteriaNotFoundException("Cette analyse multicritère n'existe pas.");
         }
       }
       case PREDICTIBILITY_ANALYSIS -> {
-        if (predictibilityAnalysisRepository.findById(analyseId)
-            .filter(analysis -> belongsToProject(analysis, projectId)).isEmpty()) {
+        if (!collaborationReportOwnershipPort.belongsToProject(type, analyseId, projectId)) {
           throw new PredictibilityAnalysisNotFoundException("Cette analyse de prévisibilité n'existe pas.");
         }
       }
       case EXECUTION_PLAN -> {
-        if (executionPlanRepository.findById(analyseId)
-            .filter(plan -> belongsToProject(plan, projectId)).isEmpty()) {
+        if (!collaborationReportOwnershipPort.belongsToProject(type, analyseId, projectId)) {
           throw new ExecutionPlanNotFoundException("Ce plan d'exécution n'existe pas.");
         }
       }
@@ -387,21 +363,6 @@ public class ReportServiceImpl implements ReportService {
       default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
         "Type de rapport non pris en charge : " + type);
     }
-  }
-
-  private boolean belongsToProject(final MultiCriteriaAnalysis analysis, final Long projectId) {
-    return analysis.getProject() != null
-      && Objects.equals(analysis.getProject().getProjectId(), projectId);
-  }
-
-  private boolean belongsToProject(final PredictibilityAnalysis analysis, final Long projectId) {
-    return analysis.getMultiCriteriaAnalysis() != null
-      && belongsToProject(analysis.getMultiCriteriaAnalysis(), projectId);
-  }
-
-  private boolean belongsToProject(final ExecutionPlan plan, final Long projectId) {
-    return plan.getPredictibilityAnalysis() != null
-      && belongsToProject(plan.getPredictibilityAnalysis(), projectId);
   }
 
   /**
